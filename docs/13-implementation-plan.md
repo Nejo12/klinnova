@@ -4,13 +4,17 @@
 
 Deliver the smallest production-capable version of Stint that allows a candidate to create a lightweight profile, receive suitable Berlin job matches, and submit an application, while allowing an employer to publish a verified vacancy and review applicants.
 
-## Delivery rules
+Product scope remains defined by `docs/04-mvp.md`. This plan defines delivery order for a solo founder.
 
-- Build vertical slices, not isolated frontend and backend layers.
-- Keep the MVP boundaries defined in `docs/04-mvp.md`.
+## Solo delivery rules
+
+- Build **vertical slices**, not frontend/backend layers and not micro-task checklists.
+- One active slice at a time; track it in `docs/14-founder-dashboard.md`.
+- Each slice includes the UI, data, validation, authorization, tests, and observability needed to ship.
 - Prefer deterministic, explainable rules over opaque automation.
 - Treat accessibility, privacy, authorization, and verification as core requirements.
-- Do not add features merely because the framework or an agent makes them easy.
+- Do not add features because a framework or agent makes them easy.
+- Park non-urgent ideas in `NOT_NOW.md` without changing MVP scope.
 - Every pull request must leave the product deployable.
 
 ## Recommended stack
@@ -25,120 +29,130 @@ Deliver the smallest production-capable version of Stint that allows a candidate
 - Sentry and PostHog
 - GitHub Actions and Vercel preview deployments
 
-## Release sequence
+## Vertical slices
 
-### Milestone 0 — Engineering foundation
+Each slice is the unit of planning, implementation, and review. Size for roughly 0.5–2 days of focused solo work when possible; larger slices are acceptable when the journey cannot be split without leaving `main` broken.
 
-Outcome: a deployable, tested application shell with the Stint design tokens and documented engineering rules.
+### Slice 0 — Engineering foundation
 
-Deliverables:
+**Outcome:** deployable, tested application shell with Stint design tokens and reproducible local setup.
 
-- Next.js project bootstrap
-- strict TypeScript, ESLint, Prettier, and absolute imports
-- SCSS architecture and initial design tokens
-- environment validation
-- Supabase local/development setup
-- testing toolchain
-- GitHub Actions CI
-- Vercel project and preview deployments
-- Sentry and analytics scaffolding
-- repository contribution and agent instructions
+**Includes:** Next.js bootstrap; strict TypeScript, ESLint, Prettier, absolute imports; SCSS tokens; env validation; Supabase local setup; test toolchain; CI; Vercel previews; Sentry/analytics scaffolding.
 
-Exit criteria:
+**Exit criteria:**
 
 - `main` deploys successfully
 - lint, type-check, unit tests, and build run in CI
 - local setup is documented and reproducible
 
-### Milestone 1 — Candidate onboarding and matching shell
+### Slice 1 — Registration to persisted onboarding
 
-Outcome: a candidate can register, answer essential onboarding questions, and receive deterministic sample matches.
+**Outcome:** a candidate can register and complete essential onboarding with durable progress.
 
-Deliverables:
+**Includes:** authentication; account-role selection; six-step essential onboarding; candidate profile and preference persistence; step-motif progress; safe resume.
 
-- authentication
-- account-role selection
-- six-step candidate onboarding
-- candidate profile persistence
-- language, German level, location, radius, interests, availability, and contract preferences
-- onboarding progress step motif
-- basic match calculation against seeded vacancies
-- matches screen and empty states
+**Exit criteria:**
 
-Exit criteria:
+- onboarding can be resumed without data loss
+- no CV or phone number is required to complete essentials
+- preferences needed for matching are stored
+
+### Slice 2 — Onboarding to seeded matches
+
+**Outcome:** after essentials, a candidate sees deterministic, explainable matches against seeded vacancies.
+
+**Includes:** seed vacancies; match calculation from category, language, location/radius, availability, employment type, shift, experience, and work-authorisation declaration; matches screen; empty states; match explanations.
+
+**Exit criteria:**
 
 - a new candidate reaches relevant matches in under three minutes
-- no CV or phone number is required to see matches
-- onboarding can be resumed safely
+- each match explains why it appears
+- no opaque scores or recommendation black boxes
 
-### Milestone 2 — Jobs and candidate applications
+### Slice 3 — Job detail to submitted application
 
-Outcome: a candidate can evaluate a real vacancy and apply through Stint.
+**Outcome:** a candidate can evaluate a vacancy and apply through Stint.
 
-Deliverables:
+**Includes:** job list and detail; salary, distance, shift, contract, language, verification, and freshness; save/unsave; profile-based application; optional CV upload with private storage; confirmation; application timeline; candidate application dashboard.
 
-- job list and job detail pages
-- salary, distance, shift type, contract type, language requirement, and verification state
-- save job
-- profile-based application
-- optional CV upload
-- application confirmation and timeline
-- candidate application dashboard
+**Exit criteria:**
 
-Exit criteria:
-
-- candidate can submit exactly one application per vacancy
+- exactly one application per vacancy per candidate
 - private documents are never publicly accessible
 - application status is visible and auditable
 
-### Milestone 3 — Employer vacancy and applicant flow
+### Slice 4 — Employer registration to draft vacancy
 
-Outcome: an approved employer can publish a vacancy and review applicants.
+**Outcome:** an employer can register, create a company profile, and save a structured draft vacancy.
 
-Deliverables:
+**Includes:** employer onboarding; company profile; draft vacancy with required structured fields (salary, language, location, contract, shift/schedule, expiry or auto-expiry).
 
-- employer onboarding
-- company profile
-- employer verification state
-- create, edit, publish, pause, expire, and fill vacancy
-- applicant list and applicant detail
-- application status changes
-- interview invitation metadata without full messaging
+**Exit criteria:**
 
-Exit criteria:
+- draft vacancies are not publicly visible
+- required eligibility fields are explicit before publish is possible later
+
+### Slice 5 — Employer verification to public vacancy
+
+**Outcome:** only verified employers can publish public vacancies.
+
+**Includes:** employer verification state; create/edit/publish/pause/expire/fill flows; public job visibility rules.
+
+**Exit criteria:**
 
 - unverified employers cannot publish public vacancies
-- required language and salary information are explicit
-- candidates receive application-status notifications
+- language and salary information remain required and visible
+- published vacancies can be closed or expired
 
-### Milestone 4 — Administration, trust, and beta readiness
+### Slice 6 — Applicant review to status update
 
-Outcome: Stint can be operated safely as a controlled Berlin pilot.
+**Outcome:** a verified employer can review applicants and move applications forward; candidates see progress.
 
-Deliverables:
+**Includes:** applicant list and detail; application status changes; interview invitation metadata without full messaging; candidate-visible timeline updates; status notification emails.
 
-- admin authorization
-- employer review and approval
-- vacancy moderation
-- user and vacancy reports
-- audit events
-- expiry and stale-vacancy handling
-- transactional email templates
-- account export and deletion flow
-- privacy, terms, and Impressum placeholders for legal review
-- beta analytics dashboard
+**Exit criteria:**
 
-Exit criteria:
+- employers can update application status for their jobs only
+- candidates receive clear next-step status
+- interview/hire outcomes can be recorded for pilot measurement
+
+### Slice 7 — Admin moderation to audit event
+
+**Outcome:** Stint can be operated safely for a controlled Berlin pilot.
+
+**Includes:** admin authorization; employer review/approval; vacancy moderation; reports; suspension; stale-vacancy handling; audit events; transactional email completeness; privacy/terms/Impressum placeholders; basic funnel analytics.
+
+**Exit criteria:**
 
 - administrators can suspend unsafe actors and remove vacancies
-- core GDPR user actions work
+- sensitive admin actions are audited
 - pilot funnel events are measurable
 
-### Milestone 5 — Berlin private beta
+### Slice 8 — Account deletion to confirmed data removal
 
-Outcome: validate demand and hiring outcomes with real users.
+**Outcome:** candidates and employers can request export and deletion; removal can be confirmed.
 
-Targets:
+**Includes:** account export; deletion request workflow; confirmation of data-removal path for MVP needs.
+
+**Exit criteria:**
+
+- core GDPR user actions work for the MVP surface
+- deletion does not leave private documents publicly reachable
+
+## Milestone mapping
+
+Milestones remain planning checkpoints, not separate micro-backlogs:
+
+| Milestone | Slices | Checkpoint |
+|-----------|--------|------------|
+| M0 Foundation | 0 | Shell deploys with CI |
+| M1 Candidate matching shell | 1–2 | Candidate reaches seeded matches |
+| M2 Applications | 3 | Candidate applies and tracks status |
+| M3 Employer flow | 4–6 | Verified employer publishes and reviews |
+| M4 Trust and beta readiness | 7–8 | Ops and GDPR basics work |
+| M5 Berlin private beta | operate | Validate outcomes; freeze feature expansion |
+
+### Berlin private beta targets
 
 - 20 participating employers
 - 100 verified vacancies
@@ -146,18 +160,7 @@ Targets:
 - 10 interviews
 - 3 confirmed hires
 
-This milestone is operational and product-led. It should not trigger large feature expansion.
-
-## Vertical-slice order
-
-1. Candidate registration to persisted onboarding
-2. Candidate onboarding to seeded matches
-3. Job detail to submitted application
-4. Employer registration to draft vacancy
-5. Employer verification to public vacancy
-6. Employer applicant review to status update
-7. Admin moderation to audit event
-8. Account deletion to confirmed data-removal workflow
+This phase is operational and product-led. It should not trigger large feature expansion.
 
 ## Initial domain model
 
@@ -178,14 +181,14 @@ This milestone is operational and product-led. It should not trigger large featu
 - `reports`
 - `audit_events`
 
-A schema proposal must be reviewed before migrations are committed.
+A schema proposal must be reviewed before migrations are committed. Encode verification and publication gates in the schema from Slice 0/1 onward even if admin UI arrives in Slice 7.
 
 ## Pull-request policy
 
 Each pull request should:
 
-- address one coherent issue
-- include acceptance criteria in its description
+- advance one active vertical slice (or a coherent part of it)
+- state acceptance / exit criteria in the description
 - include tests for business-critical behavior
 - preserve strict TypeScript without `any`
 - contain no unrelated refactoring
@@ -193,15 +196,6 @@ Each pull request should:
 - pass lint, type-check, tests, and production build
 - include screenshots for visible UI changes
 
-## Deferred until after beta evidence
+## Deferred work
 
-- native mobile applications
-- real-time chat
-- public reviews and ratings
-- payroll and payment processing
-- on-demand worker booking
-- AI-branded features
-- complex recommendation models
-- dedicated search infrastructure
-- multi-city rollout
-- staffing-agency functionality
+Deferred capabilities are listed in `NOT_NOW.md`. Do not implement them until MVP evidence and an explicit decision-log entry say otherwise.
