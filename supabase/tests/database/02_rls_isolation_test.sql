@@ -148,7 +148,7 @@ select lives_ok(
 select lives_ok(
   $$
     update public.candidate_languages
-    set proficiency = 'fluent'
+    set proficiency = 'proficient'
     where candidate_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
       and language_code = 'en'
   $$,
@@ -197,7 +197,7 @@ select is_empty(
 select is_empty(
   $$
     update public.candidate_languages
-    set proficiency = 'hacked'
+    set proficiency = 'native'
     where candidate_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'
     returning id
   $$,
@@ -207,7 +207,7 @@ select is_empty(
 select throws_ok(
   $$
     insert into public.candidate_languages (candidate_id, language_code, proficiency)
-    values ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'en', 'fluent')
+    values ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'en', 'native')
   $$,
   '42501',
   null,

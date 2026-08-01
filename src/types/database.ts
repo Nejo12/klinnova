@@ -100,7 +100,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      text_array_is_unique: { Args: { input: string[] }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

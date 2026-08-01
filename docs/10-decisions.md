@@ -226,3 +226,29 @@ Exact values live in `docs/06-design-system.md` under **V1 design token baseline
 **Consequences:** Explicit errors and tests; implementers must handle idempotency; not left unspecified in PR 1.1.
 
 **Acceptance note:** Accepted for Slice 1. PR 1.1 must not add an `auth.users` insert trigger. Application upsert behaviour is implemented with Auth in PR 1.2/1.3; partial Auth-without-row state must be handled explicitly there.
+
+## D-025 — Slice 1 onboarding allow-lists
+
+**Status:** Accepted
+**Accepted:** 2026-08-01
+**Must accept before:** PR 1.3
+
+**Context:** Essential onboarding needs stable constrained values for German comfort, travel time, job categories, employment types, shifts, languages, and proficiency before forms and database checks ship.
+
+**Decision:** Use product-owned allow-lists with stable stored codes and candidate-facing English labels:
+
+- **German comfort:** `none`, `basic`, `conversational`, `comfortable` (self-reported; not CEFR; no `fluent` in v1).
+- **Travel time:** integer minutes `15`, `30`, `45`, `60` (maximum one-way travel time; not geographic radius).
+- **Job categories:** `cleaning`, `hospitality`, `logistics`, `warehousing`, `food_production`, `moving`, `retail` (no unrestricted other).
+- **Employment types:** `full_time`, `part_time`, `mini_job`, `temporary`.
+- **Shift preferences:** `morning`, `daytime`, `evening`, `night`, `weekend`, `flexible`.
+- **Language proficiency:** `basic`, `conversational`, `proficient`, `native`.
+- **Language codes:** BCP-47/ISO-style lowercase set including Berlin-relevant languages plus `other` (no free-text language name in this PR).
+
+Central typed module in application code; database check constraints enforce the same sets. Empty arrays and null scalars remain valid during partial onboarding.
+
+**Alternatives:** Lookup tables; free-text categories; CEFR scale for German comfort.
+
+**Consequences:** PR 1.3 migration + UI share one vocabulary; expansion requires a later decision and migration.
+
+**Acceptance note:** Accepted for PR 1.3 allow-list constraints and essential onboarding persistence.

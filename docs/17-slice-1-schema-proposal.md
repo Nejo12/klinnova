@@ -3,7 +3,7 @@
 > Schema boundary for Slice 1. SQL/migrations belong in PR 1.1 after this acceptance lands on `main`.
 > Product scope: `docs/04-mvp.md`. Delivery: `docs/16-slice-1-build-plan.md`.
 
-**Status:** Accepted for PR 1.1 (D-019, D-020, D-023, D-024 — 2026-08-01). D-021/D-022 Accepted with PR 1.2 (2026-08-01).
+**Status:** Accepted for PR 1.1 (D-019, D-020, D-023, D-024 — 2026-08-01). D-021/D-022 Accepted with PR 1.2. D-025 allow-lists Accepted with PR 1.3 (2026-08-01).
 **Outcome constraint:** Persist the minimum essential onboarding data so a registered candidate can continue toward matching later — not a full profile, not matching, not employer discoverability.
 
 ---
@@ -47,18 +47,18 @@
 
 ## Controlled values (allow-lists)
 
-Exact lists are **product-owned** and must be approved before PR 1.3 UI ships. Migration PR may encode checks once lists are accepted. Do not invent a full occupational taxonomy in this planning PR.
+Exact lists are **Accepted as D-025** and enforced in PR 1.3 migration + `src/lib/onboarding/allow-lists.ts`.
 
 | Domain | Source | Slice 1 stance |
 |--------|--------|----------------|
-| Language codes | Product allow-list (e.g. common Berlin candidate languages) | Constrained `text`; no free-form names |
-| Language proficiency | Product labels | Constrained `text` check |
-| German comfort | MVP “German comfort level” — self-reported comfort using German, for matching against vacancy language requirements; **not** a certified CEFR claim or job-performance guarantee | Constrained `text` check; final labels Pending |
-| Travel radius | MVP “maximum travel time” | Integer **minutes**; proposed options `{15,30,45,60}` Pending approval |
+| Language codes | D-025 | Constrained `text`; `other` allowed without free-text name |
+| Language proficiency | D-025 | `basic` / `conversational` / `proficient` / `native` |
+| German comfort | D-025 | `none` / `basic` / `conversational` / `comfortable` (not CEFR; no `fluent`) |
+| Travel time | D-025 | Integer minutes `{15,30,45,60}` (one-way travel time) |
 | City | MVP Berlin-first | Fixed `Berlin` for Slice 1 (no postal code, district, coordinates, or street address) |
-| Job categories | Derived later from MVP operational sectors / employer types — **founder approves allow-list** before PR 1.3 | `text[]` with check against allow-list |
-| Employment types | MVP essential sequence item 6 | `text[]` allow-list Pending |
-| Shift preferences | MVP essential sequence item 6 | `text[]` allow-list Pending |
+| Job categories | D-025 | `cleaning` … `retail` (no unrestricted other) |
+| Employment types | D-025 | `full_time` / `part_time` / `mini_job` / `temporary` |
+| Shift preferences | D-025 | `morning` / `daytime` / `evening` / `night` / `weekend` / `flexible` |
 
 ---
 
@@ -215,6 +215,7 @@ Additional:
 - Authenticated users without a candidate row see **zero rows**, not a privilege error for normal selects.
 - `onboarding_completed_at` and `work_authorisation_declared_at` are not broadly client-updatable.
 - PR 1.1 enforces that with **column privileges** (authenticated insert/update omit those columns). Privileged roles (`service_role` / table owner) can still set them for later server paths. No completion RPC in PR 1.1.
+- **PR 1.3:** persists candidate-owned `work_authorisation_declared` (boolean). Leaves `work_authorisation_declared_at` and `onboarding_completed_at` **null**. Provisional UI “essentials look complete” is **not** authoritative completion — controlled timestamp writes belong to **PR 1.4**.
 - `anon` has **no** table privileges on these tables (defense in depth; not only empty RLS). Denied anon access therefore raises permission errors (`42501`), rather than returning zero rows under a granted SELECT.
 - No admin policies.
 - `service_role` may hold table grants for future controlled server operations only. Browser/SSR candidate flows must use the authenticated role and RLS — not `service_role`.
@@ -239,16 +240,17 @@ Additional:
 
 Accepted 2026-08-01: D-019 (two tables), D-020 (`onboarding_completed_at`), D-023 (RLS), D-024 (app upsert, no Auth trigger in 1.1).
 
-Allow-lists may be finalized before PR 1.3; migrations may land with checks added once lists are approved.
+D-025 allow-lists Accepted with PR 1.3 (2026-08-01); enforced via migration CHECKs + `src/lib/onboarding/allow-lists.ts`.
 
 ---
 
 ## Unresolved / Pending items
 
-1. Category, language, employment-type, shift allow-lists (founder/product) — before PR 1.3
-2. German comfort label set — before PR 1.3
-3. Travel-radius option set — before PR 1.3
+1. Category, language, employment-type, shift allow-lists — **Accepted (D-025; PR 1.3)**
+2. German comfort label set — **Accepted (D-025; PR 1.3)**
+3. Travel-time option set — **Accepted (D-025; PR 1.3)**
 4. D-021 authentication method — **Accepted** (2026-08-01; PR 1.2)
 5. D-022 hosted Supabase / email-confirmation policy — **Accepted** (2026-08-01; PR 1.2)
-6. Retention periods
-7. Terms/privacy acknowledgement copy at signup
+6. Controlled writes for `onboarding_completed_at` and `work_authorisation_declared_at` — **PR 1.4**
+7. Retention periods
+8. Terms/privacy acknowledgement copy at signup

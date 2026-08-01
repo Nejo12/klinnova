@@ -2,7 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { LogoutButton } from "@/components/auth/logout-button";
-import { ensureCandidateProfile } from "@/lib/auth/ensure-candidate-profile";
+import { loadCandidateOnboarding } from "@/lib/onboarding/load-candidate";
+import { onboardingGroupHref } from "@/lib/onboarding/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 import styles from "./page.module.scss";
@@ -15,22 +16,19 @@ export const metadata = {
 
 export default async function CandidatePage() {
   const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const loaded = await loadCandidateOnboarding(supabase);
 
-  if (user === null) {
-    redirect("/login?next=/candidate");
+  if (!loaded.ok) {
+    if (loaded.reason === "unauthenticated") {
+      redirect("/login?next=/candidate");
+    }
+    redirect("/auth/error?reason=profile");
   }
 
-  const ensured = await ensureCandidateProfile(supabase);
-  if (!ensured.ok) {
-    redirect(
-      ensured.reason === "profile"
-        ? "/auth/error?reason=profile"
-        : "/login?next=/candidate",
-    );
-  }
+  const { displayName, progress } = loaded.data;
+  const continueHref = progress.essentialsValid
+    ? onboardingGroupHref("review")
+    : onboardingGroupHref(progress.firstIncompleteGroup ?? "languages");
 
   return (
     <main className={styles.page}>
@@ -40,14 +38,22 @@ export default async function CandidatePage() {
         </Link>
         <LogoutButton />
       </div>
-      <h1 className={styles.heading}>Welcome, {ensured.displayName}</h1>
+      <h1 className={styles.heading}>Welcome, {displayName}</h1>
       <p className={styles.lead}>
-        You are signed in. Essential onboarding questions arrive in the next
-        step so we can match you carefully.
+        {progress.essentialsValid
+          ? "Your essential answers are saved. Matching opens after a later completion check — not from this screen."
+          : "Continue essential onboarding so we can match you carefully later. Progress is saved after each section."}
       </p>
       <p className={styles.note}>
-        Your account and profile are ready. Onboarding fields are not collected
-        here yet.
+        {progress.completeCount} of {progress.totalGroups} sections saved. No
+        job matches are shown here yet.
+      </p>
+      <p>
+        <Link className={styles.cta} href={continueHref}>
+          {progress.essentialsValid
+            ? "Review your essentials"
+            : "Continue onboarding"}
+        </Link>
       </p>
     </main>
   );

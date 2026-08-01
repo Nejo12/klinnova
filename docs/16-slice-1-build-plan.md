@@ -1,8 +1,8 @@
 # Slice 1 Build Plan
 
 > Planning artifact only. No application code, migrations, or auth implementation lands here.
-> **Status:** PR 1.1 merged; PR 1.2 Auth foundation in progress.
-> D-018–D-024 Accepted (2026-08-01). Essential onboarding forms remain PR 1.3.
+> **Status:** PR 1.1–1.2 merged; PR 1.3 essential onboarding in progress.
+> D-018–D-025 Accepted (2026-08-01). Controlled completion / resume gate remains PR 1.4.
 
 **Outcome:** A candidate can register and persist the minimum essential onboarding information required to continue toward matching (`docs/13-implementation-plan.md`).
 
@@ -22,7 +22,7 @@
 | `docs/12-terminology.md` | Work-authorisation declaration; candidate |
 | `docs/13-implementation-plan.md` | Exit criteria |
 | `docs/17-slice-1-schema-proposal.md` | Tables, RLS, completion model |
-| `docs/10-decisions.md` | D-018–D-024 Accepted |
+| `docs/10-decisions.md` | D-018–D-025 Accepted |
 | `NOT_NOW.md` | Do not implement |
 
 ### Document tensions (not silently invented)
@@ -160,9 +160,9 @@ See `docs/17` for full model. Proposed: `onboarding_completed_at` null/non-null;
 
 **Excludes:** Matching, jobs, CV/phone, employer flows.
 
-**Depends on:** PR 1.2; approved allow-lists for categories/languages/etc.
+**Depends on:** PR 1.2; D-025 allow-lists Accepted.
 
-**Acceptance:** All required fields persist without CV/phone; back navigation keeps values; completion only via server validation + verified email policy; accessible forms.
+**Acceptance:** All required essentials persist without CV/phone; back navigation and reload keep values; provisional review when essentials appear valid (**not** authoritative completion); persists `work_authorisation_declared` boolean; **does not** write `onboarding_completed_at` or `work_authorisation_declared_at` (PR 1.4); accessible forms.
 
 ---
 
@@ -222,7 +222,8 @@ No service-role key in Vercel for the candidate browser/auth flow unless a later
 |--------|-----------|
 | PR 1.1 | D-018, D-019, D-020, D-023, D-024 — **Accepted** (2026-08-01); follow `docs/17` |
 | PR 1.2 | D-021, D-022 — **Accepted** (2026-08-01) |
-| PR 1.3 | Allow-lists; German comfort labels; radius options — still Pending product approval |
+| PR 1.3 | D-025 allow-lists — **Accepted** (2026-08-01) |
+| PR 1.4 | Controlled completion write + resume/gate E2E |
 
 ---
 

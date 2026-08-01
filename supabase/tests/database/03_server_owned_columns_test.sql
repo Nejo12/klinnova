@@ -76,7 +76,7 @@ select lives_ok(
   $$
     update public.candidate_profiles
     set
-      german_comfort = 'getting_by',
+      german_comfort = 'basic',
       work_authorisation_declared = true,
       city = 'Berlin',
       travel_radius_minutes = 30,
