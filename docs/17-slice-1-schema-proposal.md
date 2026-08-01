@@ -92,7 +92,7 @@ One row per candidate account: display name, essential onboarding fields, comple
 | `shift_preferences` | `text[]` | no | non-empty | `'{}'` | Allow-listed |
 | `onboarding_completed_at` | `timestamptz` | yes | non-null when complete | null | **Server-owned**; see completion model |
 | `created_at` | `timestamptz` | no | — | `now()` | |
-| `updated_at` | `timestamptz` | no | — | `now()` | Maintained by **application** on successful writes (trigger optional later) |
+| `updated_at` | `timestamptz` | no | — | `now()` | Maintained by **application** on successful writes; **no** `updated_at` trigger in PR 1.1 |
 
 ### Explicitly not collected in Slice 1
 
@@ -214,8 +214,12 @@ Additional:
 - Deny all for `anon`.
 - Authenticated users without a candidate row see **zero rows**, not a privilege error for normal selects.
 - `onboarding_completed_at` and `work_authorisation_declared_at` are not broadly client-updatable.
+- PR 1.1 enforces that with **column privileges** (authenticated insert/update omit those columns). Privileged roles (`service_role` / table owner) can still set them for later server paths. No completion RPC in PR 1.1.
+- `anon` has **no** table privileges on these tables (defense in depth; not only empty RLS). Denied anon access therefore raises permission errors (`42501`), rather than returning zero rows under a granted SELECT.
 - No admin policies.
-- Service-role bypass exists in Supabase but must not be used from browser code.
+- `service_role` may hold table grants for future controlled server operations only. Browser/SSR candidate flows must use the authenticated role and RLS — not `service_role`.
+- Language codes are stored as provided; no database `lower()` / case-folding until product requires canonical codes.
+- `candidate_languages.candidate_id` is insert-only for authenticated clients (column privilege); ownership cannot be reassigned via UPDATE.
 
 **Tests (PR 1.1):** two Auth users; cross-user select/update denied; anon denied; owner CRUD on own language rows; attempt to set another user’s `candidate_id` fails `WITH CHECK`.
 

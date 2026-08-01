@@ -1,8 +1,8 @@
 # Slice 1 Build Plan
 
 > Planning artifact only. No application code, migrations, or auth implementation lands here.
-> **Status:** PR 1.1 unblocked — D-018, D-019, D-020, D-023, and D-024 are Accepted (2026-08-01).
-> D-021 and D-022 remain Proposed (required before PR 1.2). Do not start PR 1.1 until this acceptance PR is merged if working from `main`.
+> **Status:** PR 1.1 in progress — D-018, D-019, D-020, D-023, and D-024 Accepted (2026-08-01).
+> D-021 and D-022 remain Proposed (required before PR 1.2). Auth UI and onboarding UI are out of scope for PR 1.1.
 
 **Outcome:** A candidate can register and persist the minimum essential onboarding information required to continue toward matching (`docs/13-implementation-plan.md`).
 
@@ -126,13 +126,15 @@ See `docs/17` for full model. Proposed: `onboarding_completed_at` null/non-null;
 
 **Intent:** Land approved tables/policies; no product Auth UI.
 
-**Includes:** Migrations for `docs/17`; RLS; constraint tests; RLS tests with two local Auth users.
+**Status:** In progress (implementation branch).
 
-**Excludes:** App Auth UI, onboarding UI, hosted project secrets in repo.
+**Includes:** Migrations for `docs/17`; RLS; column privileges for server-owned timestamps; constraint/RLS pgTAP tests with two local Auth users; local/CI `supabase test db`; generated `src/types/database.ts`.
 
-**Depends on:** D-019, D-020, D-023, D-024 and schema review marked Accepted in `docs/10-decisions.md`.
+**Excludes:** App Auth UI, onboarding UI, Auth triggers, hosted project secrets in repo, allow-list product values.
 
-**Acceptance:** Migrations apply locally; no job/employer tables; cross-user isolation proven; `main` shell still builds.
+**Depends on:** D-019, D-020, D-023, D-024 Accepted in `docs/10-decisions.md`.
+
+**Acceptance:** Migrations apply locally; no job/employer tables; cross-user isolation proven; server-owned columns not client-writable; `main` shell still builds; CI schema/RLS job green.
 
 **Deploy:** Placeholders fine; no service-role in Vercel client env.
 
