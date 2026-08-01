@@ -1,4 +1,8 @@
 .mark {
   margin: 0;
-  font-weight: 600;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+  line-height: var(--line-height-xl);
+  color: var(--color-action-primary);
 }

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-import "./globals.scss";
+import "@/styles/tokens.css";
+import "@/styles/globals.scss";
 
 export const metadata: Metadata = {
   title: "Stint",

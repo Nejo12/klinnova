@@ -1,11 +1,17 @@
 .main {
-  padding: 1.5rem;
+  display: block;
 }
 
-.title {
-  margin: 0.5rem 0;
+.footer {
+  border-top: var(--border-width-default) solid var(--color-border-default);
+  background-color: var(--color-bg-surface);
 }
 
-.lead {
-  margin: 0;
+.footerCopy {
+  max-width: var(--layout-content-max);
+  margin: 0 auto;
+  padding: var(--space-4) var(--layout-gutter-mobile);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  color: var(--color-text-muted);
 }
