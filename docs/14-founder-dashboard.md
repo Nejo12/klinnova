@@ -10,9 +10,9 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M1 — Candidate matching shell |
 | Active slice | Slice 1 — Registration to persisted onboarding |
-| Slice status | Planning / Ready for PR 1.1 — no implementation started |
+| Slice status | In progress — PR 1.1 (schema + RLS) in progress |
 | Next slice | Slice 2 — Onboarding to seeded matches |
-| Blockers | None for PR 1.1. D-021 and D-022 remain Proposed (required before PR 1.2 Auth Preview) |
+| Blockers | None for PR 1.1. D-021 and D-022 remain Proposed (required before PR 1.2). No Auth UI or onboarding UI yet. |
 
 ## Slice 0 closure (complete)
 
@@ -67,7 +67,7 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 | Slice | Outcome | Status |
 |-------|---------|--------|
 | 0 Foundation | Deployable shell + CI | Done — PR 0.1–0.4 merged; CI green; Production confirmed |
-| 1 Onboarding | Register → persisted essentials | Planning / Ready for PR 1.1 — D-018/019/020/023/024 Accepted; see `docs/16` |
+| 1 Onboarding | Register → persisted essentials | In progress — PR 1.1 schema/RLS; D-018/019/020/023/024 Accepted; D-021/022 Proposed |
 | 2 Matches | Essentials → seeded explainable matches | Not started |
 | 3 Apply | Job detail → submitted application | Not started |
 | 4 Employer draft | Register → draft vacancy | Not started |

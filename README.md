@@ -141,7 +141,7 @@ At the same time, validate that employers can:
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 (engineering foundation) is complete. Active planning is Slice 1 — registration to persisted onboarding; product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 (engineering foundation) is complete. Slice 1 is in progress (PR 1.1: candidate schema + RLS); product scope remains `docs/04-mvp.md`.
 
 ## Local development
 
@@ -188,7 +188,23 @@ pnpm supabase:status
 
 Prefer the CLI `Publishable` key when present. Older CLI output may label the same browser-safe value as `anon key`; paste that value into `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — the application variable name describes the Next.js public boundary, not the CLI label.
 
-8. Start the Next.js app:
+8. Apply migrations (local database reset) and run schema/RLS tests:
+
+```bash
+pnpm supabase:db:reset   # local-only; recreates DB from migrations (no product seed)
+pnpm supabase:test:db    # pgTAP tests in supabase/tests/database
+```
+
+9. (Optional) Regenerate committed database types after schema changes:
+
+```bash
+pnpm db:types            # writes src/types/database.ts from local public schema
+pnpm db:types:check      # fails if committed types are stale
+```
+
+Generated `Insert` / `Update` types describe table shape only. They do **not** encode PostgreSQL column grants or RLS. Application mutations must use narrow validated inputs that omit server-owned fields (`onboarding_completed_at`, `work_authorisation_declared_at`) and must not treat generated types as authorization.
+
+10. Start the Next.js app:
 
 ```bash
 pnpm dev
@@ -196,7 +212,7 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-9. When finished, stop local Supabase:
+11. When finished, stop local Supabase:
 
 ```bash
 pnpm supabase:stop
@@ -207,19 +223,31 @@ pnpm supabase:stop
 - No Supabase account is needed for local development.
 - Do not run `supabase login`.
 - Do not link a remote Supabase project.
-- No product database schema exists yet.
-- No authentication flow exists yet.
-- No service-role or secret key is required.
+- Candidate schema tables exist (`candidate_profiles`, `candidate_languages`); no Auth UI or onboarding UI yet.
+- Database seeding is disabled (`supabase/config.toml`); tests create transactional fixtures.
+- No service-role or secret key is required for the current shell. Browser/SSR paths use the authenticated role and RLS.
+- `pnpm supabase:db:reset` is local-only and destructive to the local database containers’ data.
+- Anonymous clients have no table privileges on candidate tables, so denied access surfaces as permission errors (`42501`), not empty result sets.
 - Sentry and PostHog remain deferred in `NOT_NOW.md`.
 
 ### Tests and CI
 
-Unit and component tests use Vitest + React Testing Library:
+Unit and component tests use Vitest + React Testing Library (no Docker required):
 
 ```bash
 pnpm test          # watch mode
 pnpm test:run      # single deterministic run
 pnpm test:coverage # deterministic run with coverage (text + html)
+```
+
+Database schema/RLS tests (Docker + local Supabase required):
+
+```bash
+pnpm supabase:start
+pnpm supabase:db:reset
+pnpm supabase:test:db
+pnpm db:types:check
+pnpm supabase:stop
 ```
 
 End-to-end smoke (Playwright) expects a production build first:
@@ -230,14 +258,17 @@ pnpm exec playwright install chromium   # once per machine
 pnpm test:e2e
 ```
 
-GitHub Actions (`.github/workflows/ci.yml`) runs format check, lint, typecheck, unit coverage, production build, and the Playwright shell smoke on pull requests and pushes to `main`.
+GitHub Actions (`.github/workflows/ci.yml`) runs two jobs on pull requests and pushes to `main`:
 
-CI uses non-secret scaffold public values only:
+1. Format check, lint, typecheck, unit coverage, production build, Playwright shell smoke
+2. Local Supabase start → migrate/reset → pgTAP schema/RLS tests → generated types check
+
+The app job uses non-secret scaffold public values only:
 
 - `NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=stint-ci-scaffold-not-connected`
 
-These values satisfy validation and build. They do not connect to a hosted Supabase project.
+These values satisfy validation and build. They do not connect to a hosted Supabase project. The database job uses ephemeral local CLI values and does not require GitHub secrets.
 
 ### Deployment (Vercel)
 
@@ -262,22 +293,26 @@ Environment access goes through `src/lib/env/`. Do not read `process.env` ad hoc
 
 ### Scripts
 
-| Command                | Purpose                                   |
-| ---------------------- | ----------------------------------------- |
-| `pnpm dev`             | Start the Next.js development server      |
-| `pnpm build`           | Create a production build                 |
-| `pnpm start`           | Serve the production build                |
-| `pnpm lint`            | Run ESLint                                |
-| `pnpm typecheck`       | Run TypeScript (`tsc --noEmit`)           |
-| `pnpm format`          | Format files with Prettier                |
-| `pnpm format:check`    | Check Prettier formatting                 |
-| `pnpm test`            | Vitest watch mode                         |
-| `pnpm test:run`        | Vitest single run                         |
-| `pnpm test:coverage`   | Vitest run with coverage                  |
-| `pnpm test:e2e`        | Playwright shell smoke                    |
-| `pnpm supabase:start`  | Start local Supabase (project-pinned CLI) |
-| `pnpm supabase:stop`   | Stop local Supabase                       |
-| `pnpm supabase:status` | Show local URL and keys                   |
+| Command                  | Purpose                                     |
+| ------------------------ | ------------------------------------------- |
+| `pnpm dev`               | Start the Next.js development server        |
+| `pnpm build`             | Create a production build                   |
+| `pnpm start`             | Serve the production build                  |
+| `pnpm lint`              | Run ESLint                                  |
+| `pnpm typecheck`         | Run TypeScript (`tsc --noEmit`)             |
+| `pnpm format`            | Format files with Prettier                  |
+| `pnpm format:check`      | Check Prettier formatting                   |
+| `pnpm test`              | Vitest watch mode                           |
+| `pnpm test:run`          | Vitest single run                           |
+| `pnpm test:coverage`     | Vitest run with coverage                    |
+| `pnpm test:e2e`          | Playwright shell smoke                      |
+| `pnpm supabase:start`    | Start local Supabase (project-pinned CLI)   |
+| `pnpm supabase:stop`     | Stop local Supabase                         |
+| `pnpm supabase:status`   | Show local URL and keys                     |
+| `pnpm supabase:db:reset` | Reset local DB from migrations (local-only) |
+| `pnpm supabase:test:db`  | Run pgTAP schema/RLS tests                  |
+| `pnpm db:types`          | Generate `src/types/database.ts` locally    |
+| `pnpm db:types:check`    | Fail if generated types are stale           |
 
 ## Guiding question
 

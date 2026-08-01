@@ -17,7 +17,11 @@
     "test:e2e": "playwright test",
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
-    "supabase:status": "supabase status"
+    "supabase:status": "supabase status",
+    "supabase:db:reset": "supabase db reset --yes",
+    "supabase:test:db": "supabase test db",
+    "db:types": "supabase gen types --local --lang typescript --schema public > src/types/database.ts",
+    "db:types:check": "supabase gen types --local --lang typescript --schema public | diff -u src/types/database.ts -"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

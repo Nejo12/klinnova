@@ -75,3 +75,55 @@ jobs:
 
       - name: End-to-end smoke
         run: pnpm test:e2e
+
+  database:
+    name: Schema and RLS
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Activate pnpm from packageManager
+        run: corepack prepare pnpm@8.15.4 --activate
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start local Supabase
+        run: pnpm supabase:start
+
+      - name: Reset local database (apply migrations)
+        run: pnpm supabase:db:reset
+
+      - name: Run schema and RLS tests
+        run: pnpm supabase:test:db
+
+      - name: Verify generated database types
+        run: pnpm db:types:check
+
+      - name: Stop local Supabase
+        if: always()
+        run: pnpm supabase:stop
