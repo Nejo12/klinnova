@@ -146,27 +146,27 @@ Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dash
 ### Prerequisites
 
 - Node.js 20 or newer
-- npm 10 or newer (bundled with current Node LTS)
+- [pnpm](https://pnpm.io/) 8 or newer
 
 ### Setup
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### Scripts
 
-| Command                | Purpose                              |
-| ---------------------- | ------------------------------------ |
-| `npm run dev`          | Start the Next.js development server |
-| `npm run build`        | Create a production build            |
-| `npm run start`        | Serve the production build           |
-| `npm run lint`         | Run ESLint                           |
-| `npm run typecheck`    | Run TypeScript (`tsc --noEmit`)      |
-| `npm run format`       | Format files with Prettier           |
-| `npm run format:check` | Check Prettier formatting            |
+| Command             | Purpose                              |
+| ------------------- | ------------------------------------ |
+| `pnpm dev`          | Start the Next.js development server |
+| `pnpm build`        | Create a production build            |
+| `pnpm start`        | Serve the production build           |
+| `pnpm lint`         | Run ESLint                           |
+| `pnpm typecheck`    | Run TypeScript (`tsc --noEmit`)      |
+| `pnpm format`       | Format files with Prettier           |
+| `pnpm format:check` | Check Prettier formatting            |
 
-Open [http://localhost:3000](http://localhost:3000) after `npm run dev`.
+Open [http://localhost:3000](http://localhost:3000) after `pnpm dev`.
 
 Further local setup (environment validation, Supabase, CI) lands in later Slice 0 PRs — see `docs/15-slice-0-build-plan.md`.
 

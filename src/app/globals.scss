@@ -1,0 +1,11 @@
+/* Minimal global baseline only. Design tokens land in PR 0.2. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
