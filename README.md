@@ -139,7 +139,36 @@ At the same time, validate that employers can:
 
 ## Development status
 
-The repository is in product-definition and foundation planning. Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Implementation begins at Slice 0; product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Active foundation work is Slice 0; product scope remains `docs/04-mvp.md`.
+
+## Local development
+
+### Prerequisites
+
+- Node.js 20 or newer
+- npm 10 or newer (bundled with current Node LTS)
+
+### Setup
+
+```bash
+npm install
+```
+
+### Scripts
+
+| Command                | Purpose                              |
+| ---------------------- | ------------------------------------ |
+| `npm run dev`          | Start the Next.js development server |
+| `npm run build`        | Create a production build            |
+| `npm run start`        | Serve the production build           |
+| `npm run lint`         | Run ESLint                           |
+| `npm run typecheck`    | Run TypeScript (`tsc --noEmit`)      |
+| `npm run format`       | Format files with Prettier           |
+| `npm run format:check` | Check Prettier formatting            |
+
+Open [http://localhost:3000](http://localhost:3000) after `npm run dev`.
+
+Further local setup (environment validation, Supabase, CI) lands in later Slice 0 PRs — see `docs/15-slice-0-build-plan.md`.
 
 ## Guiding question
 
