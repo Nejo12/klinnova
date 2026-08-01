@@ -19,6 +19,10 @@
 
 Start with one deployable web application and one managed backend platform. Do not introduce microservices, a separate API service, Redis, a search cluster, or a native app until validated usage requires them.
 
+## Device strategy
+
+Stint is a responsive web application. Candidate flows are mobile-first. Employer and admin flows are desktop-first, with functional mobile fallback. Native mobile applications are deferred until post-beta evidence.
+
 ## High-level flow
 
 ```text

@@ -32,6 +32,7 @@ When documents conflict, stop and report the conflict. Do not invent a resolutio
 - Server Components by default; Client Components only for required interactivity.
 - SCSS Modules and CSS custom properties; no Tailwind.
 - Semantic HTML and accessible primitives.
+- Responsive web only: candidate flows mobile-first; employer and admin flows desktop-first with functional mobile fallback. No native apps until post-beta evidence.
 - Validate external input with Zod.
 - Authorize server-side and via Supabase RLS; never trust client-supplied role, ownership, verification, or application status.
 - Keep candidate documents private; expose only via short-lived signed URLs.
