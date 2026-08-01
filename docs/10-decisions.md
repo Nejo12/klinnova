@@ -129,7 +129,7 @@ Exact values live in `docs/06-design-system.md` under **V1 design token baseline
 
 **Consequences:** Schema/RLS reviewable without UI; Auth reviewable without forms; exit proven in 1.4.
 
-**Acceptance note:** Accepted for Slice 1 delivery. PR 1.1 (schema + RLS) may proceed. Authentication decisions D-021 and D-022 remain Proposed until PR 1.2.
+**Acceptance note:** Accepted for Slice 1 delivery. PR 1.1 (schema + RLS) complete. Authentication decisions D-021 and D-022 Accepted with PR 1.2 (2026-08-01).
 
 ## D-019 — Slice 1 minimum candidate schema
 
@@ -165,33 +165,35 @@ Exact values live in `docs/06-design-system.md` under **V1 design token baseline
 
 ## D-021 — Slice 1 authentication method
 
-**Status:** Proposed
+**Status:** Accepted
+**Accepted:** 2026-08-01
 **Must accept before:** PR 1.2
 
 **Context:** MVP allows email or social authentication.
 
-**Proposed choice:** Email/password via Supabase Auth for Slice 1 exit: registration, email verification, login, logout, SSR sessions, route protection. Password recovery classified **before pilot** (not Slice 1 exit). Social/magic/phone/passkeys/MFA deferred.
+**Decision:** Email/password via Supabase Auth for Slice 1 exit: registration, email verification, login, logout, SSR sessions (`src/proxy.ts` cookie refresh), protected `/candidate/*`. Password recovery classified **before pilot** (not PR 1.2 acceptance). Social/magic/phone/passkeys/MFA deferred.
 
 **Alternatives:** Add social in Slice 1; require password recovery for exit.
 
 **Consequences:** Smaller Auth surface; recovery should land before Berlin pilot even if after Slice 1 exit.
 
-**Approval:** Required before Auth UI PR.
+**Acceptance note:** Accepted with owner confirmation for PR 1.2. Incomplete-candidate recovery uses idempotent `candidate_profiles` creation (D-024).
 
 ## D-022 — Hosted Supabase timing for Auth
 
-**Status:** Proposed
+**Status:** Accepted
+**Accepted:** 2026-08-01
 **Must accept before:** PR 1.2 Preview verification
 
 **Context:** Placeholders cannot exercise real Auth email/redirects.
 
-**Proposed choice:** Local CLI for development; repository owner configures hosted project + Vercel public keys + Auth URLs/email before Preview/Production Auth demos. No service-role in browser/Vercel client env for this flow.
+**Decision:** Local CLI for development and CI; hosted Supabase for Preview/Production Auth. Vercel holds browser-safe URL + publishable key. Site URL `https://stint.company` with redirect allow-list for localhost, production, and Preview wildcard. No service-role in browser or ordinary SSR session paths. No credentials in git.
 
 **Alternatives:** Delay all Auth Preview until later; use only local forever (blocks real Preview Auth).
 
-**Consequences:** Owner action gate before claiming Preview Auth works.
+**Consequences:** Preview/Production Auth demos use the hosted project; local and CI remain on CLI.
 
-**Approval:** Required before relying on hosted Auth in Preview/Production.
+**Acceptance note:** Accepted after owner confirmed hosted project, migration apply, Vercel env, Site URL, redirects, and email confirmation.
 
 ## D-023 — Slice 1 RLS ownership model
 

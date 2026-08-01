@@ -14,7 +14,8 @@ export default function HomePage() {
       </main>
       <footer className={styles.footer}>
         <p className={styles.footerCopy}>
-          Slice 0 shell preview. Product flows arrive in later slices.
+          Candidate registration is available. Essential onboarding follows
+          next.
         </p>
       </footer>
     </>

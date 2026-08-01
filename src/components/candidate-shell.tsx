@@ -18,16 +18,25 @@ export function CandidateShell() {
         start.
       </p>
       <p className={styles.note}>
-        This is a shell preview of the candidate surface. Registration and
-        matching are not available yet.
+        Create an account to get started. Essential onboarding questions follow
+        after you confirm your email. Matching arrives in a later step.
       </p>
+
+      <div className={styles.actions}>
+        <a className={styles.action} href="/register">
+          Create account
+        </a>
+        <a className={styles.secondaryAction} href="/login">
+          Sign in
+        </a>
+      </div>
 
       <div className={styles.progress}>
         <h2 className={styles.progressHeading}>How progress will feel</h2>
         <StepProgress />
       </div>
 
-      <a className={styles.action} href="#employer-admin-experience">
+      <a className={styles.textLink} href="#employer-admin-experience">
         View employer and admin preview
       </a>
     </section>

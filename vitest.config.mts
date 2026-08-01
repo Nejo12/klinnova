@@ -30,11 +30,16 @@ export default defineConfig({
         "src/test/**",
         // server-only wrapper around getPublicEnv; unsafe under jsdom (public env covered)
         "src/lib/env/server.ts",
-        // Requires Next.js cookies(); disproportionate to mock for Slice 0 (browser factory covered)
+        // Requires Next.js cookies(); browser factory covered separately
         "src/lib/supabase/server.ts",
-        // Thin composition: assertServerEnv + HTML shell (env unit tests + Playwright cover behaviour)
-        "src/app/layout.tsx",
-        "src/app/page.tsx",
+        // Cookie refresh client; path helper unit-tested; Playwright covers redirects
+        "src/lib/supabase/proxy.ts",
+        "src/proxy.ts",
+        // Route composition + server actions (Playwright + focused unit helpers)
+        "src/app/**",
+        "src/components/auth/**",
+        // Static copy constants
+        "src/lib/auth/messages.ts",
       ],
     },
   },

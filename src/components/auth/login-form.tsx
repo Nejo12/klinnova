@@ -1,0 +1,69 @@
+"use client";
+
+import { useActionState } from "react";
+
+import { loginAction, type AuthActionState } from "@/app/auth/actions";
+
+import styles from "./auth-form.module.scss";
+
+const initialState: AuthActionState = {
+  error: null,
+  message: null,
+};
+
+type LoginFormProps = {
+  nextPath: string;
+};
+
+export function LoginForm({ nextPath }: LoginFormProps) {
+  const [state, formAction, pending] = useActionState(
+    loginAction,
+    initialState,
+  );
+
+  return (
+    <form className={styles.form} action={formAction} noValidate>
+      <input type="hidden" name="next" value={nextPath} />
+
+      {state.error !== null ? (
+        <p className={styles.error} role="alert">
+          {state.error}
+        </p>
+      ) : null}
+
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="email">
+          Email
+        </label>
+        <input
+          className={styles.input}
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          disabled={pending}
+        />
+      </div>
+
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="password">
+          Password
+        </label>
+        <input
+          className={styles.input}
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          required
+          disabled={pending}
+        />
+      </div>
+
+      <button className={styles.submit} type="submit" disabled={pending}>
+        {pending ? "Signing in…" : "Sign in"}
+      </button>
+    </form>
+  );
+}

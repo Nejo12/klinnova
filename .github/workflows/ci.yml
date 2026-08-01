@@ -124,6 +124,28 @@ jobs:
       - name: Verify generated database types
         run: pnpm db:types:check
 
+      - name: Export local Supabase env for Auth journey
+        id: supabase-env
+        shell: bash
+        run: |
+          eval "$(pnpm exec supabase status -o env)"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=${API_URL}"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${PUBLISHABLE_KEY:-$ANON_KEY}"
+            echo "NEXT_PUBLIC_SITE_URL=http://127.0.0.1:3000"
+            echo "MAILPIT_API_URL=http://127.0.0.1:54324/api/v1"
+            echo "E2E_AUTH_JOURNEY=1"
+          } >> "$GITHUB_ENV"
+
+      - name: Production build (local Supabase)
+        run: pnpm build
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Auth journey (local Supabase + Mailpit)
+        run: pnpm test:e2e:auth
+
       - name: Stop local Supabase
         if: always()
         run: pnpm supabase:stop
