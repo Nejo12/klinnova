@@ -145,30 +145,95 @@ Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dash
 
 ### Prerequisites
 
-- Node.js 20 or newer
+- Node.js 20 or newer (see `package.json` `engines`)
 - [pnpm](https://pnpm.io/) 8 or newer
+- Docker or another compatible container runtime (required to run local Supabase)
+
+A separately installed global Supabase CLI is **not** required. `pnpm install` installs the repository-pinned CLI (`supabase` in `devDependencies`). Scripts invoke that local binary via pnpm.
 
 ### Setup
+
+1. Install the repository’s supported Node version.
+2. Ensure Docker (or a compatible container runtime) is running.
+3. Install dependencies (includes the pinned Supabase CLI):
 
 ```bash
 pnpm install
 ```
 
+4. Create a local environment file from the committed example (never commit real secrets; never paste keys into chat, issues, or pull requests):
+
+```bash
+cp .env.example .env.local
+```
+
+5. Start local Supabase:
+
+```bash
+pnpm supabase:start
+```
+
+6. Inspect local connection values:
+
+```bash
+pnpm supabase:status
+```
+
+7. Copy into `.env.local`:
+
+- `API URL` → `NEXT_PUBLIC_SUPABASE_URL`
+- `Publishable` / browser-safe key → `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+
+Prefer the CLI `Publishable` key when present. Older CLI output may label the same browser-safe value as `anon key`; paste that value into `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — the application variable name describes the Next.js public boundary, not the CLI label.
+
+8. Start the Next.js app:
+
+```bash
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+9. When finished, stop local Supabase:
+
+```bash
+pnpm supabase:stop
+```
+
+### Local-only notes
+
+- No Supabase account is needed for local development.
+- Do not run `supabase login`.
+- Do not link a remote Supabase project.
+- No product database schema exists yet.
+- No authentication flow exists yet.
+- No service-role or secret key is required.
+- Tests, CI, and deployment configuration land in PR 0.4 — see `docs/15-slice-0-build-plan.md`.
+
+### Environment variables
+
+| Variable                                 | Required locally | Exposure               | Notes                                                                    |
+| ---------------------------------------- | ---------------- | ---------------------- | ------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_SUPABASE_URL`               | Yes              | Browser-safe           | Local default is `http://127.0.0.1:54321`                                |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`   | Yes              | Browser-safe           | From `pnpm supabase:status` (`Publishable` key; legacy label `anon key`) |
+| `SUPABASE_SERVICE_ROLE_KEY` / secret key | No               | Server-only (deferred) | Not used in Slice 0                                                      |
+
+Environment access goes through `src/lib/env/`. Do not read `process.env` ad hoc in application code.
+
 ### Scripts
 
-| Command             | Purpose                              |
-| ------------------- | ------------------------------------ |
-| `pnpm dev`          | Start the Next.js development server |
-| `pnpm build`        | Create a production build            |
-| `pnpm start`        | Serve the production build           |
-| `pnpm lint`         | Run ESLint                           |
-| `pnpm typecheck`    | Run TypeScript (`tsc --noEmit`)      |
-| `pnpm format`       | Format files with Prettier           |
-| `pnpm format:check` | Check Prettier formatting            |
-
-Open [http://localhost:3000](http://localhost:3000) after `pnpm dev`.
-
-Further local setup (environment validation, Supabase, CI) lands in later Slice 0 PRs — see `docs/15-slice-0-build-plan.md`.
+| Command                | Purpose                                   |
+| ---------------------- | ----------------------------------------- |
+| `pnpm dev`             | Start the Next.js development server      |
+| `pnpm build`           | Create a production build                 |
+| `pnpm start`           | Serve the production build                |
+| `pnpm lint`            | Run ESLint                                |
+| `pnpm typecheck`       | Run TypeScript (`tsc --noEmit`)           |
+| `pnpm format`          | Format files with Prettier                |
+| `pnpm format:check`    | Check Prettier formatting                 |
+| `pnpm supabase:start`  | Start local Supabase (project-pinned CLI) |
+| `pnpm supabase:stop`   | Stop local Supabase                       |
+| `pnpm supabase:status` | Show local URL and keys                   |
 
 ## Guiding question
 

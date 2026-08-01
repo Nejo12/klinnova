@@ -10,3 +10,5 @@ next-env.d.ts
 docs
 AGENTS.md
 NOT_NOW.md
+supabase/.temp
+supabase/.branches
