@@ -12,3 +12,6 @@ AGENTS.md
 NOT_NOW.md
 supabase/.temp
 supabase/.branches
+coverage
+playwright-report
+test-results

@@ -139,7 +139,7 @@ At the same time, validate that employers can:
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Active foundation work is Slice 0; product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Active foundation work is Slice 0 (PR 0.4); product scope remains `docs/04-mvp.md`.
 
 ## Local development
 
@@ -208,7 +208,45 @@ pnpm supabase:stop
 - No product database schema exists yet.
 - No authentication flow exists yet.
 - No service-role or secret key is required.
-- Tests, CI, and deployment configuration land in PR 0.4 — see `docs/15-slice-0-build-plan.md`.
+- Sentry and PostHog remain deferred in `NOT_NOW.md`.
+
+### Tests and CI
+
+Unit and component tests use Vitest + React Testing Library:
+
+```bash
+pnpm test          # watch mode
+pnpm test:run      # single deterministic run
+pnpm test:coverage # deterministic run with coverage (text + html)
+```
+
+End-to-end smoke (Playwright) expects a production build first:
+
+```bash
+pnpm build
+pnpm exec playwright install chromium   # once per machine
+pnpm test:e2e
+```
+
+GitHub Actions (`.github/workflows/ci.yml`) runs format check, lint, typecheck, unit coverage, production build, and the Playwright shell smoke on pull requests and pushes to `main`.
+
+CI uses non-secret scaffold public values only:
+
+- `NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=stint-ci-scaffold-not-connected`
+
+These values satisfy validation and build. They do not connect to a hosted Supabase project.
+
+### Deployment (Vercel)
+
+The repo is configured as a Next.js app via `vercel.json`. Preview deployments run for pull requests; production deploys from `main`.
+
+Set these browser-safe variables in the Vercel project for Preview and Production (placeholders are enough until a hosted Supabase project exists):
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+
+Do not add a service-role or secret key for Slice 0. Do not paste real credentials into issues or pull requests.
 
 ### Environment variables
 
@@ -231,6 +269,10 @@ Environment access goes through `src/lib/env/`. Do not read `process.env` ad hoc
 | `pnpm typecheck`       | Run TypeScript (`tsc --noEmit`)           |
 | `pnpm format`          | Format files with Prettier                |
 | `pnpm format:check`    | Check Prettier formatting                 |
+| `pnpm test`            | Vitest watch mode                         |
+| `pnpm test:run`        | Vitest single run                         |
+| `pnpm test:coverage`   | Vitest run with coverage                  |
+| `pnpm test:e2e`        | Playwright shell smoke                    |
 | `pnpm supabase:start`  | Start local Supabase (project-pinned CLI) |
 | `pnpm supabase:stop`   | Stop local Supabase                       |
 | `pnpm supabase:status` | Show local URL and keys                   |

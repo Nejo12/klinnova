@@ -15,6 +15,9 @@ const eslintConfig = defineConfig([
     "node_modules/**",
     "supabase/.temp/**",
     "supabase/.branches/**",
+    "coverage/**",
+    "playwright-report/**",
+    "test-results/**",
   ]),
 ]);
 
