@@ -1,9 +1,9 @@
 # Slice 1 Schema Proposal
 
-> **Proposal only.** Do not implement SQL or migrations until this document is reviewed and the Proposed decisions it depends on are accepted.
+> Schema boundary for Slice 1. SQL/migrations belong in PR 1.1 after this acceptance lands on `main`.
 > Product scope: `docs/04-mvp.md`. Delivery: `docs/16-slice-1-build-plan.md`.
 
-**Status:** Proposed
+**Status:** Accepted for PR 1.1 (D-019, D-020, D-023, D-024 — 2026-08-01). D-021/D-022 Auth and hosted-project decisions remain Proposed.
 **Outcome constraint:** Persist the minimum essential onboarding data so a registered candidate can continue toward matching later — not a full profile, not matching, not employer discoverability.
 
 ---
@@ -24,7 +24,7 @@
 
 `profiles` (shared account table — deferred until a second role needs it), `employer_profiles`, `companies`, `jobs`, `job_categories`, `languages` (lookup), `job_language_requirements`, `candidate_preferences` (as a catch-all), `saved_jobs`, `applications`, verification/moderation/audit tables, messaging, payments, analytics, Storage/CV.
 
-**Architecture note:** `docs/07-architecture.md` prefers shared `profiles` + role-specific tables. For Slice 1 only candidates exist. This proposal **intentionally narrows** to a single candidate table keyed to `auth.users` until employer registration needs a shared identity layer (Slice 4). That narrowing is Proposed (D-019), not accepted architecture rewrite.
+**Architecture note:** `docs/07-architecture.md` prefers shared `profiles` + role-specific tables. For Slice 1 only candidates exist. This document **intentionally narrows** to a single candidate table keyed to `auth.users` until employer registration needs a shared identity layer (Slice 4). That narrowing is Accepted as D-019 for Slice 1 only — not a full architecture rewrite.
 
 ---
 
@@ -194,7 +194,7 @@ German comfort remains on `candidate_profiles` (MVP lists it alongside languages
 | DB trigger on `auth.users` | Atomic | Hidden behaviour; harder to debug; metadata coupling |
 | **App upsert (proposed)** | Explicit domain errors; testable | Must handle retries/idempotency; brief Auth-without-row window |
 
-**Decision required before PR 1.1** (see D-024). Do not leave implementers to choose silently.
+**D-024 Accepted (2026-08-01):** use application upsert; do not add an `auth.users` insert trigger in PR 1.1.
 
 ---
 
@@ -231,23 +231,20 @@ Additional:
 
 ---
 
-## Decisions that must be accepted before migrations (PR 1.1)
+## Decisions for PR 1.1
 
-- D-019 schema shape (two tables)
-- D-020 completion via `onboarding_completed_at`
-- D-023 RLS ownership
-- D-024 profile creation strategy
+Accepted 2026-08-01: D-019 (two tables), D-020 (`onboarding_completed_at`), D-023 (RLS), D-024 (app upsert, no Auth trigger in 1.1).
 
-Allow-lists may be finalized before PR 1.3 but should not block empty-schema migrations if checks are added in a follow-up migration once lists are approved.
+Allow-lists may be finalized before PR 1.3; migrations may land with checks added once lists are approved.
 
 ---
 
 ## Unresolved / Pending items
 
-1. Category, language, employment-type, shift allow-lists (founder/product)
-2. German comfort label set
-3. Travel-radius option set
-4. D-024 app upsert vs trigger
-5. Hosted email-confirmation policy (D-022)
+1. Category, language, employment-type, shift allow-lists (founder/product) — before PR 1.3
+2. German comfort label set — before PR 1.3
+3. Travel-radius option set — before PR 1.3
+4. D-021 authentication method — still **Proposed** (before PR 1.2)
+5. D-022 hosted Supabase / email-confirmation policy — still **Proposed** (before PR 1.2 Preview Auth)
 6. Retention periods
 7. Terms/privacy acknowledgement copy at signup

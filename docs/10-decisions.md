@@ -117,48 +117,51 @@ Exact values live in `docs/06-design-system.md` under **V1 design token baseline
 
 ## D-018 — Slice 1 PR decomposition
 
-**Status:** Proposed
+**Status:** Accepted
+**Accepted:** 2026-08-01
 **Must accept before:** PR 1.1
 
 **Context:** Slice 1 needs schema, Auth, onboarding UI, and journey proof without oversized PRs.
 
-**Proposed choice:** Four PRs — (1.1) schema + RLS, (1.2) Auth foundation, (1.3) registration + essential persistence UI, (1.4) resume/gate + E2E. Details: `docs/16-slice-1-build-plan.md`.
+**Decision:** Four PRs — (1.1) schema + RLS, (1.2) Auth foundation, (1.3) registration + essential persistence UI, (1.4) resume/gate + E2E. Details: `docs/16-slice-1-build-plan.md`.
 
 **Alternatives:** Three PRs (merge 1.3+1.4); five PRs (split registration from onboarding).
 
 **Consequences:** Schema/RLS reviewable without UI; Auth reviewable without forms; exit proven in 1.4.
 
-**Approval:** Required before migrations start.
+**Acceptance note:** Accepted for Slice 1 delivery. PR 1.1 (schema + RLS) may proceed. Authentication decisions D-021 and D-022 remain Proposed until PR 1.2.
 
 ## D-019 — Slice 1 minimum candidate schema
 
-**Status:** Proposed
+**Status:** Accepted
+**Accepted:** 2026-08-01
 **Must accept before:** PR 1.1
 
 **Context:** Architecture describes shared `profiles` + role tables; Slice 1 only has candidates.
 
-**Proposed choice:** Two tables — `candidate_profiles` (1:1 `auth.users`) and `candidate_languages` (1:N). No shared `profiles`, no `candidate_preferences` misc table, no jobs/employers. See `docs/17-slice-1-schema-proposal.md`.
+**Decision:** Two tables — `candidate_profiles` (1:1 `auth.users`) and `candidate_languages` (1:N). No shared `profiles`, no `candidate_preferences` misc table, no jobs/employers. See `docs/17-slice-1-schema-proposal.md`.
 
 **Alternatives:** Keep shared `profiles` + `candidate_profiles` now; put languages in arrays on one table.
 
 **Consequences:** Simpler Slice 1; shared `profiles` deferred until employer role (Slice 4) needs it — intentional narrowing, not a silent architecture override.
 
-**Approval:** Required before migrations.
+**Acceptance note:** Accepted as the Slice 1 schema boundary for PR 1.1 migrations. Allow-lists and Auth-related decisions remain separate.
 
 ## D-020 — Onboarding completion model
 
-**Status:** Proposed
+**Status:** Accepted
+**Accepted:** 2026-08-01
 **Must accept before:** PR 1.1
 
 **Context:** Resume and Slice 2 gating need a durable server signal without a workflow engine.
 
-**Proposed choice:** `onboarding_completed_at timestamptz` (null = incomplete). Server-only completion after validating required fields. UI screen count is not authoritative. See `docs/17`.
+**Decision:** `onboarding_completed_at timestamptz` (null = incomplete). Server-only completion after validating required fields. UI screen count is not authoritative. See `docs/17`.
 
 **Alternatives:** Three-value status enum; compute completion only (no stored marker).
 
 **Consequences:** Avoids client-writable status; clearing timestamp handles invalidation after edits.
 
-**Approval:** Required before migrations.
+**Acceptance note:** Accepted for the `candidate_profiles` completion column and server-controlled write path in PR 1.1+.
 
 ## D-021 — Slice 1 authentication method
 
@@ -192,30 +195,32 @@ Exact values live in `docs/06-design-system.md` under **V1 design token baseline
 
 ## D-023 — Slice 1 RLS ownership model
 
-**Status:** Proposed
+**Status:** Accepted
+**Accepted:** 2026-08-01
 **Must accept before:** PR 1.1
 
 **Context:** Candidate PII must not be readable cross-user.
 
-**Proposed choice:** Owner-only select/insert/update with `USING` + `WITH CHECK` (`auth.uid()`); ownership keys immutable; anon denied; no admin policies; completion timestamp not broadly client-writable. See `docs/17`.
+**Decision:** Owner-only select/insert/update with `USING` + `WITH CHECK` (`auth.uid()`); ownership keys immutable; anon denied; no admin policies; completion timestamp not broadly client-writable. See `docs/17`.
 
 **Alternatives:** Looser select for “public profiles” (rejected for Slice 1).
 
 **Consequences:** Matches least-privilege; tests must prove isolation.
 
-**Approval:** Required before migrations.
+**Acceptance note:** Accepted as the RLS model for PR 1.1 policy migrations and tests.
 
 ## D-024 — Candidate row creation strategy
 
-**Status:** Proposed
+**Status:** Accepted
+**Accepted:** 2026-08-01
 **Must accept before:** PR 1.1
 
 **Context:** Auth user can exist briefly without a candidate row.
 
-**Proposed choice:** Application-controlled idempotent upsert of `candidate_profiles` after signup / first authenticated load. Database triggers on `auth.users` deferred unless later evidence requires them.
+**Decision:** Application-controlled idempotent upsert of `candidate_profiles` after signup / first authenticated load. Database triggers on `auth.users` deferred unless later evidence requires them.
 
 **Alternatives:** Trigger-only creation on `auth.users` insert.
 
 **Consequences:** Explicit errors and tests; implementers must handle idempotency; not left unspecified in PR 1.1.
 
-**Approval:** Required before migrations.
+**Acceptance note:** Accepted for Slice 1. PR 1.1 must not add an `auth.users` insert trigger. Application upsert behaviour is implemented with Auth in PR 1.2/1.3; partial Auth-without-row state must be handled explicitly there.

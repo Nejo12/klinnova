@@ -1,7 +1,8 @@
 # Slice 1 Build Plan
 
 > Planning artifact only. No application code, migrations, or auth implementation lands here.
-> **Status:** Proposed — do not start implementation until D-018–D-024 and `docs/17-slice-1-schema-proposal.md` are reviewed.
+> **Status:** PR 1.1 unblocked — D-018, D-019, D-020, D-023, and D-024 are Accepted (2026-08-01).
+> D-021 and D-022 remain Proposed (required before PR 1.2). Do not start PR 1.1 until this acceptance PR is merged if working from `main`.
 
 **Outcome:** A candidate can register and persist the minimum essential onboarding information required to continue toward matching (`docs/13-implementation-plan.md`).
 
@@ -21,7 +22,7 @@
 | `docs/12-terminology.md` | Work-authorisation declaration; candidate |
 | `docs/13-implementation-plan.md` | Exit criteria |
 | `docs/17-slice-1-schema-proposal.md` | Tables, RLS, completion model |
-| `docs/10-decisions.md` | D-018–D-024 (**Proposed** only) |
+| `docs/10-decisions.md` | D-018/019/020/023/024 Accepted; D-021/022 still Proposed |
 | `NOT_NOW.md` | Do not implement |
 
 ### Document tensions (not silently invented)
@@ -221,13 +222,11 @@ No service-role key in Vercel for the candidate browser/auth flow unless a later
 
 ## Decision gates
 
-| Before | Must accept |
-|--------|-------------|
-| PR 1.1 | D-018 (sequence), D-019, D-020, D-023, D-024, schema doc |
-| PR 1.2 | D-021, D-022 (hosted timing/checklist) |
-| PR 1.3 | Allow-lists; German comfort labels; radius options |
-
-All remain **Proposed** until the decision log is updated to Accepted.
+| Before | Decisions |
+|--------|-----------|
+| PR 1.1 | D-018, D-019, D-020, D-023, D-024 — **Accepted** (2026-08-01); follow `docs/17` |
+| PR 1.2 | D-021, D-022 — still **Proposed** (Auth method + hosted Supabase timing) |
+| PR 1.3 | Allow-lists; German comfort labels; radius options — still Pending product approval |
 
 ---
 
