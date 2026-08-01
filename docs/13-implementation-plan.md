@@ -52,7 +52,7 @@ Each slice is the unit of planning, implementation, and review. Size for roughly
 **Outcome:** a candidate can register and complete essential onboarding with durable progress.
 
 **Build plan:** `docs/16-slice-1-build-plan.md` (four sequential PRs; PR 1.1 decisions Accepted).
-**Schema proposal:** `docs/17-slice-1-schema-proposal.md` (Accepted). Auth method and hosted timing: D-021/D-022 Accepted (2026-08-01).
+**Schema proposal:** `docs/17-slice-1-schema-proposal.md` (Accepted). Auth: D-021/D-022 Accepted. Allow-lists: D-025 Accepted (2026-08-01).
 
 **Includes:** authentication; essential onboarding data persistence (MVP sequence as UI grouping); candidate profile essentials; step-motif progress; safe resume.
 

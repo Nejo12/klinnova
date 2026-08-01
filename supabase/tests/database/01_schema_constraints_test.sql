@@ -156,7 +156,7 @@ select lives_ok(
 select throws_ok(
   $$
     insert into public.candidate_languages (candidate_id, language_code, proficiency)
-    values ('11111111-1111-1111-1111-111111111111', 'en', 'fluent')
+    values ('11111111-1111-1111-1111-111111111111', 'en', 'basic')
   $$,
   '23505',
   null,
@@ -166,7 +166,7 @@ select throws_ok(
 select throws_ok(
   $$
     insert into public.candidate_languages (candidate_id, language_code, proficiency)
-    values ('11111111-1111-1111-1111-111111111111', '  ', 'fluent')
+    values ('11111111-1111-1111-1111-111111111111', '  ', 'basic')
   $$,
   '23514',
   null,

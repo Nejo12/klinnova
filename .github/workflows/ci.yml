@@ -143,8 +143,8 @@ jobs:
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Auth journey (local Supabase + Mailpit)
-        run: pnpm test:e2e:auth
+      - name: Auth and onboarding journeys (local Supabase + Mailpit)
+        run: pnpm test:e2e:onboarding
 
       - name: Stop local Supabase
         if: always()

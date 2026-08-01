@@ -210,7 +210,7 @@ Generated `Insert` / `Update` types describe table shape only. They do **not** e
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Register at `/register`, confirm via Mailpit/Inbucket (`pnpm supabase:status` → Mailpit URL), then sign in at `/login`.
+Open [http://localhost:3000](http://localhost:3000). Register at `/register`, confirm via Mailpit/Inbucket (`pnpm supabase:status` → Mailpit URL), sign in at `/login`, then continue essentials at `/candidate/onboarding`.
 
 11. When finished, stop local Supabase:
 
@@ -218,15 +218,24 @@ Open [http://localhost:3000](http://localhost:3000). Register at `/register`, co
 pnpm supabase:stop
 ```
 
-### Authentication (PR 1.2)
+### Authentication (PR 1.2) and essential onboarding (PR 1.3)
 
 - Email/password registration with required email confirmation
 - Cookie-based SSR sessions; refresh via `src/proxy.ts` (`getClaims()`)
 - Protected `/candidate/*` (anonymous → `/login`)
 - Idempotent `candidate_profiles` creation after signup/confirm/login (no Auth DB trigger)
 - Confirmation callback: `/auth/confirm` (supports `token_hash` + `type`, and PKCE `code`)
+- Essential onboarding at `/candidate/onboarding` with durable per-section save (D-025 allow-lists)
+- Progress derived from persisted fields; provisional review when essentials look complete (not authoritative completion)
+- Persists `work_authorisation_declared` boolean; leaves `work_authorisation_declared_at` and `onboarding_completed_at` null until PR 1.4
 - No password-recovery UI yet (before-pilot)
 - No service-role key for browser or ordinary SSR sessions
+
+Local Auth + onboarding journeys (requires local Supabase + Mailpit):
+
+```bash
+pnpm test:e2e:onboarding
+```
 
 Hosted Preview/Production Auth uses the repository owner’s Supabase project, Vercel public env, Site URL `https://stint.company`, and the configured redirect allow-list.
 
@@ -235,7 +244,7 @@ Hosted Preview/Production Auth uses the repository owner’s Supabase project, V
 - No Supabase account is needed for local development.
 - Do not run `supabase login`.
 - Do not link a remote Supabase project from the CLI for routine work.
-- Candidate schema + Auth foundation exist; essential onboarding forms are PR 1.3.
+- Candidate schema, Auth foundation, and essential onboarding forms exist; controlled completion is PR 1.4.
 - Database seeding is disabled (`supabase/config.toml`); pgTAP tests create transactional fixtures.
 - No service-role or secret key is required. Browser/SSR session paths use the publishable key + user cookies and RLS.
 - `pnpm supabase:db:reset` is local-only and destructive to the local database containers’ data.

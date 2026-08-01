@@ -40,6 +40,9 @@ export default defineConfig({
         "src/components/auth/**",
         // Static copy constants
         "src/lib/auth/messages.ts",
+        "src/lib/onboarding/messages.ts",
+        // Route composition (covered by action/unit helpers + Playwright)
+        "src/lib/onboarding/load-candidate.ts",
       ],
     },
   },
