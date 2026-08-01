@@ -8,11 +8,23 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 
 | Field | Value |
 |-------|--------|
-| Active milestone | M0 — Engineering foundation |
-| Active slice | Slice 0 — Engineering foundation |
-| Slice status | In progress — PR 0.4 tests, CI, and deployment foundation |
-| Next slice | Slice 1 — Registration to persisted onboarding |
-| Blockers | None |
+| Active milestone | M1 — Candidate matching shell |
+| Active slice | Slice 1 — Registration to persisted onboarding |
+| Slice status | Planning — no implementation started |
+| Next slice | Slice 2 — Onboarding to seeded matches |
+| Blockers | Proposed decisions D-018–D-024 and schema/plan docs (`docs/16`, `docs/17`) await approval before PR 1.1 migrations |
+
+## Slice 0 closure (complete)
+
+| Checkpoint | Status |
+|------------|--------|
+| PR 0.1 — App shell and toolchain | Complete (merged) |
+| PR 0.2 — Design tokens and responsive shell | Complete (merged) |
+| PR 0.3 — Environment validation and Supabase scaffolding | Complete (merged) |
+| PR 0.4 — Tests, CI, and deployment | Complete (merged; PR #17) |
+| CI green (lint, typecheck, unit tests, build, e2e) | Confirmed |
+| Vercel Preview and Production | Confirmed working by repository owner |
+| Registration / onboarding product behaviour | Not started (Slice 1) |
 
 ## Solo cadence
 
@@ -54,8 +66,8 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 
 | Slice | Outcome | Status |
 |-------|---------|--------|
-| 0 Foundation | Deployable shell + CI | In progress — PR 0.3 complete; PR 0.4 in progress |
-| 1 Onboarding | Register → persisted essentials | Not started |
+| 0 Foundation | Deployable shell + CI | Done — PR 0.1–0.4 merged; CI green; Production confirmed |
+| 1 Onboarding | Register → persisted essentials | Planning — see `docs/16-slice-1-build-plan.md` |
 | 2 Matches | Essentials → seeded explainable matches | Not started |
 | 3 Apply | Job detail → submitted application | Not started |
 | 4 Employer draft | Register → draft vacancy | Not started |
@@ -70,5 +82,7 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 - Settled decisions: `docs/10-decisions.md`
 - Anti-goals: `docs/11-anti-goals.md`
 - Deferred ideas: `NOT_NOW.md`
+- Slice 1 plan: `docs/16-slice-1-build-plan.md`
+- Slice 1 schema proposal: `docs/17-slice-1-schema-proposal.md`
 
 New scope requires evidence plus a decision-log entry. Until then, it is not current work.

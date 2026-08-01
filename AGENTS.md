@@ -10,8 +10,9 @@ Read before proposing or implementing work:
 2. `docs/13-implementation-plan.md` — slice order and exit criteria
 3. `docs/14-founder-dashboard.md` — current focus
 4. `NOT_NOW.md` — deferred ideas (do not implement)
-5. Active slice build plan when present (e.g. `docs/15-slice-0-build-plan.md` for Slice 0)
-6. Supporting docs as needed: vision, principles, features, design system, architecture, non-functional, anti-goals, terminology
+5. Active slice build plan when present (e.g. `docs/16-slice-1-build-plan.md` for Slice 1; `docs/15-slice-0-build-plan.md` is historical)
+6. Active schema proposal when present (e.g. `docs/17-slice-1-schema-proposal.md` before Slice 1 migrations)
+7. Supporting docs as needed: vision, principles, features, design system, architecture, non-functional, anti-goals, terminology
 
 When documents conflict, stop and report the conflict. Do not invent a resolution.
 

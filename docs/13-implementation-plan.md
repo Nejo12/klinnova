@@ -37,7 +37,7 @@ Each slice is the unit of planning, implementation, and review. Size for roughly
 
 **Outcome:** deployable, tested application shell with Stint design tokens and reproducible local setup.
 
-**Build plan:** `docs/15-slice-0-build-plan.md` (four sequential PRs).
+**Build plan:** `docs/15-slice-0-build-plan.md` (four sequential PRs). **Status:** complete (PR 0.1–0.4 merged).
 
 **Includes:** Next.js bootstrap; strict TypeScript, ESLint, Prettier, absolute imports; SCSS tokens; env validation; Supabase local setup; test toolchain; CI; Vercel previews.
 
@@ -51,7 +51,10 @@ Each slice is the unit of planning, implementation, and review. Size for roughly
 
 **Outcome:** a candidate can register and complete essential onboarding with durable progress.
 
-**Includes:** authentication; account-role selection; six-step essential onboarding; candidate profile and preference persistence; step-motif progress; safe resume.
+**Build plan:** `docs/16-slice-1-build-plan.md` (four sequential PRs — Proposed).
+**Schema proposal:** `docs/17-slice-1-schema-proposal.md` (Proposed; review before migrations).
+
+**Includes:** authentication; essential onboarding data persistence (MVP sequence as UI grouping); candidate profile essentials; step-motif progress; safe resume.
 
 **Exit criteria:**
 
@@ -183,7 +186,7 @@ This phase is operational and product-led. It should not trigger large feature e
 - `reports`
 - `audit_events`
 
-A schema proposal must be reviewed before migrations are committed. Encode verification and publication gates in the schema from Slice 0/1 onward even if admin UI arrives in Slice 7.
+A schema proposal must be reviewed before migrations are committed (`docs/17-slice-1-schema-proposal.md` for Slice 1). Candidate ownership and role are encoded from Slice 1. Employer verification and vacancy publication gates are encoded when employer/vacancy tables land (Slices 4–5), even if admin UI arrives in Slice 7.
 
 ## Pull-request policy
 

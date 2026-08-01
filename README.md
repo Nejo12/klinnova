@@ -133,13 +133,15 @@ At the same time, validate that employers can:
 - [Terminology](docs/12-terminology.md)
 - [Implementation plan](docs/13-implementation-plan.md)
 - [Founder dashboard](docs/14-founder-dashboard.md)
-- [Slice 0 build plan](docs/15-slice-0-build-plan.md)
+- [Slice 0 build plan](docs/15-slice-0-build-plan.md) (complete; historical)
+- [Slice 1 build plan](docs/16-slice-1-build-plan.md)
+- [Slice 1 schema proposal](docs/17-slice-1-schema-proposal.md)
 - [Not now](NOT_NOW.md)
 - [Agent instructions](AGENTS.md)
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Active foundation work is Slice 0 (PR 0.4); product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 (engineering foundation) is complete. Active planning is Slice 1 — registration to persisted onboarding; product scope remains `docs/04-mvp.md`.
 
 ## Local development
 
@@ -246,7 +248,7 @@ Set these browser-safe variables in the Vercel project for Preview and Productio
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
-Do not add a service-role or secret key for Slice 0. Do not paste real credentials into issues or pull requests.
+Do not add a service-role or secret key unless a later slice explicitly requires a server-only secret. Do not paste real credentials into issues or pull requests.
 
 ### Environment variables
 
@@ -254,7 +256,7 @@ Do not add a service-role or secret key for Slice 0. Do not paste real credentia
 | ---------------------------------------- | ---------------- | ---------------------- | ------------------------------------------------------------------------ |
 | `NEXT_PUBLIC_SUPABASE_URL`               | Yes              | Browser-safe           | Local default is `http://127.0.0.1:54321`                                |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`   | Yes              | Browser-safe           | From `pnpm supabase:status` (`Publishable` key; legacy label `anon key`) |
-| `SUPABASE_SERVICE_ROLE_KEY` / secret key | No               | Server-only (deferred) | Not used in Slice 0                                                      |
+| `SUPABASE_SERVICE_ROLE_KEY` / secret key | No               | Server-only (deferred) | Not required for the current shell; do not expose via `NEXT_PUBLIC_*`    |
 
 Environment access goes through `src/lib/env/`. Do not read `process.env` ad hoc in application code.
 
