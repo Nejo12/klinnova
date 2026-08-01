@@ -254,6 +254,6 @@ D-025 allow-lists Accepted with PR 1.3 (2026-08-01); enforced via migration CHEC
 3. Travel-time option set — **Accepted (D-025; PR 1.3)**
 4. D-021 authentication method — **Accepted** (2026-08-01; PR 1.2)
 5. D-022 hosted Supabase / email-confirmation policy — **Accepted** (2026-08-01; PR 1.2)
-6. Controlled writes for `onboarding_completed_at` and `work_authorisation_declared_at` — **PR 1.4** (narrow RPCs above)
+6. Controlled writes for `onboarding_completed_at` and `work_authorisation_declared_at` — **Complete (PR 1.4 / #23)**; atomic triggers + `complete_candidate_onboarding()`
 7. Retention periods
 8. Terms/privacy acknowledgement copy at signup
