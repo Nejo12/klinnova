@@ -55,6 +55,7 @@ export default async function CandidateOnboardingPage({
   }
 
   const { profile, languages, progress, displayName } = loaded.data;
+  const onboardingCompleted = profile.onboardingCompletedAt !== null;
 
   return (
     <main className={styles.page}>
@@ -68,7 +69,11 @@ export default async function CandidateOnboardingPage({
       <OnboardingProgressNav progress={progress} current={current} />
 
       {current === "review" ? (
-        <OnboardingReview progress={progress} displayName={displayName} />
+        <OnboardingReview
+          displayName={displayName}
+          onboardingCompleted={onboardingCompleted}
+          progress={progress}
+        />
       ) : (
         <>
           <h1 className={styles.heading}>{ONBOARDING_GROUP_LABELS[current]}</h1>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { CompleteOnboardingForm } from "@/components/onboarding/complete-onboarding-form";
 import {
   ONBOARDING_GROUP_LABELS,
   type OnboardingGroupId,
@@ -12,12 +13,43 @@ import styles from "./onboarding.module.scss";
 type OnboardingReviewProps = {
   progress: OnboardingProgress;
   displayName: string;
+  onboardingCompleted: boolean;
 };
 
 export function OnboardingReview({
   progress,
   displayName,
+  onboardingCompleted,
 }: OnboardingReviewProps) {
+  if (onboardingCompleted) {
+    return (
+      <section className={styles.form} aria-labelledby="review-heading">
+        <h1 className={styles.heading} id="review-heading">
+          Essentials confirmed, {displayName}
+        </h1>
+        <p className={styles.lead}>
+          Your essential answers are complete. Matching is not available yet —
+          that comes in a later step.
+        </p>
+        <p className={styles.note}>
+          No job matches are shown here. You can still review or update your
+          answers; completion stays server-controlled.
+        </p>
+        <div className={styles.actions}>
+          <Link className={styles.button} href="/candidate">
+            Return to candidate home
+          </Link>
+          <Link
+            className={`${styles.button} ${styles.buttonSecondary}`}
+            href={onboardingGroupHref("languages")}
+          >
+            Review answers
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
   if (progress.essentialsValid) {
     return (
       <section className={styles.form} aria-labelledby="review-heading">
@@ -25,13 +57,13 @@ export function OnboardingReview({
           Essentials look complete, {displayName}
         </h1>
         <p className={styles.lead}>
-          Your answers are saved. Matching is not available yet — the next step
-          confirms completion on the server and opens suitable work.
+          Your answers are saved. Confirm when you are ready — the server checks
+          your saved essentials before marking onboarding complete.
         </p>
         <p className={styles.note}>
-          No job matches are shown here. Completion is confirmed in a later
-          step, not by opening this screen.
+          No job matches are shown here. Confirming does not open matching.
         </p>
+        <CompleteOnboardingForm />
         <div className={styles.actions}>
           <Link className={styles.linkButton} href="/candidate">
             Return to candidate home

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const getUser = vi.hoisted(() => vi.fn());
 const update = vi.hoisted(() => vi.fn());
 const eq = vi.hoisted(() => vi.fn());
+const rpc = vi.hoisted(() => vi.fn());
 const syncCandidateLanguages = vi.hoisted(() => vi.fn());
 const redirect = vi.hoisted(() =>
   vi.fn((path: string) => {
@@ -21,6 +22,7 @@ vi.mock("@/lib/onboarding/sync-languages", () => ({
 vi.mock("@/lib/supabase/server", () => ({
   createServerSupabaseClient: vi.fn(async () => ({
     auth: { getUser },
+    rpc,
     from: () => ({
       update: (payload: Record<string, unknown>) => {
         update(payload);
@@ -36,6 +38,7 @@ vi.mock("@/lib/supabase/server", () => ({
 }));
 
 import {
+  completeOnboardingAction,
   saveCategoriesGroupAction,
   saveLanguagesGroupAction,
   saveWorkAuthorisationGroupAction,
@@ -54,6 +57,7 @@ describe("onboarding actions", () => {
     getUser.mockReset();
     update.mockReset();
     eq.mockReset();
+    rpc.mockReset();
     syncCandidateLanguages.mockReset();
     redirect.mockClear();
   });
@@ -78,7 +82,7 @@ describe("onboarding actions", () => {
     expect(update).not.toHaveBeenCalled();
   });
 
-  it("writes owner profile columns without protected timestamps", async () => {
+  it("writes owner profile columns without protected timestamps or reconcile RPC", async () => {
     getUser.mockResolvedValue({ data: { user: { id: "user-1" } } });
     await expect(
       saveWorkAuthorisationGroupAction(
@@ -97,9 +101,10 @@ describe("onboarding actions", () => {
     expect(payload).not.toHaveProperty("onboarding_completed_at");
     expect(payload).not.toHaveProperty("work_authorisation_declared_at");
     expect(eq).toHaveBeenCalledWith("id", "user-1");
+    expect(rpc).not.toHaveBeenCalled();
   });
 
-  it("syncs languages for authenticated user id only", async () => {
+  it("syncs languages for authenticated user id only without reconcile RPC", async () => {
     getUser.mockResolvedValue({ data: { user: { id: "user-1" } } });
     syncCandidateLanguages.mockResolvedValue({ ok: true });
 
@@ -129,5 +134,48 @@ describe("onboarding actions", () => {
       }),
     );
     expect(payload).not.toHaveProperty("onboarding_completed_at");
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("routes completion through the controlled RPC only", async () => {
+    getUser.mockResolvedValue({ data: { user: { id: "user-1" } } });
+    rpc.mockResolvedValue({
+      data: { status: "completed", already_complete: false },
+      error: null,
+    });
+
+    await expect(
+      completeOnboardingAction({ error: null, message: null }, form([])),
+    ).rejects.toThrow("REDIRECT:/candidate");
+
+    expect(rpc).toHaveBeenCalledTimes(1);
+    expect(rpc).toHaveBeenCalledWith("complete_candidate_onboarding");
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it("routes incomplete completion results to the first missing group", async () => {
+    getUser.mockResolvedValue({ data: { user: { id: "user-1" } } });
+    rpc.mockResolvedValue({
+      data: {
+        status: "incomplete",
+        first_incomplete_group: "availability",
+      },
+      error: null,
+    });
+
+    await expect(
+      completeOnboardingAction({ error: null, message: null }, form([])),
+    ).rejects.toThrow("REDIRECT:/candidate/onboarding?group=availability");
+  });
+
+  it("maps completion RPC failures to a safe error", async () => {
+    getUser.mockResolvedValue({ data: { user: { id: "user-1" } } });
+    rpc.mockResolvedValue({ data: null, error: { message: "boom" } });
+
+    const state = await completeOnboardingAction(
+      { error: null, message: null },
+      form([]),
+    );
+    expect(state.error).toMatch(/could not confirm/i);
   });
 });

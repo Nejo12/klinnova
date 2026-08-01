@@ -2,7 +2,9 @@
 
 import { redirect } from "next/navigation";
 
+import { completeOnboardingResultSchema } from "@/lib/onboarding/completion";
 import {
+  ONBOARDING_COMPLETE_FAILURE,
   ONBOARDING_GENERIC_FAILURE,
   ONBOARDING_SESSION_EXPIRED,
 } from "@/lib/onboarding/messages";
@@ -286,4 +288,45 @@ export async function saveEmploymentGroupAction(
   }
 
   redirect(onboardingGroupHref(nextOnboardingGroup("employment")));
+}
+
+/**
+ * Authoritative completion: RPC validates persisted DB state under a profile
+ * row lock, then sets protected timestamps. DB triggers own invalidation.
+ */
+export async function completeOnboardingAction(
+  prev: OnboardingActionState,
+  formData: FormData,
+): Promise<OnboardingActionState> {
+  void prev;
+  void formData;
+  const { supabase, user } = await requireAuthenticatedUser();
+  if (user === null) {
+    return { error: ONBOARDING_SESSION_EXPIRED, message: null };
+  }
+
+  const { data, error } = await supabase.rpc("complete_candidate_onboarding");
+  if (error !== null || data === null) {
+    return { error: ONBOARDING_COMPLETE_FAILURE, message: null };
+  }
+
+  const parsed = completeOnboardingResultSchema.safeParse(data);
+  if (!parsed.success) {
+    return { error: ONBOARDING_COMPLETE_FAILURE, message: null };
+  }
+
+  switch (parsed.data.status) {
+    case "unauthenticated":
+      return { error: ONBOARDING_SESSION_EXPIRED, message: null };
+    case "missing_profile":
+      return { error: ONBOARDING_COMPLETE_FAILURE, message: null };
+    case "incomplete":
+      redirect(onboardingGroupHref(parsed.data.first_incomplete_group));
+    case "completed":
+      redirect("/candidate");
+    default: {
+      const _exhaustive: never = parsed.data;
+      return _exhaustive;
+    }
+  }
 }

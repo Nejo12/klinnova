@@ -9,6 +9,9 @@ export const ONBOARDING_LOAD_FAILURE =
 
 export const ONBOARDING_SAVED = "Progress saved.";
 
+export const ONBOARDING_COMPLETE_FAILURE =
+  "We could not confirm your essentials just now. Please try again.";
+
 export const WORK_AUTHORISATION_SUPPORT =
   "This is your own declaration. Stint is not verifying documents at this step.";
 

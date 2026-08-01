@@ -155,13 +155,13 @@ Exact values live in `docs/06-design-system.md` under **V1 design token baseline
 
 **Context:** Resume and Slice 2 gating need a durable server signal without a workflow engine.
 
-**Decision:** `onboarding_completed_at timestamptz` (null = incomplete). Server-only completion after validating required fields. UI screen count is not authoritative. See `docs/17`.
+**Decision:** `onboarding_completed_at timestamptz` is the **current** Slice 2 completion gate (null = incomplete). Server-only completion after validating required fields. UI screen count is not authoritative. Invalid essential mutations clear the timestamp in the same database transaction (triggers). Re-completion after a clear sets a new timestamp. Not a historical-immutable “once completed” marker. See `docs/17`.
 
-**Alternatives:** Three-value status enum; compute completion only (no stored marker).
+**Alternatives:** Three-value status enum; compute completion only (no stored marker); historical immutable completion timestamp (rejected — gate must track current essentials).
 
-**Consequences:** Avoids client-writable status; clearing timestamp handles invalidation after edits.
+**Consequences:** Avoids client-writable status; atomic trigger invalidation prevents a stale completed gate after committed invalid edits.
 
-**Acceptance note:** Accepted for the `candidate_profiles` completion column and server-controlled write path in PR 1.1+.
+**Acceptance note:** Accepted for the `candidate_profiles` completion column and server-controlled write path in PR 1.1+. PR 1.4: `complete_candidate_onboarding()` (authenticated `SECURITY DEFINER`, profile `FOR UPDATE`) sets the gate; BEFORE/AFTER triggers clear it and sync `work_authorisation_declared_at`. No application reconcile RPC. No service-role browser/SSR client.
 
 ## D-021 — Slice 1 authentication method
 
