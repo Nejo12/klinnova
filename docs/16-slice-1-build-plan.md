@@ -2,7 +2,7 @@
 
 > Planning artifact only. No application code, migrations, or auth implementation lands here.
 > **Status:** PR 1.1–1.2 merged; PR 1.3 essential onboarding in progress.
-> D-018–D-025 Accepted (2026-08-01). Controlled completion / resume gate remains PR 1.4.
+> D-018–D-025 Accepted (2026-08-01). PR 1.4 implements the controlled completion / resume gate.
 
 **Outcome:** A candidate can register and persist the minimum essential onboarding information required to continue toward matching (`docs/13-implementation-plan.md`).
 
@@ -65,7 +65,7 @@ MVP lists an essential **sequence** of six information groups. That is a product
 
 | Layer | Rule |
 |-------|------|
-| Data | Required fields in `docs/17`; completion from field validity + `onboarding_completed_at` |
+| Data | Required fields in `docs/17`; `onboarding_completed_at` is the current Slice 2 gate (cleared atomically when essentials become invalid) |
 | UI | Provisional grouping may follow the six MVP bullets (one decision per screen, step motif) |
 | Schema / API | No `step_1` columns, no status tied to screen count; regrouping screens must not need a migration |
 
@@ -118,7 +118,7 @@ Schema before Auth remains justified: RLS is tested against Supabase Auth users 
 
 ## Onboarding completion (summary)
 
-See `docs/17` for full model. Proposed: `onboarding_completed_at` null/non-null; server-only completion; UI steps non-authoritative.
+See `docs/17` for full model. `onboarding_completed_at` null/non-null current gate; server-only completion RPC; trigger invalidation in the same transaction as essential edits; UI steps non-authoritative.
 
 ---
 
@@ -170,13 +170,13 @@ See `docs/17` for full model. Proposed: `onboarding_completed_at` null/non-null;
 
 **Intent:** Prove resume and Slice 1 exit with E2E.
 
-**Includes:** Resume routing; incomplete ≠ Slice-2-ready; Playwright journey; docs/dashboard update only when criteria truly met.
+**Includes:** Controlled completion RPC with profile-row lock; atomic trigger invalidation; resume routing; incomplete ≠ Slice-2-ready; Playwright Auth → onboarding → confirm → invalidate journey; concurrency lock proof; docs/dashboard update only when criteria truly met.
 
 **Excludes:** Seed vacancies, match algorithm.
 
 **Depends on:** PR 1.3.
 
-**Acceptance:** Exit criteria met; journey green (CI email strategy documented); shell smoke still passes.
+**Acceptance:** Exit criteria met; local journey green via CI Schema job (`pnpm test:e2e:onboarding` + Mailpit); shell smoke still passes; no matching UI.
 
 ---
 
@@ -236,7 +236,9 @@ Data minimisation to essentials; work-authorisation wording Pending legal/produc
 ## Slice 1 close checklist
 
 - [ ] PRs 1.1–1.4 merged
-- [ ] Exit criteria on Auth-capable environment
+- [ ] Exit criteria on Auth-capable environment (local CI + Preview smoke by owner)
 - [ ] RLS + critical journey green
 - [ ] No Slice 2 matching or `NOT_NOW.md` items shipped
 - [ ] Dashboard: Slice 1 Done → Slice 2 planning
+
+Update the checklist and founder dashboard to Done only after PR 1.4 merge and exit proof — not while this PR is open.

@@ -83,7 +83,7 @@ One row per candidate account: display name, essential onboarding fields, comple
 | `display_name` | `text` | no | yes | — | UI address; not legal-name verification; length-capped in app |
 | `german_comfort` | `text` | yes | yes | null | Self-reported German comfort (see above) |
 | `work_authorisation_declared` | `boolean` | yes | must be `true` | null | Minimal self-declaration only — **no** nationality, permit type, or documents |
-| `work_authorisation_declared_at` | `timestamptz` | yes | yes when declared | null | Set server-side when declaration becomes true |
+| `work_authorisation_declared_at` | `timestamptz` | yes | yes when declared | null | Non-null only while `work_authorisation_declared = true`; set to `now()` when declaration becomes true and stamp is null; cleared when declaration is false/null; completion never overwrites a non-null stamp |
 | `city` | `text` | yes | yes | null | Slice 1: `Berlin` only |
 | `travel_radius_minutes` | `integer` | yes | yes | null | Allow-listed minute values |
 | `available_from` | `date` | yes | yes | null | Earliest start; not a weekly calendar |
@@ -166,19 +166,21 @@ German comfort remains on `candidate_profiles` (MVP lists it alongside languages
 
 ## Completion model (proposed)
 
-**Selected proposal:** store `onboarding_completed_at timestamptz` (null = not complete). Do **not** store a client-writable status enum.
+**Selected proposal:** store `onboarding_completed_at timestamptz` as the **current** Slice 2 gate (null = not complete). Do **not** store a client-writable status enum. Do **not** treat the timestamp as historical-immutable completion.
 
 | Situation | Interpretation |
 |-----------|----------------|
 | No `candidate_profiles` row | Account may exist in Auth; candidate record not initialized |
-| Row exists, `onboarding_completed_at` is null | Essentials incomplete (resume using first missing required field group) |
-| Row exists, `onboarding_completed_at` set | Essentials complete for Slice 2 gate |
+| Row exists, `onboarding_completed_at` is null | Currently incomplete (resume using first missing required field group) |
+| Row exists, `onboarding_completed_at` set | Currently complete for Slice 2 gate |
 
 **Rules:**
 
-- Completeness is decided by a **controlled server operation** that validates all required fields + ≥1 language, then sets `onboarding_completed_at = now()`.
-- Clients must not update `onboarding_completed_at` (RLS column privilege or server-only RPC/service path).
-- After completion, candidates may edit essentials; if validation would fail, server clears `onboarding_completed_at` (backward transition) and resumes incomplete routing.
+- Completeness is decided by a **controlled server operation** (`complete_candidate_onboarding`) that locks the profile row (`FOR UPDATE`), validates all required fields + ≥1 language from persisted state, then sets `onboarding_completed_at = now()` when incomplete→complete.
+- Clients must not update `onboarding_completed_at` (column privileges).
+- After completion, candidates may edit essentials. Any essential profile/language mutation that leaves persisted essentials invalid **clears** `onboarding_completed_at` **in the same transaction** via triggers. Valid edits preserve it. No trigger or save action may auto-complete.
+- Re-completion after a clear writes a **new** `onboarding_completed_at`.
+- `work_authorisation_declared_at`: non-null only while declaration is true; set when declaration becomes true and stamp is null; cleared when declaration is false/null; unrelated invalid edits do not clear it; completion sets it only when null.
 - UI screen count is irrelevant to this column.
 
 **Rejected alternative:** three-value `onboarding_status` enum — easy to over-write from the client and conflates UI with persistence.
@@ -216,6 +218,7 @@ Additional:
 - `onboarding_completed_at` and `work_authorisation_declared_at` are not broadly client-updatable.
 - PR 1.1 enforces that with **column privileges** (authenticated insert/update omit those columns). Privileged roles (`service_role` / table owner) can still set them for later server paths. No completion RPC in PR 1.1.
 - **PR 1.3:** persists candidate-owned `work_authorisation_declared` (boolean). Leaves `work_authorisation_declared_at` and `onboarding_completed_at` **null**. Provisional UI “essentials look complete” is **not** authoritative completion — controlled timestamp writes belong to **PR 1.4**.
+- **PR 1.4:** `public.complete_candidate_onboarding()` — `SECURITY DEFINER`, fixed `search_path`, `auth.uid()` only, profile `FOR UPDATE`, no candidate UUID / timestamp / payload args; execute for `authenticated` only. Atomic invalidation via `BEFORE UPDATE` on essential profile columns and `AFTER` language insert/update/delete triggers (internal helpers; no client EXECUTE). No application-level reconcile RPC. Ordinary column privileges unchanged. No service-role app client.
 - `anon` has **no** table privileges on these tables (defense in depth; not only empty RLS). Denied anon access therefore raises permission errors (`42501`), rather than returning zero rows under a granted SELECT.
 - No admin policies.
 - `service_role` may hold table grants for future controlled server operations only. Browser/SSR candidate flows must use the authenticated role and RLS — not `service_role`.
@@ -251,6 +254,6 @@ D-025 allow-lists Accepted with PR 1.3 (2026-08-01); enforced via migration CHEC
 3. Travel-time option set — **Accepted (D-025; PR 1.3)**
 4. D-021 authentication method — **Accepted** (2026-08-01; PR 1.2)
 5. D-022 hosted Supabase / email-confirmation policy — **Accepted** (2026-08-01; PR 1.2)
-6. Controlled writes for `onboarding_completed_at` and `work_authorisation_declared_at` — **PR 1.4**
+6. Controlled writes for `onboarding_completed_at` and `work_authorisation_declared_at` — **PR 1.4** (narrow RPCs above)
 7. Retention periods
 8. Terms/privacy acknowledgement copy at signup

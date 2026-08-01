@@ -133,7 +133,8 @@ test.describe("local onboarding persistence journey", () => {
 
     expect(profile?.german_comfort).toBe("basic");
     expect(profile?.work_authorisation_declared).toBe(true);
-    expect(profile?.work_authorisation_declared_at).toBeNull();
+    // Declaration stamp is trigger-synced when declared true; completion remains null.
+    expect(profile?.work_authorisation_declared_at).not.toBeNull();
     expect(profile?.onboarding_completed_at).toBeNull();
     expect(profile?.city).toBe("Berlin");
     expect(profile?.travel_radius_minutes).toBe(30);
@@ -158,12 +159,17 @@ test.describe("local onboarding persistence journey", () => {
     await page.getByLabel("Password").fill(password);
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveURL(/\/candidate$/);
-    await page.getByRole("link", { name: /Review your essentials/i }).click();
+    await page
+      .getByRole("link", { name: /Review and confirm essentials/i })
+      .click();
     await expect(page).toHaveURL(/group=review/);
     await expect(
       page.getByRole("heading", {
         name: new RegExp(`Essentials look complete, ${displayName}`, "i"),
       }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Confirm essentials" }),
     ).toBeVisible();
   });
 });

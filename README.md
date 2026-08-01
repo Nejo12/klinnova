@@ -141,7 +141,7 @@ At the same time, validate that employers can:
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 is complete. Slice 1 is in progress (PR 1.1 schema/RLS merged; PR 1.2 Auth foundation). Product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 is complete. Slice 1 is in progress (PR 1.1–1.3 merged; PR 1.4 completion gate). Product scope remains `docs/04-mvp.md`.
 
 ## Local development
 
@@ -218,7 +218,7 @@ Open [http://localhost:3000](http://localhost:3000). Register at `/register`, co
 pnpm supabase:stop
 ```
 
-### Authentication (PR 1.2) and essential onboarding (PR 1.3)
+### Authentication, onboarding, and completion (PR 1.2–1.4)
 
 - Email/password registration with required email confirmation
 - Cookie-based SSR sessions; refresh via `src/proxy.ts` (`getClaims()`)
@@ -226,25 +226,28 @@ pnpm supabase:stop
 - Idempotent `candidate_profiles` creation after signup/confirm/login (no Auth DB trigger)
 - Confirmation callback: `/auth/confirm` (supports `token_hash` + `type`, and PKCE `code`)
 - Essential onboarding at `/candidate/onboarding` with durable per-section save (D-025 allow-lists)
-- Progress derived from persisted fields; provisional review when essentials look complete (not authoritative completion)
-- Persists `work_authorisation_declared` boolean; leaves `work_authorisation_declared_at` and `onboarding_completed_at` null until PR 1.4
+- Progress derived from persisted fields; review offers **Confirm essentials** when answers look complete
+- Authoritative completion via `complete_candidate_onboarding()` (locks profile, validates persisted DB state; sets gate timestamp)
+- Database triggers clear `onboarding_completed_at` in the same transaction when essential profile/language edits leave essentials invalid
+- `work_authorisation_declared_at` stays non-null only while declaration is true (trigger-synced)
+- No matching / job feed on the completed-candidate home (Slice 2)
 - No password-recovery UI yet (before-pilot)
 - No service-role key for browser or ordinary SSR sessions
 
-Local Auth + onboarding journeys (requires local Supabase + Mailpit):
+Local Auth + onboarding + completion journeys (requires local Supabase + Mailpit):
 
 ```bash
 pnpm test:e2e:onboarding
 ```
 
-Hosted Preview/Production Auth uses the repository owner’s Supabase project, Vercel public env, Site URL `https://stint.company`, and the configured redirect allow-list.
+Hosted Preview/Production Auth uses the repository owner’s Supabase project, Vercel public env, Site URL `https://stint.company`, and the configured redirect allow-list. Apply the PR 1.4 migration on hosted Supabase before Preview completion smoke.
 
 ### Local-only notes
 
 - No Supabase account is needed for local development.
 - Do not run `supabase login`.
 - Do not link a remote Supabase project from the CLI for routine work.
-- Candidate schema, Auth foundation, and essential onboarding forms exist; controlled completion is PR 1.4.
+- Candidate schema, Auth, essential onboarding, and controlled completion RPCs exist; matching is Slice 2.
 - Database seeding is disabled (`supabase/config.toml`); pgTAP tests create transactional fixtures.
 - No service-role or secret key is required. Browser/SSR session paths use the publishable key + user cookies and RLS.
 - `pnpm supabase:db:reset` is local-only and destructive to the local database containers’ data.

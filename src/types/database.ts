@@ -100,6 +100,33 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _candidate_first_incomplete_group: {
+        Args: { p_uid: string }
+        Returns: string
+      }
+      _clear_completion_for_two_candidates: {
+        Args: { p_a: string; p_b: string }
+        Returns: undefined
+      }
+      _clear_completion_if_incomplete: {
+        Args: { p_uid: string }
+        Returns: undefined
+      }
+      _profile_first_incomplete_group: {
+        Args: {
+          p_available_from: string
+          p_candidate_id: string
+          p_city: string
+          p_employment_types: string[]
+          p_german_comfort: string
+          p_job_categories: string[]
+          p_shift_preferences: string[]
+          p_travel_radius_minutes: number
+          p_work_authorisation_declared: boolean
+        }
+        Returns: string
+      }
+      complete_candidate_onboarding: { Args: never; Returns: Json }
       text_array_is_unique: { Args: { input: string[] }; Returns: boolean }
     }
     Enums: {

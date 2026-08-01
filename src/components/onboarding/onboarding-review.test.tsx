@@ -1,13 +1,20 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { OnboardingReview } from "@/components/onboarding/onboarding-review";
 
+vi.mock("@/components/onboarding/complete-onboarding-form", () => ({
+  CompleteOnboardingForm: () => (
+    <button type="submit">Confirm essentials</button>
+  ),
+}));
+
 describe("OnboardingReview", () => {
-  it("shows ready copy without job matches when essentials are valid", () => {
+  it("offers server confirmation when essentials are valid but not completed", () => {
     render(
       <OnboardingReview
         displayName="Ada"
+        onboardingCompleted={false}
         progress={{
           completeGroups: [
             "languages",
@@ -32,15 +39,52 @@ describe("OnboardingReview", () => {
       }),
     ).toBeInTheDocument();
     expect(
+      screen.getByRole("button", { name: /Confirm essentials/i }),
+    ).toBeInTheDocument();
+    expect(
       screen.getByText(/No job matches are shown here/i),
     ).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /jobs?/i })).toBeNull();
+  });
+
+  it("shows confirmed state without a confirm button when completed", () => {
+    render(
+      <OnboardingReview
+        displayName="Ada"
+        onboardingCompleted
+        progress={{
+          completeGroups: [
+            "languages",
+            "work_authorisation",
+            "location",
+            "categories",
+            "availability",
+            "employment",
+          ],
+          incompleteGroups: [],
+          firstIncompleteGroup: null,
+          completeCount: 6,
+          totalGroups: 6,
+          essentialsValid: true,
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("heading", {
+        name: /Essentials confirmed, Ada/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Confirm essentials/i }),
+    ).toBeNull();
   });
 
   it("lists incomplete sections when essentials are not valid", () => {
     render(
       <OnboardingReview
         displayName="Ada"
+        onboardingCompleted={false}
         progress={{
           completeGroups: ["languages"],
           incompleteGroups: ["work_authorisation", "location"],

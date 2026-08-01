@@ -10,9 +10,9 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M1 — Candidate matching shell |
 | Active slice | Slice 1 — Registration to persisted onboarding |
-| Slice status | In progress — PR 1.3 (essential onboarding) in progress; PR 1.1–1.2 merged |
+| Slice status | In progress — PR 1.4 (completion gate) in progress; PR 1.1–1.3 merged |
 | Next slice | Slice 2 — Onboarding to seeded matches |
-| Blockers | PR 1.4 not started. D-018–D-025 Accepted. Slice 1 not complete until PR 1.4 exit. |
+| Blockers | Slice 1 not Done until PR 1.4 merge + exit proof. D-018–D-025 Accepted. Hosted Preview smoke for completion is owner-gated if Deployment Protection blocks automation. |
 
 ## Slice 0 closure (complete)
 
@@ -67,7 +67,7 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 | Slice | Outcome | Status |
 |-------|---------|--------|
 | 0 Foundation | Deployable shell + CI | Done — PR 0.1–0.4 merged; CI green; Production confirmed |
-| 1 Onboarding | Register → persisted essentials | In progress — PR 1.1–1.2 done; PR 1.3 in progress; PR 1.4 not started; D-018–D-025 Accepted |
+| 1 Onboarding | Register → persisted essentials | In progress — PR 1.1–1.3 merged; PR 1.4 completion gate in progress; D-018–D-025 Accepted |
 | 2 Matches | Essentials → seeded explainable matches | Not started |
 | 3 Apply | Job detail → submitted application | Not started |
 | 4 Employer draft | Register → draft vacancy | Not started |
