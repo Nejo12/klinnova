@@ -59,7 +59,7 @@ Slice 0 is done only when all of the following are true:
 |--------|-----------|
 | **3 PRs** | Faster merge count, but design tokens + tooling + backend scaffolding pile into oversized reviews |
 | **4 PRs (chosen)** | Each PR is independently reviewable and deployable; risk isolated to one concern |
-| **5 PRs** | Splitting CI from observability adds ceremony without reducing risk at this stage |
+| **5 PRs** | Splitting tests from CI/deploy adds ceremony without reducing risk at this stage |
 
 Recommended sequence:
 
@@ -67,7 +67,7 @@ Recommended sequence:
 PR 0.1 App shell + tooling
   -> PR 0.2 Design tokens + responsive shell
     -> PR 0.3 Env validation + Supabase local scaffolding
-      -> PR 0.4 Tests + CI + previews + observability scaffolding
+      -> PR 0.4 Tests, CI, and deployment
 ```
 
 Do not open PR *N+1* until PR *N* is merged (or explicitly parked with a dashboard note).
@@ -118,7 +118,8 @@ Exact filenames are chosen at implementation time; keep the layout above.
 
 - Full design system / token palette (PR 0.2)
 - Supabase, env schema, auth (PR 0.3 / Slice 1)
-- Vitest, Playwright, CI, Sentry, PostHog (PR 0.4)
+- Vitest, Playwright, CI, Vercel (PR 0.4)
+- Sentry / PostHog (`NOT_NOW.md`)
 - Product routes beyond a shell home page
 
 **Acceptance criteria:**
@@ -204,9 +205,9 @@ Exact filenames are chosen at implementation time; keep the layout above.
 
 ---
 
-## PR 0.4 — Tests, CI, previews, observability scaffolding
+## PR 0.4 — Tests, CI, and deployment
 
-**Intent:** Close Slice 0 exit criteria: CI green, previews, monitoring hooks.
+**Intent:** Close Slice 0 exit criteria: CI green and deployable previews/production.
 
 **Includes:**
 
@@ -214,14 +215,13 @@ Exact filenames are chosen at implementation time; keep the layout above.
 - Playwright scaffolding for critical journeys (one smoke test against the shell is enough)
 - GitHub Actions workflow: lint, type-check, unit tests, production build
 - Vercel preview deployments wired for PRs; production deploy from `main`
-- Sentry scaffolding (client/server hooks; disabled or no-op without DSN)
-- PostHog (or chosen privacy-conscious analytics) scaffolding; no product funnel events yet
 - README updates for test and CI expectations
 
 **Explicitly excludes:**
 
 - Full E2E coverage of candidate/employer journeys (later slices)
-- Funnel analytics events for onboarding/apply (Slice 7 territory for completeness; do not invent product events now)
+- Sentry and PostHog (or equivalent) scaffolding — parked in `NOT_NOW.md`
+- Funnel analytics events
 - Performance budgets beyond a documented placeholder note if not yet measurable
 
 **Acceptance criteria:**
@@ -229,7 +229,6 @@ Exact filenames are chosen at implementation time; keep the layout above.
 - [ ] CI runs lint, type-check, unit tests, and production build on PRs
 - [ ] At least one unit test and one Playwright smoke test pass in CI (or documented local Playwright job if CI browser setup is staged — prefer both in CI)
 - [ ] Vercel preview works for the PR branch; `main` deploys successfully
-- [ ] Sentry/analytics scaffolding does not crash the app when keys are absent
 - [ ] Slice 0 exit criteria checklist can be marked complete
 
 **Verification:**
@@ -266,6 +265,7 @@ Do **not** pull these into Slice 0 even if scaffolding makes them easy:
 - Admin moderation, reports, audit UI
 - Account export/deletion
 - Native mobile applications
+- Sentry and PostHog (or equivalent) scaffolding
 - Tailwind, microservices, Redis, vector search, real-time chat
 
 Park temptations in `NOT_NOW.md`.

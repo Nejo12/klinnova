@@ -42,7 +42,8 @@ Capture new non-urgent ideas below. Keep each line concrete.
 - Candidate interview prep checklist content
 -->
 
-- _(empty)_
+- Sentry error-monitoring scaffolding
+- PostHog (or equivalent privacy-conscious product analytics) scaffolding
 
 ## Recently parked from active work
 
@@ -50,4 +51,5 @@ Use when something is removed from a slice to protect focus.
 
 | Date | Idea | Why parked | Related slice |
 |------|------|------------|---------------|
-| — | — | — | — |
+| 2026-08-01 | Sentry scaffolding | Not required for Slice 0 exit criteria; keep foundation PRs focused on deployability | Slice 0 |
+| 2026-08-01 | PostHog / product analytics scaffolding | Not required for Slice 0 exit criteria; revisit when funnel measurement is needed | Slice 0 |
