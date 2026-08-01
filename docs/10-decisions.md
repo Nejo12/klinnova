@@ -95,3 +95,22 @@ This file records product and technical decisions that should not be repeatedly 
 **Decision:** Stint is a responsive web application. Candidate flows are mobile-first. Employer and admin flows are desktop-first, with functional mobile fallback. Native mobile applications are deferred until post-beta evidence.
 
 **Reason:** Candidates primarily use phones; employers and admins primarily work on desktop. One responsive web app covers both without delaying beta for native clients.
+
+## D-017 — Design token baseline
+
+**Decision:** Stint v1 uses a compact two-layer token system consisting of primitive tokens and semantic tokens. The approved baseline defines exact colour, typography, spacing, breakpoint, radius, border, elevation, interaction, motion, layering, and step-motif values. Components and page-level SCSS should consume semantic tokens wherever a semantic equivalent exists. Primitive colour values must not be repeated in component styles.
+
+**Reason:** PR 0.2 must encode the approved visual direction without implementers inventing foundational values. A restrained token baseline preserves visual consistency, accessibility, responsive behaviour, and solo-founder implementation speed while avoiding a premature full component library.
+
+**Constraints:**
+
+- SCSS Modules and CSS custom properties remain required.
+- SCSS variables are used for media-query breakpoints because CSS custom properties are not suitable for standard media-query declarations.
+- Candidate surfaces remain mobile-first.
+- Employer and admin surfaces remain desktop-first with functional narrow-screen fallback.
+- The UI uses a system sans-serif stack in Slice 0; no web font is installed.
+- Dark mode is not part of the v1 baseline.
+- Status must never be communicated by colour alone.
+- The token set may be expanded later only in response to an implemented product need.
+
+Exact values live in `docs/06-design-system.md` under **V1 design token baseline**.
