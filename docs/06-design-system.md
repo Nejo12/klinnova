@@ -49,9 +49,14 @@ Semantic states may use tuned variants of the existing palette, provided status 
 - use clear hierarchy without excessive font sizes or weights
 - body text must remain readable on small mobile screens
 
+## Device strategy
+
+Stint is a responsive web application. Candidate flows are mobile-first. Employer and admin flows are desktop-first, with functional mobile fallback. Native mobile applications are deferred until post-beta evidence.
+
 ## Layout and spacing
 
-- mobile first
+- candidate flows: mobile-first
+- employer and admin flows: desktop-first, with functional mobile fallback
 - generous whitespace
 - restrained use of borders
 - minimal shadows

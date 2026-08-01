@@ -89,3 +89,9 @@ This file records product and technical decisions that should not be repeatedly 
 ## D-015 — Scope control
 
 **Decision:** Product documentation and the MVP exclusion list are the source of truth. New scope requires explicit evidence and a recorded decision.
+
+## D-016 — Device strategy
+
+**Decision:** Stint is a responsive web application. Candidate flows are mobile-first. Employer and admin flows are desktop-first, with functional mobile fallback. Native mobile applications are deferred until post-beta evidence.
+
+**Reason:** Candidates primarily use phones; employers and admins primarily work on desktop. One responsive web app covers both without delaying beta for native clients.

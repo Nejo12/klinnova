@@ -85,6 +85,8 @@ Initial targets:
 
 ## Browser and device support
 
+Stint is a responsive web application. Candidate flows are mobile-first. Employer and admin flows are desktop-first, with functional mobile fallback. Native mobile applications are deferred until post-beta evidence.
+
 Support current major versions of:
 
 - Chrome
@@ -92,7 +94,7 @@ Support current major versions of:
 - Firefox
 - Edge
 
-The candidate flow must be usable on common mobile screen sizes. Progressive enhancement is preferred over browser-specific implementations.
+The candidate flow must be usable on common mobile screen sizes. Employer and admin flows must remain operable on smaller viewports without requiring a native app. Progressive enhancement is preferred over browser-specific implementations.
 
 ## Internationalisation
 
