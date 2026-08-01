@@ -1,101 +1,68 @@
 # Stint Agent Instructions
 
+Solo-founder workflow. One active vertical slice at a time. Product docs define scope; this file defines how to work.
+
 ## Source of truth
 
-Before proposing or implementing work, read:
+Read before proposing or implementing work:
 
-1. `README.md`
-2. `docs/01-vision.md`
-3. `docs/02-principles.md`
-4. `docs/04-mvp.md`
-5. `docs/05-features.md`
-6. `docs/06-design-system.md`
-7. `docs/07-architecture.md`
-8. `docs/08-non-functional.md`
-9. `docs/11-anti-goals.md`
-10. `docs/12-terminology.md`
-11. `docs/13-implementation-plan.md`
+1. `docs/04-mvp.md` — scope boundary
+2. `docs/13-implementation-plan.md` — slice order and exit criteria
+3. `docs/14-founder-dashboard.md` — current focus
+4. `NOT_NOW.md` — deferred ideas (do not implement)
+5. Supporting docs as needed: vision, principles, features, design system, architecture, non-functional, anti-goals, terminology
 
-When documents conflict, stop and report the conflict. Do not silently invent a resolution.
+When documents conflict, stop and report the conflict. Do not invent a resolution.
 
 ## Working mode
 
-- Plan before editing.
-- State assumptions explicitly.
-- Keep changes scoped to the assigned issue.
-- Prefer the simplest implementation satisfying the acceptance criteria.
-- Do not introduce dependencies without explaining why existing platform capabilities are insufficient.
-- Do not redesign the product, brand, architecture, or terminology unless the issue explicitly requests it.
-- Do not implement deferred features.
-- Do not create speculative abstractions for hypothetical future requirements.
+- Plan the active slice, then edit.
+- Ship vertical slices (UI + data + authz + tests), not layered micro-tasks.
+- Keep one open slice; finish or park it before starting another.
+- Prefer the simplest implementation that meets the slice exit criteria.
+- Do not redesign product, brand, architecture, or terminology unless asked.
+- Do not implement items in `NOT_NOW.md` or other deferred scope.
+- Do not add dependencies without explaining why the current stack is insufficient.
+- Do not create speculative abstractions or agent personas.
 
 ## Engineering rules
 
-- Use strict TypeScript. Do not use `any`.
-- Use absolute imports.
-- Keep one React component per file unless a tightly coupled private helper is trivial.
-- Use lowercase directory names.
-- Minimize barrel files.
-- Prefer Server Components by default in Next.js.
-- Use Client Components only where browser interactivity requires them.
-- Use semantic HTML and accessible primitives.
-- Use SCSS Modules and shared CSS custom properties; do not introduce Tailwind.
+- Strict TypeScript; no `any`.
+- Absolute imports; lowercase directories; one React component per file; minimal barrels.
+- Server Components by default; Client Components only for required interactivity.
+- SCSS Modules and CSS custom properties; no Tailwind.
+- Semantic HTML and accessible primitives.
 - Validate external input with Zod.
-- Enforce authorization server-side and through Supabase Row Level Security.
-- Never trust client-supplied role, ownership, verification, or application-status values.
-- Keep candidate documents private and expose them only through short-lived signed access.
+- Authorize server-side and via Supabase RLS; never trust client-supplied role, ownership, verification, or application status.
+- Keep candidate documents private; expose only via short-lived signed URLs.
 
 ## Tests
 
-Use:
+Vitest, Testing Library, MSW, and Playwright for critical journeys.
 
-- Vitest for unit tests
-- Testing Library for components
-- MSW for network boundaries
-- Playwright for critical end-to-end journeys
+Require tests for: authorization, onboarding persistence, matching rules, application uniqueness, employer verification gates, vacancy publication state, candidate document privacy, account deletion.
 
-Every business-critical change requires tests. Prioritize:
+## Product language
 
-- authorization
-- onboarding persistence
-- matching rules
-- application uniqueness
-- employer verification gates
-- vacancy publication state
-- candidate document privacy
-- account deletion
-
-## Product and language rules
-
-- Candidate-facing copy must be plain, respectful, and concise.
-- Never define users by what they lack.
-- Prefer `candidate`, `employer`, `vacancy`, `application`, and `match` as defined in `docs/12-terminology.md`.
-- AI assistance must be framed as an outcome, not advertised as an AI feature.
-- Every visible interaction should either reduce uncertainty or move the user one step closer.
+- Plain, respectful, concise candidate copy.
+- Never define people by what they lack.
+- Use `candidate`, `employer`, `vacancy` / `job`, `application`, and `match` per `docs/12-terminology.md`.
+- Frame automation as outcomes, not AI features.
+- Every interaction should reduce uncertainty or move someone one step closer.
 
 ## Definition of done
 
-A task is complete only when:
+A slice (or PR) is done only when:
 
-- acceptance criteria are satisfied
-- lint and type-check pass
-- relevant automated tests pass
-- production build succeeds
-- accessibility implications were checked
-- security and privacy implications were checked
-- documentation was updated where necessary
-- no unrelated changes are included
+- slice exit criteria / acceptance criteria are met
+- lint, type-check, relevant tests, and production build pass
+- accessibility, security, and privacy implications were checked
+- docs updated when necessary
+- `main` remains deployable
+- no unrelated changes
 
-## Review perspectives
+## Review checklist
 
-Use specialist perspectives as review checklists, not as autonomous competing architectures:
+Before merge, scan: product scope, UI quality, data integrity/authz, accessibility, privacy, edge cases, deployability.
 
-- product: scope and user value
-- frontend: component boundaries and interaction quality
-- backend: data integrity and authorization
-- accessibility: keyboard, semantics, focus, labels, and contrast
-- security/privacy: least privilege, private data, validation, abuse paths
-- QA: edge cases and regression coverage
-- operations: logs, failure recovery, and deployability
-
-Do not create a separate collection of vague agent personas or reusable “superpowers” before a real repeated workflow justifies them. Repository-specific rules in this file take priority.
+Repository rules in this file take priority over generic agent workflows.

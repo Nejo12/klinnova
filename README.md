@@ -131,10 +131,14 @@ At the same time, validate that employers can:
 - [Decision log](docs/10-decisions.md)
 - [Anti-goals](docs/11-anti-goals.md)
 - [Terminology](docs/12-terminology.md)
+- [Implementation plan](docs/13-implementation-plan.md)
+- [Founder dashboard](docs/14-founder-dashboard.md)
+- [Not now](NOT_NOW.md)
+- [Agent instructions](AGENTS.md)
 
 ## Development status
 
-The repository is currently in product-definition and foundation planning. Implementation should begin only after the MVP boundaries, architecture, and first vertical slice are confirmed.
+The repository is in product-definition and foundation planning. Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Implementation begins at Slice 0; product scope remains `docs/04-mvp.md`.
 
 ## Guiding question
 
