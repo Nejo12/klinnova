@@ -10,7 +10,7 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M0 — Engineering foundation |
 | Active slice | Slice 0 — Engineering foundation |
-| Slice status | Planning — see `docs/15-slice-0-build-plan.md` |
+| Slice status | In progress — PR 0.1 (app shell); see `docs/15-slice-0-build-plan.md` |
 | Next slice | Slice 1 — Registration to persisted onboarding |
 | Blockers | None |
 
@@ -54,7 +54,7 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 
 | Slice | Outcome | Status |
 |-------|---------|--------|
-| 0 Foundation | Deployable shell + CI | Planning (`docs/15-slice-0-build-plan.md`) |
+| 0 Foundation | Deployable shell + CI | In progress — PR 0.1 |
 | 1 Onboarding | Register → persisted essentials | Not started |
 | 2 Matches | Essentials → seeded explainable matches | Not started |
 | 3 Apply | Job detail → submitted application | Not started |
