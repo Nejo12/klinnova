@@ -9,10 +9,24 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | Field | Value |
 |-------|--------|
 | Active milestone | M1 — Candidate matching shell |
-| Active slice | Slice 1 — Registration to persisted onboarding |
-| Slice status | In progress — PR 1.4 (completion gate) in progress; PR 1.1–1.3 merged |
-| Next slice | Slice 2 — Onboarding to seeded matches |
-| Blockers | Slice 1 not Done until PR 1.4 merge + exit proof. D-018–D-025 Accepted. Hosted Preview smoke for completion is owner-gated if Deployment Protection blocks automation. |
+| Active slice | Slice 2 — Onboarding to seeded matches |
+| Slice status | Not started — planning only; Slice 1 closed |
+| Next slice | Slice 3 — Job detail to submitted application |
+| Blockers | None for Slice 1. Seed vacancies / match rules for Slice 2 not started. D-018–D-025 Accepted. |
+
+## Slice 1 closure (complete)
+
+| Checkpoint | Status |
+|------------|--------|
+| PR 1.1 — Candidate schema and RLS | Complete (merged) |
+| PR 1.2 — Auth foundation | Complete (merged; PR #21) |
+| PR 1.3 — Essential onboarding | Complete (merged; PR #22) |
+| PR 1.4 — Completion gate and exit proof | Complete (merged; PR #23) |
+| Hosted migration `20260801160000_complete_candidate_onboarding.sql` | Applied; no pending remote migrations |
+| Local CI (Quality + Schema/RLS/Auth/onboarding/completion) | Confirmed green on PR #23 |
+| Hosted production smoke (register → persist → complete → invalidate → resume → re-complete) | Confirmed by repository owner |
+| No Slice 2 matching / jobs / applications / employer UI | Confirmed |
+| D-018–D-025 | Accepted |
 
 ## Slice 0 closure (complete)
 
@@ -24,7 +38,7 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | PR 0.4 — Tests, CI, and deployment | Complete (merged; PR #17) |
 | CI green (lint, typecheck, unit tests, build, e2e) | Confirmed |
 | Vercel Preview and Production | Confirmed working by repository owner |
-| Registration / onboarding product behaviour | In progress (Slice 1) |
+| Registration / onboarding product behaviour | Complete (Slice 1) |
 
 ## Solo cadence
 
@@ -67,8 +81,8 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 | Slice | Outcome | Status |
 |-------|---------|--------|
 | 0 Foundation | Deployable shell + CI | Done — PR 0.1–0.4 merged; CI green; Production confirmed |
-| 1 Onboarding | Register → persisted essentials | In progress — PR 1.1–1.3 merged; PR 1.4 completion gate in progress; D-018–D-025 Accepted |
-| 2 Matches | Essentials → seeded explainable matches | Not started |
+| 1 Onboarding | Register → persisted essentials | Done — PR 1.1–1.4 merged (#21–#23); hosted migration + production smoke confirmed; D-018–D-025 Accepted |
+| 2 Matches | Essentials → seeded explainable matches | Not started — next active slice (planning only) |
 | 3 Apply | Job detail → submitted application | Not started |
 | 4 Employer draft | Register → draft vacancy | Not started |
 | 5 Publish | Verification → public vacancy | Not started |

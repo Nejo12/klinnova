@@ -1,8 +1,7 @@
 # Slice 1 Build Plan
 
 > Planning artifact only. No application code, migrations, or auth implementation lands here.
-> **Status:** PR 1.1–1.2 merged; PR 1.3 essential onboarding in progress.
-> D-018–D-025 Accepted (2026-08-01). PR 1.4 implements the controlled completion / resume gate.
+> **Completion note (2026-08-01):** Slice 1 is complete. PR 1.1–1.4 are merged (#21–#23); hosted completion migration is applied; production smoke confirmed register → persist → complete → invalidate → resume → re-complete with no matching UI. Active delivery tracking moved to `docs/14-founder-dashboard.md` (Slice 2 next). D-018–D-025 Accepted (2026-08-01).
 
 **Outcome:** A candidate can register and persist the minimum essential onboarding information required to continue toward matching (`docs/13-implementation-plan.md`).
 
@@ -223,7 +222,7 @@ No service-role key in Vercel for the candidate browser/auth flow unless a later
 | PR 1.1 | D-018, D-019, D-020, D-023, D-024 — **Accepted** (2026-08-01); follow `docs/17` |
 | PR 1.2 | D-021, D-022 — **Accepted** (2026-08-01) |
 | PR 1.3 | D-025 allow-lists — **Accepted** (2026-08-01) |
-| PR 1.4 | Controlled completion write + resume/gate E2E |
+| PR 1.4 | Controlled completion write + resume/gate E2E — **Complete (PR #23)** |
 
 ---
 
@@ -235,10 +234,8 @@ Data minimisation to essentials; work-authorisation wording Pending legal/produc
 
 ## Slice 1 close checklist
 
-- [ ] PRs 1.1–1.4 merged
-- [ ] Exit criteria on Auth-capable environment (local CI + Preview smoke by owner)
-- [ ] RLS + critical journey green
-- [ ] No Slice 2 matching or `NOT_NOW.md` items shipped
-- [ ] Dashboard: Slice 1 Done → Slice 2 planning
-
-Update the checklist and founder dashboard to Done only after PR 1.4 merge and exit proof — not while this PR is open.
+- [x] PRs 1.1–1.4 merged
+- [x] Exit criteria on Auth-capable environment (local CI + hosted production smoke by owner)
+- [x] RLS + critical journey green
+- [x] No Slice 2 matching or `NOT_NOW.md` items shipped
+- [x] Dashboard: Slice 1 Done → Slice 2 planning

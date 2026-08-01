@@ -134,14 +134,14 @@ At the same time, validate that employers can:
 - [Implementation plan](docs/13-implementation-plan.md)
 - [Founder dashboard](docs/14-founder-dashboard.md)
 - [Slice 0 build plan](docs/15-slice-0-build-plan.md) (complete; historical)
-- [Slice 1 build plan](docs/16-slice-1-build-plan.md)
+- [Slice 1 build plan](docs/16-slice-1-build-plan.md) (complete; historical)
 - [Slice 1 schema proposal](docs/17-slice-1-schema-proposal.md)
 - [Not now](NOT_NOW.md)
 - [Agent instructions](AGENTS.md)
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 is complete. Slice 1 is in progress (PR 1.1–1.3 merged; PR 1.4 completion gate). Product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 and Slice 1 are complete. Slice 2 (seeded matches) is next and not started. Product scope remains `docs/04-mvp.md`.
 
 ## Local development
 
@@ -240,7 +240,7 @@ Local Auth + onboarding + completion journeys (requires local Supabase + Mailpit
 pnpm test:e2e:onboarding
 ```
 
-Hosted Preview/Production Auth uses the repository owner’s Supabase project, Vercel public env, Site URL `https://stint.company`, and the configured redirect allow-list. Apply the PR 1.4 migration on hosted Supabase before Preview completion smoke.
+Hosted Preview/Production Auth uses the repository owner’s Supabase project, Vercel public env, Site URL `https://stint.company`, and the configured redirect allow-list. Hosted completion migration `20260801160000_complete_candidate_onboarding.sql` is applied.
 
 ### Local-only notes
 
