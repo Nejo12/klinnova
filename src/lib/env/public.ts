@@ -5,6 +5,14 @@ import { formatEnvError } from "@/lib/env/format-error";
 const publicEnvSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
+  /** Optional canonical site origin for Auth email redirects (e.g. https://stint.company). */
+  NEXT_PUBLIC_SITE_URL: z.preprocess(
+    (value) =>
+      typeof value === "string" && value.trim().length === 0
+        ? undefined
+        : value,
+    z.string().url().optional(),
+  ),
 });
 
 export type PublicEnv = z.infer<typeof publicEnvSchema>;
@@ -16,6 +24,7 @@ function readPublicEnv(): PublicEnv {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   });
 
   if (!parsed.success) {
@@ -32,4 +41,9 @@ export function getPublicEnv(): PublicEnv {
   }
 
   return cachedPublicEnv;
+}
+
+/** Test helper: clear cached env between Vitest cases. */
+export function resetPublicEnvCache(): void {
+  cachedPublicEnv = undefined;
 }

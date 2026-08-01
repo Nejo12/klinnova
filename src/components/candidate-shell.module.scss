@@ -62,14 +62,19 @@
   color: var(--color-text-primary);
 }
 
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
 .action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  align-self: flex-start;
   min-width: var(--touch-target-min);
   min-height: var(--touch-target-min);
-  margin-top: var(--space-2);
   padding: var(--space-3) var(--space-5);
   border: var(--border-width-default) solid transparent;
   border-radius: var(--radius-md);
@@ -92,6 +97,35 @@
 .action:active {
   background-color: var(--color-action-primary-active);
   color: var(--color-action-primary-text);
+}
+
+.secondaryAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-5);
+  border: var(--border-width-default) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-md);
+  text-decoration: none;
+}
+
+.secondaryAction:hover {
+  background-color: var(--color-bg-subtle);
+}
+
+.textLink {
+  align-self: flex-start;
+  margin-top: var(--space-2);
+  color: var(--color-text-link);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
 }
 
 @media (min-width: $breakpoint-md) {

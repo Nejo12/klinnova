@@ -1,8 +1,8 @@
 # Slice 1 Build Plan
 
 > Planning artifact only. No application code, migrations, or auth implementation lands here.
-> **Status:** PR 1.1 in progress — D-018, D-019, D-020, D-023, and D-024 Accepted (2026-08-01).
-> D-021 and D-022 remain Proposed (required before PR 1.2). Auth UI and onboarding UI are out of scope for PR 1.1.
+> **Status:** PR 1.1 merged; PR 1.2 Auth foundation in progress.
+> D-018–D-024 Accepted (2026-08-01). Essential onboarding forms remain PR 1.3.
 
 **Outcome:** A candidate can register and persist the minimum essential onboarding information required to continue toward matching (`docs/13-implementation-plan.md`).
 
@@ -22,7 +22,7 @@
 | `docs/12-terminology.md` | Work-authorisation declaration; candidate |
 | `docs/13-implementation-plan.md` | Exit criteria |
 | `docs/17-slice-1-schema-proposal.md` | Tables, RLS, completion model |
-| `docs/10-decisions.md` | D-018/019/020/023/024 Accepted; D-021/022 still Proposed |
+| `docs/10-decisions.md` | D-018–D-024 Accepted |
 | `NOT_NOW.md` | Do not implement |
 
 ### Document tensions (not silently invented)
@@ -97,7 +97,7 @@ Schema before Auth remains justified: RLS is tested against Supabase Auth users 
 
 | Capability | Classification | Notes |
 |------------|----------------|-------|
-| Email + password registration | **Required for Slice 1 exit** | Proposed method (D-021) |
+| Email + password registration | **Required for Slice 1 exit** | Accepted method (D-021) |
 | Email verification | **Required for Slice 1 exit** | Supabase confirmation; see behaviour below |
 | Login / logout | **Required for Slice 1 exit** | |
 | SSR session cookies + refresh | **Required for Slice 1 exit** | Official `@supabase/ssr` + middleware/proxy as required by current Next.js guidance |
@@ -106,7 +106,7 @@ Schema before Auth remains justified: RLS is tested against Supabase Auth users 
 | Password recovery | **Required before pilot** — not Slice 1 exit | May ship in 1.2 if cheap; must not block exit if register/login/verify/resume work |
 | Social / magic / phone / passkeys / MFA | **Deferred** | |
 
-### Behaviour proposals (require acceptance with D-021 / D-022)
+### Behaviour (D-021 / D-022 Accepted)
 
 - **Duplicate email:** Auth uniqueness; avoid account enumeration in copy where practical.
 - **Unverified users:** May authenticate per project config; must **not** set `onboarding_completed_at` until email is verified (if confirmation is enabled).
@@ -126,17 +126,9 @@ See `docs/17` for full model. Proposed: `onboarding_completed_at` null/non-null;
 
 **Intent:** Land approved tables/policies; no product Auth UI.
 
-**Status:** In progress (implementation branch).
+**Status:** Complete (merged).
 
-**Includes:** Migrations for `docs/17`; RLS; column privileges for server-owned timestamps; constraint/RLS pgTAP tests with two local Auth users; local/CI `supabase test db`; generated `src/types/database.ts`.
-
-**Excludes:** App Auth UI, onboarding UI, Auth triggers, hosted project secrets in repo, allow-list product values.
-
-**Depends on:** D-019, D-020, D-023, D-024 Accepted in `docs/10-decisions.md`.
-
-**Acceptance:** Migrations apply locally; no job/employer tables; cross-user isolation proven; server-owned columns not client-writable; `main` shell still builds; CI schema/RLS job green.
-
-**Deploy:** Placeholders fine; no service-role in Vercel client env.
+**Includes:** Migrations for `docs/17`; RLS; column privileges for server-owned timestamps; constraint/RLS pgTAP tests; CI Schema and RLS job; generated `src/types/database.ts`.
 
 ---
 
@@ -144,17 +136,19 @@ See `docs/17` for full model. Proposed: `onboarding_completed_at` null/non-null;
 
 **Intent:** Email/password session path without onboarding field forms.
 
-**Includes:** Register, verify handling, login, logout, SSR cookies/refresh, route protection stubs, idempotent `candidate_profiles` creation, owner checklist for hosted Auth URLs.
+**Status:** In progress.
 
-**Excludes:** Essential-field forms; social providers; employer signup completion.
+**Includes:** Register (display name + email/password), email confirmation callback, login, logout, `src/proxy.ts` cookie refresh + `/candidate/*` protection, idempotent `candidate_profiles` creation (D-024), minimal authenticated candidate landing, tests/docs. D-021/D-022 Accepted in this PR.
 
-**Password recovery:** Prefer include if low cost; **not** an exit blocker (before-pilot).
+**Excludes:** Essential-field onboarding forms (PR 1.3); social providers; password recovery UI (before-pilot); employer signup; service-role session paths.
 
-**Depends on:** PR 1.1.
+**Password recovery:** Deferred to before-pilot (not PR 1.2 acceptance).
 
-**Acceptance:** Register → verify (local Mailpit/Inbucket OK) → login → logout; session survives refresh; protected routes reject anon; no browser service-role.
+**Depends on:** PR 1.1; D-021/D-022 Accepted; hosted Auth configured by owner.
 
-**Owner actions before Preview Auth works:** D-022 checklist (hosted project, Vercel public keys, site URL, redirect URLs, confirmation policy).
+**Acceptance:** Register → verify → login → logout; session survives refresh; protected routes reject anon; no browser service-role; CI green.
+
+**Session refresh:** Proxy calls `getClaims()` after creating the SSR client so cookies stay fresh; protected server pages use `getUser()`.
 
 ---
 
@@ -227,7 +221,7 @@ No service-role key in Vercel for the candidate browser/auth flow unless a later
 | Before | Decisions |
 |--------|-----------|
 | PR 1.1 | D-018, D-019, D-020, D-023, D-024 — **Accepted** (2026-08-01); follow `docs/17` |
-| PR 1.2 | D-021, D-022 — still **Proposed** (Auth method + hosted Supabase timing) |
+| PR 1.2 | D-021, D-022 — **Accepted** (2026-08-01) |
 | PR 1.3 | Allow-lists; German comfort labels; radius options — still Pending product approval |
 
 ---

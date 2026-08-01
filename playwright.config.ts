@@ -16,10 +16,11 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    // CI builds earlier in the workflow; locally, build first if `.next` is missing.
+    // Prefer an explicit production server. CI Auth job builds with local env first.
     command: "pnpm start",
     url: "http://127.0.0.1:3000",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer:
+      !process.env.CI && process.env.E2E_AUTH_JOURNEY !== "1",
     timeout: 120_000,
     env: {
       ...process.env,
@@ -27,6 +28,8 @@ export default defineConfig({
         process.env.NEXT_PUBLIC_SUPABASE_URL ?? scaffoldUrl,
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
         process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? scaffoldKey,
+      NEXT_PUBLIC_SITE_URL:
+        process.env.NEXT_PUBLIC_SITE_URL ?? "http://127.0.0.1:3000",
     },
   },
   projects: [

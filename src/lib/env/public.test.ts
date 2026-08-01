@@ -10,6 +10,7 @@ async function loadPublicEnvModule() {
 function clearPublicEnvVars() {
   Reflect.deleteProperty(process.env, "NEXT_PUBLIC_SUPABASE_URL");
   Reflect.deleteProperty(process.env, "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
+  Reflect.deleteProperty(process.env, "NEXT_PUBLIC_SITE_URL");
 }
 
 describe("getPublicEnv", () => {
@@ -32,10 +33,20 @@ describe("getPublicEnv", () => {
     const { getPublicEnv } = await loadPublicEnvModule();
     const env = getPublicEnv();
 
-    expect(env).toEqual({
-      NEXT_PUBLIC_SUPABASE_URL: validUrl,
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: validKey,
-    });
+    expect(env.NEXT_PUBLIC_SUPABASE_URL).toBe(validUrl);
+    expect(env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).toBe(validKey);
+    expect(env.NEXT_PUBLIC_SITE_URL).toBeUndefined();
+  });
+
+  it("accepts optional NEXT_PUBLIC_SITE_URL", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", validUrl);
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", validKey);
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://stint.company");
+
+    const { getPublicEnv } = await loadPublicEnvModule();
+    const env = getPublicEnv();
+
+    expect(env.NEXT_PUBLIC_SITE_URL).toBe("https://stint.company");
   });
 
   it("fails when the URL is missing and names the variable", async () => {

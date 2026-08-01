@@ -3,7 +3,7 @@
 > Schema boundary for Slice 1. SQL/migrations belong in PR 1.1 after this acceptance lands on `main`.
 > Product scope: `docs/04-mvp.md`. Delivery: `docs/16-slice-1-build-plan.md`.
 
-**Status:** Accepted for PR 1.1 (D-019, D-020, D-023, D-024 — 2026-08-01). D-021/D-022 Auth and hosted-project decisions remain Proposed.
+**Status:** Accepted for PR 1.1 (D-019, D-020, D-023, D-024 — 2026-08-01). D-021/D-022 Accepted with PR 1.2 (2026-08-01).
 **Outcome constraint:** Persist the minimum essential onboarding data so a registered candidate can continue toward matching later — not a full profile, not matching, not employer discoverability.
 
 ---
@@ -248,7 +248,7 @@ Allow-lists may be finalized before PR 1.3; migrations may land with checks adde
 1. Category, language, employment-type, shift allow-lists (founder/product) — before PR 1.3
 2. German comfort label set — before PR 1.3
 3. Travel-radius option set — before PR 1.3
-4. D-021 authentication method — still **Proposed** (before PR 1.2)
-5. D-022 hosted Supabase / email-confirmation policy — still **Proposed** (before PR 1.2 Preview Auth)
+4. D-021 authentication method — **Accepted** (2026-08-01; PR 1.2)
+5. D-022 hosted Supabase / email-confirmation policy — **Accepted** (2026-08-01; PR 1.2)
 6. Retention periods
 7. Terms/privacy acknowledgement copy at signup

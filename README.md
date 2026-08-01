@@ -141,7 +141,7 @@ At the same time, validate that employers can:
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 (engineering foundation) is complete. Slice 1 is in progress (PR 1.1: candidate schema + RLS); product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 is complete. Slice 1 is in progress (PR 1.1 schema/RLS merged; PR 1.2 Auth foundation). Product scope remains `docs/04-mvp.md`.
 
 ## Local development
 
@@ -210,7 +210,7 @@ Generated `Insert` / `Update` types describe table shape only. They do **not** e
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). Register at `/register`, confirm via Mailpit/Inbucket (`pnpm supabase:status` → Mailpit URL), then sign in at `/login`.
 
 11. When finished, stop local Supabase:
 
@@ -218,14 +218,26 @@ Open [http://localhost:3000](http://localhost:3000).
 pnpm supabase:stop
 ```
 
+### Authentication (PR 1.2)
+
+- Email/password registration with required email confirmation
+- Cookie-based SSR sessions; refresh via `src/proxy.ts` (`getClaims()`)
+- Protected `/candidate/*` (anonymous → `/login`)
+- Idempotent `candidate_profiles` creation after signup/confirm/login (no Auth DB trigger)
+- Confirmation callback: `/auth/confirm` (supports `token_hash` + `type`, and PKCE `code`)
+- No password-recovery UI yet (before-pilot)
+- No service-role key for browser or ordinary SSR sessions
+
+Hosted Preview/Production Auth uses the repository owner’s Supabase project, Vercel public env, Site URL `https://stint.company`, and the configured redirect allow-list.
+
 ### Local-only notes
 
 - No Supabase account is needed for local development.
 - Do not run `supabase login`.
-- Do not link a remote Supabase project.
-- Candidate schema tables exist (`candidate_profiles`, `candidate_languages`); no Auth UI or onboarding UI yet.
-- Database seeding is disabled (`supabase/config.toml`); tests create transactional fixtures.
-- No service-role or secret key is required for the current shell. Browser/SSR paths use the authenticated role and RLS.
+- Do not link a remote Supabase project from the CLI for routine work.
+- Candidate schema + Auth foundation exist; essential onboarding forms are PR 1.3.
+- Database seeding is disabled (`supabase/config.toml`); pgTAP tests create transactional fixtures.
+- No service-role or secret key is required. Browser/SSR session paths use the publishable key + user cookies and RLS.
 - `pnpm supabase:db:reset` is local-only and destructive to the local database containers’ data.
 - Anonymous clients have no table privileges on candidate tables, so denied access surfaces as permission errors (`42501`), not empty result sets.
 - Sentry and PostHog remain deferred in `NOT_NOW.md`.
