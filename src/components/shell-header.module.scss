@@ -1,0 +1,38 @@
+@use "../styles/breakpoints" as *;
+
+.header {
+  border-bottom: var(--border-width-default) solid var(--color-border-default);
+  background-color: var(--color-bg-surface);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-width: var(--layout-content-max);
+  margin-inline: auto;
+  padding: var(--space-4) var(--layout-gutter-mobile);
+}
+
+.tagline {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  color: var(--color-text-secondary);
+}
+
+@media (min-width: $breakpoint-md) {
+  .inner {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-inline: var(--layout-gutter-tablet);
+  }
+}
+
+@media (min-width: $breakpoint-lg) {
+  .inner {
+    padding-inline: var(--layout-gutter-desktop);
+  }
+}

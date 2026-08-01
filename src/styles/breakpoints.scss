@@ -1,0 +1,7 @@
+// D-017 — SCSS breakpoints for media queries.
+// CSS custom properties are not suitable for standard media-query declarations.
+
+$breakpoint-sm: 30rem;
+$breakpoint-md: 48rem;
+$breakpoint-lg: 64rem;
+$breakpoint-xl: 80rem;
