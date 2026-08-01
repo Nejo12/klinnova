@@ -37,6 +37,8 @@ Each slice is the unit of planning, implementation, and review. Size for roughly
 
 **Outcome:** deployable, tested application shell with Stint design tokens and reproducible local setup.
 
+**Build plan:** `docs/15-slice-0-build-plan.md` (four sequential PRs).
+
 **Includes:** Next.js bootstrap; strict TypeScript, ESLint, Prettier, absolute imports; SCSS tokens; env validation; Supabase local setup; test toolchain; CI; Vercel previews; Sentry/analytics scaffolding.
 
 **Exit criteria:**

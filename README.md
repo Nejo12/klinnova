@@ -133,6 +133,7 @@ At the same time, validate that employers can:
 - [Terminology](docs/12-terminology.md)
 - [Implementation plan](docs/13-implementation-plan.md)
 - [Founder dashboard](docs/14-founder-dashboard.md)
+- [Slice 0 build plan](docs/15-slice-0-build-plan.md)
 - [Not now](NOT_NOW.md)
 - [Agent instructions](AGENTS.md)
 
