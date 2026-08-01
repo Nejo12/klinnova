@@ -114,3 +114,108 @@ This file records product and technical decisions that should not be repeatedly 
 - The token set may be expanded later only in response to an implemented product need.
 
 Exact values live in `docs/06-design-system.md` under **V1 design token baseline**.
+
+## D-018 — Slice 1 PR decomposition
+
+**Status:** Proposed
+**Must accept before:** PR 1.1
+
+**Context:** Slice 1 needs schema, Auth, onboarding UI, and journey proof without oversized PRs.
+
+**Proposed choice:** Four PRs — (1.1) schema + RLS, (1.2) Auth foundation, (1.3) registration + essential persistence UI, (1.4) resume/gate + E2E. Details: `docs/16-slice-1-build-plan.md`.
+
+**Alternatives:** Three PRs (merge 1.3+1.4); five PRs (split registration from onboarding).
+
+**Consequences:** Schema/RLS reviewable without UI; Auth reviewable without forms; exit proven in 1.4.
+
+**Approval:** Required before migrations start.
+
+## D-019 — Slice 1 minimum candidate schema
+
+**Status:** Proposed
+**Must accept before:** PR 1.1
+
+**Context:** Architecture describes shared `profiles` + role tables; Slice 1 only has candidates.
+
+**Proposed choice:** Two tables — `candidate_profiles` (1:1 `auth.users`) and `candidate_languages` (1:N). No shared `profiles`, no `candidate_preferences` misc table, no jobs/employers. See `docs/17-slice-1-schema-proposal.md`.
+
+**Alternatives:** Keep shared `profiles` + `candidate_profiles` now; put languages in arrays on one table.
+
+**Consequences:** Simpler Slice 1; shared `profiles` deferred until employer role (Slice 4) needs it — intentional narrowing, not a silent architecture override.
+
+**Approval:** Required before migrations.
+
+## D-020 — Onboarding completion model
+
+**Status:** Proposed
+**Must accept before:** PR 1.1
+
+**Context:** Resume and Slice 2 gating need a durable server signal without a workflow engine.
+
+**Proposed choice:** `onboarding_completed_at timestamptz` (null = incomplete). Server-only completion after validating required fields. UI screen count is not authoritative. See `docs/17`.
+
+**Alternatives:** Three-value status enum; compute completion only (no stored marker).
+
+**Consequences:** Avoids client-writable status; clearing timestamp handles invalidation after edits.
+
+**Approval:** Required before migrations.
+
+## D-021 — Slice 1 authentication method
+
+**Status:** Proposed
+**Must accept before:** PR 1.2
+
+**Context:** MVP allows email or social authentication.
+
+**Proposed choice:** Email/password via Supabase Auth for Slice 1 exit: registration, email verification, login, logout, SSR sessions, route protection. Password recovery classified **before pilot** (not Slice 1 exit). Social/magic/phone/passkeys/MFA deferred.
+
+**Alternatives:** Add social in Slice 1; require password recovery for exit.
+
+**Consequences:** Smaller Auth surface; recovery should land before Berlin pilot even if after Slice 1 exit.
+
+**Approval:** Required before Auth UI PR.
+
+## D-022 — Hosted Supabase timing for Auth
+
+**Status:** Proposed
+**Must accept before:** PR 1.2 Preview verification
+
+**Context:** Placeholders cannot exercise real Auth email/redirects.
+
+**Proposed choice:** Local CLI for development; repository owner configures hosted project + Vercel public keys + Auth URLs/email before Preview/Production Auth demos. No service-role in browser/Vercel client env for this flow.
+
+**Alternatives:** Delay all Auth Preview until later; use only local forever (blocks real Preview Auth).
+
+**Consequences:** Owner action gate before claiming Preview Auth works.
+
+**Approval:** Required before relying on hosted Auth in Preview/Production.
+
+## D-023 — Slice 1 RLS ownership model
+
+**Status:** Proposed
+**Must accept before:** PR 1.1
+
+**Context:** Candidate PII must not be readable cross-user.
+
+**Proposed choice:** Owner-only select/insert/update with `USING` + `WITH CHECK` (`auth.uid()`); ownership keys immutable; anon denied; no admin policies; completion timestamp not broadly client-writable. See `docs/17`.
+
+**Alternatives:** Looser select for “public profiles” (rejected for Slice 1).
+
+**Consequences:** Matches least-privilege; tests must prove isolation.
+
+**Approval:** Required before migrations.
+
+## D-024 — Candidate row creation strategy
+
+**Status:** Proposed
+**Must accept before:** PR 1.1
+
+**Context:** Auth user can exist briefly without a candidate row.
+
+**Proposed choice:** Application-controlled idempotent upsert of `candidate_profiles` after signup / first authenticated load. Database triggers on `auth.users` deferred unless later evidence requires them.
+
+**Alternatives:** Trigger-only creation on `auth.users` insert.
+
+**Consequences:** Explicit errors and tests; implementers must handle idempotency; not left unspecified in PR 1.1.
+
+**Approval:** Required before migrations.

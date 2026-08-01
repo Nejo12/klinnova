@@ -1,11 +1,15 @@
 # Slice 0 Build Plan
 
+> Historical build plan for Slice 0. Acceptance criteria below are preserved as originally written.
+>
+> **Completion note (2026-08-01):** Slice 0 is complete. PR 0.1–0.4 are merged; CI is green; Vercel Preview and Production were confirmed. Active delivery tracking moved to `docs/14-founder-dashboard.md`. Slice 1 planning lives in `docs/16-slice-1-build-plan.md` and `docs/17-slice-1-schema-proposal.md`.
+
 > Planning artifact only. No application code lands in this document.
 > Execute as **four sequential PRs**. Each PR must leave `main` deployable.
 
 **Goal:** Deliver a deployable, tested application shell with Stint design tokens and reproducible local setup — the Slice 0 outcome in `docs/13-implementation-plan.md`.
 
-**Baseline:** The repository is documentation-only today. Slice 0 introduces the application.
+**Baseline (at plan authoring):** The repository was documentation-only; Slice 0 introduced the application.
 
 **Active tracking:** `docs/14-founder-dashboard.md`
 
