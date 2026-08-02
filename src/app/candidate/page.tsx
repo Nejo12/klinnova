@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { resolveCandidateHomeView } from "@/app/candidate/resolve-candidate-home";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { loadCandidateOnboarding } from "@/lib/onboarding/load-candidate";
 import { onboardingGroupHref } from "@/lib/onboarding/navigation";
@@ -26,38 +27,18 @@ export default async function CandidatePage() {
   }
 
   const { displayName, progress, profile } = loaded.data;
-  const onboardingCompleted = profile.onboardingCompletedAt !== null;
-
-  if (onboardingCompleted) {
-    return (
-      <main className={styles.page}>
-        <div className={styles.header}>
-          <Link className={styles.brand} href="/">
-            Stint
-          </Link>
-          <LogoutButton />
-        </div>
-        <h1 className={styles.heading}>Welcome, {displayName}</h1>
-        <p className={styles.lead}>
-          Your essential onboarding is complete. Matching is not available yet —
-          that opens in a later step.
-        </p>
-        <p className={styles.note}>
-          No job matches are shown here. You can still review or update your
-          essentials; completion stays server-controlled.
-        </p>
-        <p>
-          <Link className={styles.cta} href={onboardingGroupHref("review")}>
-            Review your essentials
-          </Link>
-        </p>
-      </main>
-    );
-  }
-
   const continueHref = progress.essentialsValid
     ? onboardingGroupHref("review")
     : onboardingGroupHref(progress.firstIncompleteGroup ?? "languages");
+
+  const view = resolveCandidateHomeView({
+    onboardingCompleted: profile.onboardingCompletedAt !== null,
+    continueHref,
+  });
+
+  if (view.kind === "redirect") {
+    redirect(view.href);
+  }
 
   return (
     <main className={styles.page}>
@@ -70,15 +51,14 @@ export default async function CandidatePage() {
       <h1 className={styles.heading}>Welcome, {displayName}</h1>
       <p className={styles.lead}>
         {progress.essentialsValid
-          ? "Your essential answers are saved. Confirm completion from review when you are ready — matching is not open yet."
-          : "Continue essential onboarding so we can match you carefully later. Progress is saved after each section."}
+          ? "Your essential answers are saved. Confirm completion from review when you are ready."
+          : "Continue essential onboarding so we can match you carefully. Progress is saved after each section."}
       </p>
       <p className={styles.note}>
-        {progress.completeCount} of {progress.totalGroups} sections saved. No
-        job matches are shown here yet.
+        {progress.completeCount} of {progress.totalGroups} sections saved.
       </p>
       <p>
-        <Link className={styles.cta} href={continueHref}>
+        <Link className={styles.cta} href={view.continueHref}>
           {progress.essentialsValid
             ? "Review and confirm essentials"
             : "Continue onboarding"}

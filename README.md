@@ -144,7 +144,7 @@ At the same time, validate that employers can:
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 and Slice 1 are complete. Slice 2 planning is locked (D-026–D-033 Accepted). PR 2.1 (merged) landed vacancy schema, RLS, and local/CI demo fixtures. PR 2.2 adds the pure matcher and authenticated server loader; `/candidate/matches` UI is not started. Product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 and Slice 1 are complete. Slice 2 planning is locked (D-026–D-033 Accepted). PR 2.1–2.2 merged (vacancy schema/RLS/fixtures + matcher/loader). PR 2.3 adds `/candidate/matches` UI and completion routing; job detail and applications remain later. Product scope remains `docs/04-mvp.md`.
 
 ## Local development
 

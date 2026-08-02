@@ -107,7 +107,7 @@ test.describe("local onboarding persistence journey", () => {
       }),
     ).toBeVisible();
     await expect(
-      page.getByText(/No job matches are shown here/i),
+      page.getByText(/After you confirm, you can view jobs/i),
     ).toBeVisible();
 
     await page.goto("/candidate/onboarding?group=location");

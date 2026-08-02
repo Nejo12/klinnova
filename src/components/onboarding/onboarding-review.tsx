@@ -28,16 +28,16 @@ export function OnboardingReview({
           Essentials confirmed, {displayName}
         </h1>
         <p className={styles.lead}>
-          Your essential answers are complete. Matching is not available yet —
-          that comes in a later step.
+          Your essential answers are complete. You can view jobs that match your
+          saved preferences, or review your answers any time.
         </p>
         <p className={styles.note}>
-          No job matches are shown here. You can still review or update your
-          answers; completion stays server-controlled.
+          Updating answers can clear completion when essentials are no longer
+          met. Completion stays server-controlled.
         </p>
         <div className={styles.actions}>
-          <Link className={styles.button} href="/candidate">
-            Return to candidate home
+          <Link className={styles.button} href="/candidate/matches">
+            View matching jobs
           </Link>
           <Link
             className={`${styles.button} ${styles.buttonSecondary}`}
@@ -61,7 +61,8 @@ export function OnboardingReview({
           your saved essentials before marking onboarding complete.
         </p>
         <p className={styles.note}>
-          No job matches are shown here. Confirming does not open matching.
+          After you confirm, you can view jobs that match your saved
+          preferences.
         </p>
         <CompleteOnboardingForm />
         <div className={styles.actions}>

@@ -100,12 +100,17 @@ test.describe("Slice 1 completion gate journey", () => {
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Confirm essentials" }).click();
-    await expect(page).toHaveURL(/\/candidate$/, { timeout: 15_000 });
+    await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
     await expect(
-      page.getByText(/essential onboarding is complete/i),
+      page.getByRole("heading", {
+        level: 1,
+        name: "Jobs that match your preferences",
+      }),
     ).toBeVisible();
     await expect(
-      page.getByText(/No job matches are shown here/i),
+      page.getByText(
+        /Matches are shown using the work-authorisation declaration/i,
+      ),
     ).toBeVisible();
 
     const client = createClient(supabaseUrl, publishableKey, {
@@ -129,15 +134,21 @@ test.describe("Slice 1 completion gate journey", () => {
     expect(completedProfile?.work_authorisation_declared).toBe(true);
 
     await page.reload();
+    await expect(page).toHaveURL(/\/candidate\/matches$/);
     await expect(
-      page.getByText(/essential onboarding is complete/i),
+      page.getByRole("heading", {
+        level: 1,
+        name: "Jobs that match your preferences",
+      }),
     ).toBeVisible();
-    await page.getByRole("link", { name: /Review your essentials/i }).click();
-    await expect(page).toHaveURL(/group=review/);
+    await page.goto("/candidate/onboarding?group=review");
     await expect(
       page.getByRole("heading", {
         name: new RegExp(`Essentials confirmed, ${displayName}`, "i"),
       }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /View matching jobs/i }),
     ).toBeVisible();
 
     await page.goto("/candidate/onboarding?group=work_authorisation");
