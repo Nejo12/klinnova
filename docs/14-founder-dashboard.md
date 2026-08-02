@@ -10,17 +10,17 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M1 — Candidate matching shell |
 | Active slice | Slice 2 — Onboarding to seeded matches |
-| Slice status | PR 2.1 in progress — vacancy schema, RLS, local/CI fixtures |
+| Slice status | PR 2.2 in progress — pure matcher + authenticated server loader |
 | Next slice | Slice 3 — Job detail to submitted application |
-| Blockers | None. Matching UI / matcher (PR 2.2+) not started. |
+| Blockers | None. Matches UI (PR 2.3) and hosted fixture procedure (PR 2.4) not started. |
 
 ## Slice 2 delivery
 
 | Artifact | Status |
 |----------|--------|
 | `docs/18`–`docs/20` / D-026–D-033 | Locked / Accepted |
-| PR 2.1 — Vacancy schema, RLS, local/CI fixtures | In progress (this branch) |
-| PR 2.2 — Pure matcher + server loader | Not started |
+| PR 2.1 — Vacancy schema, RLS, local/CI fixtures | Done (merged; PR #26) |
+| PR 2.2 — Pure matcher + server loader | In progress (this branch) |
 | PR 2.3 — `/candidate/matches` UI | Not started |
 | PR 2.4 — Critical journey + hosted fixture procedure | Not started |
 
@@ -92,7 +92,7 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 |-------|---------|--------|
 | 0 Foundation | Deployable shell + CI | Done — PR 0.1–0.4 merged; CI green; Production confirmed |
 | 1 Onboarding | Register → persisted essentials | Done — PR 1.1–1.4 merged (#21–#23); hosted migration + production smoke confirmed; D-018–D-025 Accepted |
-| 2 Matches | Essentials → seeded explainable matches | In progress — PR 2.1 (schema/RLS/fixtures); matcher/UI not started |
+| 2 Matches | Essentials → seeded explainable matches | In progress — PR 2.1 merged (#26); PR 2.2 matcher/loader in progress; UI not started |
 | 3 Apply | Job detail → submitted application | Not started |
 | 4 Employer draft | Register → draft vacancy | Not started |
 | 5 Publish | Verification → public vacancy | Not started |
