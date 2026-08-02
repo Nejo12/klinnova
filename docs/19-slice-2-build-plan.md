@@ -102,6 +102,8 @@ D-026–D-033 are Accepted; implementation may open after this planning package 
 
 ## PR 2.1 — Vacancy schema, RLS, local/CI fixtures
 
+**Status:** Done (merged; PR #26).
+
 **Intent:** Land approved tables, policies, and deterministic local/CI fixtures.
 
 **Includes:** Migrations for `companies`, `vacancies`, `vacancy_language_requirements`; CHECKs per `docs/20` / D-025 / D-029; RLS per D-033; local seed tooling + CI reset fixtures; pgTAP; generated types.
@@ -115,6 +117,8 @@ D-026–D-033 are Accepted; implementation may open after this planning package 
 ---
 
 ## PR 2.2 — Pure matcher and authenticated server loader
+
+**Status:** In progress (branch `feat/slice-2-pr-2.2-matcher-loader`). Not complete until merge.
 
 **Intent:** Pure deterministic matcher + authenticated server loader returning vacancies + explanation codes.
 
