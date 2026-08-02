@@ -144,7 +144,7 @@ At the same time, validate that employers can:
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 and Slice 1 are complete. Slice 2 (seeded matches) planning is locked with D-026–D-033 Accepted; vacancy/matching implementation has not started. Product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 and Slice 1 are complete. Slice 2 planning is locked (D-026–D-033 Accepted). PR 2.1 lands vacancy schema, RLS, and local/CI demo fixtures; matching UI is not started. Product scope remains `docs/04-mvp.md`.
 
 ## Local development
 
@@ -194,7 +194,7 @@ Prefer the CLI `Publishable` key when present. Older CLI output may label the sa
 8. Apply migrations (local database reset) and run schema/RLS tests:
 
 ```bash
-pnpm supabase:db:reset   # local-only; recreates DB from migrations (no product seed)
+pnpm supabase:db:reset   # local-only; recreates DB from migrations + local/CI seeds
 pnpm supabase:test:db    # pgTAP tests in supabase/tests/database
 ```
 
@@ -250,8 +250,8 @@ Hosted Preview/Production Auth uses the repository owner’s Supabase project, V
 - No Supabase account is needed for local development.
 - Do not run `supabase login`.
 - Do not link a remote Supabase project from the CLI for routine work.
-- Candidate schema, Auth, essential onboarding, and controlled completion RPCs exist; matching is Slice 2.
-- Database seeding is disabled (`supabase/config.toml`); pgTAP tests create transactional fixtures.
+- Candidate schema, Auth, essential onboarding, and controlled completion RPCs exist; vacancy tables are Slice 2 PR 2.1.
+- Local/CI seeding is enabled for fictional Demo vacancy fixtures (`supabase/seeds`); hosted Production/Preview schema migrations do not auto-insert demo business data (D-031).
 - No service-role or secret key is required. Browser/SSR session paths use the publishable key + user cookies and RLS.
 - `pnpm supabase:db:reset` is local-only and destructive to the local database containers’ data.
 - Anonymous clients have no table privileges on candidate tables, so denied access surfaces as permission errors (`42501`), not empty result sets.

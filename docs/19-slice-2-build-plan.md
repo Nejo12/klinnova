@@ -194,7 +194,8 @@ All of the above decisions are Accepted as of 2026-08-01.
 ## Slice 2 close checklist
 
 - [x] D-026–D-033 Accepted
-- [ ] PRs 2.1–2.4 merged
+- [ ] PR 2.1 merged (schema/RLS/local-CI fixtures)
+- [ ] PRs 2.2–2.4 merged
 - [ ] Exit criteria on Auth-capable hosted environment
 - [ ] RLS + matching tests + critical journey green
 - [ ] Hosted demo fixture procedure documented and used (not migration auto-seed)

@@ -1,6 +1,6 @@
 # Slice 2 Schema and Matching Proposal
 
-> Proposal locked to Accepted D-026–D-033 (2026-08-01). No migrations until PR 2.1.
+> Proposal locked to Accepted D-026–D-033 (2026-08-01). PR 2.1 implements schema, RLS, and local/CI fixtures.
 > Terminology: `vacancy` in schema/employer contexts; `job` in candidate-facing UI (`docs/12-terminology.md`).
 
 **Depends on:** Slice 1 schema (`docs/17`); D-012, D-019, D-020, D-023, D-025; D-026–D-033 Accepted.
@@ -250,63 +250,40 @@ Do not place a legal-eligibility badge on every card.
 
 ## RLS contract (D-033)
 
-Pseudocode:
+Semantics (implemented in PR 2.1):
 
 ```text
-completed_candidate :=
-  auth.uid() IS NOT NULL
-  AND EXISTS (
-    SELECT 1 FROM candidate_profiles cp
-    WHERE cp.id = auth.uid()
-      AND cp.onboarding_completed_at IS NOT NULL
-  )
-
-companies SELECT:
-  completed_candidate
-  AND companies.source = 'seed'
-  AND EXISTS (
-    SELECT 1 FROM vacancies v
-    WHERE v.company_id = companies.id
-      AND v.source = 'seed'
-      AND v.publication_state = 'published'
-      AND v.published_at IS NOT NULL
-      AND v.published_at <= now()
-      AND v.expires_at > now()
-  )
-
-vacancies SELECT:
-  completed_candidate
-  AND source = 'seed'
-  AND publication_state = 'published'
-  AND published_at IS NOT NULL
+visible_seed_vacancy_ids() :=
+  SECURITY DEFINER set-returning helper
+  returns vacancy ids only when auth.uid() owns a completed candidate profile
+  AND vacancy/company are seed
+  AND publication_state = published
   AND published_at <= now()
   AND expires_at > now()
-  AND EXISTS (
-    SELECT 1 FROM companies c
-    WHERE c.id = vacancies.company_id
-      AND c.source = 'seed'
-  )
+  otherwise empty
+
+visible_seed_company_ids() :=
+  distinct company_ids that currently have at least one id from
+  visible_seed_vacancy_ids() semantics (contract B)
+
+companies SELECT:
+  id IN (SELECT visible_seed_company_ids())
+
+vacancies SELECT:
+  id IN (SELECT visible_seed_vacancy_ids())
 
 vacancy_language_requirements SELECT:
-  completed_candidate
-  AND EXISTS (
-    SELECT 1 FROM vacancies v
-    JOIN companies c ON c.id = v.company_id
-    WHERE v.id = vacancy_language_requirements.vacancy_id
-      AND v.source = 'seed'
-      AND c.source = 'seed'
-      AND v.publication_state = 'published'
-      AND v.published_at IS NOT NULL
-      AND v.published_at <= now()
-      AND v.expires_at > now()
-  )
+  vacancy_id IN (SELECT visible_seed_vacancy_ids())
 
-anon: no privileges on all three tables
-authenticated: SELECT only (no insert/update/delete)
-identity: auth.uid() only — no candidate UUID parameter
+anon: no table privileges; no helper EXECUTE
+authenticated: SELECT only on tables; EXECUTE on visibility helpers
+  (required for policy evaluation; direct calls return only already-visible ids)
+identity: auth.uid() only — no candidate UUID argument on helpers
 service_role: may exist for owner-controlled seed/admin ops;
   never used in browser or ordinary SSR candidate clients
 ```
+
+UUID-probe predicates (`company_is_seed(uuid)`, `vacancy_is_active_seed(uuid)`, etc.) are intentionally **not** present — they leaked hidden inventory to incomplete authenticated callers. Set-returning helpers embed the completion gate and return only D-033-visible ids.
 
 ---
 
@@ -352,4 +329,4 @@ service_role: may exist for owner-controlled seed/admin ops;
 - [x] Hard filters + explanation model locked
 - [x] RLS contract locked
 - [x] Seed environment contract locked
-- [ ] PR 2.1 implementation (next)
+- [x] PR 2.1 implementation (schema/RLS/local-CI fixtures; matcher/UI remain later)
