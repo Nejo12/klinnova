@@ -10,9 +10,19 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M1 — Candidate matching shell |
 | Active slice | Slice 2 — Onboarding to seeded matches |
-| Slice status | Not started — planning only; Slice 1 closed |
+| Slice status | Planning complete (decisions Accepted) — implementation not started; merge discovery package before PR 2.1 |
 | Next slice | Slice 3 — Job detail to submitted application |
-| Blockers | None for Slice 1. Seed vacancies / match rules for Slice 2 not started. D-018–D-025 Accepted. |
+| Blockers | None for decisions. Open PR 2.1 only after this planning package merges. |
+
+## Slice 2 planning (decisions Accepted)
+
+| Artifact | Status |
+|----------|--------|
+| `docs/18-slice-2-discovery.md` | Locked — T1–T5 resolved via D-026–D-033 |
+| `docs/19-slice-2-build-plan.md` | Locked — PR 2.1–2.4 sequence |
+| `docs/20-slice-2-schema-and-matching-proposal.md` | Locked — tables, RLS, match rules |
+| D-026–D-033 | Accepted 2026-08-01 |
+| Migrations / matching / matches UI | Not started |
 
 ## Slice 1 closure (complete)
 
@@ -82,7 +92,7 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 |-------|---------|--------|
 | 0 Foundation | Deployable shell + CI | Done — PR 0.1–0.4 merged; CI green; Production confirmed |
 | 1 Onboarding | Register → persisted essentials | Done — PR 1.1–1.4 merged (#21–#23); hosted migration + production smoke confirmed; D-018–D-025 Accepted |
-| 2 Matches | Essentials → seeded explainable matches | Not started — next active slice (planning only) |
+| 2 Matches | Essentials → seeded explainable matches | Planning complete — D-026–D-033 Accepted; `docs/18`–`docs/20` locked; no migrations/app yet |
 | 3 Apply | Job detail → submitted application | Not started |
 | 4 Employer draft | Register → draft vacancy | Not started |
 | 5 Publish | Verification → public vacancy | Not started |

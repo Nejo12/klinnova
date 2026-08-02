@@ -66,7 +66,11 @@ Each slice is the unit of planning, implementation, and review. Size for roughly
 
 **Outcome:** after essentials, a candidate sees deterministic, explainable matches against seeded vacancies.
 
-**Includes:** seed vacancies; match calculation from category, language, location/radius, availability, employment type, shift, experience, and work-authorisation declaration; matches screen; empty states; match explanations.
+**Includes:** seed/demo vacancies; match calculation from category, language, Berlin location, availability, employment type, shift, and work-authorisation declaration as a completion gate; `/candidate/matches` screen; empty states; match explanations.
+
+**Accepted Slice 2 narrowings (D-026–D-033):** experience is excluded (no fields, eligibility, ordering, explanation, or display-only pseudo-requirement); travel minutes are unused for eligibility, ordering, reasons, and match claims (Berlin hard filter only); UI is `/candidate/matches` only (no detail/apply/save); fictional seed companies with `source = seed` and no verification claim; pure TypeScript matching with deterministic sort and no opaque scores; no automatic Production business-data insertion through schema migrations. Broader Matching v1 items remain later MVP intent where narrowed here.
+
+**Planning artifacts:** discovery `docs/18-slice-2-discovery.md`, build plan `docs/19-slice-2-build-plan.md`, schema/matching proposal `docs/20-slice-2-schema-and-matching-proposal.md`.
 
 **Exit criteria:**
 
