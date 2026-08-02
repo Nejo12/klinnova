@@ -252,3 +252,138 @@ Central typed module in application code; database check constraints enforce the
 **Consequences:** PR 1.3 migration + UI share one vocabulary; expansion requires a later decision and migration.
 
 **Acceptance note:** Accepted for PR 1.3 allow-list constraints and essential onboarding persistence.
+
+## D-026 — Slice 2 vacancy ownership without employers
+
+**Status:** Accepted
+**Accepted:** 2026-08-01
+**Must accept before:** PR 2.1
+
+**Context:** Slice 2 needs Berlin vacancies before employer Auth, company self-serve, or Slice 5 verification exist (`docs/13`; discovery T3 in `docs/18-slice-2-discovery.md`).
+
+**Decision:** Introduce minimal `companies` and `vacancies` tables with one constrained ownership vocabulary: `source = seed` for Slice 2. Companies are fictional/demo only. No fake employer Auth users. No verification claim or verified-employer badges. Do not add `is_platform_seed` (redundant with `source`). Schema remains extensible later for real employer ownership via future migrations (additional sources/FKs) — not implemented in Slice 2.
+
+**Alternatives:** Fake employer Auth accounts for seeds; `is_platform_seed` flag; skip `companies` and orphan vacancies; wait for Slice 4–5 before any matches.
+
+**Consequences:** RLS and matching treat seed companies/vacancies as curated demo fixtures; employer product surfaces remain Slice 4+. See `docs/20-slice-2-schema-and-matching-proposal.md`.
+
+**Acceptance note:** Accepted after architecture review. PR 2.1 must not create employer Auth users or verification columns for seeds.
+
+## D-027 — Experience omitted from Slice 2 matching
+
+**Status:** Accepted
+**Accepted:** 2026-08-01
+**Must accept before:** PR 2.2
+
+**Context:** `docs/04`, `docs/07`, and `docs/13` list experience in Matching v1 / Slice 2 includes, but Slice 1 deferred candidate experience collection (`docs/17`). Discovery T1.
+
+**Decision:** Slice 2 intentionally narrows Matching v1: **no** experience fields on vacancies or candidates; **no** experience eligibility; **no** experience ordering; **no** experience explanation; **no** display-only pseudo-requirement. Experience matching remains later MVP intent after experience is collected.
+
+**Alternatives:** Collect experience in Slice 2 before matches; invent default experience; display-only experience text that is not a filter.
+
+**Consequences:** Implementers must not invent experience inputs or copy; revisit when experience onboarding lands.
+
+**Acceptance note:** Accepted. Narrows `docs/13` Slice 2 includes for this slice only.
+
+## D-028 — Slice 2 matching engine shape
+
+**Status:** Accepted
+**Accepted:** 2026-08-01
+**Must accept before:** PR 2.2
+
+**Context:** D-012 requires explainable deterministic matching. Architecture mentions weighted ranking; exit criteria forbid opaque scores (discovery T5).
+
+**Decision:** Matching runs as pure TypeScript functions in `src/lib/matching/` that **do not fetch**. An authenticated server loader performs reads under RLS. Identity comes from the verified session only (`auth.uid()`); no candidate UUID from the browser. Incomplete candidates are rejected **before** vacancy loading. No persisted matches table. No numeric scores. Explanations are produced by the same rules as eligibility. No temporary diagnostic or public match endpoint. Deterministic ordering: (1) `published_at DESC`, (2) `title ASC`, (3) `id ASC`.
+
+**Alternatives:** SQL-only matcher; weighted score with UI percentage; materialised `matches` table; temporary diagnostic endpoint.
+
+**Consequences:** Unit-testable rules without DB; loader owns authz-sensitive reads; ranking sophistication deferred.
+
+**Acceptance note:** Accepted. PR 2.2 must not ship diagnostic/public match endpoints.
+
+## D-029 — Vacancy German and language requirements
+
+**Status:** Accepted
+**Accepted:** 2026-08-01
+**Must accept before:** PR 2.1
+
+**Context:** Candidates have `german_comfort` and `candidate_languages` (D-025). Vacancies need aligned deterministic German/language filters.
+
+**Decision:** Use the same German vocabulary for candidate comfort and vacancy requirement: `none`, `basic`, `conversational`, `comfortable`. Canonical ordinal ranks: `none`=0, `basic`=1, `conversational`=2, `comfortable`=3. Eligibility: `rank(candidate) >= rank(requirement)`. Additional languages use normalized `vacancy_language_requirements` (D-025 codes + proficiency); zero rows allowed; when rows exist all are mandatory and must be satisfied; `other` matches only `other`; no preferred-language scoring. No `english_ok` column. No CEFR.
+
+**Alternatives:** `none_required` vacancy code; CEFR; `english_ok` flag; Fluent German before allow-list expansion.
+
+**Consequences:** PR 2.1 CHECKs + matcher share one vocabulary; expansion needs a later decision + migration.
+
+**Acceptance note:** Accepted. Removes earlier draft `none_required` / `english_ok` proposal.
+
+## D-030 — Slice 2 location and travel rule
+
+**Status:** Accepted
+**Accepted:** 2026-08-01
+**Must accept before:** PR 2.2
+
+**Context:** Candidates store Berlin + travel minutes without coordinates. Matching docs say “location or travel radius.” No GIS stack (discovery T2).
+
+**Decision:** Hard location filter is Berlin-only: candidate `city = Berlin` and vacancy `city = Berlin`. Travel minutes are unused for eligibility, unused for ordering, not returned as a reason, and not displayed as a match claim. No “within your travel preference” wording. Factual Berlin location may be displayed. No lat/lng, PostGIS, or district polygons.
+
+**Alternatives:** Require coordinates; approximate districts; soft-rank by travel minutes; travel-fit copy on cards.
+
+**Consequences:** Intentional narrowing of travel-radius matching until geography exists; seeds CHECK city Berlin.
+
+**Acceptance note:** Accepted.
+
+## D-031 — Seed and demo fixture environments
+
+**Status:** Accepted
+**Accepted:** 2026-08-01
+**Must accept before:** PR 2.1
+
+**Context:** Slice 2 needs matchable demo vacancies without treating schema migrations as a Production business-data pipeline, and without a Slice 5 employer publish workflow.
+
+**Decision:** Replace automatic published Production seeding. Environment contract:
+
+- **Local:** deterministic fictional fixtures through local seed tooling.
+- **CI:** deterministic fixtures during reset/test setup.
+- **Preview:** optional explicit owner-applied demo fixture set.
+- **Production:** no automatic business-data insertion through schema migrations; explicit owner-controlled demo-data operation only.
+
+Matchable demo rows use `publication_state = published`, non-null `published_at`, `source = seed`, and `expires_at`. Production/Preview demo records must be fictional, visibly labelled **Demo vacancy**, expiring/removable, with no real company names and no verified-employer claim. Lifecycle includes `withdrawn` for removal without delete when needed.
+
+**Alternatives:** Insert Production demo inventory in schema migrations; match drafts; perpetual non-expiring fake jobs.
+
+**Consequences:** PR 2.1 ships schema/RLS + local/CI fixtures only; PR 2.4 documents hosted owner-controlled fixture procedure.
+
+**Acceptance note:** Accepted. Supersedes the earlier “seeds inserted published via migration for all environments” draft.
+
+## D-032 — Slice 2 matches UI depth
+
+**Status:** Accepted
+**Accepted:** 2026-08-01
+**Must accept before:** PR 2.3
+
+**Context:** `docs/05` describes rich job discovery; Slice 3 owns detail, apply, and save (discovery T4).
+
+**Decision:** Slice 2 owns only `/candidate/matches`. Cards may show enough structured information and match reasons (≤4 prioritized codes) to understand fit. No detail route. No apply. No save. No employer contact action. No disabled future-action button. Empty state when none match. Full job detail, save/unsave, and apply remain Slice 3.
+
+**Alternatives:** Optional read-only detail route; full apply in Slice 2; public anonymous SEO job board in Slice 2.
+
+**Consequences:** Protects Slice 3 boundary; exit focuses on explainable seeded matches on one route.
+
+**Acceptance note:** Accepted. Removes optional detail-route escape hatch from the draft proposal.
+
+## D-033 — Vacancy read RLS for Slice 2
+
+**Status:** Accepted
+**Accepted:** 2026-08-01
+**Must accept before:** PR 2.1
+
+**Context:** Candidate documents and PII stay private (D-023). Seed vacancies must not become an anonymous public board in Slice 2.
+
+**Decision:** `anon` has no privileges on `companies`, `vacancies`, or `vacancy_language_requirements`. Authenticated candidates receive **SELECT only**, and only when: verified session; own `candidate_profiles` row exists; `onboarding_completed_at IS NOT NULL`; company `source = seed`; vacancy `source = seed`; vacancy `publication_state = published`; `published_at <= now()`; `expires_at > now()`; language rows belong to a vacancy visible under those rules. Identity from `auth.uid()` only — no candidate UUID parameter. `service_role` may exist for owner-controlled seed/admin ops; never used in browser or ordinary SSR candidate clients.
+
+**Alternatives:** Public anon read; any authenticated (including incomplete) read; SELECT without expiry/`published_at` checks.
+
+**Consequences:** Matches gate aligns RLS with product gate and lifecycle; incomplete users resume onboarding without vacancy inventory access.
+
+**Acceptance note:** Accepted. PR 2.1 policies must encode expiry and publish-time visibility.

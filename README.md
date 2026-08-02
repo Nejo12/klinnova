@@ -136,12 +136,15 @@ At the same time, validate that employers can:
 - [Slice 0 build plan](docs/15-slice-0-build-plan.md) (complete; historical)
 - [Slice 1 build plan](docs/16-slice-1-build-plan.md) (complete; historical)
 - [Slice 1 schema proposal](docs/17-slice-1-schema-proposal.md)
+- [Slice 2 discovery](docs/18-slice-2-discovery.md) (planning locked; D-026–D-033 Accepted)
+- [Slice 2 build plan](docs/19-slice-2-build-plan.md) (planning locked)
+- [Slice 2 schema and matching proposal](docs/20-slice-2-schema-and-matching-proposal.md) (planning locked)
 - [Not now](NOT_NOW.md)
 - [Agent instructions](AGENTS.md)
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 and Slice 1 are complete. Slice 2 (seeded matches) is next and not started. Product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 and Slice 1 are complete. Slice 2 (seeded matches) planning is locked with D-026–D-033 Accepted; vacancy/matching implementation has not started. Product scope remains `docs/04-mvp.md`.
 
 ## Local development
 
