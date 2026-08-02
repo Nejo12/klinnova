@@ -95,6 +95,136 @@ export type Database = {
         }
         Relationships: []
       }
+      companies: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          source: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          source?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      vacancies: {
+        Row: {
+          available_from: string | null
+          city: string
+          company_id: string
+          created_at: string
+          employment_types: string[]
+          expires_at: string
+          german_requirement: string
+          id: string
+          job_category: string
+          publication_state: string
+          published_at: string | null
+          shift_requirements: string[]
+          slug: string
+          source: string
+          summary: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          available_from?: string | null
+          city: string
+          company_id: string
+          created_at?: string
+          employment_types: string[]
+          expires_at: string
+          german_requirement: string
+          id?: string
+          job_category: string
+          publication_state: string
+          published_at?: string | null
+          shift_requirements: string[]
+          slug: string
+          source: string
+          summary: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          available_from?: string | null
+          city?: string
+          company_id?: string
+          created_at?: string
+          employment_types?: string[]
+          expires_at?: string
+          german_requirement?: string
+          id?: string
+          job_category?: string
+          publication_state?: string
+          published_at?: string | null
+          shift_requirements?: string[]
+          slug?: string
+          source?: string
+          summary?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vacancies_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vacancy_language_requirements: {
+        Row: {
+          created_at: string
+          id: string
+          language_code: string
+          min_proficiency: string
+          updated_at: string
+          vacancy_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          language_code: string
+          min_proficiency: string
+          updated_at?: string
+          vacancy_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          language_code?: string
+          min_proficiency?: string
+          updated_at?: string
+          vacancy_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vacancy_language_requirements_vacancy_id_fkey"
+            columns: ["vacancy_id"]
+            isOneToOne: false
+            referencedRelation: "vacancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -128,6 +258,8 @@ export type Database = {
       }
       complete_candidate_onboarding: { Args: never; Returns: Json }
       text_array_is_unique: { Args: { input: string[] }; Returns: boolean }
+      visible_seed_company_ids: { Args: never; Returns: string[] }
+      visible_seed_vacancy_ids: { Args: never; Returns: string[] }
     }
     Enums: {
       [_ in never]: never
