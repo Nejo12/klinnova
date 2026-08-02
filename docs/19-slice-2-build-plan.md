@@ -118,7 +118,7 @@ D-026–D-033 are Accepted; implementation may open after this planning package 
 
 ## PR 2.2 — Pure matcher and authenticated server loader
 
-**Status:** In progress (branch `feat/slice-2-pr-2.2-matcher-loader`). Not complete until merge.
+**Status:** Done (merged; PR #27).
 
 **Intent:** Pure deterministic matcher + authenticated server loader returning vacancies + explanation codes.
 
@@ -133,6 +133,8 @@ D-026–D-033 are Accepted; implementation may open after this planning package 
 ---
 
 ## PR 2.3 — `/candidate/matches` UI and routing
+
+**Status:** In progress (branch `feat/slice-2-pr-2.3-candidate-matches-ui`). Not complete until merge.
 
 **Intent:** Completed candidates see matches; incomplete resume onboarding.
 

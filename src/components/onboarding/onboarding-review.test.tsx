@@ -42,9 +42,8 @@ describe("OnboardingReview", () => {
       screen.getByRole("button", { name: /Confirm essentials/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/No job matches are shown here/i),
+      screen.getByText(/After you confirm, you can view jobs/i),
     ).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /jobs?/i })).toBeNull();
   });
 
   it("shows confirmed state without a confirm button when completed", () => {
@@ -78,6 +77,9 @@ describe("OnboardingReview", () => {
     expect(
       screen.queryByRole("button", { name: /Confirm essentials/i }),
     ).toBeNull();
+    expect(
+      screen.getByRole("link", { name: /View matching jobs/i }),
+    ).toHaveAttribute("href", "/candidate/matches");
   });
 
   it("lists incomplete sections when essentials are not valid", () => {

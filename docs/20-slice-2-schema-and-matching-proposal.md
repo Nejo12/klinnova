@@ -1,6 +1,6 @@
 # Slice 2 Schema and Matching Proposal
 
-> Proposal locked to Accepted D-026–D-033 (2026-08-01). PR 2.1 (merged) implements schema, RLS, and local/CI fixtures. PR 2.2 implements the pure matcher and authenticated server loader (no UI).
+> Proposal locked to Accepted D-026–D-033 (2026-08-01). PR 2.1–2.2 merged (schema/RLS/fixtures + pure matcher/loader). PR 2.3 implements `/candidate/matches` UI only (no apply/detail).
 > Terminology: `vacancy` in schema/employer contexts; `job` in candidate-facing UI (`docs/12-terminology.md`).
 
 **Depends on:** Slice 1 schema (`docs/17`); D-012, D-019, D-020, D-023, D-025; D-026–D-033 Accepted.
@@ -330,4 +330,5 @@ UUID-probe predicates (`company_is_seed(uuid)`, `vacancy_is_active_seed(uuid)`, 
 - [x] RLS contract locked
 - [x] Seed environment contract locked
 - [x] PR 2.1 implementation (schema/RLS/local-CI fixtures; merged PR #26)
-- [ ] PR 2.2 implementation (pure matcher + authenticated loader; UI remains PR 2.3)
+- [x] PR 2.2 implementation (pure matcher + authenticated loader; merged PR #27)
+- [ ] PR 2.3 implementation (`/candidate/matches` UI; apply/detail remain later)
