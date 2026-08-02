@@ -47,6 +47,7 @@ Browser
 /candidate/matches
 /candidate/applications
 /candidate/profile
+/employer/profile
 /employer/company
 /employer/jobs
 /employer/jobs/new
@@ -54,6 +55,8 @@ Browser
 /admin/verifications
 /admin/reports
 ```
+
+`/employer/profile` is the employer account surface for private and organisation employers. `/employer/company` applies only to organisation employers’ legal or public business profile (see D-034 and `docs/12-terminology.md`).
 
 ## Code organisation
 
@@ -104,7 +107,8 @@ Use a shared profile identity and separate role-specific records. Avoid one larg
 
 - use Supabase Row Level Security
 - candidates may read and change only their own private profile and applications
-- employers may read applicants only for jobs belonging to their verified company
+- employers may read applicants only for jobs belonging to their verified employer account
+- exact private residential service locations must not be publicly readable; public job surfaces use privacy-safe approximate location where required (D-034)
 - administrators receive explicitly assigned elevated permissions
 - sensitive actions must also be validated server-side
 

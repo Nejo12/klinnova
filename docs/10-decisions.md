@@ -387,3 +387,21 @@ Matchable demo rows use `publication_state = published`, non-null `published_at`
 **Consequences:** Matches gate aligns RLS with product gate and lifecycle; incomplete users resume onboarding without vacancy inventory access.
 
 **Acceptance note:** Accepted. PR 2.1 policies must encode expiry and publish-time visibility.
+
+## D-034 — Private and organisation employers
+
+**Status:** Accepted
+**Accepted:** 2026-08-03
+**Must accept before:** Slice 4 employer registration / Slice 5 verification design
+
+**Context:** Early product docs assumed company-style employers. Initial Berlin hiring also includes private households, residents, landlords, property managers, shops, and retail-store operators — especially for legitimate household and premises-support work such as cleaning. Treating every employer as a registered company with a public website would exclude important legitimate hiring.
+
+**Decision:** Stint supports both **private employers** and **organisation employers**. Every employer has an employer profile; a company profile applies only to organisation employers. Employer verification is type-specific. Private households do not need a legal company name, commercial website, or company registration merely to create an employer account. Exact private residential addresses are sensitive and must not be publicly exposed; job cards may show a privacy-safe approximate area, with precise location disclosed only at an appropriate, consented stage. All jobs must remain legitimate and subject to trust, moderation, reporting, suspension, and vacancy expiry. Stint does not support undeclared work, cash-in-hand arrangements, or freelancer marketplace operations.
+
+This decision does **not** add employer implementation, schema, Auth, verification UI, or private-address storage to Slice 2. Detailed employer schema and workflows belong to later employer slices (Slice 4+). Slice 2 Demo fixtures may remain fictional organisation-style seed records without real private residential addresses.
+
+**Alternatives:** Company-only employer model; require website/registration for all employers; public full residential addresses on job cards; treat private hiring as out of scope.
+
+**Consequences:** Product docs (`docs/03`–`docs/05`, `docs/12`) distinguish private vs organisation employers; later employer slices must design type-specific verification and location privacy; Slice 2 matching/fixtures remain unchanged.
+
+**Acceptance note:** Accepted as a product-domain clarification during Slice 2 PR 2.4 documentation correction.
