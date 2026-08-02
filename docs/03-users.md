@@ -49,28 +49,43 @@ Needs flexible or nearby work after a career break, family responsibility, illne
 
 ## Primary employer
 
-A Berlin employer with recurring operational hiring needs who is willing to hire people with limited German when the actual role does not require fluency.
+A Berlin person, household, shop operator, or organisation who needs to hire for legitimate work and is willing to hire people with limited German when the actual role does not require fluency.
+
+Employers are not limited to registered companies. They include verified private individuals, households, property owners, residents, tenants, landlords, property managers, shops and retail-store operators, and registered businesses and organisations.
+
+An employer account does not require recurring hiring, company status, a commercial website, or a commercial office. Every job must still be legitimate and comply with Stint’s trust and moderation requirements. Stint does not support undeclared work, cash-in-hand arrangements, or freelancer marketplace operations.
 
 ### Initial employer types
 
+- private households and residents
+- homeowners, tenants, landlords, and property managers
+- shop and retail-store owners or operators
 - cleaning companies
 - hotels and hostels
 - restaurants and commercial kitchens
 - warehouses and logistics companies
 - food-production businesses
 - moving and event-service companies
-- retailers
-- small and medium-sized local businesses
+- other small and medium-sized local businesses
+
+Private households, shops, and stores are especially important for early hiring of home cleaning, apartment cleaning, common-area or property cleaning, shop cleaning, retail-store cleaning, and related household or premises-support work. Describe the employer as the person or entity hiring — not by the worker’s job title.
 
 ### Core needs
 
-- publish vacancies quickly
-- state realistic language requirements
+- publish vacancies quickly with realistic language requirements
 - receive candidates who match location, availability, and shift constraints
 - identify reliable people beyond conventional CV signals
 - reduce unsuitable applications and no-shows
 - communicate next steps clearly
 - close or expire vacancies without stale listings remaining online
+
+### Private-employer core needs
+
+- publish a legitimate household or premises-support job clearly
+- protect the exact residential address until disclosure is appropriate
+- state schedule, expected duties, pay, frequency, and employment basis
+- understand legal-employment expectations
+- receive suitable candidates without exposing unnecessary personal data
 
 ## Administrative user
 

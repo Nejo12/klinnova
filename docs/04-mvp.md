@@ -52,13 +52,29 @@ The candidate should see job matches after these essentials. Experience, phone n
 
 ## Employer MVP
 
+Stint supports two employer profile models:
+
+A. **Private employer profiles** — verified individuals or households hiring for legitimate work in a private home, apartment, residential property, shop, store, or similar premises.
+B. **Organisation employer profiles** — verified businesses, nonprofits, or other organisations. A **company profile** applies only to organisation employers.
+
+Every employer has an **employer profile**. Verification evidence differs by employer type. Private households do not need a legal company name, commercial website, or company registration merely to create an employer account. All jobs must still be legitimate and comply with the platform’s trust and moderation requirements.
+
+Initial private-employer use cases include:
+
+- recurring home or apartment cleaning
+- one-off deep cleaning where legally supported
+- common-area or managed-property cleaning
+- shop or retail-premises cleaning
+
 ### Included
 
-- employer registration
-- company profile
-- manual employer verification workflow
+- employer registration for private and organisation employers
+- employer profile (with company profile only for organisation employers)
+- type-specific manual employer verification workflow
 - create, edit, publish, close, and expire vacancy
-- title, description, category, location, salary, contract, shift, and start date
+- title, description, category, privacy-safe public location, salary, contract, shift, and start date
+- employer type and workplace type where required for clarity
+- work frequency (one-off or recurring) where relevant
 - explicit language requirements
 - experience and qualification requirements
 - whether a CV is required
@@ -68,6 +84,7 @@ The candidate should see job matches after these essentials. Experience, phone n
 - application status updates
 - interview invitation details
 - vacancy closing and filled status
+- controls so exact private residential addresses are not publicly exposed
 
 ## Administration MVP
 
@@ -118,10 +135,10 @@ The result should explain the match rather than expose an unexplained score.
 - temporary-employment agency operations
 - public candidate directory
 - employer-to-candidate cold outreach without consent
-- real-time chat
+- real-time chat //TODO: this will be nearest future feature
 - native mobile applications
 - video interviewing
-- reviews and reputation scoring
+- reviews and reputation scoring //TODO: this will be nearest future feature
 - automated hiring or rejection
 - complex recommendation models
 - nationwide launch

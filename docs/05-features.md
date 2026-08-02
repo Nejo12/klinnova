@@ -112,15 +112,21 @@ Produce clear, comparable vacancies with realistic eligibility requirements.
 ### Requirements
 
 - structured fields before free-text description
+- employer type (private or organisation)
+- workplace type where relevant (for example private home, apartment, managed property, shop, or commercial premises)
+- work frequency where relevant (one-off or recurring)
 - salary required
 - language requirement required
-- location required
+- privacy-safe public location required (approximate area or district for private homes and apartments)
+- exact-location disclosure control so precise service locations are shared only at an appropriate, consented stage
 - contract type required
 - shift or schedule required
 - expiry date required or automatically assigned
 - employer confirms the vacancy is active and legitimate
 - discriminatory wording warnings
 - preview before publication
+
+These vacancy fields are product requirements for a future employer slice. They are not Slice 2 implementation requirements.
 
 ## Employer applicant review
 
@@ -143,16 +149,29 @@ Make candidates easy to compare without reducing them to conventional CV signals
 
 ### Employer verification
 
-Initial verification is manual. The process should record:
+Initial verification is manual and type-specific. Private-employer verification is not an endorsement. Both private and organisation employers remain subject to moderation, reporting, suspension, and vacancy expiry.
 
-- legal company name
-- public website or other evidence
+#### Private employer
+
+Possible verification evidence may include:
+
+- verified personal identity
+- confirmed email and phone
+- residential or service-location evidence handled privately
+- job-location verification
+- acknowledgement of lawful hiring and pay obligations
+
+Do not require a company website or legal company name from a private household. Exact private residential addresses must not be publicly exposed. Job cards may show a safe approximate area or district. Precise service location should be disclosed only at an appropriate, consented stage.
+
+#### Organisation employer
+
+Possible verification evidence may include:
+
+- legal organisation name
+- registration or equivalent evidence
 - business address
-- contact person
-- verification status
-- reviewer
-- review timestamp
-- notes
+- public website or alternative evidence
+- authorised contact person
 
 ### Vacancy quality
 

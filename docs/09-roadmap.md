@@ -39,15 +39,15 @@ Exit condition: a candidate can apply successfully and see the resulting status.
 
 ## Stage 3 — Employer slice
 
-- employer registration
-- company profile
-- employer verification
-- vacancy creation and publishing
+- employer registration for private and organisation employers
+- employer profile (company profile only for organisation employers)
+- type-specific employer verification
+- vacancy creation and publishing with privacy-safe public location
 - applicant list and candidate profile
 - application status updates
 - interview invitation
 
-Exit condition: a verified employer can post a job, review an applicant, and move the application forward.
+Exit condition: a verified private or organisation employer can post a legitimate job, review an applicant, and move the application forward.
 
 ## Stage 4 — Trust and administration
 

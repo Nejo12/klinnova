@@ -150,15 +150,17 @@ D-026–D-033 are Accepted; implementation may open after this planning package 
 
 ## PR 2.4 — Critical journey, hosted fixture procedure, closure
 
-**Intent:** Prove Slice 2 exit locally and on hosted environments.
+**Intent:** Prove Slice 2 exit locally and prepare hosted exit proof.
 
-**Includes:** Playwright completed-candidate → matches; incomplete blocked; documented owner-controlled Preview/Production demo fixture procedure; hosted smoke notes; docs/dashboard update only when criteria met.
+**Status:** In progress — local critical journey + hosted Demo fixture apply/cleanup procedure implemented; **owner-run hosted proof pending**. Slice 2 is **not** Done until hosted proof is recorded.
 
-**Excludes:** Slice 3 apply/detail flow; automatic Production seed migrations.
+**Includes:** Playwright Slice 2 critical journey (`e2e/slice2-critical-journey.spec.ts`); owner-controlled Preview/Production Demo fixtures under `supabase/fixtures/hosted/`; `pnpm fixtures:hosted:apply` / `cleanup` (explicit `--env`, `--project-ref`, Production confirmation); closure evidence in `docs/21-slice-2-closure.md`.
 
-**Depends on:** PR 2.3.
+**Excludes:** Slice 3 apply/detail flow; automatic Production seed migrations; marking Slice 2 Done without owner-run hosted proof.
 
-**Acceptance:** Exit criteria met; CI green; owner hosted smoke; Slice 2 checklist complete.
+**Depends on:** PR 2.3 (merged as #28).
+
+**Acceptance:** Local exit criteria proven; CI green; hosted procedure ready; Slice 2 checklist marked Done only after owner-run hosted smoke.
 
 ---
 
@@ -200,12 +202,14 @@ All of the above decisions are Accepted as of 2026-08-01.
 ## Slice 2 close checklist
 
 - [x] D-026–D-033 Accepted
-- [ ] PR 2.1 merged (schema/RLS/local-CI fixtures)
-- [ ] PRs 2.2–2.4 merged
-- [ ] Exit criteria on Auth-capable hosted environment
-- [ ] RLS + matching tests + critical journey green
-- [ ] Hosted demo fixture procedure documented and used (not migration auto-seed)
-- [ ] No applications / detail routes / employer features / `NOT_NOW.md` items shipped
-- [ ] Dashboard: Slice 2 Done → Slice 3 planning
+- [x] PR 2.1 merged (schema/RLS/local-CI fixtures) — #26
+- [x] PR 2.2 merged — #27
+- [x] PR 2.3 merged — #28
+- [ ] PR 2.4 merged (local exit proof + hosted procedure)
+- [x] Local RLS + matching tests + critical journey green (PR 2.4 verification)
+- [x] Hosted demo fixture procedure documented (not migration auto-seed)
+- [ ] Exit criteria on Auth-capable hosted environment (owner-run hosted proof pending)
+- [x] No applications / detail routes / employer features / `NOT_NOW.md` items shipped
+- [ ] Dashboard: Slice 2 Done → Slice 3 planning (blocked on hosted proof)
 
 Update the checklist and founder dashboard to Done only after true exit proof.

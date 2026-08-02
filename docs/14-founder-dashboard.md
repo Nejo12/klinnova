@@ -10,9 +10,9 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M1 — Candidate matching shell |
 | Active slice | Slice 2 — Onboarding to seeded matches |
-| Slice status | PR 2.3 in progress — `/candidate/matches` UI and routing |
-| Next slice | Slice 3 — Job detail to submitted application |
-| Blockers | None. Hosted fixture procedure / Slice 2 closure remain PR 2.4. |
+| Slice status | PR 2.4 in progress — local exit proof + hosted fixture procedure; owner-run hosted proof pending |
+| Next slice | Slice 3 — Job detail to submitted application (not started) |
+| Blockers | Slice 2 awaits owner-run hosted exit proof after PR 2.4 merges. |
 
 ## Slice 2 delivery
 
@@ -21,8 +21,9 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | `docs/18`–`docs/20` / D-026–D-033 | Locked / Accepted |
 | PR 2.1 — Vacancy schema, RLS, local/CI fixtures | Done (merged; PR #26) |
 | PR 2.2 — Pure matcher + server loader | Done (merged; PR #27) |
-| PR 2.3 — `/candidate/matches` UI | In progress (this branch) |
-| PR 2.4 — Critical journey + hosted fixture procedure | Not started |
+| PR 2.3 — `/candidate/matches` UI | Done (merged; PR #28) |
+| PR 2.4 — Critical journey + hosted fixture procedure | In progress — local proof + procedure ready; hosted proof pending |
+| `docs/21-slice-2-closure.md` | In progress — awaiting owner-run hosted proof before Slice 2 Done |
 
 ## Slice 1 closure (complete)
 
@@ -92,7 +93,7 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 |-------|---------|--------|
 | 0 Foundation | Deployable shell + CI | Done — PR 0.1–0.4 merged; CI green; Production confirmed |
 | 1 Onboarding | Register → persisted essentials | Done — PR 1.1–1.4 merged (#21–#23); hosted migration + production smoke confirmed; D-018–D-025 Accepted |
-| 2 Matches | Essentials → seeded explainable matches | In progress — PR 2.1–2.2 merged (#26–#27); PR 2.3 matches UI in progress; apply/detail excluded |
+| 2 Matches | Essentials → seeded explainable matches | In progress — PR 2.1–2.3 merged (#26–#28); PR 2.4 local exit proof + hosted procedure; owner-run hosted proof pending; apply/detail excluded |
 | 3 Apply | Job detail → submitted application | Not started |
 | 4 Employer draft | Register → draft vacancy | Not started |
 | 5 Publish | Verification → public vacancy | Not started |

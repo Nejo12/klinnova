@@ -14,9 +14,25 @@ Avoid using `worker`, `job seeker`, and `talent` interchangeably.
 
 ### Employer
 
-A verified person or organisation publishing a vacancy and reviewing candidates.
+A verified person, household, business, or organisation using Stint to publish a legitimate job and review candidates.
 
-Use `company` for the legal or public organisation profile. Use `employer` for the hiring role in the product.
+Do not use `company` as a synonym for every employer. Employer verification does not itself verify every job or guarantee safety.
+
+### Private employer
+
+A verified individual or household hiring for legitimate work in a private home, apartment, residential property, shop, store, or similar premises.
+
+### Organisation employer
+
+A verified business, nonprofit, or other organisation hiring through Stint.
+
+### Company
+
+Use only for an organisation’s legal or public business profile. Do not use `company` as a synonym for every employer.
+
+### Workplace or service location
+
+The place where work is performed. For private homes and apartments, the exact address is sensitive and should not be publicly exposed. Job cards may show a privacy-safe approximate area or district; precise location should be disclosed only at an appropriate, consented stage.
 
 ### Job
 
@@ -47,7 +63,7 @@ Initial labels:
 
 ### Verified employer
 
-An employer whose identity and company evidence have been manually reviewed by Stint. Verification is not an endorsement of every future action.
+An employer whose identity and type-specific evidence have been manually reviewed by Stint. Verification is not an endorsement of every future action, does not verify every job, and does not guarantee safety.
 
 ### Verified job
 

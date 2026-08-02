@@ -73,11 +73,12 @@ At the same time, validate that employers can:
 
 ### Employer
 
-- employer account
-- company profile
+- employer account for private and organisation employers
+- employer profile (company profile only for organisation employers)
+- type-specific employer verification
 - vacancy creation
 - language-requirement configuration
-- salary, shift, location, and contract details
+- salary, shift, privacy-safe location, and contract details
 - applicant list
 - candidate review
 - application status updates
@@ -139,12 +140,13 @@ At the same time, validate that employers can:
 - [Slice 2 discovery](docs/18-slice-2-discovery.md) (planning locked; D-026–D-033 Accepted)
 - [Slice 2 build plan](docs/19-slice-2-build-plan.md) (planning locked)
 - [Slice 2 schema and matching proposal](docs/20-slice-2-schema-and-matching-proposal.md) (planning locked)
+- [Slice 2 closure evidence](docs/21-slice-2-closure.md) (PR 2.4; owner-run hosted proof pending)
 - [Not now](NOT_NOW.md)
 - [Agent instructions](AGENTS.md)
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 and Slice 1 are complete. Slice 2 planning is locked (D-026–D-033 Accepted). PR 2.1–2.2 merged (vacancy schema/RLS/fixtures + matcher/loader). PR 2.3 adds `/candidate/matches` UI and completion routing; job detail and applications remain later. Product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0 and Slice 1 are complete. Slice 2 planning is locked (D-026–D-033 Accepted). PR 2.1–2.3 merged (#26–#28): vacancy schema/RLS/local fixtures, matcher/loader, and `/candidate/matches`. PR 2.4 adds the local critical journey and owner-controlled hosted Demo fixture procedure; **Slice 2 is not Done** until the owner-run hosted proof is recorded. Job detail and applications remain Slice 3. Product scope remains `docs/04-mvp.md`.
 
 ## Local development
 
@@ -237,13 +239,21 @@ pnpm supabase:stop
 - No password-recovery UI yet (before-pilot)
 - No service-role key for browser or ordinary SSR sessions
 
-Local Auth + onboarding + completion journeys (requires local Supabase + Mailpit):
+Local Auth + onboarding + completion + matches journeys (requires local Supabase + Mailpit):
 
 ```bash
 pnpm test:e2e:onboarding
 ```
 
+Slice 2 critical exit journey (register → complete → matches → authz → invalidate → recover):
+
+```bash
+pnpm test:e2e:slice2
+```
+
 Hosted Preview/Production Auth uses the repository owner’s Supabase project, Vercel public env, Site URL `https://stint.company`, and the configured redirect allow-list. Hosted completion migration `20260801160000_complete_candidate_onboarding.sql` is applied.
+
+Hosted Demo vacancy fixtures (D-031) are **owner-run only** — never applied by migrations, CI, build, or deploy. See `supabase/fixtures/hosted/README.md` and `docs/21-slice-2-closure.md`.
 
 ### Local-only notes
 
@@ -251,8 +261,8 @@ Hosted Preview/Production Auth uses the repository owner’s Supabase project, V
 - Do not run `supabase login`.
 - Do not link a remote Supabase project from the CLI for routine work.
 - Candidate schema, Auth, essential onboarding, and controlled completion RPCs exist; vacancy tables are Slice 2 PR 2.1.
-- Local/CI seeding is enabled for fictional Demo vacancy fixtures (`supabase/seeds`); hosted Production/Preview schema migrations do not auto-insert demo business data (D-031).
-- No service-role or secret key is required. Browser/SSR session paths use the publishable key + user cookies and RLS.
+- Local/CI seeding is enabled for fictional Demo vacancy fixtures (`supabase/seeds`); hosted Production/Preview schema migrations do not auto-insert demo business data (D-031). Owner-run hosted Demo fixtures: temporarily `export SUPABASE_DB_URL='...'`, then `pnpm fixtures:hosted:apply -- --env <preview|production> --project-ref <ref>` (Production also needs `--confirm-production=I_UNDERSTAND_HOSTED_DEMO`), then `unset SUPABASE_DB_URL`. Never pass the connection string on the CLI; never paste credentials into issues, PRs, or evidence.
+- No service-role or secret key is required for ordinary app paths. Browser/SSR session paths use the publishable key + user cookies and RLS.
 - `pnpm supabase:db:reset` is local-only and destructive to the local database containers’ data.
 - Anonymous clients have no table privileges on candidate tables, so denied access surfaces as permission errors (`42501`), not empty result sets.
 - Sentry and PostHog remain deferred in `NOT_NOW.md`.

@@ -1,6 +1,6 @@
 # Slice 2 Schema and Matching Proposal
 
-> Proposal locked to Accepted D-026–D-033 (2026-08-01). PR 2.1–2.2 merged (schema/RLS/fixtures + pure matcher/loader). PR 2.3 implements `/candidate/matches` UI only (no apply/detail).
+> Proposal locked to Accepted D-026–D-033 (2026-08-01). PR 2.1–2.3 merged (#26–#28). PR 2.4 adds local exit proof + owner-controlled hosted Demo fixtures (`supabase/fixtures/hosted/`); Slice 2 remains open until owner-run hosted proof. No apply/detail.
 > Terminology: `vacancy` in schema/employer contexts; `job` in candidate-facing UI (`docs/12-terminology.md`).
 
 **Depends on:** Slice 1 schema (`docs/17`); D-012, D-019, D-020, D-023, D-025; D-026–D-033 Accepted.

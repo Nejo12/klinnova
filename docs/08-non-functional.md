@@ -22,6 +22,7 @@
 - no scraping or importing candidate profiles
 - no collection of identity or residence documents in MVP
 - separate marketing consent from product communications
+- exact private residential service locations are sensitive; public job surfaces use privacy-safe approximate location, with precise disclosure only at an appropriate, consented stage (D-034)
 
 ## Accessibility
 

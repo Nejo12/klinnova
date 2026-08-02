@@ -56,6 +56,8 @@ It should help employers answer:
 - Who is reliable and ready to work?
 - How can I review and contact candidates quickly?
 
+Employers include private households and residents, shop and retail-store operators, and local organisations — not only registered companies (see D-034).
+
 ## Initial market
 
 Berlin, Germany.
@@ -77,6 +79,8 @@ Initial sectors include:
 - food production
 - moving and event setup
 - retail and other operational roles
+
+Initial employer contexts include private homes and apartments, shops and retail premises, and small local businesses hiring for legitimate work.
 
 ## Long-term direction
 

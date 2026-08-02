@@ -92,26 +92,28 @@ Each slice is the unit of planning, implementation, and review. Size for roughly
 
 ### Slice 4 — Employer registration to draft vacancy
 
-**Outcome:** an employer can register, create a company profile, and save a structured draft vacancy.
+**Outcome:** a private or organisation employer can register, create an employer profile, and save a structured draft vacancy.
 
-**Includes:** employer onboarding; company profile; draft vacancy with required structured fields (salary, language, location, contract, shift/schedule, expiry or auto-expiry).
+**Includes:** employer onboarding for private and organisation employers; employer profile (company profile only for organisation employers); draft vacancy with required structured fields (salary, language, privacy-safe location, contract, shift/schedule, expiry or auto-expiry; employer type / workplace type / frequency where product requires).
 
 **Exit criteria:**
 
 - draft vacancies are not publicly visible
 - required eligibility fields are explicit before publish is possible later
+- exact private residential addresses are not publicly exposed
 
 ### Slice 5 — Employer verification to public vacancy
 
 **Outcome:** only verified employers can publish public vacancies.
 
-**Includes:** employer verification state; create/edit/publish/pause/expire/fill flows; public job visibility rules.
+**Includes:** type-specific employer verification state (D-034); create/edit/publish/pause/expire/fill flows; public job visibility rules with privacy-safe location for private workplaces.
 
 **Exit criteria:**
 
 - unverified employers cannot publish public vacancies
 - language and salary information remain required and visible
 - published vacancies can be closed or expired
+- private residential addresses remain non-public
 
 ### Slice 6 — Applicant review to status update
 
