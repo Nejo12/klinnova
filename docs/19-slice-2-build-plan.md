@@ -1,7 +1,7 @@
 # Slice 2 Build Plan
 
 > Planning artifact locked to Accepted D-026–D-033 (2026-08-01). Discovery in `docs/18-slice-2-discovery.md`.
-> No application code or migrations land in the planning PR.
+> Slice 2 Done — PR 2.1–2.4 merged (#26–#29); hosted Production proof in `docs/21-slice-2-closure.md`.
 
 **Outcome:** After essentials, a candidate sees deterministic, explainable matches against seeded Berlin vacancies (`docs/13-implementation-plan.md`).
 
@@ -152,15 +152,15 @@ D-026–D-033 are Accepted; implementation may open after this planning package 
 
 **Intent:** Prove Slice 2 exit locally and prepare hosted exit proof.
 
-**Status:** In progress — local critical journey + hosted Demo fixture apply/cleanup procedure implemented; **owner-run hosted proof pending**. Slice 2 is **not** Done until hosted proof is recorded.
+**Status:** Complete — merged as #29. Local critical journey + hosted Demo fixture apply/cleanup procedure implemented. Owner-run hosted Production proof recorded in `docs/21-slice-2-closure.md`. Slice 2 Done.
 
 **Includes:** Playwright Slice 2 critical journey (`e2e/slice2-critical-journey.spec.ts`); owner-controlled Preview/Production Demo fixtures under `supabase/fixtures/hosted/`; `pnpm fixtures:hosted:apply` / `cleanup` (explicit `--env`, `--project-ref`, Production confirmation); closure evidence in `docs/21-slice-2-closure.md`.
 
-**Excludes:** Slice 3 apply/detail flow; automatic Production seed migrations; marking Slice 2 Done without owner-run hosted proof.
+**Excludes:** Job detail; applications; save/unsave; employer contact; salary; experience; travel-time matching; scores; employer Auth/verification UI; automatic Production seed migrations; Slice 3 implementation.
 
 **Depends on:** PR 2.3 (merged as #28).
 
-**Acceptance:** Local exit criteria proven; CI green; hosted procedure ready; Slice 2 checklist marked Done only after owner-run hosted smoke.
+**Acceptance:** Local exit criteria proven; CI green; hosted procedure ready; Slice 2 checklist marked Done after owner-run hosted smoke — met.
 
 ---
 
@@ -205,11 +205,11 @@ All of the above decisions are Accepted as of 2026-08-01.
 - [x] PR 2.1 merged (schema/RLS/local-CI fixtures) — #26
 - [x] PR 2.2 merged — #27
 - [x] PR 2.3 merged — #28
-- [ ] PR 2.4 merged (local exit proof + hosted procedure)
+- [x] PR 2.4 merged (local exit proof + hosted procedure) — #29
 - [x] Local RLS + matching tests + critical journey green (PR 2.4 verification)
 - [x] Hosted demo fixture procedure documented (not migration auto-seed)
-- [ ] Exit criteria on Auth-capable hosted environment (owner-run hosted proof pending)
+- [x] Exit criteria on Auth-capable hosted environment (owner-run Production proof complete; see `docs/21`)
 - [x] No applications / detail routes / employer features / `NOT_NOW.md` items shipped
-- [ ] Dashboard: Slice 2 Done → Slice 3 planning (blocked on hosted proof)
+- [x] Dashboard: Slice 2 Done → Slice 3 next planned (implementation not started)
 
-Update the checklist and founder dashboard to Done only after true exit proof.
+All Slice 2 exit criteria are complete. Exclusions remain: job detail, applications, save/unsave, employer contact, salary, experience, travel-time matching, scores, and employer implementation.

@@ -2,7 +2,7 @@
 
 Owner-facing evidence and status for Slice 2 — Onboarding to seeded matches.
 
-**Do not mark Slice 2 Done until the owner-run hosted proof is complete.**
+**Slice 2 is Done.** Owner-run hosted Production proof is complete. Slice 3 is next and has not started implementation.
 
 ## Scope delivered
 
@@ -12,9 +12,9 @@ Owner-facing evidence and status for Slice 2 — Onboarding to seeded matches.
 | Deterministic local/CI Demo fixtures | Implemented (PR #26) |
 | Pure matcher + authenticated server loader | Implemented (PR #27) |
 | Protected `/candidate/matches` UI | Implemented (PR #28) |
-| Local critical journey (Playwright) | Locally verified (PR 2.4) |
-| Owner-controlled hosted Demo fixture procedure | Procedure ready (PR 2.4) |
-| Owner-run hosted Preview/Production proof | Owner-run hosted proof pending |
+| Local critical journey (Playwright) | Locally verified (PR 2.4 / #29) |
+| Owner-controlled hosted Demo fixture procedure | Implemented (PR 2.4 / #29) |
+| Owner-run hosted Production proof | Complete (2026-08-03) |
 
 ## Pull requests
 
@@ -23,11 +23,11 @@ Owner-facing evidence and status for Slice 2 — Onboarding to seeded matches.
 | 2.1 Vacancy schema, RLS, local/CI fixtures | #26 | Merged |
 | 2.2 Pure matcher + server loader | #27 | Merged |
 | 2.3 `/candidate/matches` UI | #28 | Merged |
-| 2.4 Exit proof + hosted fixtures + closure readiness | — | In progress (this work) |
+| 2.4 Exit proof + hosted fixtures + closure readiness | #29 | Merged |
 
 ## Accepted decisions
 
-D-026 through D-033 remain **Accepted** (2026-08-01). No reinterpretation of D-031 Production fixture restrictions.
+D-026 through D-033 remain **Accepted** (2026-08-01). D-034 (private and organisation employers) remains **Accepted** as a future employer-domain requirement — not an implemented employer feature in Slice 2. No reinterpretation of D-031 Production fixture restrictions: Production Demo data requires explicit owner-controlled application.
 
 ## Local exit proof checklist
 
@@ -49,6 +49,69 @@ D-026 through D-033 remain **Accepted** (2026-08-01). No reinterpretation of D-0
 | 14 | Invalidated candidate returned to onboarding | Playwright |
 | 15 | Correct → re-complete → matches return | Playwright |
 
+## Hosted Production proof (owner-run)
+
+### Target
+
+| Field | Value |
+|-------|--------|
+| Environment | production (explicit owner authorization) |
+| Project ref | `kvrzmzoszitdicjvrprt` |
+| Application | `https://stint.company` |
+| Proof date | 2026-08-03 |
+
+Production was the intentionally authorized target. It was not contacted accidentally. No automatic fixture insertion was introduced.
+
+### Migration status
+
+- Existing candidate migrations were already applied on the remote project.
+- Migration `20260802190000_vacancy_schema_and_rls.sql` was initially missing remotely.
+- It was applied intentionally with `pnpm exec supabase db push --linked`.
+- Vacancy schema and RLS were present before the successful Demo fixture apply.
+
+### Demo fixture apply
+
+| Field | Value |
+|-------|--------|
+| Result | success |
+| Approximate execution | 2026-08-03 02:56 CEST |
+| Company ID | `11111111-1111-4111-8111-111111111111` |
+| Vacancy IDs | `22222222-2222-4222-8222-222222222201`, `22222222-2222-4222-8222-222222222206` |
+| Language requirement ID | `33333333-3333-4333-8333-333333333301` |
+| Expiry | `2026-09-02 02:56:07 +0200` |
+| Retention | Retained until expiry; cleanup not run |
+
+### Journey results
+
+| Check | Result |
+|-------|--------|
+| Candidate registration | Pass |
+| Essential onboarding | Pass |
+| `/candidate/matches` | Pass |
+| Demo vacancy visible | Pass |
+| Fictional company visible | Pass |
+| Match reasons visible | Pass |
+| Exact work-authorisation notice | Pass |
+| Reload persistence | Pass |
+| Unauthenticated denial | Pass |
+| Incomplete-candidate denial | Pass |
+| Essential-field invalidation | Pass |
+| Matches inaccessible after invalidation | Pass |
+| Correction and explicit re-completion | Pass |
+| Matches restored after re-completion | Pass |
+| No score, percentage, apply, save, detail, or contact | Pass |
+
+### Credential safety
+
+- No database URL, password, access token, or service-role key was recorded in source, GitHub, reports, or chat.
+- `SUPABASE_DB_URL` was unset after execution.
+- Credentials were passed only via temporary environment variable, never as CLI arguments.
+
+### Deviations and operational notes
+
+- A second hosted apply was **not** executed in Production. Hosted idempotency was therefore not directly repeated there. Idempotency remains established by deterministic fixture IDs, fixture-tool tests, and the verified local apply/apply simulation. Do not claim a second hosted apply occurred.
+- Completed candidates redirect from `/candidate` to `/candidate/matches`. Direct onboarding group URLs (for example `/candidate/onboarding?group=work_authorisation`) were used to edit work authorisation during the invalidation proof.
+
 ## Hosted fixture policy (D-031)
 
 - Location: `supabase/fixtures/hosted/` (not migrations).
@@ -59,50 +122,9 @@ D-026 through D-033 remain **Accepted** (2026-08-01). No reinterpretation of D-0
 - Never auto-run from install, build, migrate, CI, Vercel, or app startup.
 - Deterministic IDs; 30-day relative expiry on apply; ID-scoped cleanup only.
 - Fictional labels only; no verified-employer claim.
-- Hosted evidence may record project ref, environment, timestamp, fixture IDs, expiry, result — never database URL, password, access token, or service-role key.
+- Cleanup remains available via `pnpm fixtures:hosted:cleanup` but was not run for this proof.
 
-See `supabase/fixtures/hosted/README.md` for the full owner checklist.
-
-## Hosted verification checklist (owner-run)
-
-### Before insertion
-
-- [ ] Confirm target project ref
-- [ ] Confirm target environment (`preview` or `production`)
-- [ ] Confirm current migration state; no pending migrations
-- [ ] Confirm fixture IDs in `supabase/fixtures/hosted/manifest.json`
-- [ ] Confirm fictional Demo labels (no real employers)
-- [ ] If Production: authorize and prepare `--confirm-production=I_UNDERSTAND_HOSTED_DEMO`
-
-### Insert
-
-- [ ] `export SUPABASE_DB_URL='...'` (temporary; do not paste into issues/PRs/evidence)
-- [ ] Run `pnpm fixtures:hosted:apply -- --env <env> --project-ref <ref>` (Production: add `--confirm-production=I_UNDERSTAND_HOSTED_DEMO`)
-- [ ] `unset SUPABASE_DB_URL`
-- [ ] Record timestamp, project ref, environment, and printed `fixture_expiry` values (never the connection string)
-- [ ] Confirm expected company / vacancy / language rows
-
-### Candidate journey
-
-- [ ] Register a fresh test candidate on the hosted app
-- [ ] Complete onboarding with documented matching values (see hosted README)
-- [ ] Confirm `/candidate/matches` shows Demo vacancy, fictional company, reasons, work-authorisation notice
-- [ ] Reload and confirm persistence
-- [ ] Invalidate an essential field; confirm matches inaccessible (no inventory content)
-- [ ] Correct and re-complete; confirm matches return
-
-### Authorization checks
-
-- [ ] Unauthenticated visitor cannot view matches inventory
-- [ ] Incomplete candidate cannot view inventory
-- [ ] No vacancy data in unauthorized HTML
-- [ ] RLS remains the access boundary
-
-### Cleanup
-
-- [ ] Remove the test candidate only if a safe existing procedure/policy permits (do not invent deletion tooling here)
-- [ ] Run `pnpm fixtures:hosted:cleanup` if fixtures should not be retained
-- [ ] Confirm cleanup affected only known fixture IDs
+See `supabase/fixtures/hosted/README.md` for the owner checklist.
 
 ## Hosted verification status
 
@@ -110,31 +132,24 @@ See `supabase/fixtures/hosted/README.md` for the full owner checklist.
 |------|--------|
 | Hosted procedure implemented | Implemented |
 | Dry-run / static safeguards | Locally verified |
-| Local apply/cleanup simulation | Locally verified (not hosted proof) |
-| Owner-run Preview/Production journey | Owner-run hosted proof pending |
-
-Do not invent project refs, timestamps, or hosted pass results here.
+| Local apply/cleanup simulation | Locally verified |
+| Owner-run Production journey | Complete |
+| Fixture retention | Retained until 2026-09-02 expiry |
+| Cleanup | Not run |
 
 ## Remaining exclusions (Slice 3+)
 
-Job detail, applications, save/unsave, employer contact, salary, experience, travel-time matching, scores, employer Auth/verification UI, automatic Production seeding.
+Job detail, applications, save/unsave, employer contact, salary, experience, travel-time matching, scores, employer Auth/verification UI, automatic Production seeding. D-034 private/organisation employer workflows remain future employer-slice work.
 
 ## Slice 3 boundary
 
-Slice 3 remains **Not started**. Do not activate Slice 3 in the founder dashboard until Slice 2 is Done after owner-run hosted proof.
+Slice 3 — Job detail to submitted application — is the **next planned** slice. Implementation has **not** started.
 
-## Closure status wording (current)
+## Closure status wording (final)
 
-- PR 2.4 in progress
-- Local exit proof complete (after verification in this PR)
-- Hosted procedure ready
-- Owner-run hosted proof pending
-- Slice 2 awaiting hosted exit proof
-
-## After owner reports hosted proof
-
-A separate documentation update may then mark:
-
-- Hosted proof complete
+- PR 2.4 merged (#29)
+- Local exit proof complete
+- Hosted procedure implemented
+- Owner-run hosted proof complete
 - Slice 2 Done
-- Next active slice Slice 3
+- Next planned slice: Slice 3
