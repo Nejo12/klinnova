@@ -2,10 +2,10 @@
 
 > Planning artifact. Discovery in `docs/22-slice-3-discovery.md`.
 > Schema/journey proposal in `docs/24-slice-3-schema-and-journey-proposal.md`.
-> **Status:** Contracts Accepted 2026-08-03 (D-035–D-045). PR 3.1–3.3 merged.
-> PR 3.4 implementation in progress on `feat/slice-3-application-confirmation`
-> (persistent confirmation and Applied state pending review). Slice 3 is not
-> Done. PR 3.5 has not started.
+> **Status:** Contracts Accepted 2026-08-03 (D-035–D-045). PR 3.1–3.4 merged
+> (#33–#36). PR 3.5 local exit proof and hosted-proof readiness in progress on
+> `chore/slice-3-exit-proof`. Hosted proof remains pending. Slice 3 is not Done.
+> Slice 4 has not started.
 
 **Outcome:** A completed candidate can open a matched Demo job, preview a
 profile-based application, submit exactly once, and see reload-safe confirmation
@@ -188,17 +188,13 @@ trust for candidate identity or completion.
 
 ## PR 3.4 — Confirmation, applied state, critical journey
 
-**Intent:** Prove the vertical Slice 3 exit locally.
+**Intent:** Persistent confirmation and Applied state on matches/detail.
 
-**Status:** Implementation in progress on branch
-`feat/slice-3-application-confirmation` — persistent confirmation and Applied
-state implemented locally; pending review / merge. Slice 3 is not Done until
-this PR merges and exit proof/closure requirements are completed. Not marked
-complete before merge.
+**Status:** Complete — merged as #36.
 
 **Includes:** Confirmation view reading stored application; Applied on
-matches/detail; Playwright critical journey + authz/lifecycle denials;
-update Slice 2 e2e assertions that forbade detail/apply links.
+matches/detail; Playwright confirmation/Applied coverage; update Slice 2 e2e
+assertions that forbade detail/apply links.
 
 **Excludes:** Hosted Production commands; employer UI; analytics product work.
 
@@ -209,33 +205,37 @@ update Slice 2 e2e assertions that forbade detail/apply links.
 **Security review:** Confirmation reveals only own application; no cross-candidate
 read.
 
-**Tests:** Playwright full journey (register → complete → detail → preview →
-submit → confirm → reload → applied → duplicate); unauth/incomplete/lifecycle
-denials.
-
-**Exit criteria:** Local exit checklist green; CI green.
+**Exit criteria:** Met on merge of #36.
 
 ---
 
-## PR 3.5 — Hosted proof and closure
+## PR 3.5 — Local exit proof and hosted-proof readiness
 
-**Intent:** Record owner-run hosted evidence and mark Slice 3 Done only after
-true proof.
+**Intent:** Produce auditable local exit evidence for the complete Slice 3
+candidate journey and prepare the owner-authorized hosted-proof runbook.
+Does **not** mark Slice 3 Done.
 
-**Includes:** Hosted checklist in closure doc; optional owner-controlled
-application cleanup procedure (non-migration); dashboard/README status update
-after proof — pattern from Slice 2 PR 2.4 / closure PR.
+**Status:** Implementation in progress on branch `chore/slice-3-exit-proof` —
+local critical journey, static security proof, exit-proof doc, and hosted
+runbook. Hosted commands are not executed in this PR. Slice 3 remains not Done
+until hosted proof, evidence review, closure docs, and merge complete.
 
-**Excludes:** Automatic Production inserts; starting Slice 4.
+**Includes:** `e2e/slice3-critical-journey.spec.ts`; `pnpm test:e2e:slice3`;
+static security assertions; `docs/25-slice-3-exit-proof.md`;
+`docs/26-slice-3-hosted-proof-runbook.md`; README/dashboard/build-plan status.
+
+**Excludes:** Hosted Supabase commands; Production proof; marking Slice 3 Done;
+starting Slice 4; schema/RLS/RPC/migration changes; new product behaviour.
 
 **Depends on:** PR 3.4 merged; Accepted D-045.
 
 **Migration impact:** None expected.
 
-**Security review:** Credentials only via temporary env; no secrets in evidence.
+**Security review:** No hosted credentials; no service-role path; ownership and
+snapshot immutability proven locally.
 
-**Exit criteria:** Owner-run hosted proof recorded; Slice 3 Done; Slice 4 next
-planned only.
+**Exit criteria:** Local exit checklist green; CI green; hosted runbook ready;
+Slice 3 still explicitly not Done.
 
 ---
 
@@ -245,8 +245,8 @@ planned only.
 |-------|-----|--------|
 | Schema / RLS / RPC | 3.1 | Constraints; unique; ownership; incomplete/invisible deny |
 | Unit / component | 3.2–3.3 | Detail loader; preview; submit result mapping |
-| Playwright | 3.4 | Critical apply journey + authz + duplicate |
-| Hosted | 3.5 | Owner-run Production or Preview per D-045 |
+| Playwright | 3.4–3.5 | Apply journey + dedicated Slice 3 critical exit journey |
+| Hosted | After 3.5 | Owner-run Preview (preferred) or Production per D-045 / `docs/26` |
 
 ### Playwright critical journey (required)
 
