@@ -1,15 +1,26 @@
 # Slice 3 Hosted-Proof Runbook
 
-Owner-authorized procedure for hosted Slice 3 exit proof. **Do not execute** as
-part of ordinary development, CI, or PR 3.5 local exit-proof work.
+Owner-authorized procedure for hosted Slice 3 exit proof.
 
 Local exit evidence lives in `docs/25-slice-3-exit-proof.md`. Hosted Demo fixture
-tooling remains `supabase/fixtures/hosted/` (D-031). Application records created
-during hosted proof require an explicit retention or cleanup decision before
-Slice 3 can be marked Done (D-045).
+tooling remains `supabase/fixtures/hosted/` (D-031). Closure evidence for the
+completed Production fallback proof lives in `docs/27-slice-3-closure.md`.
 
-**Slice 3 is not Done until hosted proof is recorded and closure docs are
-updated.**
+## Execution status (2026-08-03)
+
+| Field | Value |
+|-------|--------|
+| Status | Executed — owner-authorized `PRODUCTION_FALLBACK` |
+| Application | `https://stint.company` |
+| Project ref | `kvrzmzoszitdicjvrprt` |
+| Tested SHA | `d2896702b4fa5601b16871656607f7e3ecc00b01` |
+| Preview proof | Not used — Preview was not safely isolated |
+| Closure record | `docs/27-slice-3-closure.md` |
+| Slice 3 | Done |
+
+This runbook remains the procedure reference for future re-proofs. Do not treat
+Vercel Preview alone as an isolated database environment until Supabase Preview
+branching/isolation is corrected.
 
 ---
 

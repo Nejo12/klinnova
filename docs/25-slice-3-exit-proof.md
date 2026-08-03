@@ -2,9 +2,9 @@
 
 Owner-facing local exit evidence for Slice 3 — Job detail to submitted application.
 
-**Slice 3 is not Done.** Local exit proof is recorded on this branch. Hosted
-proof remains pending. Closure requires owner-run hosted proof, evidence review,
-closure docs, and merge. Slice 4 has not started.
+**Local exit proof is complete (PR #37).** Owner-authorized Production hosted
+proof and Slice 3 closure are recorded in `docs/27-slice-3-closure.md`.
+**Slice 3 is Done.** Slice 4 has not started.
 
 ## Scope delivered (implementation PRs)
 
@@ -14,10 +14,10 @@ closure docs, and merge. Slice 4 has not started.
 | Candidate job detail | Merged (PR #34) |
 | Application preview + atomic submission | Merged (PR #35) |
 | Persistent confirmation + Applied state | Merged (PR #36) |
-| Local critical journey + static security proof | This PR (PR 3.5) |
-| Hosted-proof runbook | Documented — not executed (`docs/26-slice-3-hosted-proof-runbook.md`) |
-| Owner-run hosted proof | Pending |
-| Slice 3 Done | No |
+| Local critical journey + static security proof | Merged (PR #37) |
+| Hosted-proof runbook | Merged (PR #37) — executed later under owner authorization |
+| Owner-run hosted proof | Complete — see `docs/27-slice-3-closure.md` |
+| Slice 3 Done | Yes — see `docs/27-slice-3-closure.md` |
 
 ## Pull requests
 
@@ -27,24 +27,23 @@ closure docs, and merge. Slice 4 has not started.
 | 3.2 Candidate job detail | #34 | Merged |
 | 3.3 Preview + atomic submission | #35 | Merged |
 | 3.4 Confirmation + Applied state | #36 | Merged |
-| 3.5 Local exit proof + hosted readiness | Pending review on `chore/slice-3-exit-proof` | Not merged |
+| 3.5 Local exit proof + hosted readiness | #37 | Merged |
 
 ## Accepted decisions
 
-D-035 through D-045 remain **Accepted** (2026-08-03). No reinterpretation of
-D-045: Preview is preferred for hosted proof; Production requires explicit owner
-authorization.
+D-035 through D-045 remain **Accepted** (2026-08-03). Slice 3 acceptance
+conditions are complete. Hosted Production proof used explicit owner
+authorization per D-045 after Preview was not safely isolated.
 
-## Proof environment
+## Proof environment (local)
 
 | Field | Value |
 |-------|--------|
 | Base / tested main SHA | `8bfed056b2dfaf13dcc3d822a6342b5bd4d7a3cc` |
-| Branch | `chore/slice-3-exit-proof` |
+| Branch (at proof) | `chore/slice-3-exit-proof` |
 | Environment | Local CLI Supabase + Mailpit + `pnpm start` |
 | Local proof date (UTC) | 2026-08-03 |
-| Hosted commands | None executed in this PR |
-| Production operations | None executed in this PR |
+| Hosted commands in PR #37 | None |
 
 ## Commands executed
 
@@ -105,7 +104,7 @@ git diff --check
 | 20 | Job detail Applied; preview/Submit removed | Playwright | Pass |
 | 21 | Matches Applied + View application | Playwright | Pass |
 | 22 | Application lookup failure ≠ false non-applied | Vitest loaders | Pass |
-| 23 | Expired/withdrawn/future/hidden cannot receive new application | Playwright withdrawn + pgTAP | Pass |
+| 23 | Expired/withdrawn/future/hidden cannot receive a new application | Playwright withdrawn + pgTAP | Pass |
 | 24 | Visible non-matching cannot reach RPC | Playwright unavailable + Vitest action | Pass |
 | 25 | No application ID in candidate-facing text | Playwright + static security | Pass |
 | 26 | No service-role browser/SSR path | Static security + client modules | Pass |
@@ -123,10 +122,11 @@ git diff --check
 | Package script | `pnpm test:e2e:slice3` |
 | Static security | `src/lib/applications/slice3-static-security.test.ts` |
 | Hosted runbook | `docs/26-slice-3-hosted-proof-runbook.md` |
+| Closure evidence | `docs/27-slice-3-closure.md` |
 
 ## Database / RLS / RPC proof
 
-Recorded from `pnpm supabase:db:reset` + `pnpm supabase:test:db` on this branch:
+Recorded from `pnpm supabase:db:reset` + `pnpm supabase:test:db` during PR #37:
 
 | Check | Result |
 |-------|--------|
@@ -146,24 +146,16 @@ Recorded from `pnpm supabase:db:reset` + `pnpm supabase:test:db` on this branch:
 - No Withdraw, Submit again, Edit application, Contact/Message employer, timeline, or interview promises.
 - Exact work-authorisation notice retained on matches/detail surfaces.
 
-## Remaining hosted-proof requirement
+## Hosted proof and closure
 
-Hosted Preview (preferred) or owner-authorized Production proof must still be
-executed per `docs/26-slice-3-hosted-proof-runbook.md` and D-045 before Slice 3
-can be marked Done. No hosted evidence is claimed here.
+Hosted Production proof and final Done status are recorded in
+`docs/27-slice-3-closure.md`. This document remains the local automated proof
+record.
 
-## Closure blockers (Slice 3 Done)
+## Status wording (final for local proof)
 
-1. Merge of this local exit-proof PR after review
-2. Owner-run hosted proof with recorded evidence
-3. Application test-record retention/cleanup decision
-4. Closure documentation update marking Slice 3 Done
-5. Explicit confirmation that Slice 4 has not started
-
-## Status wording (current)
-
-- PRs 3.1–3.4 merged (#33–#36)
-- Local exit proof completed on branch (validation green)
-- Hosted proof remains pending
-- Slice 3 remains not Done
+- PRs #33–#37 merged
+- Local exit proof complete
+- Hosted Production proof complete — see `docs/27-slice-3-closure.md`
+- Slice 3 Done
 - Slice 4 has not started
