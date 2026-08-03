@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(30);
+select plan(35);
 
 -- Tables exist
 select has_table('public', 'candidate_profiles', 'candidate_profiles exists');
@@ -14,13 +14,13 @@ select has_table(
   'vacancy_language_requirements',
   'vacancy_language_requirements exists'
 );
+select has_table('public', 'applications', 'applications exists');
 
 -- Forbidden application tables must not exist
 select hasnt_table('public', 'profiles', 'no shared profiles table');
 select hasnt_table('public', 'candidate_preferences', 'no candidate_preferences table');
 select hasnt_table('public', 'employer_profiles', 'no employer_profiles table');
 select hasnt_table('public', 'jobs', 'no jobs table');
-select hasnt_table('public', 'applications', 'no applications table');
 
 -- Keys and RLS
 select has_pk('public', 'candidate_profiles', 'candidate_profiles has primary key');
@@ -32,6 +32,7 @@ select has_pk(
   'vacancy_language_requirements',
   'vacancy_language_requirements has primary key'
 );
+select has_pk('public', 'applications', 'applications has primary key');
 
 select ok(
   exists (
@@ -152,6 +153,46 @@ select is(
   ),
   true,
   'RLS enabled on vacancy_language_requirements'
+);
+
+select is(
+  (
+    select relrowsecurity
+    from pg_class
+    where oid = 'public.applications'::regclass
+  ),
+  true,
+  'RLS enabled on applications'
+);
+
+select ok(
+  exists (
+    select 1
+    from pg_constraint
+    where conname = 'applications_candidate_id_fkey'
+      and contype = 'f'
+  ),
+  'applications references candidate_profiles'
+);
+
+select ok(
+  exists (
+    select 1
+    from pg_constraint
+    where conname = 'applications_vacancy_id_fkey'
+      and contype = 'f'
+  ),
+  'applications references vacancies'
+);
+
+select ok(
+  exists (
+    select 1
+    from pg_constraint
+    where conname = 'applications_candidate_vacancy_key'
+      and contype = 'u'
+  ),
+  'unique (candidate_id, vacancy_id)'
 );
 
 -- No auth.users insert triggers (D-024)
