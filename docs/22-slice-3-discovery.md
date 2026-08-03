@@ -1,9 +1,8 @@
 # Slice 3 Discovery
 
-> Analysis artifact only. No migrations or application code land here.
-> **Status:** Discovery drafted on branch `docs/slice-3-discovery`.
-> Implementation may begin only after this package is merged and Proposed
-> decisions D-035–D-045 are Accepted (or revised) by the owner.
+> Analysis artifact. No migrations or application code land here.
+> **Status:** Contracts Accepted 2026-08-03 (D-035–D-045). PR 3.1 is the next
+> implementation unit; Slice 3 implementation has not started.
 
 **Outcome to enable:** A completed candidate can open one matched Demo vacancy,
 understand the job and why it matches, preview a profile-based application,
@@ -14,7 +13,7 @@ application (`docs/13-implementation-plan.md`, narrowed by D-035).
 
 - Build plan — `docs/23-slice-3-build-plan.md`
 - Schema + journey proposal — `docs/24-slice-3-schema-and-journey-proposal.md`
-- Decisions — D-035–D-045 in `docs/10-decisions.md` (**Proposed**)
+- Decisions — D-035–D-045 in `docs/10-decisions.md` (**Accepted** 2026-08-03)
 
 ---
 
@@ -38,11 +37,10 @@ application (`docs/13-implementation-plan.md`, narrowed by D-035).
 
 ---
 
-## Document tensions — reported
+## Document tensions — resolved
 
-AGENTS.md requires reporting conflicts before inventing a resolution. The
-Proposed decisions below are the recommended narrowings; they are **not**
-Accepted until the owner confirms.
+AGENTS.md required reporting conflicts before inventing a resolution. T1–T6 were
+resolved by Accepted D-035–D-045 (2026-08-03).
 
 ### T1 — Broad Slice 3 vs submission-only journey
 
@@ -53,14 +51,14 @@ Accepted until the owner confirms.
 | Owner Slice 3 objective | Open matched Demo vacancy → understand → preview → submit → confirm → prevent duplicate; ends at successful submission |
 | Stop rules | No save/unsave, messaging, interviews/status timelines, salary/experience matching, employer Auth |
 
-**Recommendation (D-035):** Narrow Slice 3 to authenticated candidate job detail +
-profile-based submit + confirmation + applied-state feedback. Defer save/unsave,
-CV upload, application history dashboard, employer-facing status transitions,
-salary/distance/verification fields, and interview workflows.
+**Resolution (D-035 Accepted):** Narrow Slice 3 to authenticated candidate job
+detail + profile-based submit + confirmation + Applied-state feedback. Defer
+save/unsave, CV upload, application history dashboard, employer-facing status
+transitions, salary/distance/verification fields, and interview workflows.
 
 **Note:** D-032 previously said “Full job detail, save/unsave, and apply remain
-Slice 3.” D-035 supersedes the save/unsave portion for this slice; save/unsave
-moves to a later candidate slice unless the owner rejects the narrowing.
+Slice 3.” D-035 supersedes **only** the save/unsave placement in D-032; it does
+not reinterpret the rest of D-032.
 
 ### T2 — Public `/jobs/[slug]` vs candidate-gated inventory
 
@@ -70,8 +68,9 @@ moves to a later candidate slice unless the owner rejects the narrowing.
 | D-033 | Seed vacancies are not an anonymous public board; SELECT only for completed authenticated candidates |
 | Current app | Only `/candidate/*` candidate product surfaces |
 
-**Recommendation (D-036):** Use `/candidate/jobs/[vacancyId]` under the existing
-candidate Auth gate. Do not introduce a public SEO job board in Slice 3.
+**Resolution (D-036 Accepted):** Use `/candidate/jobs/[vacancyId]` and
+`/candidate/applications/[applicationId]` under the existing candidate Auth
+gate. Do not introduce a public SEO job board in Slice 3.
 
 ### T3 — Detail richness vs current schema
 
@@ -80,9 +79,9 @@ candidate Auth gate. Do not introduce a public SEO job board in Slice 3.
 | MVP / features | Salary, responsibilities, precise/privacy-safe district, experience, CV requirement, interview language, verification |
 | Current schema | `title`, `summary`, `city=Berlin`, category, employment types, shifts, German, optional language requirements, `available_from`, `published_at`, `expires_at`, company name; Demo labelling via seed titles + UI |
 
-**Recommendation (D-037):** Show only fields that exist. Explicitly defer missing
-MVP fields; do not invent columns in Slice 3 unless the owner Accepts a schema
-expansion decision (none proposed here).
+**Resolution (D-037 Accepted):** Show only schema-backed fields and derived match
+reasons. Explicitly defer missing MVP fields; do not invent columns in Slice 3
+unless a later Accepted decision expands the schema.
 
 ### T4 — Full status machine vs submit-only
 
@@ -91,7 +90,7 @@ expansion decision (none proposed here).
 | `docs/05` | submitted → viewed → shortlisted → interview\* → offer → hired / not selected / withdrawn |
 | Owner objective | Create successful submission; employer review and status changes later |
 
-**Recommendation (D-039):** Constrain and create only `submitted` in Slice 3.
+**Resolution (D-039 Accepted):** Constrain and create only `submitted` in Slice 3.
 Do not pre-authorize future workflow states in the CHECK. Future statuses
 (viewed, shortlisted, interview\*, offer, hired, not selected, withdrawn) are
 deferred; additive migrations may extend the constraint later after transition
@@ -105,9 +104,9 @@ ownership and authorization are defined. No withdrawal action in Slice 3.
 | `docs/09` Stage 2 | Apply + CV + timeline |
 | Vertical slices (`docs/13`) | Slice 2 matches; Slice 3 detail+apply |
 
-**Recommendation:** Treat `docs/09` as capability roadmap, not PR sequence.
-Vertical-slice docs + D-035 win for delivery order. Update roadmap wording only
-to note Slice 3 discovery narrowings (no capability deletion from MVP intent).
+**Resolution:** Treat `docs/09` as capability roadmap, not PR sequence.
+Vertical-slice docs + Accepted D-035 win for delivery order. Roadmap notes
+Accepted Slice 3 narrowings (no capability deletion from MVP intent).
 
 ### T6 — Email / phone / CV in applications
 
@@ -116,9 +115,9 @@ to note Slice 3 discovery narrowings (no capability deletion from MVP intent).
 | Features | Profile-based apply; optional CV; contact in later employer review |
 | Schema | Email on `auth.users` only; no phone; no CV storage |
 
-**Recommendation (D-038 / D-043):** Slice 3 snapshots do not copy email, phone,
-CV, or precise address. Preview uses collected essentials only. Contact sharing
-is a later employer-workflow decision.
+**Resolution (D-038 / D-043 Accepted):** Slice 3 snapshots do not copy email,
+phone, CV, or precise address. Preview uses collected essentials only. Contact
+sharing is a later employer-workflow decision.
 
 ---
 
@@ -153,7 +152,7 @@ is a later employer-workflow decision.
 
 ---
 
-## Resolved discovery answers (proposed)
+## Resolved discovery answers (Accepted)
 
 ### 1. Job-detail route and authorization
 
@@ -188,7 +187,7 @@ is a later employer-workflow decision.
   employer verification state; interview language; CV requirement flag;
   structured responsibilities beyond `summary`; save/unsave; employer contact.
 
-**Blocked:** none for a credible Demo journey if deferrals are Accepted.
+**Blocked:** none for a credible Demo journey under Accepted deferrals.
 
 ### 3–6. Application model, status, duplicates, RLS
 
@@ -252,11 +251,11 @@ owner authorization; cleanup risk recorded.
 
 ---
 
-## Recommended owner choices (Proposed)
+## Accepted owner choices (2026-08-03)
 
-| Choice | Recommendation |
-|--------|----------------|
-| Save/unsave | Removed from Slice 3 |
+| Choice | Accepted |
+|--------|----------|
+| Save/unsave | Removed from Slice 3 (D-035 supersedes only D-032 save/unsave placement) |
 | Status vocabulary | `submitted` only |
 | Duplicate rule | Permanent candidate–vacancy uniqueness |
 | Snapshots | DB/RPC-generated immutable versioned jsonb (`snapshot_version = 1`) |
@@ -286,32 +285,30 @@ Do not implement:
 
 ---
 
-## Proposed decision map
+## Accepted decision map
 
 | # | Topic | Decision | Status |
 |---|-------|----------|--------|
-| 1 | Slice 3 boundary | D-035 | Proposed |
-| 2 | Detail route + authz | D-036 | Proposed |
-| 3 | Detail content / missing fields | D-037 | Proposed |
-| 4 | Application schema + snapshot | D-038 | Proposed |
-| 5 | Status vocabulary | D-039 | Proposed |
-| 6 | Duplicate prevention + idempotency | D-040 | Proposed |
-| 7 | Submit-time eligibility | D-041 | Proposed |
-| 8 | Insertion + RLS | D-042 | Proposed |
-| 9 | Preview + confirmation UX | D-043 | Proposed |
-| 10 | Applied state + history boundary | D-044 | Proposed |
-| 11 | Hosted proof strategy | D-045 | Proposed |
+| 1 | Slice 3 boundary | D-035 | Accepted 2026-08-03 |
+| 2 | Detail route + authz | D-036 | Accepted 2026-08-03 |
+| 3 | Detail content / missing fields | D-037 | Accepted 2026-08-03 |
+| 4 | Application schema + snapshot | D-038 | Accepted 2026-08-03 |
+| 5 | Status vocabulary | D-039 | Accepted 2026-08-03 |
+| 6 | Duplicate prevention + idempotency | D-040 | Accepted 2026-08-03 |
+| 7 | Submit-time eligibility | D-041 | Accepted 2026-08-03 |
+| 8 | Insertion + RLS | D-042 | Accepted 2026-08-03 |
+| 9 | Preview + confirmation UX | D-043 | Accepted 2026-08-03 |
+| 10 | Applied state + history boundary | D-044 | Accepted 2026-08-03 |
+| 11 | Hosted proof strategy | D-045 | Accepted 2026-08-03 |
 
 ---
 
-## Owner acceptance order
+## Delivery order after acceptance
 
-1. Review discovery + schema/journey proposal.
-2. Accept or revise D-035–D-045 (especially T1 save/unsave supersession of D-032,
-   `submitted`-only status, permanent uniqueness, RPC-generated snapshots,
-   Preview-preferred hosted proof).
-3. Merge this planning package.
-4. Open implementation PRs per `docs/23` (schema first).
+1. ~~Review discovery + schema/journey proposal~~ — done (PR #31).
+2. ~~Accept D-035–D-045~~ — Accepted 2026-08-03.
+3. Open PR 3.1 per `docs/23` (application schema first). Implementation has not
+   started in this acceptance update.
 
 ---
 

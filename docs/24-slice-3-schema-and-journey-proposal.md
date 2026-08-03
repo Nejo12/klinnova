@@ -1,11 +1,11 @@
 # Slice 3 Schema and Journey Proposal
 
-> Proposal locked to Proposed D-035–D-045 until owner Acceptance.
+> Contracts Accepted 2026-08-03 (D-035–D-045). Implementation not started.
 > Terminology: `vacancy` in schema/employer contexts; `job` in candidate-facing UI
 > (`docs/12-terminology.md`). Application is the candidate submission record.
 
 **Depends on:** Slice 2 vacancy + matching (`docs/20`); D-020, D-023, D-031–D-034;
-Proposed D-035–D-045.
+Accepted D-035–D-045.
 
 **Companion:** `docs/22-slice-3-discovery.md`, `docs/23-slice-3-build-plan.md`.
 
@@ -30,7 +30,7 @@ Employer review and status timelines are out of scope.
 | Route | Purpose |
 |-------|---------|
 | `/candidate/jobs/[vacancyId]` | Job detail + preview + submit entry |
-| `/candidate/applications/[applicationId]` | Reload-safe confirmation (recommended) |
+| `/candidate/applications/[applicationId]` | Reload-safe confirmation (Accepted D-036 / D-043) |
 | `/candidate/matches` | Entry list; Applied badge after submit |
 
 Rejected for Slice 3: public `/jobs`, `/jobs/[slug]` (would conflict with D-033
@@ -376,7 +376,7 @@ Show before submit:
 - Disclaimer: submitting records interest using this profile information; employer
   review workflows are not yet available on Stint
 
-**Checkbox decision (recommended):** no additional checkbox. Explicit Submit
+**Checkbox decision (Accepted D-043):** no additional checkbox. Explicit Submit
 button and disclosure are sufficient (declaration already stored at onboarding).
 
 Do **not** show/require: email, phone, CV, salary expectations.
@@ -475,13 +475,11 @@ Do not run hosted commands during discovery/planning PRs.
 
 ---
 
-## 16. Recommended owner choices (still Proposed until Accepted)
+## 16. Accepted owner choices (2026-08-03)
 
-These are the discovery recommendations; statuses remain **Proposed**:
-
-| Choice | Recommendation |
-|--------|----------------|
-| Save/unsave | Removed from Slice 3 (D-035) |
+| Choice | Accepted |
+|--------|----------|
+| Save/unsave | Removed from Slice 3 (D-035 supersedes only D-032 save/unsave placement) |
 | Status vocabulary | `submitted` only (D-039) |
 | Duplicate rule | Permanent `UNIQUE (candidate_id, vacancy_id)` (D-040) |
 | Snapshots | DB/RPC-generated immutable versioned jsonb (`snapshot_version = 1`) (D-038) |
@@ -489,10 +487,8 @@ These are the discovery recommendations; statuses remain **Proposed**:
 | Extra checkbox | Not required; explicit Submit + disclosure sufficient (D-043) |
 | Hosted proof | Preview preferred; Production only after explicit owner authorization (D-045) |
 
-### Remaining owner Acceptance checklist
+### Next step
 
-1. Accept or revise D-035–D-045 as a package.
-2. Confirm route shapes `/candidate/jobs/[vacancyId]` and
-   `/candidate/applications/[applicationId]`.
-3. Confirm version-1 snapshot field lists in §4.
-4. Confirm matcher stays TypeScript-authoritative with RPC integrity gate.
+PR 3.1 — application schema, constraints, RLS, RPC, and pgTAP — is the next
+implementation unit. Slice 3 implementation has not started in this acceptance
+update.
