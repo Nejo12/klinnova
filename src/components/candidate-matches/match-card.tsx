@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import {
   employmentTypeLabel,
   formatIsoCalendarDate,
@@ -19,6 +21,7 @@ export function MatchCard({ match }: MatchCardProps) {
   const { vacancy, reasons } = match;
   const titleId = `match-title-${vacancy.id}`;
   const reasonsId = `match-reasons-${vacancy.id}`;
+  const detailHref = `/candidate/jobs/${vacancy.id}`;
   const availableFromText =
     vacancy.availableFrom === null
       ? "Flexible start"
@@ -68,6 +71,14 @@ export function MatchCard({ match }: MatchCardProps) {
       </dl>
 
       <MatchReasons reasons={reasons} labelledBy={reasonsId} />
+
+      <Link
+        className={styles.detailLink}
+        href={detailHref}
+        aria-label={`View job: ${vacancy.title}`}
+      >
+        View job
+      </Link>
     </article>
   );
 }

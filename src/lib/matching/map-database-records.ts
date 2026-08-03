@@ -210,3 +210,29 @@ export function mapVacanciesMatchingInput(
     );
   });
 }
+
+/**
+ * Map one RLS vacancy row for matcher eligibility when the select omits
+ * unused presentation-only columns (e.g. candidate job detail).
+ */
+export function mapVacancyRowForMatcherEligibility(
+  vacancyRow: unknown,
+  languageRows: readonly unknown[],
+): VacancyMatchingInput {
+  if (typeof vacancyRow !== "object" || vacancyRow === null) {
+    throw new MatchingInvariantError("Invalid vacancy row for matching");
+  }
+
+  const record = vacancyRow as Record<string, unknown>;
+  const normalized =
+    typeof record.summary === "string" && record.summary.length > 0
+      ? vacancyRow
+      : { ...record, summary: "." };
+
+  const vacancies = mapVacanciesMatchingInput([normalized], languageRows);
+  const vacancy = vacancies[0];
+  if (vacancy === undefined) {
+    throw new MatchingInvariantError("Invalid vacancy row for matching");
+  }
+  return vacancy;
+}

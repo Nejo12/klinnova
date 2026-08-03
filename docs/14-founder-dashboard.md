@@ -10,20 +10,21 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M1 — Candidate matching shell |
 | Active slice | Slice 3 — Job detail to submitted application |
-| Slice status | Contracts Accepted (2026-08-03) — D-035–D-045 Accepted; PR 3.1 implementation in progress on `feat/slice-3-applications-schema`; Slice 3 is not Done; PR 3.2 has not started |
+| Slice status | Contracts Accepted (2026-08-03) — D-035–D-045 Accepted; PR 3.1 merged; PR 3.2 implementation in progress on `feat/slice-3-candidate-job-detail`; Slice 3 is not Done; PR 3.3 has not started |
 | Next slice | Slice 4 — Employer registration to draft vacancy (not started) |
-| Blockers | None for PR 3.1 local work. Hosted Demo fixtures remain in Production until 2026-09-02. |
+| Blockers | None for PR 3.2 local work. Hosted Demo fixtures remain in Production until 2026-09-02. |
 
 ## Slice 3 delivery (in progress)
 
 | Artifact | Status |
 |----------|--------|
 | `docs/22-slice-3-discovery.md` | Locked — contracts Accepted 2026-08-03 |
-| `docs/23-slice-3-build-plan.md` | Locked — PR 3.1–3.5 sequence; PR 3.1 implementation in progress |
+| `docs/23-slice-3-build-plan.md` | Locked — PR 3.1–3.5 sequence; PR 3.2 implementation in progress |
 | `docs/24-slice-3-schema-and-journey-proposal.md` | Locked — schema/journey contracts Accepted |
 | D-035–D-045 | Accepted 2026-08-03 |
-| PR 3.1 — application schema, constraints, RLS, RPC | Implementation in progress on branch — schema/RLS/RPC pending review; not merged |
-| Application detail route / submit UI | Not started (PR 3.2+) |
+| PR 3.1 — application schema, constraints, RLS, RPC | Done (merged) |
+| PR 3.2 — job-detail loader and candidate detail route | Implementation in progress on branch — loader/route pending review; not merged |
+| Application preview / submit UI | Not started (PR 3.3+) |
 
 ## Slice 2 delivery (complete)
 
@@ -106,7 +107,7 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 | 0 Foundation | Deployable shell + CI | Done — PR 0.1–0.4 merged; CI green; Production confirmed |
 | 1 Onboarding | Register → persisted essentials | Done — PR 1.1–1.4 merged (#21–#23); hosted migration + production smoke confirmed; D-018–D-025 Accepted |
 | 2 Matches | Essentials → seeded explainable matches | Done — PR 2.1–2.4 merged (#26–#29); hosted Production proof complete; Demo fixtures expire 2026-09-02; apply/detail excluded |
-| 3 Apply | Job detail → submitted application | Contracts Accepted (2026-08-03) — D-035–D-045 Accepted; PR 3.1 implementation in progress; Slice 3 not Done; PR 3.2 not started |
+| 3 Apply | Job detail → submitted application | Contracts Accepted (2026-08-03) — D-035–D-045 Accepted; PR 3.1 merged; PR 3.2 implementation in progress; Slice 3 not Done; PR 3.3 not started |
 | 4 Employer draft | Register → draft vacancy | Not started |
 | 5 Publish | Verification → public vacancy | Not started |
 | 6 Review | Applicant review → status update | Not started |
