@@ -30,7 +30,13 @@ export default async function CandidateJobDetailRoutePage({
   }
 
   if (view.kind === "ready") {
-    return <CandidateJobDetailPage status="ready" detail={view.detail} />;
+    return (
+      <CandidateJobDetailPage
+        status="ready"
+        detail={view.detail}
+        preview={view.preview}
+      />
+    );
   }
 
   if (view.kind === "unavailable") {

@@ -9,8 +9,10 @@ const USER_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const VACANCY_ID = "22222222-2222-4222-8222-222222222201";
 
 const completeProfile = {
+  display_name: "Ada Candidate",
   city: "Berlin" as const,
   german_comfort: "comfortable" as const,
+  work_authorisation_declared: true,
   job_categories: ["hospitality"],
   employment_types: ["part_time"],
   shift_preferences: ["flexible"],
@@ -160,6 +162,9 @@ describe("loadCandidateVacancyDetail", () => {
       ]);
       expect(result.detail.matchReasons.length).toBeGreaterThan(0);
       expect(result.detail.matchReasons.length).toBeLessThanOrEqual(4);
+      expect(result.preview.candidateDisplayName).toBe("Ada Candidate");
+      expect(result.preview.matchedJobCategoryLabel).toBe("Hospitality");
+      expect(result.preview.vacancyId).toBe(VACANCY_ID);
     }
     expect(access.loadVisibleVacancyById).toHaveBeenCalledWith(VACANCY_ID);
     expect(

@@ -1,5 +1,6 @@
 import {
   EMPLOYMENT_TYPE_OPTIONS,
+  GERMAN_COMFORT_OPTIONS,
   JOB_CATEGORY_OPTIONS,
   LANGUAGE_OPTIONS,
   LANGUAGE_PROFICIENCY_OPTIONS,
@@ -32,6 +33,11 @@ const LANGUAGE_LABELS = Object.fromEntries(
 const LANGUAGE_PROFICIENCY_LABELS = Object.fromEntries(
   LANGUAGE_PROFICIENCY_OPTIONS.map((option) => [option.code, option.label]),
 ) as Record<LanguageProficiencyCode, string>;
+
+/** Onboarding vocabulary for the candidate’s German comfort declaration. */
+const GERMAN_COMFORT_LABELS = Object.fromEntries(
+  GERMAN_COMFORT_OPTIONS.map((option) => [option.code, option.label]),
+) as Record<GermanComfortCode, string>;
 
 /** Short vacancy-facing German requirement labels (not long onboarding sentences). */
 const GERMAN_REQUIREMENT_LABELS: Record<GermanComfortCode, string> = {
@@ -76,6 +82,10 @@ export function languageProficiencyLabel(
   code: LanguageProficiencyCode,
 ): string {
   return LANGUAGE_PROFICIENCY_LABELS[code];
+}
+
+export function germanComfortLabel(code: GermanComfortCode): string {
+  return GERMAN_COMFORT_LABELS[code];
 }
 
 export function germanRequirementLabel(code: GermanComfortCode): string {

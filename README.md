@@ -142,14 +142,14 @@ At the same time, validate that employers can:
 - [Slice 2 schema and matching proposal](docs/20-slice-2-schema-and-matching-proposal.md) (planning locked)
 - [Slice 2 closure evidence](docs/21-slice-2-closure.md) (complete; hosted Production proof recorded)
 - [Slice 3 discovery](docs/22-slice-3-discovery.md) (contracts Accepted 2026-08-03; D-035–D-045)
-- [Slice 3 build plan](docs/23-slice-3-build-plan.md) (contracts Accepted; PR 3.1 merged; PR 3.2 implementation in progress; Slice 3 not Done)
+- [Slice 3 build plan](docs/23-slice-3-build-plan.md) (contracts Accepted; PR 3.1 and PR 3.2 merged; PR 3.3 implementation in progress; Slice 3 not Done)
 - [Slice 3 schema and journey proposal](docs/24-slice-3-schema-and-journey-proposal.md) (contracts Accepted)
 - [Not now](NOT_NOW.md)
 - [Agent instructions](AGENTS.md)
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, and Slice 2 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Hosted Production proof is complete on `https://stint.company`; deterministic Demo fixtures expire on 2026-09-02. Slice 3 contracts are Accepted (D-035–D-045, 2026-08-03). PR 3.1 (application persistence) is merged. PR 3.2 (candidate job-detail loader and `/candidate/jobs/[vacancyId]`) is implementation in progress on branch; Slice 3 is not Done; PR 3.3 has not started. D-034 remains a future employer-domain requirement, not an implemented employer feature. Product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, and Slice 2 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Hosted Production proof is complete on `https://stint.company`; deterministic Demo fixtures expire on 2026-09-02. Slice 3 contracts are Accepted (D-035–D-045, 2026-08-03). PR 3.1 (application persistence) and PR 3.2 (candidate job-detail) are merged. PR 3.3 (application preview and atomic submission) is implementation in progress on branch; inline acknowledgement is temporary until PR 3.4 adds persistent confirmation and Applied state; Slice 3 is not Done; PR 3.4 has not started. D-034 remains a future employer-domain requirement, not an implemented employer feature. Product scope remains `docs/04-mvp.md`.
 
 ## Local development
 
