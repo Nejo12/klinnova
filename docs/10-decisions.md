@@ -581,3 +581,120 @@ This decision does **not** add employer implementation, schema, Auth, verificati
 **Consequences:** Closure docs record environment, project ref, fixture IDs used, application retention/cleanup outcome — never connection strings or tokens.
 
 **Acceptance note:** Accepted 2026-08-03 by repository owner after PR #31 discovery review.
+
+## D-046 — Slice 4 boundary
+
+**Status:** Proposed
+**Must accept before:** PR 4.1
+
+**Context:** `docs/13` Slice 4 covers employer registration through structured draft vacancy. MVP also lists verification, publish, and rich vacancy fields. Slice 5 owns verification and publication; Slice 6 owns applicant review.
+
+**Decision (proposed):** Slice 4 delivers employer account entry, private and organisation employer profiles (company only for organisation), employer onboarding completion, and employer-owned private draft vacancies with structured fields and an explicit publish-ready checklist. It does **not** include verification approval, evidence upload, badges, publication, public/candidate draft visibility, applicant review, exact residential address collection, team membership, or multi-organisation ownership.
+
+**Alternatives:** Include publish in Slice 4; require verification before drafting; company-only employers.
+
+**Consequences:** Planning docs `docs/28`–`docs/30` and PRs 4.1–4.5 follow this boundary when Accepted.
+
+## D-047 — Employer account capability model
+
+**Status:** Proposed
+**Must accept before:** PR 4.1
+
+**Context:** No shared `profiles` or application role exists (D-019). Login/register currently assume candidate intent via `ensureCandidateProfile`.
+
+**Decision (proposed):** Add `employer_profiles` 1:1 with `auth.users` (additive capability). Do **not** introduce exclusive `profiles.role` in Slice 4. One Auth user may hold both candidate and employer profiles. Existing candidates may later create an employer profile. Employer type is selected once and immutable in Slice 4. Team membership and private→organisation conversion are deferred. Multi-role landing uses explicit navigation/chooser; employer routes must not silently create candidate profiles.
+
+**Alternatives:** Exclusive role column; organisation membership graph now; force separate Auth users per role.
+
+**Consequences:** Candidate Auth path remains; employer entry points and proxy `/employer/*` protection are required.
+
+## D-048 — Private/organisation profiles and company ownership
+
+**Status:** Proposed
+**Must accept before:** PR 4.1
+
+**Context:** D-034 Accepted. Current `companies` are seed-only with no Auth owner. Vacancies require `company_id`.
+
+**Decision (proposed):** Every employer has `employer_profiles`. Organisation employers own exactly one `companies` row (`source=employer`, `owner_employer_id`). Private employers have no company row. Vacancies are owned by `employer_profile_id` when `source=employer`; `company_id` is required for organisation vacancies and null for private. Seed companies/vacancies remain `source=seed` without Auth owners.
+
+**Alternatives:** Fake company for every private employer; company-only vacancy ownership; multi-company MVP.
+
+**Consequences:** Migrate `companies.source` and vacancy ownership FKs carefully; preserve Demo seeds.
+
+## D-049 — Employer onboarding completion
+
+**Status:** Proposed
+**Must accept before:** PR 4.1 / 4.2
+
+**Context:** Candidate completion uses `onboarding_completed_at` + Auth-bound RPC (D-020).
+
+**Decision (proposed):** Employer completion is separate: `employer_profiles.onboarding_completed_at` set only by an Auth-bound completion RPC after validating type-specific essentials. Incomplete employers cannot create vacancies. Candidate completion is unchanged and independent.
+
+**Alternatives:** Reuse candidate completion; client-writable status enum.
+
+**Consequences:** Vacancy create gates on employer completion; dual-capability users may be complete in one role and incomplete in the other.
+
+## D-050 — Draft lifecycle, source, ownership, and visibility
+
+**Status:** Proposed
+**Must accept before:** PR 4.3
+
+**Context:** `publication_state` is `published`|`withdrawn`; `source` is `seed` only; `expires_at` is NOT NULL.
+
+**Decision (proposed):** Add `draft` to `publication_state` and `employer` to `source`. Employer drafts use `source=employer` and `employer_profile_id=auth.uid()` ownership. Drafts have `published_at` null and `expires_at` null. Drafts are invisible to anon, candidates, unrelated employers, matchers, and application submit. Slice 4 allows create/update of own drafts; delete only while draft and without applications (owner decision to confirm). No draft→published transition in Slice 4. Seed published/withdrawn behaviour remains intact.
+
+**Alternatives:** Separate `drafts` table; keep expires_at always set; allow candidate SELECT of own-employer’s drafts (rejected).
+
+**Consequences:** Visibility helpers and submit RPC must exclude drafts; pgTAP matrix required.
+
+## D-051 — Draft fields, salary, location, language, expiry
+
+**Status:** Proposed
+**Must accept before:** PR 4.3 / 4.4
+
+**Context:** MVP requires structured salary, language, privacy-safe location, contract/shifts, etc. Current vacancy schema lacks salary/locality/workplace/frequency. Exact addresses must not be public (D-034).
+
+**Decision (proposed):** Initial draft save requires completed employer onboarding, title, and category (plus server-owned draft/source/ownership). Incomplete structured fields may persist on drafts (relaxed array CHECKs while draft). Publish-ready checklist (UI + helper, not publish action) requires description, public locality, employment types, shifts, German requirement, salary (`salary_amount_cents` + `salary_period` + `gross` basis, EUR only), workplace/frequency where required, and explicit CV/interview-English booleans. Do **not** collect exact residential address in Slice 4. Language requirements reuse normalized table and D-029 codes; no free-text languages. Draft expiry stays null; public lifetime decided at publish (Slice 5).
+
+**Alternatives:** Require full publish-ready fields on first save; free-text salary; store exact address encrypted now.
+
+**Consequences:** Candidate-facing salary/locality appear only after Slice 5 publish; Slice 3 Demo detail remains schema-limited until then.
+
+## D-052 — Employer form persistence boundary
+
+**Status:** Proposed
+**Must accept before:** PR 4.2 / 4.4
+
+**Context:** Candidate onboarding uses Actions+RLS; completion/submit use Auth-bound RPCs.
+
+**Decision (proposed):** Hybrid: Server Actions + Zod always; direct RLS for single-row owned updates; Auth-bound SECURITY DEFINER RPCs for employer completion, atomic organisation profile+company creation, and language-requirement set replacement. Caller cannot supply owner IDs, foreign company IDs, verification_state, source, illegal lifecycle transitions, or publication timestamps.
+
+**Alternatives:** RLS-only; RPC-only.
+
+**Consequences:** Mirrors Slice 1/3 patterns; clearer audit of privileged writes.
+
+## D-053 — Employer routes and RLS authorization
+
+**Status:** Proposed
+**Must accept before:** PR 4.2 / 4.3
+
+**Context:** Architecture lists `/employer/jobs*`; codebase uses `vacancies` terminology. Only `/candidate/*` is proxy-protected today.
+
+**Decision (proposed):** Protect `/employer` and `/employer/*`. Routes: `/employer/register`, `/employer`, `/employer/onboarding`, `/employer/vacancies`, `/employer/vacancies/new`, `/employer/vacancies/[vacancyId]/edit` (+ optional owner preview). Unauthenticated → login with `next`. Incomplete → onboarding. Wrong owner → generic unavailable. RLS enforces owner-only employer profile/company/draft access; candidates keep seed-only vacancy SELECT; drafts never enter candidate helpers. Prefer `vacancies` path segment over architecture’s `jobs` for schema alignment.
+
+**Alternatives:** Public employer pages; `/employer/jobs` naming only; UI-only ownership checks.
+
+**Consequences:** Proxy + loader + RLS layered authz; architecture doc route names may lag until updated after Acceptance.
+
+## D-054 — Slice 4 hosted proof strategy
+
+**Status:** Proposed
+**Must accept before:** PR 4.5 / Slice 4 Done
+
+**Context:** Preview isolation is not configured; Slice 3 used owner-authorized Production fallback (D-045 / `docs/27`).
+
+**Decision (proposed):** Local CI must prove schema/RLS/journeys before hosted proof. Prefer isolated Preview (separate Supabase project/branch + correct public env). Do **not** authorize Production hosted proof in the Slice 4 planning package. Production fallback requires a later explicit owner authorization recorded in the decision log. Hosted proof must verify private+org draft journeys, draft invisibility, ownership denials, and candidate regression without leaking secrets in evidence.
+
+**Alternatives:** Pre-authorize Production now; close Slice 4 on local proof only.
+
+**Consequences:** Preview infrastructure fix is a preferred-proof prerequisite, not a Slice 4 product scope item.
