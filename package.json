@@ -19,6 +19,7 @@
     "test:e2e:auth": "E2E_AUTH_JOURNEY=1 playwright test e2e/auth-journey.spec.ts",
     "test:e2e:onboarding": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/auth-journey.spec.ts e2e/onboarding-journey.spec.ts e2e/completion-journey.spec.ts e2e/matches-journey.spec.ts",
     "test:e2e:slice2": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/slice2-critical-journey.spec.ts",
+    "test:e2e:slice3": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/slice3-critical-journey.spec.ts",
     "fixtures:hosted:apply": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/fixtures/hosted-demo.mts apply",
     "fixtures:hosted:cleanup": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/fixtures/hosted-demo.mts cleanup",
     "supabase:start": "supabase start",

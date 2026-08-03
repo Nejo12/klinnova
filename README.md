@@ -142,14 +142,16 @@ At the same time, validate that employers can:
 - [Slice 2 schema and matching proposal](docs/20-slice-2-schema-and-matching-proposal.md) (planning locked)
 - [Slice 2 closure evidence](docs/21-slice-2-closure.md) (complete; hosted Production proof recorded)
 - [Slice 3 discovery](docs/22-slice-3-discovery.md) (contracts Accepted 2026-08-03; D-035–D-045)
-- [Slice 3 build plan](docs/23-slice-3-build-plan.md) (contracts Accepted; PR 3.1–3.3 merged; PR 3.4 implementation in progress; Slice 3 not Done)
+- [Slice 3 build plan](docs/23-slice-3-build-plan.md) (contracts Accepted; PR 3.1–3.4 merged; PR 3.5 local exit proof in progress; Slice 3 not Done)
 - [Slice 3 schema and journey proposal](docs/24-slice-3-schema-and-journey-proposal.md) (contracts Accepted)
+- [Slice 3 exit proof (local)](docs/25-slice-3-exit-proof.md) (local evidence; hosted proof pending; Slice 3 not Done)
+- [Slice 3 hosted-proof runbook](docs/26-slice-3-hosted-proof-runbook.md) (owner-authorized; not executed in PR 3.5)
 - [Not now](NOT_NOW.md)
 - [Agent instructions](AGENTS.md)
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, and Slice 2 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Hosted Production proof is complete on `https://stint.company`; deterministic Demo fixtures expire on 2026-09-02. Slice 3 contracts are Accepted (D-035–D-045, 2026-08-03). PR 3.1–3.3 are merged. PR 3.4 (persistent confirmation and Applied state) is implementation in progress on branch; Slice 3 is not Done until PR 3.4 merges and exit proof/closure requirements are completed; no next PR should be started yet. D-034 remains a future employer-domain requirement, not an implemented employer feature. Product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, and Slice 2 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Hosted Production proof is complete on `https://stint.company`; deterministic Demo fixtures expire on 2026-09-02. Slice 3 contracts are Accepted (D-035–D-045, 2026-08-03). PR 3.1–3.4 are merged (#33–#36). PR 3.5 (local exit proof and hosted-proof readiness) is in progress on branch; hosted proof remains pending; Slice 3 is not Done until hosted proof, evidence review, and closure requirements are completed. Slice 4 has not started. D-034 remains a future employer-domain requirement, not an implemented employer feature. Product scope remains `docs/04-mvp.md`.
 
 ## Local development
 
@@ -254,7 +256,13 @@ Slice 2 critical exit journey (register → complete → matches → authz → i
 pnpm test:e2e:slice2
 ```
 
-Hosted Preview/Production Auth uses the repository owner’s Supabase project, Vercel public env, Site URL `https://stint.company`, and the configured redirect allow-list. Hosted completion migration `20260801160000_complete_candidate_onboarding.sql` is applied.
+Slice 3 critical exit journey (register → complete → detail → preview → submit → confirmation → Applied → duplicate/single-row → authz/historical proofs):
+
+```bash
+pnpm test:e2e:slice3
+```
+
+Hosted Preview/Production Auth uses the repository owner’s Supabase project, Vercel public env, Site URL `https://stint.company`, and the configured redirect allow-list. Hosted completion migration `20260801160000_complete_candidate_onboarding.sql` is applied. Slice 3 hosted proof is owner-run only — see `docs/26-slice-3-hosted-proof-runbook.md`.
 
 Hosted Demo vacancy fixtures (D-031) are **owner-run only** — never applied by migrations, CI, build, or deploy. See `supabase/fixtures/hosted/README.md` and `docs/21-slice-2-closure.md`.
 
