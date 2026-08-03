@@ -154,6 +154,7 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          owner_employer_id: string | null
           slug: string
           source: string
           updated_at: string
@@ -162,6 +163,7 @@ export type Database = {
           created_at?: string
           id?: string
           name: string
+          owner_employer_id?: string | null
           slug: string
           source: string
           updated_at?: string
@@ -170,9 +172,66 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
+          owner_employer_id?: string | null
           slug?: string
           source?: string
           updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "companies_owner_employer_id_fkey"
+            columns: ["owner_employer_id"]
+            isOneToOne: false
+            referencedRelation: "employer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employer_profiles: {
+        Row: {
+          berlin_locality: string | null
+          created_at: string
+          display_name: string | null
+          employer_type: string
+          id: string
+          lawful_hiring_declared: boolean | null
+          lawful_hiring_declared_at: string | null
+          onboarding_completed_at: string | null
+          organisation_legal_name: string | null
+          phone: string | null
+          updated_at: string
+          verification_state: string
+          website: string | null
+        }
+        Insert: {
+          berlin_locality?: string | null
+          created_at?: string
+          display_name?: string | null
+          employer_type: string
+          id: string
+          lawful_hiring_declared?: boolean | null
+          lawful_hiring_declared_at?: string | null
+          onboarding_completed_at?: string | null
+          organisation_legal_name?: string | null
+          phone?: string | null
+          updated_at?: string
+          verification_state?: string
+          website?: string | null
+        }
+        Update: {
+          berlin_locality?: string | null
+          created_at?: string
+          display_name?: string | null
+          employer_type?: string
+          id?: string
+          lawful_hiring_declared?: boolean | null
+          lawful_hiring_declared_at?: string | null
+          onboarding_completed_at?: string | null
+          organisation_legal_name?: string | null
+          phone?: string | null
+          updated_at?: string
+          verification_state?: string
+          website?: string | null
         }
         Relationships: []
       }
@@ -296,6 +355,25 @@ export type Database = {
         Args: { p_uid: string }
         Returns: undefined
       }
+      _clear_employer_completion_if_incomplete: {
+        Args: { p_uid: string }
+        Returns: undefined
+      }
+      _employer_first_incomplete_reason: {
+        Args: {
+          p_berlin_locality: string
+          p_display_name: string
+          p_employer_type: string
+          p_id: string
+          p_lawful_hiring_declared: boolean
+          p_organisation_legal_name: string
+        }
+        Returns: string
+      }
+      _employer_has_owned_company: {
+        Args: { p_employer_id: string }
+        Returns: boolean
+      }
       _profile_first_incomplete_group: {
         Args: {
           p_available_from: string
@@ -310,7 +388,20 @@ export type Database = {
         }
         Returns: string
       }
+      bootstrap_organisation_employer: {
+        Args: {
+          p_berlin_locality: string
+          p_company_name: string
+          p_company_slug: string
+          p_display_name: string
+          p_organisation_legal_name: string
+          p_phone?: string
+          p_website?: string
+        }
+        Returns: Json
+      }
       complete_candidate_onboarding: { Args: never; Returns: Json }
+      complete_employer_onboarding: { Args: never; Returns: Json }
       submit_candidate_application: {
         Args: { p_vacancy_id: string }
         Returns: Json

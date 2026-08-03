@@ -1,8 +1,10 @@
 # Slice 4 Build Plan
 
-> Planning artifact. No migrations or application code land here.
-> **Status:** Contracts Accepted 2026-08-03 (D-046–D-054). Ready for PR 4.1.
-> Slice 4 implementation has **not** started in this package.
+> Planning artifact for the PR sequence. Schema for PR 4.1 lands in the
+> implementation branch, not in planning-only packages.
+> **Status:** Contracts Accepted 2026-08-03 (D-046–D-054). PR 4.1 implementation
+> prepared (local schema/RLS/pgTAP validated); not Done until merge. PR 4.2+ not
+> started.
 
 **Outcome:** Employer registration → employer profile (private or organisation) →
 structured private draft vacancy.
@@ -30,7 +32,8 @@ structured private draft vacancy.
 ### PR 4.1 — Employer identity, profiles, company ownership, RLS
 
 **Intent:** Persist employer capability without breaking candidates.
-**Authorized next unit** after the decision-acceptance PR merges.
+**Status:** Implementation prepared on `feat/slice-4-employer-profile-schema`
+(local validation); not Done until merge.
 
 **Includes:**
 

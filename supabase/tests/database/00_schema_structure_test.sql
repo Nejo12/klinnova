@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(35);
+select plan(40);
 
 -- Tables exist
 select has_table('public', 'candidate_profiles', 'candidate_profiles exists');
@@ -15,11 +15,11 @@ select has_table(
   'vacancy_language_requirements exists'
 );
 select has_table('public', 'applications', 'applications exists');
+select has_table('public', 'employer_profiles', 'employer_profiles exists');
 
 -- Forbidden application tables must not exist
 select hasnt_table('public', 'profiles', 'no shared profiles table');
 select hasnt_table('public', 'candidate_preferences', 'no candidate_preferences table');
-select hasnt_table('public', 'employer_profiles', 'no employer_profiles table');
 select hasnt_table('public', 'jobs', 'no jobs table');
 
 -- Keys and RLS
@@ -33,6 +33,7 @@ select has_pk(
   'vacancy_language_requirements has primary key'
 );
 select has_pk('public', 'applications', 'applications has primary key');
+select has_pk('public', 'employer_profiles', 'employer_profiles has primary key');
 
 select ok(
   exists (
@@ -42,6 +43,16 @@ select ok(
       and contype = 'f'
   ),
   'candidate_profiles references auth.users'
+);
+
+select ok(
+  exists (
+    select 1
+    from pg_constraint
+    where conname = 'employer_profiles_id_fkey'
+      and contype = 'f'
+  ),
+  'employer_profiles references auth.users'
 );
 
 select ok(
@@ -165,6 +176,16 @@ select is(
   'RLS enabled on applications'
 );
 
+select is(
+  (
+    select relrowsecurity
+    from pg_class
+    where oid = 'public.employer_profiles'::regclass
+  ),
+  true,
+  'RLS enabled on employer_profiles'
+);
+
 select ok(
   exists (
     select 1
@@ -217,6 +238,18 @@ select has_column(
   'candidate_profiles',
   'work_authorisation_declared_at',
   'declaration timestamp column exists'
+);
+select has_column(
+  'public',
+  'employer_profiles',
+  'onboarding_completed_at',
+  'employer completion column exists'
+);
+select has_column(
+  'public',
+  'companies',
+  'owner_employer_id',
+  'company owner_employer_id exists'
 );
 
 select * from finish();
