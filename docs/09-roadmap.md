@@ -26,7 +26,7 @@ Exit condition: the team can begin the first vertical slice without unresolved a
 
 Exit condition: a new candidate can register and receive understandable, relevant opportunities.
 
-**Delivery note (2026-08):** Vertical Slice 2 delivered matching job cards without detail/save. Proposed Slice 3 discovery (`docs/22`) places job detail + apply next and defers save/unsave. This stage remains capability roadmap, not PR order.
+**Delivery note (2026-08):** Vertical Slice 2 delivered matching job cards without detail/save. Accepted Slice 3 contracts (D-035–D-045) place job detail + apply next and defer save/unsave. This stage remains capability roadmap, not PR order.
 
 ## Stage 2 — Application slice
 
@@ -39,7 +39,7 @@ Exit condition: a new candidate can register and receive understandable, relevan
 
 Exit condition: a candidate can apply successfully and see the resulting status.
 
-**Delivery note (2026-08):** Proposed Slice 3 narrows first delivery to profile-based submit + confirmation + Applied state; CV upload and status timeline remain later within this stage’s intent.
+**Delivery note (2026-08):** Accepted Slice 3 contracts (D-035–D-045) narrow first delivery to profile-based submit + confirmation + Applied state; CV upload and status timeline remain later within this stage’s intent.
 
 ## Stage 3 — Employer slice
 

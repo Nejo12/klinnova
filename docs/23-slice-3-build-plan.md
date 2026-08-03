@@ -2,16 +2,16 @@
 
 > Planning artifact. Discovery in `docs/22-slice-3-discovery.md`.
 > Schema/journey proposal in `docs/24-slice-3-schema-and-journey-proposal.md`.
-> **Status:** Slice 3 discovery in progress; implementation not started;
-> decisions D-035–D-045 Proposed (pending owner Acceptance).
+> **Status:** Contracts Accepted 2026-08-03 (D-035–D-045). PR 3.1 is the next
+> implementation unit; Slice 3 implementation has not started.
 
 **Outcome:** A completed candidate can open a matched Demo job, preview a
 profile-based application, submit exactly once, and see reload-safe confirmation
-(`docs/13`, narrowed by Proposed D-035).
+(`docs/13`, narrowed by Accepted D-035).
 
 **Tracking:** `docs/14-founder-dashboard.md`
 
-**Decisions:** D-035–D-045 Proposed in `docs/10-decisions.md`
+**Decisions:** D-035–D-045 Accepted 2026-08-03 in `docs/10-decisions.md`
 
 ---
 
@@ -27,12 +27,12 @@ profile-based application, submit exactly once, and see reload-safe confirmation
 | `docs/13-implementation-plan.md` | Slice order; exit criteria (narrowed) |
 | `docs/21-slice-2-closure.md` | Hosted Demo fixture baseline |
 | `docs/22` / `docs/24` | Discovery + schema/journey contracts |
-| `docs/10-decisions.md` | D-020, D-023, D-031–D-034; Proposed D-035–D-045 |
+| `docs/10-decisions.md` | D-020, D-023, D-031–D-034; Accepted D-035–D-045 |
 | `NOT_NOW.md` | Do not implement |
 
 ---
 
-## Intentional narrowings (Proposed)
+## Intentional narrowings (Accepted)
 
 | Broader doc statement | Slice 3 boundary |
 |-----------------------|------------------|
@@ -65,7 +65,7 @@ profile-based application, submit exactly once, and see reload-safe confirmation
 
 ## Exit criteria (Slice 3)
 
-Operationalised from owner objective + Proposed D-035:
+Operationalised from owner objective + Accepted D-035:
 
 1. Completed candidate opens a matched Demo job at `/candidate/jobs/[vacancyId]`.
 2. Detail shows schema-backed job facts, Demo label, match reasons, and
@@ -104,7 +104,7 @@ boundary.
 
 **Intent:** Persist applications with ownership, uniqueness, and insert path.
 
-**Status:** Not started (blocked on Accepted D-035–D-042).
+**Status:** Not started — contracts Accepted; next implementation unit.
 
 **Includes:** `applications` table; FKs; permanent unique `(candidate_id, vacancy_id)`;
 `status = 'submitted'` CHECK only; `snapshot_version` + `candidate_snapshot` /
@@ -300,11 +300,12 @@ planned only.
 
 ## Slice 3 close checklist (planning)
 
-- [ ] D-035–D-045 Accepted
+- [x] D-035–D-045 Accepted (2026-08-03)
 - [ ] PR 3.1–3.4 merged
 - [ ] Local critical journey green
 - [ ] Hosted proof recorded (D-045)
 - [ ] No employer / save / CV / timeline dashboard shipped
 - [ ] Dashboard: Slice 3 Done → next slice planned
 
-Do not mark Slice 3 Done until hosted exit proof is recorded.
+PR 3.1 is next. Do not mark Slice 3 Done until hosted exit proof is recorded.
+Do not mark PR 3.1 started in this acceptance update.

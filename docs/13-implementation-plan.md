@@ -84,11 +84,11 @@ Each slice is the unit of planning, implementation, and review. Size for roughly
 
 **Broader MVP includes (still product intent):** job list and detail; salary, distance, shift, contract, language, verification, and freshness; save/unsave; profile-based application; optional CV upload with private storage; confirmation; application timeline; candidate application dashboard.
 
-**Proposed Slice 3 narrowings (D-035–D-045; pending Acceptance):** authenticated `/candidate/jobs/[vacancyId]` detail for RLS-visible seed vacancies using schema-backed fields only; profile-based preview and atomic submit; reload-safe confirmation from RPC-generated versioned snapshots; Applied-state feedback; permanent DB unique one application per candidate per vacancy; status constrained to `submitted` only. Deferred from this slice: save/unsave; CV/Storage; salary/distance/experience/verification/interview-language fields; employer status transitions; withdrawal/resubmission; future application statuses beyond `submitted`; full applications dashboard. Employer implementation remains Slice 4+.
+**Accepted Slice 3 narrowings (D-035–D-045; Accepted 2026-08-03):** authenticated `/candidate/jobs/[vacancyId]` detail for RLS-visible seed vacancies using schema-backed fields only; profile-based preview and atomic submit; reload-safe confirmation from RPC-generated versioned snapshots; Applied-state feedback; permanent DB unique one application per candidate per vacancy; status constrained to `submitted` only. Deferred from this slice: save/unsave; CV/Storage; salary/distance/experience/verification/interview-language fields; employer status transitions; withdrawal/resubmission; future application statuses beyond `submitted`; full applications dashboard. Employer implementation remains Slice 4+.
 
-**Planning artifacts:** discovery `docs/22-slice-3-discovery.md`, build plan `docs/23-slice-3-build-plan.md`, schema/journey proposal `docs/24-slice-3-schema-and-journey-proposal.md`.
+**Planning artifacts:** discovery `docs/22-slice-3-discovery.md`, build plan `docs/23-slice-3-build-plan.md`, schema/journey proposal `docs/24-slice-3-schema-and-journey-proposal.md`. PR 3.1 is the next implementation unit; implementation has not started.
 
-**Exit criteria (operational for narrowed Slice 3 once decisions Accepted):**
+**Exit criteria (operational for narrowed Slice 3):**
 
 - exactly one application per vacancy per candidate
 - completed candidate can submit a profile-based Demo application with confirmation
