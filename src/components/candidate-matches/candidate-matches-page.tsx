@@ -6,12 +6,17 @@ import { MatchList } from "@/components/candidate-matches/match-list";
 import { MatchesEmptyState } from "@/components/candidate-matches/matches-empty-state";
 import { MatchesErrorState } from "@/components/candidate-matches/matches-error-state";
 import { WorkAuthorisationNotice } from "@/components/candidate-matches/work-authorisation-notice";
+import type { OwnedApplicationSummary } from "@/lib/applications/owned-application";
 import type { CandidateMatch } from "@/lib/matching/types";
 
 import styles from "./candidate-matches.module.scss";
 
 type CandidateMatchesPageProps =
-  | { status: "success"; matches: readonly CandidateMatch[] }
+  | {
+      status: "success";
+      matches: readonly CandidateMatch[];
+      applicationsByVacancyId: ReadonlyMap<string, OwnedApplicationSummary>;
+    }
   | { status: "failure" };
 
 export function CandidateMatchesPage(props: CandidateMatchesPageProps) {
@@ -44,7 +49,10 @@ export function CandidateMatchesPage(props: CandidateMatchesPageProps) {
           ) : (
             <>
               <MatchCount count={props.matches.length} />
-              <MatchList matches={props.matches} />
+              <MatchList
+                matches={props.matches}
+                applicationsByVacancyId={props.applicationsByVacancyId}
+              />
             </>
           )}
         </>

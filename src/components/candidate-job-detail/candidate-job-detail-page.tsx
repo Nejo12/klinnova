@@ -6,6 +6,11 @@ import { ApplicationSubmitForm } from "@/components/candidate-job-detail/applica
 import { JobDetailUnavailable } from "@/components/candidate-job-detail/job-detail-unavailable";
 import { WorkAuthorisationNotice } from "@/components/candidate-matches/work-authorisation-notice";
 import type { ApplicationPreview } from "@/lib/applications/application-preview";
+import {
+  APPLIED_STATUS_LABEL,
+  formatSubmittedAtUtc,
+} from "@/lib/applications/application-confirmation";
+import type { OwnedApplicationSummary } from "@/lib/applications/owned-application";
 import type { CandidateVacancyDetail } from "@/lib/matching/candidate-vacancy-detail";
 
 import styles from "./candidate-job-detail.module.scss";
@@ -15,6 +20,7 @@ type CandidateJobDetailPageProps =
       status: "ready";
       detail: CandidateVacancyDetail;
       preview: ApplicationPreview;
+      application: OwnedApplicationSummary | null;
     }
   | { status: "unavailable"; reason: "unavailable" | "not_matching" }
   | { status: "failure" };
@@ -36,9 +42,11 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
     );
   }
 
-  const { detail, preview } = props;
+  const { detail, preview, application } = props;
   const reasonsHeadingId = `job-reasons-${detail.vacancyId}`;
   const languagesHeadingId = `job-languages-${detail.vacancyId}`;
+  const submittedAtLabel =
+    application === null ? null : formatSubmittedAtUtc(application.submittedAt);
 
   return (
     <main className={styles.page}>
@@ -55,7 +63,12 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
 
       <div className={styles.titleRow}>
         <h1 className={styles.heading}>{detail.title}</h1>
-        <p className={styles.demoLabel}>{detail.demoLabel}</p>
+        <div className={styles.badgeGroup}>
+          <p className={styles.demoLabel}>{detail.demoLabel}</p>
+          {application !== null ? (
+            <p className={styles.appliedLabel}>{APPLIED_STATUS_LABEL}</p>
+          ) : null}
+        </div>
       </div>
 
       <p className={styles.company}>{detail.employerDisplayName}</p>
@@ -140,8 +153,42 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
         </section>
       ) : null}
 
-      <ApplicationPreviewSection preview={preview} />
-      <ApplicationSubmitForm vacancyId={detail.vacancyId} />
+      {application !== null ? (
+        <section
+          className={styles.section}
+          aria-labelledby="application-applied-heading"
+        >
+          <h2
+            className={styles.sectionHeading}
+            id="application-applied-heading"
+          >
+            Application
+          </h2>
+          <p className={styles.appliedStatus}>
+            {APPLIED_STATUS_LABEL}
+            {submittedAtLabel !== null ? (
+              <>
+                {" · "}
+                <time dateTime={application.submittedAt}>
+                  {submittedAtLabel}
+                </time>
+              </>
+            ) : null}
+          </p>
+          <Link
+            className={styles.cta}
+            href={`/candidate/applications/${application.applicationId}`}
+            aria-label={`View application: ${detail.title}`}
+          >
+            View application
+          </Link>
+        </section>
+      ) : (
+        <>
+          <ApplicationPreviewSection preview={preview} />
+          <ApplicationSubmitForm vacancyId={detail.vacancyId} />
+        </>
+      )}
     </main>
   );
 }

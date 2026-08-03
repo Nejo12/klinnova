@@ -9,6 +9,7 @@ import { resolveCandidateVacancyMatch } from "@/lib/matching/resolve-candidate-v
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const vacancyIdSchema = z.string().uuid();
+const applicationIdSchema = z.string().uuid();
 
 function formString(formData: FormData, key: string): string {
   const value = formData.get(key);
@@ -19,6 +20,7 @@ function formString(formData: FormData, key: string): string {
  * Explicit candidate application submission.
  * Rechecks Auth, completion, RLS-visible vacancy, and the TypeScript matcher
  * before calling Auth-bound `submit_candidate_application` with vacancy ID only.
+ * Successful and duplicate outcomes redirect to the canonical confirmation.
  */
 export async function submitCandidateApplicationAction(
   _prev: SubmitCandidateApplicationState,
@@ -58,7 +60,6 @@ export async function submitCandidateApplicationAction(
     }
   }
 
-  // Matcher already passed in resolve; call RPC with vacancy ID only.
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase.rpc("submit_candidate_application", {
     p_vacancy_id: vacancyId,
@@ -75,15 +76,15 @@ export async function submitCandidateApplicationAction(
 
   switch (parsed.data.result) {
     case "submitted":
-      return {
-        status: "submitted",
-        applicationId: parsed.data.application_id,
-      };
-    case "already_applied":
-      return {
-        status: "already_applied",
-        applicationId: parsed.data.application_id,
-      };
+    case "already_applied": {
+      const applicationId = applicationIdSchema.safeParse(
+        parsed.data.application_id,
+      );
+      if (!applicationId.success) {
+        return { status: "failure" };
+      }
+      redirect(`/candidate/applications/${applicationId.data}`);
+    }
     case "incomplete":
       redirect("/candidate/onboarding");
     case "unavailable":

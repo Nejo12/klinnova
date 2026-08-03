@@ -77,11 +77,13 @@ describe("resolveJobDetailPageView", () => {
         status: "ready",
         detail,
         preview,
+        application: null,
       }),
     ).toEqual({
       kind: "ready",
       detail,
       preview,
+      application: null,
     });
   });
 });

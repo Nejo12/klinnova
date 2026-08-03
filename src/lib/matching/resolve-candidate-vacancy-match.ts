@@ -82,6 +82,9 @@ export type CandidateVacancyMatchDataAccess = {
   loadVisibleLanguageRequirementsForVacancy: (
     vacancyId: string,
   ) => Promise<{ ok: true; requirements: unknown[] } | { ok: false }>;
+  loadOwnedApplicationForVacancy: (
+    vacancyId: string,
+  ) => Promise<{ ok: true; application: unknown | null } | { ok: false }>;
 };
 
 export function createSupabaseCandidateVacancyMatchDataAccess(
@@ -155,6 +158,19 @@ export function createSupabaseCandidateVacancyMatchDataAccess(
         return { ok: false };
       }
       return { ok: true, requirements: data ?? [] };
+    },
+
+    async loadOwnedApplicationForVacancy(vacancyId) {
+      const { data, error } = await supabase
+        .from("applications")
+        .select("id, vacancy_id, status, submitted_at")
+        .eq("vacancy_id", vacancyId)
+        .maybeSingle();
+
+      if (error !== null) {
+        return { ok: false };
+      }
+      return { ok: true, application: data };
     },
   };
 }

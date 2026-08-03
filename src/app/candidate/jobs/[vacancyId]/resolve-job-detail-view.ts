@@ -1,4 +1,5 @@
 import type { ApplicationPreview } from "@/lib/applications/application-preview";
+import type { OwnedApplicationSummary } from "@/lib/applications/owned-application";
 import type { CandidateVacancyDetail } from "@/lib/matching/candidate-vacancy-detail";
 import type { LoadCandidateVacancyDetailResult } from "@/lib/matching/load-candidate-vacancy-detail";
 
@@ -8,6 +9,7 @@ export type JobDetailPageView =
       kind: "ready";
       detail: CandidateVacancyDetail;
       preview: ApplicationPreview;
+      application: OwnedApplicationSummary | null;
     }
   | { kind: "unavailable"; reason: "unavailable" | "not_matching" }
   | { kind: "failure" };
@@ -39,6 +41,7 @@ export function resolveJobDetailPageView(
         kind: "ready",
         detail: result.detail,
         preview: result.preview,
+        application: result.application,
       };
     case "failure":
       return { kind: "failure" };

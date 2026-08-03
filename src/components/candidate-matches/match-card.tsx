@@ -8,6 +8,8 @@ import {
   shiftLabel,
 } from "@/lib/matching/labels";
 import type { CandidateMatch } from "@/lib/matching/types";
+import { APPLIED_STATUS_LABEL } from "@/lib/applications/application-confirmation";
+import type { OwnedApplicationSummary } from "@/lib/applications/owned-application";
 
 import { MatchReasons } from "@/components/candidate-matches/match-reasons";
 
@@ -15,9 +17,10 @@ import styles from "./candidate-matches.module.scss";
 
 type MatchCardProps = {
   match: CandidateMatch;
+  application: OwnedApplicationSummary | null;
 };
 
-export function MatchCard({ match }: MatchCardProps) {
+export function MatchCard({ match, application }: MatchCardProps) {
   const { vacancy, reasons } = match;
   const titleId = `match-title-${vacancy.id}`;
   const reasonsId = `match-reasons-${vacancy.id}`;
@@ -33,7 +36,12 @@ export function MatchCard({ match }: MatchCardProps) {
         <h2 className={styles.cardTitle} id={titleId}>
           {vacancy.title}
         </h2>
-        <p className={styles.demoLabel}>Demo vacancy</p>
+        <div className={styles.badgeGroup}>
+          <p className={styles.demoLabel}>Demo vacancy</p>
+          {application !== null ? (
+            <p className={styles.appliedLabel}>{APPLIED_STATUS_LABEL}</p>
+          ) : null}
+        </div>
       </div>
 
       <p className={styles.company}>{vacancy.company.name}</p>
@@ -72,13 +80,24 @@ export function MatchCard({ match }: MatchCardProps) {
 
       <MatchReasons reasons={reasons} labelledBy={reasonsId} />
 
-      <Link
-        className={styles.detailLink}
-        href={detailHref}
-        aria-label={`View job: ${vacancy.title}`}
-      >
-        View job
-      </Link>
+      <div className={styles.cardActions}>
+        <Link
+          className={styles.detailLink}
+          href={detailHref}
+          aria-label={`View job: ${vacancy.title}`}
+        >
+          View job
+        </Link>
+        {application !== null ? (
+          <Link
+            className={styles.applicationLink}
+            href={`/candidate/applications/${application.applicationId}`}
+            aria-label={`View application: ${vacancy.title}`}
+          >
+            View application
+          </Link>
+        ) : null}
+      </div>
     </article>
   );
 }

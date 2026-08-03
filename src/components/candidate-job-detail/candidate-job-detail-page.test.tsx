@@ -63,6 +63,7 @@ describe("CandidateJobDetailPage", () => {
         status="ready"
         detail={detail}
         preview={preview}
+        application={null}
       />,
     );
 
@@ -104,6 +105,39 @@ describe("CandidateJobDetailPage", () => {
       screen.getByRole("link", { name: "Back to matches" }),
     ).toHaveAttribute("href", "/candidate/matches");
     expect(screen.queryByText(/salary|exact address|cv/i)).toBeNull();
+  });
+
+  it("renders Applied state and View application instead of submit", () => {
+    render(
+      <CandidateJobDetailPage
+        status="ready"
+        detail={detail}
+        preview={preview}
+        application={{
+          applicationId: "33333333-3333-4333-8333-333333333301",
+          vacancyId: detail.vacancyId,
+          status: "submitted",
+          submittedAt: "2026-08-03T14:30:00.000Z",
+        }}
+      />,
+    );
+
+    expect(screen.getAllByText("Applied").length).toBeGreaterThan(0);
+    expect(
+      screen.getByRole("link", {
+        name: `View application: ${detail.title}`,
+      }),
+    ).toHaveAttribute(
+      "href",
+      "/candidate/applications/33333333-3333-4333-8333-333333333301",
+    );
+    expect(screen.queryByTestId("application-submit-form")).toBeNull();
+    expect(
+      screen.queryByRole("heading", { name: "Application preview" }),
+    ).toBeNull();
+    expect(
+      screen.queryByText("33333333-3333-4333-8333-333333333301"),
+    ).toBeNull();
   });
 
   it("renders unavailable state without protected vacancy data", () => {

@@ -10,22 +10,23 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M1 — Candidate matching shell |
 | Active slice | Slice 3 — Job detail to submitted application |
-| Slice status | Contracts Accepted (2026-08-03) — D-035–D-045 Accepted; PR 3.1 merged; PR 3.2 merged; PR 3.3 implementation in progress on `feat/slice-3-application-preview-submit`; Slice 3 is not Done; PR 3.4 has not started |
+| Slice status | Contracts Accepted (2026-08-03) — D-035–D-045 Accepted; PR 3.1–3.3 merged; PR 3.4 implementation in progress on `feat/slice-3-application-confirmation`; Slice 3 is not Done |
 | Next slice | Slice 4 — Employer registration to draft vacancy (not started) |
-| Blockers | None for PR 3.3 local work. Hosted Demo fixtures remain in Production until 2026-09-02. |
+| Blockers | None for PR 3.4 local work. Hosted Demo fixtures remain in Production until 2026-09-02. |
 
 ## Slice 3 delivery (in progress)
 
 | Artifact | Status |
 |----------|--------|
 | `docs/22-slice-3-discovery.md` | Locked — contracts Accepted 2026-08-03 |
-| `docs/23-slice-3-build-plan.md` | Locked — PR 3.1–3.5 sequence; PR 3.3 implementation in progress |
+| `docs/23-slice-3-build-plan.md` | Locked — PR 3.1–3.5 sequence; PR 3.4 implementation in progress |
 | `docs/24-slice-3-schema-and-journey-proposal.md` | Locked — schema/journey contracts Accepted |
 | D-035–D-045 | Accepted 2026-08-03 |
 | PR 3.1 — application schema, constraints, RLS, RPC | Done (merged) |
 | PR 3.2 — job-detail loader and candidate detail route | Done (merged) |
-| PR 3.3 — application preview and atomic submission | Implementation in progress on branch — preview/submit pending review; not merged. Inline acknowledgement is temporary until PR 3.4 adds persistent confirmation and Applied state |
-| PR 3.4 — confirmation, Applied state, critical journey | Not started |
+| PR 3.3 — application preview and atomic submission | Done (merged) |
+| PR 3.4 — confirmation, Applied state, critical journey | Implementation in progress on branch — persistent confirmation and Applied state pending review; not merged. Slice 3 is not Done |
+| PR 3.5 — hosted proof and closure | Not started |
 
 ## Slice 2 delivery (complete)
 

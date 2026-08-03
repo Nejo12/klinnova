@@ -5,6 +5,10 @@ import { type SupabaseClient } from "@supabase/supabase-js";
 import { buildApplicationPreview } from "@/lib/applications/application-preview";
 import type { ApplicationPreview } from "@/lib/applications/application-preview";
 import {
+  mapOwnedApplicationSummary,
+  type OwnedApplicationSummary,
+} from "@/lib/applications/owned-application";
+import {
   buildCandidateVacancyDetail,
   type CandidateVacancyDetail,
 } from "@/lib/matching/candidate-vacancy-detail";
@@ -26,6 +30,7 @@ export type LoadCandidateVacancyDetailResult =
       status: "ready";
       detail: CandidateVacancyDetail;
       preview: ApplicationPreview;
+      application: OwnedApplicationSummary | null;
     }
   | { status: "failure"; reason: "load" | "invariant" };
 
@@ -43,6 +48,7 @@ export function createSupabaseCandidateVacancyDetailDataAccess(
  * Candidate identity comes only from the verified session.
  * Incomplete onboarding stops before vacancy queries.
  * Matching uses the existing TypeScript matcher (no SQL matcher).
+ * Owned application lookup uses candidate-own SELECT RLS.
  */
 export async function loadCandidateVacancyDetail(
   vacancyId: string,
@@ -60,6 +66,20 @@ export async function loadCandidateVacancyDetail(
     return resolved;
   }
 
+  const applicationResult =
+    await access.loadOwnedApplicationForVacancy(vacancyId);
+  if (!applicationResult.ok) {
+    return { status: "failure", reason: "load" };
+  }
+
+  let application: OwnedApplicationSummary | null = null;
+  if (applicationResult.application !== null) {
+    application = mapOwnedApplicationSummary(applicationResult.application);
+    if (application === null) {
+      return { status: "failure", reason: "load" };
+    }
+  }
+
   return {
     status: "ready",
     detail: buildCandidateVacancyDetail(resolved.match),
@@ -69,5 +89,6 @@ export async function loadCandidateVacancyDetail(
       displayName: resolved.displayName,
       workAuthorisationDeclared: resolved.workAuthorisationDeclared,
     }),
+    application,
   };
 }

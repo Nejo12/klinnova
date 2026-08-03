@@ -149,7 +149,7 @@ test.describe("Slice 3 candidate job detail journey", () => {
     await expect(page).toHaveURL(/\/candidate\/matches$/);
   });
 
-  test("completed candidate previews and submits an application", async ({
+  test("completed candidate submits and sees persistent confirmation and Applied state", async ({
     page,
   }) => {
     expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
@@ -162,57 +162,108 @@ test.describe("Slice 3 candidate job detail journey", () => {
       page.getByRole("heading", { level: 2, name: "Application preview" }),
     ).toBeVisible();
     await expect(page.getByText(displayName)).toBeVisible();
-    await expect(page.getByText(MORNING_KITCHEN_TITLE).first()).toBeVisible();
-    await expect(page.getByText("Demo Berlin Work Co").first()).toBeVisible();
-    await expect(page.getByText("Hospitality").first()).toBeVisible();
-    await expect(
-      page.getByText("No additional language requirements"),
-    ).toBeVisible();
     await expect(page.getByText(APPLICATION_SUBMIT_DISCLOSURE)).toBeVisible();
     await expect(page.getByRole("checkbox")).toHaveCount(0);
-    await expect(page.getByText(/@example\.test/i)).toHaveCount(0);
-    await expect(page.getByText(/exact address|curriculum|cv\b/i)).toHaveCount(
-      0,
-    );
 
-    const submitButton = page.getByRole("button", {
-      name: "Submit application",
-    });
-    await submitButton.click();
+    await page.getByRole("button", { name: "Submit application" }).click();
 
-    await expect(page.getByText("Application submitted.")).toBeVisible({
+    await expect(page).toHaveURL(/\/candidate\/applications\/[0-9a-f-]{36}$/, {
       timeout: 15_000,
     });
+    const confirmationUrl = page.url();
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Application submitted" }),
+    ).toBeVisible();
     await expect(
       page.getByText("Your application was recorded successfully."),
     ).toBeVisible();
-    await expect(page.getByRole("status")).toContainText(
-      "Application submitted.",
+    await expect(page.getByText("Submitted").first()).toBeVisible();
+    await expect(page.getByText("Demo Berlin Work Co").first()).toBeVisible();
+    await expect(page.getByText(MORNING_KITCHEN_TITLE).first()).toBeVisible();
+    await expect(page.getByText(displayName)).toBeVisible();
+    await expect(page.getByText(/employer will|response time/i)).toHaveCount(0);
+
+    const bodyText = await page.locator("main").innerText();
+    expect(bodyText).not.toMatch(
+      /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
     );
+
+    await page.reload();
+    await expect(page).toHaveURL(confirmationUrl);
     await expect(
-      page.getByRole("button", { name: "Submit application" }),
-    ).toHaveCount(0);
+      page.getByRole("heading", { level: 1, name: "Application submitted" }),
+    ).toBeVisible();
+
+    await page.getByRole("link", { name: "View job" }).click();
     await expect(page).toHaveURL(
       new RegExp(`/candidate/jobs/${MORNING_KITCHEN_ID}$`),
     );
-    await expect(page.getByText(/application_id|33333333/i)).toHaveCount(0);
-    await expect(
-      page.getByText(/employer will|response time|interview guaranteed/i),
-    ).toHaveCount(0);
-
-    // Temporary PR 3.3 boundary: reload returns to preview; persistent Applied is PR 3.4.
-    await page.reload();
+    await expect(page.getByText("Applied").first()).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Submit application" }),
-    ).toBeVisible();
-    await page.getByRole("button", { name: "Submit application" }).click();
-    await expect(page.getByText("Application already submitted.")).toBeVisible({
-      timeout: 15_000,
-    });
+    ).toHaveCount(0);
     await expect(
-      page.getByText("This vacancy already has your application."),
+      page.getByRole("link", {
+        name: `View application: ${MORNING_KITCHEN_TITLE}`,
+      }),
     ).toBeVisible();
-    await expect(page).not.toHaveURL(/\/candidate\/applications\//);
+
+    await page.getByRole("link", { name: "Back to matches" }).click();
+    await expect(page).toHaveURL(/\/candidate\/matches$/);
+    await expect(page.getByText("Applied").first()).toBeVisible();
+    await expect(
+      page.getByRole("link", {
+        name: `View application: ${MORNING_KITCHEN_TITLE}`,
+      }),
+    ).toBeVisible();
+
+    await page
+      .getByRole("link", {
+        name: `View application: ${MORNING_KITCHEN_TITLE}`,
+      })
+      .click();
+    await expect(page).toHaveURL(confirmationUrl);
+
+    // Duplicate path via job detail is blocked by Applied UI; revisit confirmation.
+    await page.goto(`/candidate/jobs/${MORNING_KITCHEN_ID}`);
+    await expect(
+      page.getByRole("button", { name: "Submit application" }),
+    ).toHaveCount(0);
+    await page
+      .getByRole("link", {
+        name: `View application: ${MORNING_KITCHEN_TITLE}`,
+      })
+      .click();
+    await expect(page).toHaveURL(confirmationUrl);
+  });
+
+  test("unauthenticated confirmation URL redirects to login", async ({
+    page,
+    context,
+  }) => {
+    expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
+    await context.clearCookies();
+    await page.goto(
+      "/candidate/applications/33333333-3333-4333-8333-333333333301",
+    );
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test("malformed confirmation id shows unavailable", async ({ page }) => {
+    expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
+    const stamp = Date.now() + 11;
+    await registerAndConfirm(page, stamp);
+    await completeMatchingEssentials(page);
+    await page.getByRole("button", { name: "Confirm essentials" }).click();
+    await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
+
+    await page.goto("/candidate/applications/not-a-uuid");
+    await expect(
+      page.getByRole("heading", {
+        level: 1,
+        name: "Application not available",
+      }),
+    ).toBeVisible();
   });
 
   test("unauthenticated direct detail URL redirects to login", async ({

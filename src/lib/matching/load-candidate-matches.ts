@@ -2,6 +2,7 @@ import "server-only";
 
 import { type SupabaseClient } from "@supabase/supabase-js";
 
+import { mapOwnedApplicationsByVacancyId } from "@/lib/applications/owned-application";
 import {
   MatchingInvariantError,
   mapCandidateMatchingInput,
@@ -31,6 +32,9 @@ export type CandidateMatchesDataAccess = {
   loadVisibleLanguageRequirements: () => Promise<
     { ok: true; requirements: unknown[] } | { ok: false }
   >;
+  loadOwnedApplicationsForVacancies: (
+    vacancyIds: readonly string[],
+  ) => Promise<{ ok: true; applications: unknown[] } | { ok: false }>;
 };
 
 const VACANCY_SELECT = `
@@ -122,6 +126,22 @@ export function createSupabaseCandidateMatchesDataAccess(
       }
       return { ok: true, requirements: data ?? [] };
     },
+
+    async loadOwnedApplicationsForVacancies(vacancyIds) {
+      if (vacancyIds.length === 0) {
+        return { ok: true, applications: [] };
+      }
+
+      const { data, error } = await supabase
+        .from("applications")
+        .select("id, vacancy_id, status, submitted_at")
+        .in("vacancy_id", [...vacancyIds]);
+
+      if (error !== null) {
+        return { ok: false };
+      }
+      return { ok: true, applications: data ?? [] };
+    },
   };
 }
 
@@ -129,6 +149,7 @@ export function createSupabaseCandidateMatchesDataAccess(
  * Authenticated server loader for Slice 2 matches.
  * Candidate identity comes only from the verified session.
  * Incomplete onboarding stops before vacancy inventory queries.
+ * Owned applications are loaded in one batched query after matching.
  */
 export async function loadCandidateMatches(
   dataAccess?: CandidateMatchesDataAccess,
@@ -179,9 +200,25 @@ export async function loadCandidateMatches(
       vacanciesResult.vacancies,
       requirementsResult.requirements,
     );
+    const matches = matchCandidateToVacancies(candidate, vacancies);
+    const vacancyIds = matches.map((match) => match.vacancy.id);
+    const applicationsResult =
+      await access.loadOwnedApplicationsForVacancies(vacancyIds);
+    if (!applicationsResult.ok) {
+      return { status: "failure", reason: "load" };
+    }
+
+    const applicationsByVacancyId = mapOwnedApplicationsByVacancyId(
+      applicationsResult.applications,
+    );
+    if (applicationsByVacancyId === null) {
+      return { status: "failure", reason: "load" };
+    }
+
     return {
       status: "success",
-      matches: matchCandidateToVacancies(candidate, vacancies),
+      matches,
+      applicationsByVacancyId,
     };
   } catch (error) {
     if (error instanceof MatchingInvariantError) {

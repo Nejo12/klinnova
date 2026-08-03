@@ -35,6 +35,7 @@ export default async function CandidateJobDetailRoutePage({
         status="ready"
         detail={view.detail}
         preview={view.preview}
+        application={view.application}
       />
     );
   }
