@@ -1,10 +1,10 @@
 # Slice 4 Schema and Journey Proposal
 
-> Design proposal only. No migrations land here.
-> **Status:** Discovery / planning. Aligns with Proposed D-046–D-054.
-> Table/column names are proposals until Accepted.
+> Design proposal locked by Accepted D-046–D-054 (2026-08-03).
+> **Status:** Ready for PR 4.1. No migrations land in the decision-acceptance
+> package. Slice 4 implementation has **not** started here.
 
-**Depends on:** Accepted D-034; current migrations through
+**Depends on:** Accepted D-034; Accepted D-046–D-054; current migrations through
 `20260803120000_applications_schema_and_submit_rpc.sql`.
 
 **Companion:** `docs/28-slice-4-discovery.md`, `docs/29-slice-4-build-plan.md`
@@ -29,7 +29,7 @@
 | Column | Type | Notes |
 |--------|------|-------|
 | `id` | `uuid` PK | `= auth.users.id` ON DELETE CASCADE |
-| `employer_type` | `text` NOT NULL | `private` \| `organisation`; immutable after insert |
+| `employer_type` | `text` NOT NULL | `private` \| `organisation`; changeable only while incomplete and no employer company/draft; locked at completion (D-048) |
 | `display_name` | `text` NOT NULL | Employer-facing display |
 | `berlin_locality` | `text` NULL | Privacy-safe district/locality |
 | `phone` | `text` NULL | Optional; not public |
@@ -42,6 +42,12 @@
 
 Contact email inherits from Auth; do not duplicate unless product later requires
 a separate public contact.
+
+**Employer-type locking (D-048):** Type may change only while
+`onboarding_completed_at IS NULL` and the employer has no employer-sourced
+company and no employer-sourced draft vacancy. Completion locks type.
+Server/database must reject later changes. Conversion workflows are deferred.
+An Auth-bound RPC may enforce type selection/change with atomic consistency.
 
 **Private minimum (onboarding complete):** `employer_type=private`,
 `display_name`, lawful-hiring declaration, Berlin locality (recommended).
@@ -246,7 +252,7 @@ Unverified employers **may** create and edit drafts.
 | Candidate-only | Start employer onboarding; no foreign drafts |
 | Incomplete employer | Onboarding only |
 | Wrong owner / unknown id | Generic unavailable |
-| Dual capability | Nav between `/candidate` and `/employer` |
+| Dual capability | Intent/`next` first; visible nav between `/candidate` and `/employer`; role-choice surface only when no intent (D-047); no hidden default-role |
 | Post-save | Prefer redirect to edit for resume |
 
 Proxy: protect `/employer` and `/employer/*` like candidate paths.
@@ -307,7 +313,7 @@ source, illegal publication_state, published_at, moderation fields.
 |-------|--------|--------|--------|--------|
 | anon | no | no | no | no |
 | completed candidate | active published **seed** only | no | no | no |
-| owning employer | own employer rows | draft only | own drafts | own drafts w/o applications (if Accepted) |
+| owning employer | own employer rows | draft only | own drafts | own drafts w/o applications (D-050) |
 | unrelated employer | no | no | no | no |
 
 Drafts excluded from candidate visibility helpers and submit RPC gates.
@@ -375,22 +381,20 @@ body enforces `auth.uid()`. No publish RPC in Slice 4.
 
 ---
 
-## Approval checklist (owner)
+## Approval checklist (owner) — resolved 2026-08-03
 
-All items below **Require owner decision**. Recommendations in this document are
-not Accepted until the owner marks them so.
+- [x] Accept D-046–D-054 as a package (Accepted 2026-08-03)
+- [x] Dual candidate/employer capability coexistence (D-047)
+- [x] Employer-type locking while incomplete / no company / no draft; completion locks (D-048)
+- [x] Multi-capability intent-based routing + role-choice when no intent (D-047)
+- [x] Draft deletion under D-050 conditions
+- [x] Route names: `/employer/vacancies` (D-053)
+- [x] Vacancy ownership via `employer_profile_id` (D-048 / D-050)
+- [x] No exact-address collection in Slice 4 (D-051)
+- [x] Draft vs publish-ready field split (D-051)
+- [x] Salary cents + period + gross EUR model (D-051)
+- [x] Hosted proof Preview-first; Production not authorized by D-054
 
-- [ ] Accept or revise D-046–D-054 as a package (**Requires owner decision**)
-- [ ] Dual candidate/employer capability coexistence (**Requires owner decision**)
-- [ ] Employer-type immutability after initial profile creation (**Requires owner decision**)
-- [ ] Multi-role landing behaviour (**Requires owner decision**)
-- [ ] Draft deletion in Slice 4 (**Requires owner decision**)
-- [ ] Route names: `/employer/vacancies` vs `/employer/jobs` (**Requires owner decision**)
-- [ ] Confirm vacancy ownership via `employer_profile_id`
-- [ ] Confirm no exact-address collection in Slice 4
-- [ ] Confirm draft vs publish-ready field split
-- [ ] Confirm salary cents + period + gross EUR model
-- [ ] Confirm hosted proof stays Preview-first without Production authorization
-
-When Accepted, open PR 4.1 against the locked schema proposal. Do not begin
-implementation from Proposed status alone.
+**Next step after decision-acceptance merge:** open PR 4.1 — employer
+identity/profile schema and RLS. Do not begin PR 4.1 in the decision-acceptance
+documentation PR.

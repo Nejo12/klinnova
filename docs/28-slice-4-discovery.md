@@ -1,20 +1,20 @@
 # Slice 4 Discovery
 
 > Analysis artifact. No migrations or application code land here.
-> **Status:** Discovery / planning. Decisions D-046–D-054 are **Proposed** —
-> not Accepted. Implementation must not begin until owner acceptance and the
-> build-plan sequence opens.
+> **Status:** Contracts Accepted 2026-08-03 (D-046–D-054). Ready for PR 4.1 —
+> employer identity/profile schema and RLS. Slice 4 implementation has **not**
+> started in this package.
 
 **Outcome to enable:** A private or organisation employer can register, create
 the appropriate employer profile (and company profile only when organisation),
 and save a structured private draft vacancy (`docs/13-implementation-plan.md`,
-narrowed by Proposed D-046; product boundary D-034 Accepted).
+narrowed by Accepted D-046; product boundary D-034 Accepted).
 
 **Related:**
 
 - Build plan — `docs/29-slice-4-build-plan.md`
 - Schema + journey proposal — `docs/30-slice-4-schema-and-journey-proposal.md`
-- Decisions — D-046–D-054 in `docs/10-decisions.md` (**Proposed**)
+- Decisions — D-046–D-054 in `docs/10-decisions.md` (**Accepted** 2026-08-03)
 - Prior Accepted boundary — D-034 (private vs organisation employers)
 
 ---
@@ -60,7 +60,7 @@ AGENTS.md: do not invent replacements beyond citing the living documents above.
 
 ---
 
-## Document tensions — open (require owner decisions)
+## Document tensions — resolved (Accepted 2026-08-03)
 
 ### T1 — Exclusive role vs dual capability
 
@@ -71,13 +71,10 @@ AGENTS.md: do not invent replacements beyond citing the living documents above.
 | Current code | Candidate-only; `ensureCandidateProfile` on every login |
 | MVP | Distinct candidate and employer journeys |
 
-**Open:** Can one Auth user hold both capabilities? Is shared `profiles.role`
-needed, or are additive profile tables enough?
-
-**Recommendation (Proposed D-047):** Additive `employer_profiles` (1:1
-`auth.users`) beside `candidate_profiles`. Dual capability allowed. No exclusive
-`profiles.role` trap. Shared `profiles` remains optional / deferred if additive
-tables suffice.
+**Resolution (D-047 Accepted):** Additive `employer_profiles` (1:1 `auth.users`)
+beside `candidate_profiles`. Dual capability allowed. No exclusive
+`profiles.role`. Intent-based multi-capability routing with explicit role-choice
+when no intent exists; no hidden default-role field.
 
 ### T2 — Company-required vacancies vs private employers
 
@@ -87,10 +84,7 @@ tables suffice.
 | D-034 / MVP | Company profile only for organisation employers |
 | Seed model | Fictional companies own Demo vacancies |
 
-**Open:** Must every vacancy keep a company FK? How do private employers own
-drafts?
-
-**Recommendation (Proposed D-048 / D-050):** Employer profile owns vacancies.
+**Resolution (D-048 / D-050 Accepted):** Employer profile owns vacancies.
 `company_id` required only for organisation employers; null for private.
 Seed vacancies remain `source = 'seed'` with existing company FK and no Auth
 owner.
@@ -103,10 +97,8 @@ owner.
 | Exit criteria | Eligibility fields explicit before publish is possible later |
 | UX reality | Employers need resume; incomplete drafts should persist |
 
-**Open:** Which fields are mandatory on first save vs publish-ready?
-
-**Recommendation (Proposed D-051):** Allow incomplete draft persistence with a
-small create minimum. Maintain an explicit publish-readiness checklist used by
+**Resolution (D-051 Accepted):** Allow incomplete draft persistence with a small
+create minimum. Maintain an explicit publish-readiness checklist used by
 Slice 5; do not implement publish in Slice 4.
 
 ### T4 — Terminology “verified employer” vs unverified drafter
@@ -116,10 +108,8 @@ Slice 5; do not implement publish in Slice 4.
 | `docs/12-terminology.md` | Employer often framed as verified |
 | Slice 4 / Slice 5 | Unverified employers may draft; only verified may publish |
 
-**Open:** Copy language for unverified employer accounts.
-
-**Recommendation:** Product copy may say “employer account” / “draft”; never
-claim verified. Placeholder `verification_state = unverified` only. No badges.
+**Resolution:** Product copy may say “employer account” / “draft”; never claim
+verified. Placeholder `verification_state = unverified` only. No badges.
 
 ### T5 — Language vocabulary conflict
 
@@ -128,10 +118,8 @@ claim verified. Placeholder `verification_state = unverified` only. No badges.
 | D-029 Accepted | Vacancy German: `none` \| `basic` \| `conversational` \| `comfortable`; no fluent / CEFR |
 | `docs/12-terminology.md` | Still mentions “Fluent German”, “English accepted” |
 
-**Open:** Employer-facing labels must map to Accepted D-029 codes.
-
-**Recommendation:** Database + matcher keep D-029. UI labels may be friendlier
-but must persist Accepted codes. Free-text language requirements prohibited.
+**Resolution:** Database + matcher keep D-029. UI labels may be friendlier but
+must persist Accepted codes. Free-text language requirements prohibited.
 
 ### T6 — Stale plan status vs Slice 3 Done
 
@@ -140,9 +128,8 @@ but must persist Accepted codes. Free-text language requirements prohibited.
 | Parts of `docs/13` / older Slice 3 headers | Historical “implementation has not started” wording in Accepted notes |
 | Dashboard / closure | Slice 3 Done |
 
-**Resolution for this package:** Treat dashboard + `docs/27` as current delivery
-status. Update dashboard / README / plan pointers in this PR to Slice 4
-discovery without rewriting Accepted Slice 3 decision history.
+**Resolution:** Treat dashboard + `docs/27` as current delivery status for
+Slices 0–3. Slice 4 is Ready for PR 4.1 after D-046–D-054 acceptance.
 
 ### T7 — Exact address collection timing
 
@@ -151,13 +138,27 @@ discovery without rewriting Accepted Slice 3 decision history.
 | D-034 / MVP | Exact private residential addresses must not be public; disclose later with consent |
 | Features | Privately handled location evidence for verification |
 
-**Open:** Collect exact address in Slice 4 drafts?
-
-**Recommendation (Proposed D-051):** Do **not** collect exact residential address
-in Slice 4. Store privacy-safe district/locality only. Exact address deferred to
+**Resolution (D-051 Accepted):** Do **not** collect exact residential address in
+Slice 4. Store privacy-safe district/locality only. Exact address deferred to
 Slice 5+ with authorization and consent design.
 
----
+### T8 — Employer-type immutability timing
+
+| Source | Early proposal | Owner refinement |
+|--------|----------------|------------------|
+| Type lock | Immutable on first insert | Changeable while incomplete and no employer company/draft exists; completion locks type |
+
+**Resolution (D-048 Accepted):** Use the owner refinement exactly; server/database
+rejects post-completion type changes; conversion workflows deferred.
+
+### T9 — Multi-capability landing
+
+| Source | Early proposal | Owner refinement |
+|--------|----------------|------------------|
+| Landing | Chooser or role home | Intent/`next` first; capability-specific spaces; role-choice only when no intent; no hidden default-role |
+
+**Resolution (D-047 Accepted):** Intent-based explicit routing as specified in
+D-047.
 
 ## Current capability inventory (repository facts)
 
@@ -253,8 +254,9 @@ No employer routes.
 | **B. Additive capability tables** | Matches D-019 deferral; no role trap; candidate path untouched | Landing page when both exist; two completion gates | Medium (`employer_profiles`) | Medium | Good — verification on employer profile | **Yes** |
 | **C. Organisation membership model** | Future teams | Overbuilt for MVP; private employers awkward | High | High | Good later, heavy now | Defer |
 
-**Recommended:** B — `employer_profiles` 1:1 `auth.users`; optional coexistence
-with `candidate_profiles`; no exclusive role column in Slice 4.
+**Accepted (D-047):** B — `employer_profiles` 1:1 `auth.users`; optional coexistence
+with `candidate_profiles`; no exclusive role column in Slice 4; intent-based
+multi-capability routing.
 
 ### Employer ownership models
 
@@ -264,7 +266,7 @@ with `candidate_profiles`; no exclusive role column in Slice 4.
 | **B. Vacancy → company only** | Matches current FK shape | Private employers need fake companies; fights D-034 | Keep NOT NULL company | Ownership via company→user join | Messy private verification | No |
 | **C. Unified employer entity** | Abstraction | Extra table without MVP need | High | Indirection | Possible later | Defer |
 
-**Recommended:** A — `vacancies.employer_profile_id` for employer-sourced rows;
+**Accepted (D-048 / D-050):** A — `vacancies.employer_profile_id` for employer-sourced rows;
 `company_id` required iff organisation; seed rows keep company FK and null
 employer owner.
 
@@ -276,65 +278,75 @@ employer owner.
 | **B. SECURITY DEFINER RPC only** | Atomic; central policy | Heavier; overkill for every field edit | Good for publish later | Partial |
 | **C. Hybrid Action + RLS/RPC** | Zod at edge; RLS ownership; RPC when multi-row atomicity needed | Need clear taxonomy | Matches Slice 1/3 patterns | **Yes** |
 
-**Recommended:** C — Server Actions + Zod always; direct RLS for employer
+**Accepted (D-052):** C — Server Actions + Zod always; direct RLS for employer
 profile / single-row draft updates where safe; Auth-bound RPC when creating
 organisation profile+company atomically or replacing language requirements as
-a set.
+a set (and type-change consistency when needed).
 
 ---
 
-## Discovery questions → proposed answers
+## Discovery questions → accepted answers
 
-| # | Question | Proposed answer | Status |
+| # | Question | Accepted answer | Status |
 |---|----------|-----------------|--------|
-| Q1 | Dual candidate+employer on one Auth user? | Allowed | Requires owner decision |
-| Q2 | `profiles.role` exclusive? | No — additive profiles | Recommended |
-| Q3 | Existing candidate become employer? | Yes, via employer onboarding | Recommended |
-| Q4 | Employer also keep candidate profile? | Yes, optional | Recommended |
-| Q5 | Employer type changeable? | Immutable after first save in Slice 4 | Requires owner decision |
+| Q1 | Dual candidate+employer on one Auth user? | Allowed | Accepted (D-047) |
+| Q2 | `profiles.role` exclusive? | No — additive profiles | Accepted (D-047) |
+| Q3 | Existing candidate become employer? | Yes, via employer onboarding | Accepted (D-047) |
+| Q4 | Employer also keep candidate profile? | Yes, optional | Accepted (D-047) |
+| Q5 | Employer type changeable? | Changeable only while incomplete and no employer company/draft; completion locks type | Accepted (D-048) |
 | Q6 | Private → organisation conversion? | Deferred | Deferred |
-| Q7 | Multiple orgs per user? | No in MVP | Recommended |
+| Q7 | Multiple orgs per user? | No in MVP | Accepted (D-048) |
 | Q8 | Team membership? | Deferred | Deferred |
-| Q9 | Separate employer completion? | Yes (`employer_profiles.onboarding_completed_at`) | Recommended |
-| Q10 | Multi-role landing? | Explicit chooser at `/` or post-login when both exist; else role home | Requires owner decision |
-| Q11 | Draft state value? | `publication_state = 'draft'` | Recommended |
-| Q12 | Draft deletion? | Soft-withdraw or hard delete own drafts with no applications — prefer hard delete only while draft & no applications | Requires owner decision |
-| Q13 | Auto-save? | Explicit Save sufficient | Recommended |
-| Q14 | Exact address in Slice 4? | Do not collect | Recommended |
-| Q15 | Salary on first save? | Not required; required for publish-ready | Recommended |
-| Q16 | Hosted proof env? | Prefer isolated Preview; do **not** authorize Production in planning | Recommended |
-| Q17 | Route segment `/employer/vacancies` vs `/employer/jobs`? | Prefer `vacancies` (schema alignment); architecture still says `jobs` | Requires owner decision |
-| Q18 | Accept or revise D-046–D-054 as a package? | Pending owner review — all remain Proposed | Requires owner decision |
+| Q9 | Separate employer completion? | Yes (`employer_profiles.onboarding_completed_at`) | Accepted (D-049) |
+| Q10 | Multi-role landing? | Intent/`next` first; role-choice only when no intent; no hidden default-role | Accepted (D-047) |
+| Q11 | Draft state value? | `publication_state = 'draft'` | Accepted (D-050) |
+| Q12 | Draft deletion? | Allowed for owned employer drafts with no applications / no publication history | Accepted (D-050) |
+| Q13 | Auto-save? | Explicit Save sufficient | Accepted (planning) |
+| Q14 | Exact address in Slice 4? | Do not collect | Accepted (D-051) |
+| Q15 | Salary on first save? | Not required; required for publish-ready | Accepted (D-051) |
+| Q16 | Hosted proof env? | Prefer isolated Preview; Production not authorized by D-054 | Accepted (D-054) |
+| Q17 | Route segment `/employer/vacancies` vs `/employer/jobs`? | Use `vacancies` | Accepted (D-053) |
+| Q18 | Accept or revise D-046–D-054 as a package? | Accepted 2026-08-03 with type-lock and routing refinements | Accepted |
 
-### Owner decisions still required (do not treat recommendations as Accepted)
+### Resolved owner decisions
 
-1. Dual candidate/employer capability coexistence (Q1 / D-047)
-2. Employer-type immutability after initial profile creation (Q5 / D-047)
-3. Landing behaviour for accounts with both capabilities (Q10)
-4. Whether draft deletion is included in Slice 4 (Q12 / D-050)
-5. `/employer/vacancies` versus `/employer/jobs` (Q17 / D-053)
-6. Acceptance or revision of D-046–D-054 as a package (Q18)
+1. Dual candidate/employer capability — Allowed (D-047)
+2. Employer-type locking — Incomplete + no company/draft; completion locks (D-048)
+3. Multi-capability landing — Intent-based + role-choice when no intent (D-047)
+4. Draft deletion — Included under D-050 conditions
+5. Route terminology — `/employer/vacancies` (D-053)
+6. D-046–D-054 package — Accepted 2026-08-03
+
+### Remaining deferred (not Slice 4 scope)
+
+- Private↔organisation conversion after completion
+- Team membership / organisation membership graph
+- Multiple organisations per user
+- Exact residential/workplace address collection
+- Verification approval / evidence upload / badges
+- Publication and auto-expiry product flows
+- Applicant review (Slice 6)
+- Hidden/default-role field (explicitly rejected)
 
 ---
 
-## Decision map (Proposed)
+## Decision map (Accepted)
 
 | ID | Topic | Status |
 |----|-------|--------|
-| D-046 | Slice 4 boundary | Proposed |
-| D-047 | Employer account capability model | Proposed |
-| D-048 | Private/org profiles and company ownership | Proposed |
-| D-049 | Employer onboarding completion | Proposed |
-| D-050 | Draft lifecycle, source, ownership, visibility | Proposed |
-| D-051 | Draft fields, salary, location, language, expiry | Proposed |
-| D-052 | Form / Action / RPC persistence boundary | Proposed |
-| D-053 | Routes and RLS authorization matrix | Proposed |
-| D-054 | Slice 4 hosted proof strategy | Proposed |
+| D-046 | Slice 4 boundary | Accepted 2026-08-03 |
+| D-047 | Employer account capability model | Accepted 2026-08-03 |
+| D-048 | Private/org profiles and company ownership | Accepted 2026-08-03 |
+| D-049 | Employer onboarding completion | Accepted 2026-08-03 |
+| D-050 | Draft lifecycle, source, ownership, visibility | Accepted 2026-08-03 |
+| D-051 | Draft fields, salary, location, language, expiry | Accepted 2026-08-03 |
+| D-052 | Form / Action / RPC persistence boundary | Accepted 2026-08-03 |
+| D-053 | Routes and RLS authorization matrix | Accepted 2026-08-03 |
+| D-054 | Slice 4 hosted proof strategy | Accepted 2026-08-03 |
 
-None of D-046–D-054 are Accepted. Implementation may begin only after owner
-acceptance (or an Accepted subset covering PR 4.1 dependencies).
-
----
+Next authorized implementation unit after this acceptance merges: **PR 4.1 —
+employer identity/profile schema and RLS**. Do not start PR 4.1 inside the
+decision-acceptance documentation PR.
 
 ## Candidate regression protections (planning requirements)
 
@@ -356,10 +368,12 @@ Regression proof belongs in PR 4.5 (and continuous pgTAP/e2e).
 
 Stop and report if:
 
-- owner rejects dual-capability or ownership recommendation;
-- product docs require exact-address storage in Slice 4;
 - publication or verification approval is pulled into Slice 4;
 - seed vacancy visibility rules would need weakening to support drafts;
-- Preview/Production hosted proof is demanded without isolation decision.
+- Production hosted proof is demanded without a new explicit owner authorization
+  beyond D-054;
+- type is treated as immutable on first insert contrary to D-048;
+- a hidden/default-role field is introduced contrary to D-047.
 
-Do not implement migrations or employer UI in this package.
+Do not implement migrations or employer UI in the decision-acceptance package.
+PR 4.1 is the next authorized unit after that package merges.
