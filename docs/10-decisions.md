@@ -405,3 +405,146 @@ This decision does **not** add employer implementation, schema, Auth, verificati
 **Consequences:** Product docs (`docs/03`–`docs/05`, `docs/12`) distinguish private vs organisation employers; later employer slices must design type-specific verification and location privacy; Slice 2 matching/fixtures remain unchanged.
 
 **Acceptance note:** Accepted as a product-domain clarification during Slice 2 PR 2.4 documentation correction.
+
+## D-035 — Slice 3 boundary
+
+**Status:** Proposed
+**Must accept before:** PR 3.1
+
+**Context:** `docs/13` Slice 3 and `docs/04`/`docs/05` describe a broad apply surface (salary, distance, verification, save/unsave, CV, timeline, applications dashboard). Current schema and the owner Slice 3 objective support a smaller vertical: detail → preview → submit → confirm → duplicate prevention. D-032 previously parked save/unsave in Slice 3.
+
+**Decision:** Slice 3 delivers authenticated candidate job detail for RLS-visible seed vacancies, profile-based application preview, atomic submission, reload-safe confirmation, and Applied-state feedback on matches/detail. It ends at successful candidate submission. Deferred from this slice: save/unsave; CV upload/Storage; salary/distance/experience/verification/interview-language fields; employer review and status transitions; application withdrawal UI; full application history dashboard; messaging/interviews. Broader MVP items remain later intent. This supersedes the D-032 implication that save/unsave ships in Slice 3.
+
+**Alternatives:** Implement full `docs/13` Slice 3 includes list; include save/unsave now; include CV optional upload now.
+
+**Consequences:** Planning docs `docs/22`–`docs/24` and implementation PRs 3.1–3.5 follow this narrowing. Owner must Accept before schema work.
+
+## D-036 — Slice 3 job-detail route and authorization
+
+**Status:** Proposed
+**Must accept before:** PR 3.2
+
+**Context:** Architecture lists public `/jobs/[slug]`. D-033 keeps seed vacancies off the anonymous public board. Matches already use vacancy UUIDs.
+
+**Decision:** Job detail lives at `/candidate/jobs/[vacancyId]`. Access requires authenticated session and completed onboarding (same gate family as `/candidate/matches`). Unauthenticated users are redirected to login. Incomplete candidates are redirected to onboarding. No public vacancy HTML in Slice 3. A completed candidate may open any RLS-visible active seed vacancy by id; Demo vacancy labelling remains required.
+
+**Alternatives:** Public `/jobs/[slug]`; slug-based candidate route; detail only when currently matching.
+
+**Consequences:** Detail loader is server-only and RLS-backed; public SEO board remains a later decision.
+
+## D-037 — Slice 3 detail content and missing fields
+
+**Status:** Proposed
+**Must accept before:** PR 3.2
+
+**Context:** Feature docs require salary, responsibilities, CV flags, interview language, verification, and richer location. Vacancy schema has title, summary, Berlin, category, employment, shifts, German, language requirements, available_from, published_at, expires_at, company name.
+
+**Decision:** Slice 3 detail shows only schema-backed fields plus match reasons and the existing work-authorisation notice. Freshness may use `published_at` / `expires_at`. Salary, structured responsibilities beyond summary, precise/district address, experience requirements, employer verification state, interview language, and CV-required flags are deferred — not invented as empty UI. No vacancy schema expansion for those fields in Slice 3 unless a separate Accepted decision says otherwise.
+
+**Alternatives:** Block Slice 3 until salary/location columns exist; show “not provided” placeholders for missing MVP fields.
+
+**Consequences:** Credible Demo detail uses current seeds; MVP richness waits for employer vacancy schema (Slice 4+).
+
+## D-038 — Application schema and snapshot strategy
+
+**Status:** Proposed
+**Must accept before:** PR 3.1
+
+**Context:** No `applications` table exists. Candidates and vacancies may change after submit. Future employer review needs stable evidence without copying unnecessary PII.
+
+**Decision:** Add `applications` with `id`, `candidate_id` → `candidate_profiles`, `vacancy_id` → `vacancies`, `status`, `submitted_at`, `snapshot_version integer not null`, `candidate_snapshot` jsonb not null, `vacancy_snapshot` jsonb not null, timestamps, and `UNIQUE (candidate_id, vacancy_id)`. Persist both live FKs and immutable submission snapshots (strategy C). Initial `snapshot_version = 1`. Snapshots are generated inside the Auth-bound RPC from trusted database rows only — never caller-supplied. Snapshot field lists are fixed in `docs/24`. Excluded from snapshots: email, phone, CV data, exact address, Auth metadata, unrelated onboarding answers. Vacancy delete is restricted; candidate delete cascades. No candidate UPDATE policy on applications in Slice 3.
+
+**Alternatives:** References only; snapshots only; denormalize email into applications now; caller-supplied snapshot JSON.
+
+**Consequences:** PR 3.1 migration + types; confirmation renders historical values from snapshots after profile or vacancy edits.
+
+## D-039 — Application status vocabulary
+
+**Status:** Proposed
+**Must accept before:** PR 3.1
+
+**Context:** `docs/05` defines a full status machine. Slice 3 only creates submissions. Pre-authorizing unsupported workflow states in the database invites premature UI and policy assumptions.
+
+**Decision:** Database `status` is constrained, not free-form. Slice 3 constrains and creates only `submitted` (`CHECK (status = 'submitted')` or equivalent). No withdrawal action exists in Slice 3. Future states such as viewed, shortlisted, interview invited, interview scheduled, offer, hired, not selected, and withdrawn are deferred. Future migrations may extend the constraint **additively** after transition ownership and authorization are defined. Slice 3 does not pre-authorize unsupported workflow states.
+
+**Alternatives:** Pre-seed the full `docs/05` status CHECK now; implement withdrawal in Slice 3.
+
+**Consequences:** Slice 3 UI and RPC never pretend employer progress or withdrawal exists; later slices own additive status migrations.
+
+## D-040 — Duplicate prevention and idempotency
+
+**Status:** Proposed
+**Must accept before:** PR 3.1
+
+**Context:** Exit criterion requires exactly one application per vacancy per candidate. UI-only guards are insufficient under concurrency and retries.
+
+**Decision:** Enforce `UNIQUE (candidate_id, vacancy_id)` for all time in Slice 3 — one application per candidate and vacancy permanently under this slice. Concurrent duplicate attempts are resolved by the database constraint. Duplicate or retry returns deterministic idempotent `already_applied` plus the existing application id; the UI routes to that confirmation; no second row is created. No withdrawal action and no resubmission-after-withdrawal behavior exist. Future withdrawal/resubmission requires a new Accepted decision and migration.
+
+**Alternatives:** Partial unique excluding withdrawn from day one; allow multiple historical rows.
+
+**Consequences:** RPC/Server Action treat duplicate as safe idempotent outcome, not a hard crash.
+
+## D-041 — Submit-time match and completion rules
+
+**Status:** Proposed
+**Must accept before:** PR 3.3
+
+**Context:** Detail may be opened for any RLS-visible vacancy; preferences and lifecycle can change while a tab is open. Matching lives in TypeScript; security/lifecycle must live in the database.
+
+**Decision:** The TypeScript matcher is the product-level matching source of truth. The Server Action loads the completed candidate and RLS-visible vacancy, runs the existing matcher, rejects `not_matching` before calling the RPC, and invokes the RPC with vacancy ID only. The RPC/database are the security, lifecycle, ownership, and integrity source of truth (identity, completion, visibility/active/published/not-future/not-withdrawn/not-expired, seed inventory rules, duplicate prevention, trusted snapshots, atomic insert). Slice 3 does not duplicate the full matcher in SQL. Stale candidate or vacancy state must fail safely. Any future move to database-authoritative matching requires a separate decision and parity tests.
+
+**Alternatives:** Allow apply to any visible vacancy without match re-check; freeze match at detail-open time only; reimplement matcher in SQL now.
+
+**Consequences:** Explainability stays aligned with eligibility; RPC never claims to reuse the TypeScript matcher.
+
+## D-042 — Application insertion mechanism and candidate RLS
+
+**Status:** Proposed
+**Must accept before:** PR 3.1
+
+**Context:** Completion already uses an Auth-bound RPC. Application insert needs multiple atomic checks and server-built snapshots.
+
+**Decision:** Candidates do not INSERT directly. Authenticated clients call `submit_candidate_application(p_vacancy_id uuid)` (`SECURITY DEFINER`, locked `search_path`). The RPC never accepts candidate ID or snapshot JSON from the caller. It sets `candidate_id` from `auth.uid()`, verifies ownership/completion and vacancy lifecycle/visibility/source rules, builds versioned snapshots from trusted rows, inserts `status = 'submitted'`, and returns `already_applied` on unique conflict. Candidates receive SELECT on own applications only. No authenticated UPDATE/DELETE in Slice 3. No employer/admin read policies in Slice 3. No service-role browser/ordinary SSR path.
+
+**Alternatives:** Direct RLS INSERT; Server Action-only without RPC; caller-supplied snapshots.
+
+**Consequences:** pgTAP must prove privilege boundaries; Server Action remains the match gate; RPC remains the integrity gate.
+
+## D-043 — Application preview and confirmation UX
+
+**Status:** Proposed
+**Must accept before:** PR 3.3
+
+**Context:** Features require preview before submit and confirmation after. Email/phone/CV are not collected for apply yet.
+
+**Decision:** Preview is a detail-route section/step showing vacancy title/employer, candidate essentials (name, languages, German, work-authorisation declaration wording, availability, employment, shifts, categories), and a factual disclaimer that employer review is not yet available. Explicit Submit button and disclosure are sufficient — no additional checkbox is required. Confirmation at `/candidate/applications/[applicationId]` reads historical submitted values from immutable snapshots (reload-safe). No email/phone/CV/precise address in preview payload or snapshots.
+
+**Alternatives:** Modal-only preview; require an extra checkbox; confirmation as toast only.
+
+**Consequences:** Editing returns to onboarding group URLs; re-completion may be required after invalidation.
+
+## D-044 — Applied state and application history boundary
+
+**Status:** Proposed
+**Must accept before:** PR 3.4
+
+**Context:** Architecture lists `/candidate/applications` as a dashboard. Owner objective needs confirmation and duplicate-safe revisit, not a full history product.
+
+**Decision:** Slice 3 shows Applied on matches cards and detail when an own application exists, and provides the confirmation route. A full applications index, filters, withdrawal, and status timeline are deferred.
+
+**Alternatives:** Ship `/candidate/applications` index in Slice 3; omit Applied badges.
+
+**Consequences:** Matches loader may fetch own application vacancy ids; timeline remains later-slice work.
+
+## D-045 — Slice 3 hosted proof strategy
+
+**Status:** Proposed
+**Must accept before:** PR 3.5 / Slice 3 Done
+
+**Context:** Production Demo fixtures exist until 2026-09-02. Applications introduce persistent candidate-linked rows and snapshots. D-031 forbids automatic Production business-data insertion via migrations.
+
+**Decision:** Local CI proves schema/RLS/journey before hosted proof. Preview is preferred for hosted proof and iterative application-record testing. Production proof is permitted only after explicit owner authorization, against current Demo fixtures while active, with credentials only via temporary `SUPABASE_DB_URL`, unset after use, and no secrets in evidence. Owner-run application cleanup (non-migration, scoped) should be available; cleanup is recommended after Production proof unless the owner explicitly retains records. No automatic Production application seeding.
+
+**Alternatives:** Production-only proof; Preview-only closure; retain Production applications indefinitely without cleanup tooling.
+
+**Consequences:** Closure docs record environment, project ref, fixture IDs used, application retention/cleanup outcome — never connection strings or tokens.

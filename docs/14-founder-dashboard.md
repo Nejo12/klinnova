@@ -9,10 +9,20 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | Field | Value |
 |-------|--------|
 | Active milestone | M1 — Candidate matching shell |
-| Active slice | Slice 3 — Job detail to submitted application (next planned; implementation not started) |
-| Slice status | Slice 2 Done — PR 2.1–2.4 merged (#26–#29); owner-run hosted Production proof complete |
-| Next slice | Slice 3 — Job detail to submitted application (planned; not started) |
-| Blockers | None for Slice 2 closure. Slice 3 planning/implementation has not begun. |
+| Active slice | Slice 3 — Job detail to submitted application |
+| Slice status | Discovery in progress — `docs/22`–`docs/24`; D-035–D-045 Proposed; implementation not started; no schema or application flow implemented |
+| Next slice | Slice 4 — Employer registration to draft vacancy (not started) |
+| Blockers | Owner Acceptance of D-035–D-045 required before PR 3.1. Hosted Demo fixtures remain in Production until 2026-09-02. |
+
+## Slice 3 delivery (planning)
+
+| Artifact | Status |
+|----------|--------|
+| `docs/22-slice-3-discovery.md` | Draft — discovery in progress |
+| `docs/23-slice-3-build-plan.md` | Draft — PR 3.1–3.5 proposed; implementation not started |
+| `docs/24-slice-3-schema-and-journey-proposal.md` | Draft — schema/journey contracts proposed |
+| D-035–D-045 | Proposed — pending owner Acceptance |
+| Application schema / detail route / submit UI | Not started |
 
 ## Slice 2 delivery (complete)
 
@@ -95,7 +105,7 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 | 0 Foundation | Deployable shell + CI | Done — PR 0.1–0.4 merged; CI green; Production confirmed |
 | 1 Onboarding | Register → persisted essentials | Done — PR 1.1–1.4 merged (#21–#23); hosted migration + production smoke confirmed; D-018–D-025 Accepted |
 | 2 Matches | Essentials → seeded explainable matches | Done — PR 2.1–2.4 merged (#26–#29); hosted Production proof complete; Demo fixtures expire 2026-09-02; apply/detail excluded |
-| 3 Apply | Job detail → submitted application | Next planned — not started |
+| 3 Apply | Job detail → submitted application | Discovery in progress — decisions pending; implementation not started |
 | 4 Employer draft | Register → draft vacancy | Not started |
 | 5 Publish | Verification → public vacancy | Not started |
 | 6 Review | Applicant review → status update | Not started |
