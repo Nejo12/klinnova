@@ -1,8 +1,8 @@
 # Slice 4 Schema and Journey Proposal
 
 > Design proposal locked by Accepted D-046–D-054 (2026-08-03).
-> **Status:** Ready for PR 4.1. No migrations land in the decision-acceptance
-> package. Slice 4 implementation has **not** started here.
+> **Status:** PR 4.1 implementation prepared on the schema branch; proposal text
+> remains the Accepted contract. PR 4.2+ / vacancy drafts not started.
 
 **Depends on:** Accepted D-034; Accepted D-046–D-054; current migrations through
 `20260803120000_applications_schema_and_submit_rpc.sql`.
@@ -395,6 +395,6 @@ body enforces `auth.uid()`. No publish RPC in Slice 4.
 - [x] Salary cents + period + gross EUR model (D-051)
 - [x] Hosted proof Preview-first; Production not authorized by D-054
 
-**Next step after decision-acceptance merge:** open PR 4.1 — employer
-identity/profile schema and RLS. Do not begin PR 4.1 in the decision-acceptance
-documentation PR.
+**Current step:** PR 4.1 — employer identity/profile schema and RLS —
+implementation prepared (local validation). Not Done until merge. Do not begin
+PR 4.2, vacancy drafts, or Slice 5/6 from this proposal.

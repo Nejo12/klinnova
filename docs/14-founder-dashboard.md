@@ -10,20 +10,20 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M3 — Employer flow |
 | Active slice | Slice 4 — Employer registration to draft vacancy |
-| Slice status | Ready for PR 4.1 — D-046–D-054 Accepted 2026-08-03; implementation has not started |
+| Slice status | PR 4.1 implementation prepared — employer profile schema/RLS locally validated; not merged; D-046–D-054 remain Accepted |
 | Next slice | Slice 5 — Employer verification to public vacancy (**not started**) |
-| Blockers | None for opening PR 4.1 after decision-acceptance merges. Preview isolation remains an infrastructure follow-up for preferred hosted proofs (D-054). Hosted Demo fixtures remain in Production until 2026-09-02. |
+| Blockers | None for PR 4.1 review/merge. PR 4.2 not started. Preview isolation remains an infrastructure follow-up for preferred hosted proofs (D-054). Hosted Demo fixtures remain in Production until 2026-09-02. |
 
-## Slice 4 delivery (Ready for PR 4.1)
+## Slice 4 delivery (PR 4.1 prepared)
 
 | Artifact | Status |
 |----------|--------|
 | `docs/28-slice-4-discovery.md` | Locked — contracts Accepted 2026-08-03 |
-| `docs/29-slice-4-build-plan.md` | Locked — PR 4.1–4.5 sequence; next unit PR 4.1 |
+| `docs/29-slice-4-build-plan.md` | Locked — PR 4.1–4.5 sequence; PR 4.1 implementation prepared |
 | `docs/30-slice-4-schema-and-journey-proposal.md` | Locked — schema/routes/RLS Accepted |
 | D-034 | Accepted — private vs organisation employers (product boundary) |
 | D-046–D-054 | Accepted 2026-08-03 (type-lock + intent routing refinements) |
-| PR 4.1 — employer identity/profile schema and RLS | Next — not started |
+| PR 4.1 — employer identity/profile schema and RLS | Implementation prepared — local validation complete; not Done until merge |
 | PR 4.2+ | Not started |
 | Slice 5 / Slice 6 | Not started |
 
