@@ -90,7 +90,12 @@ describe("CandidateMatchesPage", () => {
     expect(reasons[0]).toHaveTextContent(/hospitality preference/i);
     expect(screen.queryByText("category_match")).toBeNull();
     expect(
-      screen.queryByRole("link", { name: /apply|job details?/i }),
+      screen.getByRole("link", {
+        name: "View job: Demo vacancy — Morning kitchen support",
+      }),
+    ).toHaveAttribute("href", `/candidate/jobs/${match.vacancy.id}`);
+    expect(
+      screen.queryByRole("link", { name: /apply|submit|save/i }),
     ).toBeNull();
     expect(screen.queryByRole("button", { name: /apply|save/i })).toBeNull();
     expect(screen.queryByText(/\d+\s*%|match score|perfect match/i)).toBeNull();
@@ -167,13 +172,22 @@ describe("CandidateMatchesPage", () => {
     );
   });
 
-  it("uses a semantic match list and does not nest interactive cards", () => {
-    render(<CandidateMatchesPage status="success" matches={[buildMatch()]} />);
+  it("uses a semantic match list with one accessible detail link per card", () => {
+    const match = buildMatch();
+    render(<CandidateMatchesPage status="success" matches={[match]} />);
 
     const lists = screen.getAllByRole("list");
     expect(lists.length).toBeGreaterThanOrEqual(1);
     const card = screen.getByRole("article");
-    expect(within(card).queryByRole("link")).toBeNull();
+    const detailLink = within(card).getByRole("link", {
+      name: `View job: ${match.vacancy.title}`,
+    });
+    expect(detailLink).toHaveAttribute(
+      "href",
+      `/candidate/jobs/${match.vacancy.id}`,
+    );
+    expect(detailLink).toHaveTextContent("View job");
+    expect(within(card).queryAllByRole("link")).toHaveLength(1);
     expect(within(card).queryByRole("button")).toBeNull();
   });
 });

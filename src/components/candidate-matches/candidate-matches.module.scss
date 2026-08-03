@@ -237,6 +237,21 @@
   outline-offset: var(--focus-ring-offset);
 }
 
+.detailLink {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+  color: var(--color-text-link);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.detailLink:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
 .cta {
   display: inline-flex;
   align-items: center;

@@ -123,7 +123,10 @@ test.describe("Slice 2 candidate matches journey", () => {
       page.getByText(/\d+\s*%|match score|perfect match/i),
     ).toHaveCount(0);
     await expect(
-      page.getByRole("link", { name: /apply|job details?/i }),
+      page.getByRole("link", { name: /View job/i }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /apply|submit|save|contact/i }),
     ).toHaveCount(0);
 
     await page.reload();

@@ -7,6 +7,7 @@ import {
   jobCategoryLabel,
   joinLabels,
   languageLabel,
+  languageProficiencyLabel,
   shiftLabel,
 } from "@/lib/matching/labels";
 
@@ -17,6 +18,7 @@ describe("matching labels", () => {
     expect(employmentTypeLabel("full_time")).toBe("Full time");
     expect(shiftLabel("evening")).toBe("Evening");
     expect(languageLabel("en")).toBe("English");
+    expect(languageProficiencyLabel("conversational")).toBe("Conversational");
     expect(germanRequirementLabel("conversational")).toBe(
       "Conversational German",
     );

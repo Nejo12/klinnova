@@ -2,9 +2,9 @@
 
 > Planning artifact. Discovery in `docs/22-slice-3-discovery.md`.
 > Schema/journey proposal in `docs/24-slice-3-schema-and-journey-proposal.md`.
-> **Status:** Contracts Accepted 2026-08-03 (D-035–D-045). PR 3.1
-> implementation in progress on `feat/slice-3-applications-schema`
-> (schema/RLS/RPC pending review). Slice 3 is not Done. PR 3.2 has not started.
+> **Status:** Contracts Accepted 2026-08-03 (D-035–D-045). PR 3.1 merged.
+> PR 3.2 implementation in progress on `feat/slice-3-candidate-job-detail`
+> (loader/route pending review). Slice 3 is not Done. PR 3.3 has not started.
 
 **Outcome:** A completed candidate can open a matched Demo job, preview a
 profile-based application, submit exactly once, and see reload-safe confirmation
@@ -105,9 +105,7 @@ boundary.
 
 **Intent:** Persist applications with ownership, uniqueness, and insert path.
 
-**Status:** Implementation in progress on branch — application schema, RLS,
-Auth-bound RPC, generated types, and pgTAP implemented locally; pending review /
-merge. Not marked complete before merge.
+**Status:** Done — merged.
 
 **Includes:** `applications` table; FKs; permanent unique `(candidate_id, vacancy_id)`;
 `status = 'submitted'` CHECK only; `snapshot_version` + `candidate_snapshot` /
@@ -135,7 +133,9 @@ RLS isolation; RPC success/deny matrix; unique/concurrent duplicate.
 
 **Intent:** Authenticated completed candidates can inspect one Demo job.
 
-**Status:** Not started.
+**Status:** Implementation in progress on branch — candidate job-detail loader
+and `/candidate/jobs/[vacancyId]` route implemented locally; pending review /
+merge. Not marked complete before merge.
 
 **Includes:** Dedicated detail loader; `/candidate/jobs/[vacancyId]` page;
 matches card link to detail; Demo label; reasons; work-authorisation notice;
@@ -310,6 +310,6 @@ planned only.
 - [ ] No employer / save / CV / timeline dashboard shipped
 - [ ] Dashboard: Slice 3 Done → next slice planned
 
-PR 3.1 implementation is in progress on branch; do not mark PR 3.1 complete
-before merge. Do not mark Slice 3 Done until hosted exit proof is recorded.
-PR 3.2 has not started.
+PR 3.1 is merged. PR 3.2 implementation is in progress on branch; do not mark
+PR 3.2 complete before merge. Do not mark Slice 3 Done until hosted exit proof
+is recorded. PR 3.3 has not started.

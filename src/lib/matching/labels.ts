@@ -2,11 +2,13 @@ import {
   EMPLOYMENT_TYPE_OPTIONS,
   JOB_CATEGORY_OPTIONS,
   LANGUAGE_OPTIONS,
+  LANGUAGE_PROFICIENCY_OPTIONS,
   SHIFT_PREFERENCE_OPTIONS,
   type EmploymentTypeCode,
   type GermanComfortCode,
   type JobCategoryCode,
   type LanguageCode,
+  type LanguageProficiencyCode,
   type ShiftPreferenceCode,
 } from "@/lib/onboarding/allow-lists";
 import type { ConcreteShift } from "@/lib/matching/types";
@@ -26,6 +28,10 @@ const SHIFT_LABELS = Object.fromEntries(
 const LANGUAGE_LABELS = Object.fromEntries(
   LANGUAGE_OPTIONS.map((option) => [option.code, option.label]),
 ) as Record<LanguageCode, string>;
+
+const LANGUAGE_PROFICIENCY_LABELS = Object.fromEntries(
+  LANGUAGE_PROFICIENCY_OPTIONS.map((option) => [option.code, option.label]),
+) as Record<LanguageProficiencyCode, string>;
 
 /** Short vacancy-facing German requirement labels (not long onboarding sentences). */
 const GERMAN_REQUIREMENT_LABELS: Record<GermanComfortCode, string> = {
@@ -64,6 +70,12 @@ export function shiftLabel(code: ShiftPreferenceCode | ConcreteShift): string {
 
 export function languageLabel(code: LanguageCode): string {
   return LANGUAGE_LABELS[code];
+}
+
+export function languageProficiencyLabel(
+  code: LanguageProficiencyCode,
+): string {
+  return LANGUAGE_PROFICIENCY_LABELS[code];
 }
 
 export function germanRequirementLabel(code: GermanComfortCode): string {

@@ -96,7 +96,10 @@ async function expectDemoMatchInventory(page: import("@playwright/test").Page) {
     page.getByText(/\d+\s*%|match score|perfect match/i),
   ).toHaveCount(0);
   await expect(
-    page.getByRole("link", { name: /apply|job details?|contact|save/i }),
+    page.getByRole("link", { name: /View job/i }).first(),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /apply|submit|contact|save/i }),
   ).toHaveCount(0);
   await expect(
     page.getByRole("button", { name: /apply|save|contact/i }),
