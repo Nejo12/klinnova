@@ -9,6 +9,60 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      applications: {
+        Row: {
+          candidate_id: string
+          candidate_snapshot: Json
+          created_at: string
+          id: string
+          snapshot_version: number
+          status: string
+          submitted_at: string
+          updated_at: string
+          vacancy_id: string
+          vacancy_snapshot: Json
+        }
+        Insert: {
+          candidate_id: string
+          candidate_snapshot: Json
+          created_at?: string
+          id?: string
+          snapshot_version: number
+          status: string
+          submitted_at?: string
+          updated_at?: string
+          vacancy_id: string
+          vacancy_snapshot: Json
+        }
+        Update: {
+          candidate_id?: string
+          candidate_snapshot?: Json
+          created_at?: string
+          id?: string
+          snapshot_version?: number
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+          vacancy_id?: string
+          vacancy_snapshot?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "candidate_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_vacancy_id_fkey"
+            columns: ["vacancy_id"]
+            isOneToOne: false
+            referencedRelation: "vacancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       candidate_languages: {
         Row: {
           candidate_id: string
@@ -257,6 +311,10 @@ export type Database = {
         Returns: string
       }
       complete_candidate_onboarding: { Args: never; Returns: Json }
+      submit_candidate_application: {
+        Args: { p_vacancy_id: string }
+        Returns: Json
+      }
       text_array_is_unique: { Args: { input: string[] }; Returns: boolean }
       visible_seed_company_ids: { Args: never; Returns: string[] }
       visible_seed_vacancy_ids: { Args: never; Returns: string[] }

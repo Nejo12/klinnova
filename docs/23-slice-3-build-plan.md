@@ -2,8 +2,9 @@
 
 > Planning artifact. Discovery in `docs/22-slice-3-discovery.md`.
 > Schema/journey proposal in `docs/24-slice-3-schema-and-journey-proposal.md`.
-> **Status:** Contracts Accepted 2026-08-03 (D-035–D-045). PR 3.1 is the next
-> implementation unit; Slice 3 implementation has not started.
+> **Status:** Contracts Accepted 2026-08-03 (D-035–D-045). PR 3.1
+> implementation in progress on `feat/slice-3-applications-schema`
+> (schema/RLS/RPC pending review). Slice 3 is not Done. PR 3.2 has not started.
 
 **Outcome:** A completed candidate can open a matched Demo job, preview a
 profile-based application, submit exactly once, and see reload-safe confirmation
@@ -104,7 +105,9 @@ boundary.
 
 **Intent:** Persist applications with ownership, uniqueness, and insert path.
 
-**Status:** Not started — contracts Accepted; next implementation unit.
+**Status:** Implementation in progress on branch — application schema, RLS,
+Auth-bound RPC, generated types, and pgTAP implemented locally; pending review /
+merge. Not marked complete before merge.
 
 **Includes:** `applications` table; FKs; permanent unique `(candidate_id, vacancy_id)`;
 `status = 'submitted'` CHECK only; `snapshot_version` + `candidate_snapshot` /
@@ -307,5 +310,6 @@ planned only.
 - [ ] No employer / save / CV / timeline dashboard shipped
 - [ ] Dashboard: Slice 3 Done → next slice planned
 
-PR 3.1 is next. Do not mark Slice 3 Done until hosted exit proof is recorded.
-Do not mark PR 3.1 started in this acceptance update.
+PR 3.1 implementation is in progress on branch; do not mark PR 3.1 complete
+before merge. Do not mark Slice 3 Done until hosted exit proof is recorded.
+PR 3.2 has not started.
