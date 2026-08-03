@@ -8,11 +8,22 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 
 | Field | Value |
 |-------|--------|
-| Active milestone | M1 — Candidate matching shell |
-| Active slice | Slice 3 — Job detail to submitted application (**Done**) |
-| Slice status | Slice 3 Done — D-035–D-045 complete; PRs #33–#37 merged; local exit proof passed; owner-authorized Production hosted proof passed; retained fixtures restored; proof users/apps cleaned up |
-| Next slice | Slice 4 — Employer registration to draft vacancy (**not started**; separate planning/authorization required) |
-| Blockers | None for Slice 3. Preview isolation remains an infrastructure follow-up for future hosted proofs. Hosted Demo fixtures remain in Production until 2026-09-02. |
+| Active milestone | M3 — Employer flow |
+| Active slice | Slice 4 — Employer registration to draft vacancy |
+| Slice status | Discovery / planning — `docs/28`–`docs/30`; D-046–D-054 Proposed (not Accepted); implementation has not started |
+| Next slice | Slice 5 — Employer verification to public vacancy (**not started**) |
+| Blockers | Owner acceptance of D-046–D-054 required before PR 4.1. Preview isolation remains an infrastructure follow-up for preferred hosted proofs. Hosted Demo fixtures remain in Production until 2026-09-02. |
+
+## Slice 4 delivery (discovery / planning)
+
+| Artifact | Status |
+|----------|--------|
+| `docs/28-slice-4-discovery.md` | Draft — repository audit + alternatives; not Accepted |
+| `docs/29-slice-4-build-plan.md` | Draft — PR 4.1–4.5 sequence proposed |
+| `docs/30-slice-4-schema-and-journey-proposal.md` | Draft — schema/routes/RLS proposed |
+| D-034 | Accepted — private vs organisation employers (product boundary) |
+| D-046–D-054 | Proposed — require owner acceptance before implementation |
+| PR 4.1+ | Not started |
 
 ## Slice 3 delivery (complete)
 
@@ -114,7 +125,7 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 | 1 Onboarding | Register → persisted essentials | Done — PR 1.1–1.4 merged (#21–#23); hosted migration + production smoke confirmed; D-018–D-025 Accepted |
 | 2 Matches | Essentials → seeded explainable matches | Done — PR 2.1–2.4 merged (#26–#29); hosted Production proof complete; Demo fixtures expire 2026-09-02 |
 | 3 Apply | Job detail → submitted application | Done — PR 3.1–3.5 merged (#33–#37); local + Production hosted proof complete; D-035–D-045 complete; Demo fixtures expire 2026-09-02 |
-| 4 Employer draft | Register → draft vacancy | Not started |
+| 4 Employer draft | Register → draft vacancy | Discovery / planning — D-046–D-054 Proposed; implementation not started |
 | 5 Publish | Verification → public vacancy | Not started |
 | 6 Review | Applicant review → status update | Not started |
 | 7 Trust ops | Admin moderation → audit | Not started |

@@ -147,12 +147,15 @@ At the same time, validate that employers can:
 - [Slice 3 exit proof (local)](docs/25-slice-3-exit-proof.md) (local automated proof complete)
 - [Slice 3 hosted-proof runbook](docs/26-slice-3-hosted-proof-runbook.md) (Production fallback executed 2026-08-03)
 - [Slice 3 closure evidence](docs/27-slice-3-closure.md) (complete; hosted Production proof recorded)
+- [Slice 4 discovery](docs/28-slice-4-discovery.md) (discovery / planning; D-046–D-054 Proposed)
+- [Slice 4 build plan](docs/29-slice-4-build-plan.md) (discovery / planning)
+- [Slice 4 schema and journey proposal](docs/30-slice-4-schema-and-journey-proposal.md) (discovery / planning)
 - [Not now](NOT_NOW.md)
 - [Agent instructions](AGENTS.md)
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, Slice 2, and Slice 3 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Slice 3 delivered candidate job detail, application preview/submit, snapshot-backed confirmation, Applied state, local exit proof, and owner-authorized Production hosted proof (PR #33–#37; closure in `docs/27-slice-3-closure.md`). Hosted Demo fixtures on `https://stint.company` / project `kvrzmzoszitdicjvrprt` remain retained until 2026-09-02. Slice 4 has not started and requires separate planning and authorization. D-034 remains a future employer-domain requirement, not an implemented employer feature. Product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, Slice 2, and Slice 3 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Slice 3 delivered candidate job detail, application preview/submit, snapshot-backed confirmation, Applied state, local exit proof, and owner-authorized Production hosted proof (PR #33–#37; closure in `docs/27-slice-3-closure.md`). Hosted Demo fixtures on `https://stint.company` / project `kvrzmzoszitdicjvrprt` remain retained until 2026-09-02. Slice 4 is in **discovery / planning** (`docs/28`–`docs/30`; D-046–D-054 Proposed, not Accepted). Employer implementation, schema, and routes have not started. D-034 (private vs organisation employers) is Accepted product boundary for that planning. Slice 5/6 have not started. Product scope remains `docs/04-mvp.md`.
 
 ## Local development
 
