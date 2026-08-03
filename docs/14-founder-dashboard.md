@@ -9,26 +9,28 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | Field | Value |
 |-------|--------|
 | Active milestone | M1 — Candidate matching shell |
-| Active slice | Slice 3 — Job detail to submitted application |
-| Slice status | Contracts Accepted (2026-08-03) — D-035–D-045 Accepted; PR 3.1–3.4 merged (#33–#36); PR 3.5 local exit proof and hosted-proof readiness in progress on `chore/slice-3-exit-proof`; hosted proof pending; Slice 3 is not Done |
-| Next slice | Slice 4 — Employer registration to draft vacancy (not started) |
-| Blockers | Hosted Slice 3 proof still required before Done. Hosted Demo fixtures remain in Production until 2026-09-02. |
+| Active slice | Slice 3 — Job detail to submitted application (**Done**) |
+| Slice status | Slice 3 Done — D-035–D-045 complete; PRs #33–#37 merged; local exit proof passed; owner-authorized Production hosted proof passed; retained fixtures restored; proof users/apps cleaned up |
+| Next slice | Slice 4 — Employer registration to draft vacancy (**not started**; separate planning/authorization required) |
+| Blockers | None for Slice 3. Preview isolation remains an infrastructure follow-up for future hosted proofs. Hosted Demo fixtures remain in Production until 2026-09-02. |
 
-## Slice 3 delivery (in progress)
+## Slice 3 delivery (complete)
 
 | Artifact | Status |
 |----------|--------|
 | `docs/22-slice-3-discovery.md` | Locked — contracts Accepted 2026-08-03 |
-| `docs/23-slice-3-build-plan.md` | Locked — PR 3.1–3.5 sequence; PR 3.5 local exit proof in progress |
+| `docs/23-slice-3-build-plan.md` | Locked — PR 3.1–3.5 sequence complete |
 | `docs/24-slice-3-schema-and-journey-proposal.md` | Locked — schema/journey contracts Accepted |
-| `docs/25-slice-3-exit-proof.md` | Local exit proof on branch — hosted evidence not claimed |
-| `docs/26-slice-3-hosted-proof-runbook.md` | Hosted readiness documented — not executed |
-| D-035–D-045 | Accepted 2026-08-03 |
+| `docs/25-slice-3-exit-proof.md` | Done — local automated proof (PR #37) |
+| `docs/26-slice-3-hosted-proof-runbook.md` | Done — Production fallback executed 2026-08-03 |
+| `docs/27-slice-3-closure.md` | Done — Slice 3 closed after hosted Production proof |
+| D-035–D-045 | Accepted 2026-08-03; Slice 3 acceptance conditions complete |
 | PR 3.1 — application schema, constraints, RLS, RPC | Done (merged; PR #33) |
 | PR 3.2 — job-detail loader and candidate detail route | Done (merged; PR #34) |
 | PR 3.3 — application preview and atomic submission | Done (merged; PR #35) |
 | PR 3.4 — confirmation, Applied state | Done (merged; PR #36) |
-| PR 3.5 — local exit proof + hosted-proof readiness | Implementation in progress on branch — local proof pending review; hosted proof not run; Slice 3 not Done |
+| PR 3.5 — local exit proof + hosted-proof readiness | Done (merged; PR #37) |
+| Owner-run hosted Production proof | Done — `https://stint.company`; project `kvrzmzoszitdicjvrprt`; Demo fixtures retained until 2026-09-02 |
 
 ## Slice 2 delivery (complete)
 
@@ -110,8 +112,8 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 |-------|---------|--------|
 | 0 Foundation | Deployable shell + CI | Done — PR 0.1–0.4 merged; CI green; Production confirmed |
 | 1 Onboarding | Register → persisted essentials | Done — PR 1.1–1.4 merged (#21–#23); hosted migration + production smoke confirmed; D-018–D-025 Accepted |
-| 2 Matches | Essentials → seeded explainable matches | Done — PR 2.1–2.4 merged (#26–#29); hosted Production proof complete; Demo fixtures expire 2026-09-02; apply/detail excluded |
-| 3 Apply | Job detail → submitted application | Contracts Accepted (2026-08-03) — D-035–D-045 Accepted; PR 3.1–3.4 merged (#33–#36); PR 3.5 local exit proof in progress; hosted proof pending; Slice 3 not Done; Slice 4 not started |
+| 2 Matches | Essentials → seeded explainable matches | Done — PR 2.1–2.4 merged (#26–#29); hosted Production proof complete; Demo fixtures expire 2026-09-02 |
+| 3 Apply | Job detail → submitted application | Done — PR 3.1–3.5 merged (#33–#37); local + Production hosted proof complete; D-035–D-045 complete; Demo fixtures expire 2026-09-02 |
 | 4 Employer draft | Register → draft vacancy | Not started |
 | 5 Publish | Verification → public vacancy | Not started |
 | 6 Review | Applicant review → status update | Not started |

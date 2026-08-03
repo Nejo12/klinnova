@@ -2,10 +2,10 @@
 
 > Planning artifact. Discovery in `docs/22-slice-3-discovery.md`.
 > Schema/journey proposal in `docs/24-slice-3-schema-and-journey-proposal.md`.
-> **Status:** Contracts Accepted 2026-08-03 (D-035–D-045). PR 3.1–3.4 merged
-> (#33–#36). PR 3.5 local exit proof and hosted-proof readiness in progress on
-> `chore/slice-3-exit-proof`. Hosted proof remains pending. Slice 3 is not Done.
-> Slice 4 has not started.
+> **Status:** Slice 3 Done. Contracts Accepted 2026-08-03 (D-035–D-045).
+> PR 3.1–3.5 merged (#33–#37). Local exit proof complete. Owner-authorized
+> Production hosted proof complete (`docs/27-slice-3-closure.md`). Slice 4 has
+> not started.
 
 **Outcome:** A completed candidate can open a matched Demo job, preview a
 profile-based application, submit exactly once, and see reload-safe confirmation
@@ -29,6 +29,7 @@ profile-based application, submit exactly once, and see reload-safe confirmation
 | `docs/13-implementation-plan.md` | Slice order; exit criteria (narrowed) |
 | `docs/21-slice-2-closure.md` | Hosted Demo fixture baseline |
 | `docs/22` / `docs/24` | Discovery + schema/journey contracts |
+| `docs/25` / `docs/26` / `docs/27` | Local proof, hosted runbook, Slice 3 closure |
 | `docs/10-decisions.md` | D-020, D-023, D-031–D-034; Accepted D-035–D-045 |
 | `NOT_NOW.md` | Do not implement |
 
@@ -215,27 +216,28 @@ read.
 candidate journey and prepare the owner-authorized hosted-proof runbook.
 Does **not** mark Slice 3 Done.
 
-**Status:** Implementation in progress on branch `chore/slice-3-exit-proof` —
-local critical journey, static security proof, exit-proof doc, and hosted
-runbook. Hosted commands are not executed in this PR. Slice 3 remains not Done
-until hosted proof, evidence review, closure docs, and merge complete.
+**Status:** Complete — merged as #37. Local critical journey, static security
+proof, exit-proof doc, and hosted runbook landed. Owner-authorized Production
+hosted proof and closure evidence are recorded in `docs/27-slice-3-closure.md`.
+Slice 3 Done. Slice 4 has not started.
 
 **Includes:** `e2e/slice3-critical-journey.spec.ts`; `pnpm test:e2e:slice3`;
 static security assertions; `docs/25-slice-3-exit-proof.md`;
 `docs/26-slice-3-hosted-proof-runbook.md`; README/dashboard/build-plan status.
 
-**Excludes:** Hosted Supabase commands; Production proof; marking Slice 3 Done;
-starting Slice 4; schema/RLS/RPC/migration changes; new product behaviour.
+**Excludes:** Automatic Production seeding; starting Slice 4; schema/RLS/RPC
+product changes in the proof PR.
 
 **Depends on:** PR 3.4 merged; Accepted D-045.
 
-**Migration impact:** None expected.
+**Migration impact:** None in PR #37. Production later applied
+`20260803120000_applications_schema_and_submit_rpc.sql` during hosted proof.
 
-**Security review:** No hosted credentials; no service-role path; ownership and
-snapshot immutability proven locally.
+**Security review:** No secrets in evidence; ownership and snapshot immutability
+proven locally and on Production.
 
-**Exit criteria:** Local exit checklist green; CI green; hosted runbook ready;
-Slice 3 still explicitly not Done.
+**Exit criteria:** Met — local checklist green; CI green; hosted proof recorded;
+Slice 3 closed.
 
 ---
 
@@ -246,7 +248,7 @@ Slice 3 still explicitly not Done.
 | Schema / RLS / RPC | 3.1 | Constraints; unique; ownership; incomplete/invisible deny |
 | Unit / component | 3.2–3.3 | Detail loader; preview; submit result mapping |
 | Playwright | 3.4–3.5 | Apply journey + dedicated Slice 3 critical exit journey |
-| Hosted | After 3.5 | Owner-run Preview (preferred) or Production per D-045 / `docs/26` |
+| Hosted | After 3.5 | Owner-run Production fallback completed 2026-08-03 — `docs/27` |
 
 ### Playwright critical journey (required)
 
@@ -311,12 +313,11 @@ Slice 3 still explicitly not Done.
 ## Slice 3 close checklist (planning)
 
 - [x] D-035–D-045 Accepted (2026-08-03)
-- [ ] PR 3.1–3.4 merged
-- [ ] Local critical journey green
-- [ ] Hosted proof recorded (D-045)
-- [ ] No employer / save / CV / timeline dashboard shipped
-- [ ] Dashboard: Slice 3 Done → next slice planned
+- [x] PR 3.1–3.5 merged (#33–#37)
+- [x] Local critical journey green
+- [x] Hosted proof recorded (D-045) — Production fallback 2026-08-03
+- [x] No employer / save / CV / timeline dashboard shipped
+- [x] Dashboard: Slice 3 Done → Slice 4 next planned (not started)
 
-PR 3.1–3.3 are merged. PR 3.4 implementation is in progress on branch; do not
-mark PR 3.4 complete before merge. Do not mark Slice 3 Done until hosted exit
-proof is recorded. Do not start the next PR yet.
+Slice 3 is Done. Closure evidence: `docs/27-slice-3-closure.md`. Do not start
+Slice 4 until separately planned and authorized.
