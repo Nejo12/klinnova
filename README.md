@@ -141,12 +141,15 @@ At the same time, validate that employers can:
 - [Slice 2 build plan](docs/19-slice-2-build-plan.md) (planning locked)
 - [Slice 2 schema and matching proposal](docs/20-slice-2-schema-and-matching-proposal.md) (planning locked)
 - [Slice 2 closure evidence](docs/21-slice-2-closure.md) (complete; hosted Production proof recorded)
+- [Slice 3 discovery](docs/22-slice-3-discovery.md) (draft; D-035–D-045 Proposed)
+- [Slice 3 build plan](docs/23-slice-3-build-plan.md) (draft; implementation not started)
+- [Slice 3 schema and journey proposal](docs/24-slice-3-schema-and-journey-proposal.md) (draft)
 - [Not now](NOT_NOW.md)
 - [Agent instructions](AGENTS.md)
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, and Slice 2 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Hosted Production proof is complete on `https://stint.company`; deterministic Demo fixtures expire on 2026-09-02. Slice 3 (job detail to submitted application) is next and has not started. D-034 remains a future employer-domain requirement, not an implemented employer feature. Product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, and Slice 2 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Hosted Production proof is complete on `https://stint.company`; deterministic Demo fixtures expire on 2026-09-02. Slice 3 discovery is in progress (`docs/22`–`docs/24`); decisions D-035–D-045 are Proposed; implementation, schema, and application flow are not started. D-034 remains a future employer-domain requirement, not an implemented employer feature. Product scope remains `docs/04-mvp.md`.
 
 ## Local development
 

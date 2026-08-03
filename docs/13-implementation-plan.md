@@ -82,13 +82,20 @@ Each slice is the unit of planning, implementation, and review. Size for roughly
 
 **Outcome:** a candidate can evaluate a vacancy and apply through Stint.
 
-**Includes:** job list and detail; salary, distance, shift, contract, language, verification, and freshness; save/unsave; profile-based application; optional CV upload with private storage; confirmation; application timeline; candidate application dashboard.
+**Broader MVP includes (still product intent):** job list and detail; salary, distance, shift, contract, language, verification, and freshness; save/unsave; profile-based application; optional CV upload with private storage; confirmation; application timeline; candidate application dashboard.
 
-**Exit criteria:**
+**Proposed Slice 3 narrowings (D-035–D-045; pending Acceptance):** authenticated `/candidate/jobs/[vacancyId]` detail for RLS-visible seed vacancies using schema-backed fields only; profile-based preview and atomic submit; reload-safe confirmation from RPC-generated versioned snapshots; Applied-state feedback; permanent DB unique one application per candidate per vacancy; status constrained to `submitted` only. Deferred from this slice: save/unsave; CV/Storage; salary/distance/experience/verification/interview-language fields; employer status transitions; withdrawal/resubmission; future application statuses beyond `submitted`; full applications dashboard. Employer implementation remains Slice 4+.
+
+**Planning artifacts:** discovery `docs/22-slice-3-discovery.md`, build plan `docs/23-slice-3-build-plan.md`, schema/journey proposal `docs/24-slice-3-schema-and-journey-proposal.md`.
+
+**Exit criteria (operational for narrowed Slice 3 once decisions Accepted):**
 
 - exactly one application per vacancy per candidate
-- private documents are never publicly accessible
-- application status is visible and auditable
+- completed candidate can submit a profile-based Demo application with confirmation
+- duplicate submit is deterministic and safe
+- unauthenticated / incomplete candidates cannot apply
+- private documents remain out of Slice 3 (no CV upload); later privacy rules still apply when documents exist
+- submission is auditable via stored application + snapshots; employer-visible status timeline deferred
 
 ### Slice 4 — Employer registration to draft vacancy
 
