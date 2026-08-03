@@ -55,7 +55,13 @@ describe("CandidateMatchesPage", () => {
     ];
     const match = buildMatch({}, sevenReasons);
 
-    render(<CandidateMatchesPage status="success" matches={[match]} />);
+    render(
+      <CandidateMatchesPage
+        status="success"
+        matches={[match]}
+        applicationsByVacancyId={new Map()}
+      />,
+    );
 
     expect(
       screen.getByRole("heading", {
@@ -112,7 +118,13 @@ describe("CandidateMatchesPage", () => {
       availableFrom: "2026-10-01",
     });
 
-    render(<CandidateMatchesPage status="success" matches={[first, second]} />);
+    render(
+      <CandidateMatchesPage
+        status="success"
+        matches={[first, second]}
+        applicationsByVacancyId={new Map()}
+      />,
+    );
 
     expect(screen.getByText("2 matching jobs")).toBeInTheDocument();
     expect(screen.getByText("From 1 September 2026")).toBeInTheDocument();
@@ -120,7 +132,11 @@ describe("CandidateMatchesPage", () => {
 
   it("renders empty state distinctly from failure", () => {
     const { rerender } = render(
-      <CandidateMatchesPage status="success" matches={[]} />,
+      <CandidateMatchesPage
+        status="success"
+        matches={[]}
+        applicationsByVacancyId={new Map()}
+      />,
     );
 
     expect(
@@ -160,7 +176,13 @@ describe("CandidateMatchesPage", () => {
   });
 
   it("uses positive intro copy without score or ranking language", () => {
-    render(<CandidateMatchesPage status="success" matches={[buildMatch()]} />);
+    render(
+      <CandidateMatchesPage
+        status="success"
+        matches={[buildMatch()]}
+        applicationsByVacancyId={new Map()}
+      />,
+    );
 
     expect(
       screen.getByText(
@@ -174,7 +196,13 @@ describe("CandidateMatchesPage", () => {
 
   it("uses a semantic match list with one accessible detail link per card", () => {
     const match = buildMatch();
-    render(<CandidateMatchesPage status="success" matches={[match]} />);
+    render(
+      <CandidateMatchesPage
+        status="success"
+        matches={[match]}
+        applicationsByVacancyId={new Map()}
+      />,
+    );
 
     const lists = screen.getAllByRole("list");
     expect(lists.length).toBeGreaterThanOrEqual(1);
@@ -189,5 +217,46 @@ describe("CandidateMatchesPage", () => {
     expect(detailLink).toHaveTextContent("View job");
     expect(within(card).queryAllByRole("link")).toHaveLength(1);
     expect(within(card).queryByRole("button")).toBeNull();
+  });
+
+  it("shows Applied and View application without nesting controls", () => {
+    const match = buildMatch();
+    const applicationId = "33333333-3333-4333-8333-333333333301";
+    render(
+      <CandidateMatchesPage
+        status="success"
+        matches={[match]}
+        applicationsByVacancyId={
+          new Map([
+            [
+              match.vacancy.id,
+              {
+                applicationId,
+                vacancyId: match.vacancy.id,
+                status: "submitted",
+                submittedAt: "2026-08-03T14:30:00.000Z",
+              },
+            ],
+          ])
+        }
+      />,
+    );
+
+    const card = screen.getByRole("article");
+    expect(within(card).getByText("Applied")).toBeInTheDocument();
+    const applicationLink = within(card).getByRole("link", {
+      name: `View application: ${match.vacancy.title}`,
+    });
+    expect(applicationLink).toHaveAttribute(
+      "href",
+      `/candidate/applications/${applicationId}`,
+    );
+    expect(
+      within(card).getByRole("link", {
+        name: `View job: ${match.vacancy.title}`,
+      }),
+    ).toBeInTheDocument();
+    expect(within(card).queryAllByRole("link")).toHaveLength(2);
+    expect(within(card).queryByText(applicationId)).toBeNull();
   });
 });

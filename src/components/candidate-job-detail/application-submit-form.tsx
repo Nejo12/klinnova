@@ -6,14 +6,10 @@ import { useFormStatus } from "react-dom";
 
 import { submitCandidateApplicationAction } from "@/app/candidate/jobs/[vacancyId]/actions";
 import {
-  APPLICATION_ALREADY_APPLIED_BODY,
-  APPLICATION_ALREADY_APPLIED_HEADING,
   APPLICATION_FAILURE_MESSAGE,
   APPLICATION_NOT_MATCHING_BODY,
   APPLICATION_NOT_MATCHING_HEADING,
   APPLICATION_SUBMIT_DISCLOSURE,
-  APPLICATION_SUBMITTED_BODY,
-  APPLICATION_SUBMITTED_HEADING,
   APPLICATION_UNAVAILABLE_BODY,
   APPLICATION_UNAVAILABLE_HEADING,
   APPLICATION_VALIDATION_MESSAGE,
@@ -47,23 +43,15 @@ function SubmitButton({ locked }: { locked: boolean }) {
 }
 
 function resultCopy(state: SubmitCandidateApplicationState): {
-  kind: "status" | "alert";
+  kind: "alert";
   heading: string;
   body: string;
 } | null {
   switch (state.status) {
     case "submitted":
-      return {
-        kind: "status",
-        heading: APPLICATION_SUBMITTED_HEADING,
-        body: APPLICATION_SUBMITTED_BODY,
-      };
     case "already_applied":
-      return {
-        kind: "status",
-        heading: APPLICATION_ALREADY_APPLIED_HEADING,
-        body: APPLICATION_ALREADY_APPLIED_BODY,
-      };
+      // Successful outcomes redirect server-side to confirmation.
+      return null;
     case "not_matching":
       return {
         kind: "alert",
@@ -106,8 +94,6 @@ export function ApplicationSubmitForm({
   );
   const resultRef = useRef<HTMLDivElement>(null);
   const result = resultCopy(state);
-  const locked =
-    state.status === "submitted" || state.status === "already_applied";
 
   useEffect(() => {
     if (result !== null) {
@@ -127,10 +113,8 @@ export function ApplicationSubmitForm({
       {result !== null ? (
         <div
           ref={resultRef}
-          className={
-            result.kind === "status" ? styles.resultStatus : styles.resultAlert
-          }
-          role={result.kind === "status" ? "status" : "alert"}
+          className={styles.resultAlert}
+          role="alert"
           tabIndex={-1}
         >
           <p className={styles.resultHeading}>{result.heading}</p>
@@ -143,15 +127,13 @@ export function ApplicationSubmitForm({
         </div>
       ) : null}
 
-      {!locked ? (
-        <form action={formAction} className={styles.submitForm}>
-          <input type="hidden" name="vacancyId" value={vacancyId} />
-          <p className={styles.disclosure} id="application-submit-disclosure">
-            {APPLICATION_SUBMIT_DISCLOSURE}
-          </p>
-          <SubmitButton locked={locked} />
-        </form>
-      ) : null}
+      <form action={formAction} className={styles.submitForm}>
+        <input type="hidden" name="vacancyId" value={vacancyId} />
+        <p className={styles.disclosure} id="application-submit-disclosure">
+          {APPLICATION_SUBMIT_DISCLOSURE}
+        </p>
+        <SubmitButton locked={false} />
+      </form>
     </section>
   );
 }

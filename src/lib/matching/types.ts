@@ -1,3 +1,4 @@
+import type { OwnedApplicationSummary } from "@/lib/applications/owned-application";
 import type {
   EmploymentTypeCode,
   GermanComfortCode,
@@ -147,5 +148,9 @@ export type LoadCandidateMatchesResult =
   | { status: "unauthenticated" }
   | { status: "profile_missing" }
   | { status: "onboarding_incomplete" }
-  | { status: "success"; matches: CandidateMatch[] }
+  | {
+      status: "success";
+      matches: CandidateMatch[];
+      applicationsByVacancyId: ReadonlyMap<string, OwnedApplicationSummary>;
+    }
   | { status: "failure"; reason: "load" | "invariant" };

@@ -74,6 +74,10 @@ function createAccess(
         },
       ],
     }),
+    loadOwnedApplicationForVacancy: vi.fn().mockResolvedValue({
+      ok: true,
+      application: null,
+    }),
     ...overrides,
   };
 }
@@ -165,6 +169,7 @@ describe("loadCandidateVacancyDetail", () => {
       expect(result.preview.candidateDisplayName).toBe("Ada Candidate");
       expect(result.preview.matchedJobCategoryLabel).toBe("Hospitality");
       expect(result.preview.vacancyId).toBe(VACANCY_ID);
+      expect(result.application).toBeNull();
     }
     expect(access.loadVisibleVacancyById).toHaveBeenCalledWith(VACANCY_ID);
     expect(
@@ -222,6 +227,41 @@ describe("loadCandidateVacancyDetail", () => {
     expect(await loadCandidateVacancyDetail(VACANCY_ID, access)).toEqual({
       status: "failure",
       reason: "invariant",
+    });
+  });
+
+  it("returns owned application summary when present", async () => {
+    const access = createAccess({
+      loadOwnedApplicationForVacancy: vi.fn().mockResolvedValue({
+        ok: true,
+        application: {
+          id: "33333333-3333-4333-8333-333333333301",
+          vacancy_id: VACANCY_ID,
+          status: "submitted",
+          submitted_at: "2026-08-03T14:30:00.000Z",
+        },
+      }),
+    });
+
+    const result = await loadCandidateVacancyDetail(VACANCY_ID, access);
+    expect(result.status).toBe("ready");
+    if (result.status === "ready") {
+      expect(result.application).toEqual({
+        applicationId: "33333333-3333-4333-8333-333333333301",
+        vacancyId: VACANCY_ID,
+        status: "submitted",
+        submittedAt: "2026-08-03T14:30:00.000Z",
+      });
+    }
+  });
+
+  it("maps application lookup failures to safe load failures", async () => {
+    const access = createAccess({
+      loadOwnedApplicationForVacancy: vi.fn().mockResolvedValue({ ok: false }),
+    });
+    expect(await loadCandidateVacancyDetail(VACANCY_ID, access)).toEqual({
+      status: "failure",
+      reason: "load",
     });
   });
 

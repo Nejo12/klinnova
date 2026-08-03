@@ -22,5 +22,11 @@ export default async function CandidateMatchesRoutePage() {
     return <CandidateMatchesPage status="failure" />;
   }
 
-  return <CandidateMatchesPage status="success" matches={view.matches} />;
+  return (
+    <CandidateMatchesPage
+      status="success"
+      matches={view.matches}
+      applicationsByVacancyId={view.applicationsByVacancyId}
+    />
+  );
 }

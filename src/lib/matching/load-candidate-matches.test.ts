@@ -66,6 +66,10 @@ function createAccess(
       ok: true,
       requirements: [],
     }),
+    loadOwnedApplicationsForVacancies: vi.fn().mockResolvedValue({
+      ok: true,
+      applications: [],
+    }),
     ...overrides,
   };
 }
@@ -134,6 +138,10 @@ describe("loadCandidateMatches", () => {
       expect(result.matches).toHaveLength(1);
       expect(result.matches[0]?.vacancy.id).toBe(vacancyRow.id);
       expect(result.matches[0]?.reasons[0]?.code).toBe("category_match");
+      expect(result.applicationsByVacancyId.size).toBe(0);
+      expect(access.loadOwnedApplicationsForVacancies).toHaveBeenCalledWith([
+        vacancyRow.id,
+      ]);
     }
   });
 
@@ -184,7 +192,52 @@ describe("loadCandidateMatches", () => {
     });
 
     const result = await loadCandidateMatches(access);
-    expect(result).toEqual({ status: "success", matches: [] });
+    expect(result.status).toBe("success");
+    if (result.status === "success") {
+      expect(result.matches).toEqual([]);
+      expect(result.applicationsByVacancyId.size).toBe(0);
+    }
+    expect(access.loadOwnedApplicationsForVacancies).toHaveBeenCalledWith([]);
+  });
+
+  it("maps owned applications by vacancy id in one batched query", async () => {
+    const access = createAccess({
+      loadOwnedApplicationsForVacancies: vi.fn().mockResolvedValue({
+        ok: true,
+        applications: [
+          {
+            id: "33333333-3333-4333-8333-333333333301",
+            vacancy_id: vacancyRow.id,
+            status: "submitted",
+            submitted_at: "2026-08-03T14:30:00.000Z",
+          },
+        ],
+      }),
+    });
+
+    const result = await loadCandidateMatches(access);
+    expect(result.status).toBe("success");
+    if (result.status === "success") {
+      expect(result.applicationsByVacancyId.get(vacancyRow.id)).toEqual({
+        applicationId: "33333333-3333-4333-8333-333333333301",
+        vacancyId: vacancyRow.id,
+        status: "submitted",
+        submittedAt: "2026-08-03T14:30:00.000Z",
+      });
+    }
+    expect(access.loadOwnedApplicationsForVacancies).toHaveBeenCalledTimes(1);
+  });
+
+  it("fails safely when owned application lookup fails", async () => {
+    const access = createAccess({
+      loadOwnedApplicationsForVacancies: vi.fn().mockResolvedValue({
+        ok: false,
+      }),
+    });
+    expect(await loadCandidateMatches(access)).toEqual({
+      status: "failure",
+      reason: "load",
+    });
   });
 
   it("does not accept a caller-supplied candidate id parameter", () => {

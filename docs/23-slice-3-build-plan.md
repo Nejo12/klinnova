@@ -2,11 +2,10 @@
 
 > Planning artifact. Discovery in `docs/22-slice-3-discovery.md`.
 > Schema/journey proposal in `docs/24-slice-3-schema-and-journey-proposal.md`.
-> **Status:** Contracts Accepted 2026-08-03 (D-035–D-045). PR 3.1 merged.
-> PR 3.2 merged. PR 3.3 implementation in progress on
-> `feat/slice-3-application-preview-submit` (application preview and atomic
-> submission pending review; inline acknowledgement temporary until PR 3.4).
-> Slice 3 is not Done. PR 3.4 has not started.
+> **Status:** Contracts Accepted 2026-08-03 (D-035–D-045). PR 3.1–3.3 merged.
+> PR 3.4 implementation in progress on `feat/slice-3-application-confirmation`
+> (persistent confirmation and Applied state pending review). Slice 3 is not
+> Done. PR 3.5 has not started.
 
 **Outcome:** A completed candidate can open a matched Demo job, preview a
 profile-based application, submit exactly once, and see reload-safe confirmation
@@ -163,11 +162,7 @@ component a11y; Playwright smoke optional (full journey in 3.4).
 
 **Intent:** Preview essentials and submit exactly once.
 
-**Status:** Implementation in progress on branch
-`feat/slice-3-application-preview-submit` — application preview and atomic
-submission implemented locally; pending review / merge. Inline acknowledgement
-is temporary until PR 3.4 adds persistent confirmation and Applied state. Not
-marked complete before merge.
+**Status:** Done — merged.
 
 **Includes:** Preview section/step; Server Action (session, completed profile,
 RLS-visible vacancy, TypeScript matcher, `not_matching` reject, RPC with vacancy
@@ -194,6 +189,12 @@ trust for candidate identity or completion.
 ## PR 3.4 — Confirmation, applied state, critical journey
 
 **Intent:** Prove the vertical Slice 3 exit locally.
+
+**Status:** Implementation in progress on branch
+`feat/slice-3-application-confirmation` — persistent confirmation and Applied
+state implemented locally; pending review / merge. Slice 3 is not Done until
+this PR merges and exit proof/closure requirements are completed. Not marked
+complete before merge.
 
 **Includes:** Confirmation view reading stored application; Applied on
 matches/detail; Playwright critical journey + authz/lifecycle denials;
@@ -316,6 +317,6 @@ planned only.
 - [ ] No employer / save / CV / timeline dashboard shipped
 - [ ] Dashboard: Slice 3 Done → next slice planned
 
-PR 3.1 and PR 3.2 are merged. PR 3.3 implementation is in progress on branch;
-do not mark PR 3.3 complete before merge. Do not mark Slice 3 Done until hosted
-exit proof is recorded. PR 3.4 has not started.
+PR 3.1–3.3 are merged. PR 3.4 implementation is in progress on branch; do not
+mark PR 3.4 complete before merge. Do not mark Slice 3 Done until hosted exit
+proof is recorded. Do not start the next PR yet.

@@ -31,15 +31,28 @@ describe("resolveMatchesPageView", () => {
   it("returns success matches and empty success distinctly from failure", () => {
     const match = matchCandidateToVacancy(makeCandidate(), makeVacancy());
     expect(match).not.toBeNull();
+    const applicationsByVacancyId = new Map();
     expect(
-      resolveMatchesPageView({ status: "success", matches: [match!] }),
+      resolveMatchesPageView({
+        status: "success",
+        matches: [match!],
+        applicationsByVacancyId,
+      }),
     ).toEqual({
       kind: "success",
       matches: [match],
+      applicationsByVacancyId,
     });
-    expect(resolveMatchesPageView({ status: "success", matches: [] })).toEqual({
+    expect(
+      resolveMatchesPageView({
+        status: "success",
+        matches: [],
+        applicationsByVacancyId,
+      }),
+    ).toEqual({
       kind: "success",
       matches: [],
+      applicationsByVacancyId,
     });
     expect(
       resolveMatchesPageView({ status: "failure", reason: "load" }),

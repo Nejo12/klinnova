@@ -15,8 +15,7 @@ const actionMock = vi.hoisted(() =>
         | "failure";
       applicationId?: string;
     }> => ({
-      status: "submitted",
-      applicationId: "33333333-3333-4333-8333-333333333301",
+      status: "failure",
     }),
   ),
 );
@@ -27,12 +26,8 @@ vi.mock("@/app/candidate/jobs/[vacancyId]/actions", () => ({
 
 import { ApplicationSubmitForm } from "@/components/candidate-job-detail/application-submit-form";
 import {
-  APPLICATION_ALREADY_APPLIED_BODY,
-  APPLICATION_ALREADY_APPLIED_HEADING,
   APPLICATION_NOT_MATCHING_HEADING,
   APPLICATION_SUBMIT_DISCLOSURE,
-  APPLICATION_SUBMITTED_BODY,
-  APPLICATION_SUBMITTED_HEADING,
   APPLICATION_FAILURE_MESSAGE,
 } from "@/lib/applications/messages";
 
@@ -58,11 +53,9 @@ describe("ApplicationSubmitForm", () => {
     ).toBeEnabled();
   });
 
-  it("disables the button while pending and shows submitted acknowledgement", async () => {
+  it("disables the button while pending", async () => {
     const user = userEvent.setup();
-    let finish:
-      | ((value: { status: "submitted"; applicationId: string }) => void)
-      | undefined;
+    let finish: ((value: { status: "failure" }) => void) | undefined;
     actionMock.mockImplementationOnce(
       () =>
         new Promise((resolve) => {
@@ -80,28 +73,16 @@ describe("ApplicationSubmitForm", () => {
     });
     expect(pendingButton).toBeDisabled();
 
-    finish?.({
-      status: "submitted",
-      applicationId: "33333333-3333-4333-8333-333333333301",
-    });
-
-    expect(
-      await screen.findByText(APPLICATION_SUBMITTED_HEADING),
-    ).toBeInTheDocument();
-    expect(screen.getByText(APPLICATION_SUBMITTED_BODY)).toBeInTheDocument();
-    expect(screen.getByRole("status")).toBeInTheDocument();
-    expect(
-      screen.queryByText("33333333-3333-4333-8333-333333333301"),
-    ).toBeNull();
-    expect(
-      screen.queryByRole("button", { name: "Submit application" }),
-    ).toBeNull();
+    finish?.({ status: "failure" });
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      APPLICATION_FAILURE_MESSAGE,
+    );
   });
 
-  it("shows already-applied acknowledgement without rendering the application id", async () => {
+  it("does not show temporary submitted acknowledgement copy", async () => {
     const user = userEvent.setup();
     actionMock.mockResolvedValueOnce({
-      status: "already_applied",
+      status: "submitted",
       applicationId: "33333333-3333-4333-8333-333333333301",
     });
 
@@ -110,17 +91,10 @@ describe("ApplicationSubmitForm", () => {
       screen.getByRole("button", { name: "Submit application" }),
     );
 
-    expect(
-      await screen.findByText(APPLICATION_ALREADY_APPLIED_HEADING),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(APPLICATION_ALREADY_APPLIED_BODY),
-    ).toBeInTheDocument();
+    expect(screen.queryByText("Application submitted.")).toBeNull();
+    expect(screen.queryByText("Application already submitted.")).toBeNull();
     expect(
       screen.queryByText("33333333-3333-4333-8333-333333333301"),
-    ).toBeNull();
-    expect(
-      screen.queryByRole("button", { name: "Submit application" }),
     ).toBeNull();
   });
 

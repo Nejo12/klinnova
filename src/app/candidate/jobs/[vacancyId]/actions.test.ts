@@ -125,32 +125,44 @@ describe("submitCandidateApplicationAction", () => {
     expect(rpc).not.toHaveBeenCalled();
   });
 
-  it("calls the RPC once with only p_vacancy_id when currently matching", async () => {
+  it("redirects to confirmation after a successful submitted RPC", async () => {
     resolveCandidateVacancyMatch.mockResolvedValue(readyResolve());
     rpc.mockResolvedValue({
       data: { result: "submitted", application_id: APPLICATION_ID },
       error: null,
     });
 
-    const state = await submitCandidateApplicationAction(
-      initialSubmitCandidateApplicationState,
-      form(VACANCY_ID),
-    );
-
+    await expect(
+      submitCandidateApplicationAction(
+        initialSubmitCandidateApplicationState,
+        form(VACANCY_ID),
+      ),
+    ).rejects.toThrow(`REDIRECT:/candidate/applications/${APPLICATION_ID}`);
     expect(rpc).toHaveBeenCalledTimes(1);
     expect(rpc).toHaveBeenCalledWith("submit_candidate_application", {
       p_vacancy_id: VACANCY_ID,
     });
-    expect(state).toEqual({
-      status: "submitted",
-      applicationId: APPLICATION_ID,
-    });
   });
 
-  it("maps already_applied RPC results", async () => {
+  it("redirects to the same confirmation after already_applied", async () => {
     resolveCandidateVacancyMatch.mockResolvedValue(readyResolve());
     rpc.mockResolvedValue({
       data: { result: "already_applied", application_id: APPLICATION_ID },
+      error: null,
+    });
+
+    await expect(
+      submitCandidateApplicationAction(
+        initialSubmitCandidateApplicationState,
+        form(VACANCY_ID),
+      ),
+    ).rejects.toThrow(`REDIRECT:/candidate/applications/${APPLICATION_ID}`);
+  });
+
+  it("fails safely when a successful RPC omits a valid application id", async () => {
+    resolveCandidateVacancyMatch.mockResolvedValue(readyResolve());
+    rpc.mockResolvedValue({
+      data: { result: "submitted", application_id: "not-a-uuid" },
       error: null,
     });
 
@@ -159,10 +171,7 @@ describe("submitCandidateApplicationAction", () => {
       form(VACANCY_ID),
     );
 
-    expect(state).toEqual({
-      status: "already_applied",
-      applicationId: APPLICATION_ID,
-    });
+    expect(state).toEqual({ status: "failure" });
   });
 
   it("redirects when the RPC reports incomplete", async () => {
@@ -246,10 +255,12 @@ describe("submitCandidateApplicationAction", () => {
       data: { result: "submitted", application_id: APPLICATION_ID },
       error: null,
     });
-    await submitCandidateApplicationAction(
-      initialSubmitCandidateApplicationState,
-      form(VACANCY_ID),
-    );
+    await expect(
+      submitCandidateApplicationAction(
+        initialSubmitCandidateApplicationState,
+        form(VACANCY_ID),
+      ),
+    ).rejects.toThrow(`REDIRECT:/candidate/applications/${APPLICATION_ID}`);
     expect(resolveCandidateVacancyMatch).toHaveBeenLastCalledWith(VACANCY_ID);
     expect(rpc).toHaveBeenCalledTimes(1);
   });

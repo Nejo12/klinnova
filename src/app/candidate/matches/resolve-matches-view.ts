@@ -1,3 +1,4 @@
+import type { OwnedApplicationSummary } from "@/lib/applications/owned-application";
 import type {
   CandidateMatch,
   LoadCandidateMatchesResult,
@@ -5,7 +6,11 @@ import type {
 
 export type MatchesPageView =
   | { kind: "redirect"; href: string }
-  | { kind: "success"; matches: CandidateMatch[] }
+  | {
+      kind: "success";
+      matches: CandidateMatch[];
+      applicationsByVacancyId: ReadonlyMap<string, OwnedApplicationSummary>;
+    }
   | { kind: "failure" };
 
 /**
@@ -23,7 +28,11 @@ export function resolveMatchesPageView(
     case "onboarding_incomplete":
       return { kind: "redirect", href: "/candidate/onboarding" };
     case "success":
-      return { kind: "success", matches: result.matches };
+      return {
+        kind: "success",
+        matches: result.matches,
+        applicationsByVacancyId: result.applicationsByVacancyId,
+      };
     case "failure":
       return { kind: "failure" };
   }
