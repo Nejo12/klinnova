@@ -1,8 +1,8 @@
 # Slice 4 Build Plan
 
 > Planning artifact. No migrations or application code land here.
-> **Status:** Discovery / planning. Depends on Proposed D-046–D-054.
-> Do not open implementation PRs until decisions are Accepted.
+> **Status:** Contracts Accepted 2026-08-03 (D-046–D-054). Ready for PR 4.1.
+> Slice 4 implementation has **not** started in this package.
 
 **Outcome:** Employer registration → employer profile (private or organisation) →
 structured private draft vacancy.
@@ -20,33 +20,42 @@ structured private draft vacancy.
 5. Draft ownership is database-enforced.
 6. Caller never supplies owner IDs, verification state, source, or illegal
    lifecycle transitions.
-7. Hosted proof prefers isolated Preview (D-054); Production not authorized here.
+7. Hosted proof prefers isolated Preview (D-054); Production not authorized by
+   D-054.
 
 ---
 
-## PR sequence (recommended)
+## PR sequence (accepted)
 
 ### PR 4.1 — Employer identity, profiles, company ownership, RLS
 
 **Intent:** Persist employer capability without breaking candidates.
+**Authorized next unit** after the decision-acceptance PR merges.
 
 **Includes:**
 
 - `employer_profiles` (1:1 `auth.users`)
-- `employer_type` (`private` \| `organisation`) immutable after insert
+- `employer_type` (`private` \| `organisation`) with D-048 locking invariant
+  (changeable only while incomplete and no employer company/draft; completion
+  locks; server/database rejects later changes)
 - private vs organisation field subsets
 - organisation → exactly one `companies` row owned by that employer
 - extend `companies` for employer-owned rows (`source` allow `employer`; owner FK)
 - keep seed companies `source = seed` without Auth owner
 - employer completion column + validation rules (server-owned)
-- pgTAP: structure, constraints, RLS isolation, dual-capability coexistence
+- atomic organisation/company bootstrap RPC when required
+- pgTAP: structure, constraints, type-locking, RLS isolation, dual-capability
+  coexistence
 - generated types
+- documentation synchronization
 
-**Excludes:** Vacancy draft columns beyond what’s needed for FK prep; UI;
-publication; verification evidence.
+**Excludes:** Employer onboarding UI; employer vacancy/draft schema; vacancy
+routes; draft forms; publication; verification approval; hosted migration
+execution; Slice 5 or Slice 6.
 
 **Exit:** Authenticated employer can own profile (+ company when org) under RLS;
-candidates cannot read/write employer rows; anon denied.
+candidates cannot read/write employer rows; anon denied; type-lock invariants
+proven.
 
 ### PR 4.2 — Employer registration and onboarding UI
 
@@ -61,7 +70,8 @@ candidates cannot read/write employer rows; anon denied.
 - candidate-only authenticated users redirected with clear next step to start
   employer onboarding (no silent candidate-profile creation from employer
   routes)
-- dual-capability navigation when both profiles exist
+- dual-capability navigation when both profiles exist (intent/`next` first;
+  role-choice when no intent; no hidden default-role — D-047)
 - Vitest + Playwright happy path for profile completion
 - copy: no verified claims
 
@@ -84,9 +94,10 @@ employer home; incomplete employers cannot reach vacancy create.
   frequency, description, etc.)
 - `expires_at` nullable while draft
 - language requirements writable for owned drafts
+- scoped draft deletion per D-050
 - visibility helpers: drafts excluded from `visible_seed_*` / matcher loaders /
   submit RPC vacancy gates
-- pgTAP RLS matrix for draft isolation
+- pgTAP RLS matrix for draft isolation + delete rules
 - generated types
 
 **Excludes:** Publish transitions; UI forms (may stub types only).
@@ -204,11 +215,12 @@ Must all pass before claiming local readiness:
 
 ## Slice 4 close checklist (planning)
 
-- [ ] D-046–D-054 Accepted
+- [x] D-046–D-054 Accepted (2026-08-03)
 - [ ] PR 4.1–4.5 merged
 - [ ] Local critical journey green
-- [ ] Hosted proof recorded under Accepted strategy
+- [ ] Hosted proof recorded under Accepted D-054 strategy
 - [ ] No publication / verification approval / applicant review shipped
 - [ ] Dashboard: Slice 4 Done → Slice 5 planned separately
 
-Do not mark Slice 4 Done from this discovery package.
+Do not mark Slice 4 Done from the decision-acceptance package.
+Do not start PR 4.1 inside the decision-acceptance package.

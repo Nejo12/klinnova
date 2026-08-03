@@ -109,7 +109,11 @@ Each slice is the unit of planning, implementation, and review. Size for roughly
 - required eligibility fields are explicit before publish is possible later
 - exact private residential addresses are not publicly exposed
 
-**Planning status:** Discovery / planning package in `docs/28`–`docs/30`. Proposed decisions D-046–D-054 in `docs/10-decisions.md`. Implementation has **not** started; do not open PR 4.1 until those decisions are Accepted. Verification and publication remain Slice 5.
+**Planning status:** Contracts Accepted 2026-08-03 (D-046–D-054) in
+`docs/10-decisions.md`. Planning package `docs/28`–`docs/30` locked. Slice 4
+implementation has **not** started. Next authorized unit after
+decision-acceptance merge: **PR 4.1 — employer identity/profile schema and RLS**.
+Verification and publication remain Slice 5.
 
 ### Slice 5 — Employer verification to public vacancy
 
