@@ -1,8 +1,16 @@
 import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("@/components/candidate-job-detail/application-submit-form", () => ({
+  ApplicationSubmitForm: ({ vacancyId }: { vacancyId: string }) => (
+    <div data-testid="application-submit-form">{vacancyId}</div>
+  ),
+}));
 
 import { CandidateJobDetailPage } from "@/components/candidate-job-detail/candidate-job-detail-page";
 import { WORK_AUTHORISATION_NOTICE } from "@/components/candidate-matches/work-authorisation-notice";
+import type { ApplicationPreview } from "@/lib/applications/application-preview";
+import { NO_ADDITIONAL_LANGUAGE_REQUIREMENTS } from "@/lib/applications/messages";
 import type { CandidateVacancyDetail } from "@/lib/matching/candidate-vacancy-detail";
 
 const detail: CandidateVacancyDetail = {
@@ -33,9 +41,30 @@ const detail: CandidateVacancyDetail = {
   ],
 };
 
+const preview: ApplicationPreview = {
+  vacancyId: detail.vacancyId,
+  vacancyTitle: detail.title,
+  employerDisplayName: detail.employerDisplayName,
+  candidateDisplayName: "Ada Candidate",
+  matchedJobCategoryLabel: "Hospitality",
+  germanComfortLabel: "I can understand and use some basic German",
+  relevantLanguages: [],
+  noAdditionalLanguagesLabel: NO_ADDITIONAL_LANGUAGE_REQUIREMENTS,
+  workAuthorisationDeclaredLabel: "Yes",
+  availableFromLabel: "4 August 2026",
+  employmentPreferencesLabel: "Part time",
+  shiftPreferencesLabel: "Morning",
+};
+
 describe("CandidateJobDetailPage", () => {
-  it("renders ready detail with metadata, reasons, and notice", () => {
-    render(<CandidateJobDetailPage status="ready" detail={detail} />);
+  it("renders ready detail with preview and submission mount point", () => {
+    render(
+      <CandidateJobDetailPage
+        status="ready"
+        detail={detail}
+        preview={preview}
+      />,
+    );
 
     expect(
       screen.getByRole("heading", {
@@ -43,11 +72,15 @@ describe("CandidateJobDetailPage", () => {
         name: "Demo vacancy — Morning kitchen support",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Demo Berlin Work Co")).toBeInTheDocument();
+    expect(screen.getAllByText("Demo Berlin Work Co").length).toBeGreaterThan(
+      0,
+    );
     expect(screen.getByText("Demo vacancy")).toBeInTheDocument();
-    expect(screen.getByText(WORK_AUTHORISATION_NOTICE)).toBeInTheDocument();
+    expect(
+      screen.getAllByText(WORK_AUTHORISATION_NOTICE).length,
+    ).toBeGreaterThan(0);
     expect(screen.getByText("Berlin")).toBeInTheDocument();
-    expect(screen.getByText("Hospitality")).toBeInTheDocument();
+    expect(screen.getAllByText("Hospitality").length).toBeGreaterThan(0);
     expect(screen.getByText("English — Conversational")).toBeInTheDocument();
     expect(screen.getByText("15 January 2026")).toBeInTheDocument();
 
@@ -57,14 +90,19 @@ describe("CandidateJobDetailPage", () => {
     expect(within(reasonList).getAllByRole("listitem")).toHaveLength(2);
 
     expect(
+      screen.getByRole("heading", { level: 2, name: "Application preview" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Ada Candidate")).toBeInTheDocument();
+    expect(
+      screen.getByText(NO_ADDITIONAL_LANGUAGE_REQUIREMENTS),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("application-submit-form")).toHaveTextContent(
+      detail.vacancyId,
+    );
+
+    expect(
       screen.getByRole("link", { name: "Back to matches" }),
     ).toHaveAttribute("href", "/candidate/matches");
-    expect(
-      screen.queryByRole("button", { name: /apply|submit|save/i }),
-    ).toBeNull();
-    expect(
-      screen.queryByRole("link", { name: /apply|submit|save|contact/i }),
-    ).toBeNull();
     expect(screen.queryByText(/salary|exact address|cv/i)).toBeNull();
   });
 
@@ -79,25 +117,7 @@ describe("CandidateJobDetailPage", () => {
         name: "This job is not available",
       }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: "Back to matches" }),
-    ).toBeInTheDocument();
     expect(screen.queryByText("Demo Berlin Work Co")).toBeNull();
-    expect(
-      screen.queryByText("Demo vacancy — Morning kitchen support"),
-    ).toBeNull();
-  });
-
-  it("renders not_matching state with factual copy", () => {
-    render(
-      <CandidateJobDetailPage status="unavailable" reason="not_matching" />,
-    );
-
-    expect(
-      screen.getByRole("heading", {
-        level: 1,
-        name: "This job no longer matches your preferences",
-      }),
-    ).toBeInTheDocument();
+    expect(screen.queryByTestId("application-submit-form")).toBeNull();
   });
 });

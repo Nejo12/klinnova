@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { resolveJobDetailPageView } from "@/app/candidate/jobs/[vacancyId]/resolve-job-detail-view";
+import type { ApplicationPreview } from "@/lib/applications/application-preview";
 import type { CandidateVacancyDetail } from "@/lib/matching/candidate-vacancy-detail";
 
 const VACANCY_ID = "22222222-2222-4222-8222-222222222201";
@@ -20,6 +21,21 @@ const detail = {
   listedOnLabel: "15 January 2026",
   matchReasons: [{ key: "berlin_job", text: "Based in Berlin" }],
 } satisfies CandidateVacancyDetail;
+
+const preview = {
+  vacancyId: VACANCY_ID,
+  vacancyTitle: "Demo vacancy — Morning kitchen support",
+  employerDisplayName: "Demo Berlin Work Co",
+  candidateDisplayName: "Ada",
+  matchedJobCategoryLabel: "Hospitality",
+  germanComfortLabel: "I can understand and use some basic German",
+  relevantLanguages: [],
+  noAdditionalLanguagesLabel: "No additional language requirements",
+  workAuthorisationDeclaredLabel: "Yes",
+  availableFromLabel: "4 August 2026",
+  employmentPreferencesLabel: "Part time",
+  shiftPreferencesLabel: "Morning",
+} satisfies ApplicationPreview;
 
 describe("resolveJobDetailPageView", () => {
   it("redirects unauthenticated visitors to login with next", () => {
@@ -55,12 +71,17 @@ describe("resolveJobDetailPageView", () => {
     });
   });
 
-  it("returns ready detail without redirects", () => {
+  it("returns ready detail and preview without redirects", () => {
     expect(
-      resolveJobDetailPageView(VACANCY_ID, { status: "ready", detail }),
+      resolveJobDetailPageView(VACANCY_ID, {
+        status: "ready",
+        detail,
+        preview,
+      }),
     ).toEqual({
       kind: "ready",
       detail,
+      preview,
     });
   });
 });

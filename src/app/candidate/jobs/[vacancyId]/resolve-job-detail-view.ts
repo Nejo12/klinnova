@@ -1,9 +1,14 @@
+import type { ApplicationPreview } from "@/lib/applications/application-preview";
 import type { CandidateVacancyDetail } from "@/lib/matching/candidate-vacancy-detail";
 import type { LoadCandidateVacancyDetailResult } from "@/lib/matching/load-candidate-vacancy-detail";
 
 export type JobDetailPageView =
   | { kind: "redirect"; href: string }
-  | { kind: "ready"; detail: CandidateVacancyDetail }
+  | {
+      kind: "ready";
+      detail: CandidateVacancyDetail;
+      preview: ApplicationPreview;
+    }
   | { kind: "unavailable"; reason: "unavailable" | "not_matching" }
   | { kind: "failure" };
 
@@ -30,7 +35,11 @@ export function resolveJobDetailPageView(
     case "not_matching":
       return { kind: "unavailable", reason: "not_matching" };
     case "ready":
-      return { kind: "ready", detail: result.detail };
+      return {
+        kind: "ready",
+        detail: result.detail,
+        preview: result.preview,
+      };
     case "failure":
       return { kind: "failure" };
   }

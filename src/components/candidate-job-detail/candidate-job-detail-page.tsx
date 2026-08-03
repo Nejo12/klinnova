@@ -1,14 +1,21 @@
 import Link from "next/link";
 
 import { LogoutButton } from "@/components/auth/logout-button";
-import { WorkAuthorisationNotice } from "@/components/candidate-matches/work-authorisation-notice";
+import { ApplicationPreviewSection } from "@/components/candidate-job-detail/application-preview-section";
+import { ApplicationSubmitForm } from "@/components/candidate-job-detail/application-submit-form";
 import { JobDetailUnavailable } from "@/components/candidate-job-detail/job-detail-unavailable";
+import { WorkAuthorisationNotice } from "@/components/candidate-matches/work-authorisation-notice";
+import type { ApplicationPreview } from "@/lib/applications/application-preview";
 import type { CandidateVacancyDetail } from "@/lib/matching/candidate-vacancy-detail";
 
 import styles from "./candidate-job-detail.module.scss";
 
 type CandidateJobDetailPageProps =
-  | { status: "ready"; detail: CandidateVacancyDetail }
+  | {
+      status: "ready";
+      detail: CandidateVacancyDetail;
+      preview: ApplicationPreview;
+    }
   | { status: "unavailable"; reason: "unavailable" | "not_matching" }
   | { status: "failure" };
 
@@ -29,7 +36,7 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
     );
   }
 
-  const { detail } = props;
+  const { detail, preview } = props;
   const reasonsHeadingId = `job-reasons-${detail.vacancyId}`;
   const languagesHeadingId = `job-languages-${detail.vacancyId}`;
 
@@ -132,6 +139,9 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
           </ul>
         </section>
       ) : null}
+
+      <ApplicationPreviewSection preview={preview} />
+      <ApplicationSubmitForm vacancyId={detail.vacancyId} />
     </main>
   );
 }
