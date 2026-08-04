@@ -60,7 +60,7 @@ select throws_ok(
   $$,
   '23514',
   null,
-  'companies.source rejects non-seed'
+  'companies.source=employer requires owner_employer_id'
 );
 
 select throws_ok(
@@ -328,7 +328,7 @@ select throws_ok(
   $$,
   '23514',
   null,
-  'publication_state only published or withdrawn'
+  'seed vacancies cannot use publication_state=draft'
 );
 
 select throws_ok(

@@ -10,22 +10,23 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M3 — Employer flow |
 | Active slice | Slice 4 — Employer registration to draft vacancy |
-| Slice status | PR 4.2 implementation prepared — employer registration/onboarding UI locally validated; not merged; D-046–D-054 remain Accepted |
+| Slice status | PR 4.3 implementation prepared — employer draft vacancy schema/RLS/RPCs locally validated; not Done until merge; D-046–D-054 remain Accepted |
 | Next slice | Slice 5 — Employer verification to public vacancy (**not started**) |
-| Blockers | None for PR 4.2 review/merge. PR 4.3 (draft vacancies) not started. Preview isolation remains an infrastructure follow-up for preferred hosted proofs (D-054). Hosted Demo fixtures remain in Production until 2026-09-02. |
+| Blockers | None for PR 4.3 review/merge. Employer vacancy UI (PR 4.4), publication, and verification not started. Preview isolation remains an infrastructure follow-up for preferred hosted proofs (D-054). Hosted Demo fixtures remain in Production until 2026-09-02. |
 
-## Slice 4 delivery (PR 4.2 prepared)
+## Slice 4 delivery (PR 4.3 prepared)
 
 | Artifact | Status |
 |----------|--------|
 | `docs/28-slice-4-discovery.md` | Locked — contracts Accepted 2026-08-03 |
-| `docs/29-slice-4-build-plan.md` | Locked — PR 4.1–4.5 sequence; PR 4.2 implementation prepared |
+| `docs/29-slice-4-build-plan.md` | Locked — PR 4.1–4.5 sequence; PR 4.3 implementation prepared |
 | `docs/30-slice-4-schema-and-journey-proposal.md` | Locked — schema/routes/RLS Accepted |
 | D-034 | Accepted — private vs organisation employers (product boundary) |
 | D-046–D-054 | Accepted 2026-08-03 (type-lock + intent routing refinements) |
 | PR 4.1 — employer identity/profile schema and RLS | Done |
-| PR 4.2 — employer registration and onboarding UI | Implementation prepared — local validation; not Done until merge |
-| PR 4.3+ | Not started |
+| PR 4.2 — employer registration and onboarding UI | Done |
+| PR 4.3 — draft vacancy schema, languages, RLS, RPCs | Implementation prepared — local validation; not Done until merge |
+| Employer vacancy UI / publication / verification | Not started |
 | Slice 5 / Slice 6 | Not started |
 
 ## Slice 3 delivery (complete)
@@ -128,7 +129,7 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 | 1 Onboarding | Register → persisted essentials | Done — PR 1.1–1.4 merged (#21–#23); hosted migration + production smoke confirmed; D-018–D-025 Accepted |
 | 2 Matches | Essentials → seeded explainable matches | Done — PR 2.1–2.4 merged (#26–#29); hosted Production proof complete; Demo fixtures expire 2026-09-02 |
 | 3 Apply | Job detail → submitted application | Done — PR 3.1–3.5 merged (#33–#37); local + Production hosted proof complete; D-035–D-045 complete; Demo fixtures expire 2026-09-02 |
-| 4 Employer draft | Register → draft vacancy | Ready for PR 4.1 — D-046–D-054 Accepted 2026-08-03; implementation not started |
+| 4 Employer draft | Register → draft vacancy | PR 4.1–4.2 Done; PR 4.3 implementation prepared — draft schema/RLS; vacancy UI not started |
 | 5 Publish | Verification → public vacancy | Not started |
 | 6 Review | Applicant review → status update | Not started |
 | 7 Trust ops | Admin moderation → audit | Not started |
