@@ -1,9 +1,10 @@
 # Slice 4 Schema and Journey Proposal
 
 > Design proposal locked by Accepted D-046–D-054 (2026-08-03).
-> **Status:** PR 4.1–4.3 Done. PR 4.4 implementation prepared (employer draft
-> vacancy UI); proposal text remains the Accepted contract. Publication and
-> verification not started.
+> **Status:** PR 4.1–4.4 Done. PR 4.5 implementation prepared (local exit proof
+> + hosted readiness); proposal text remains the Accepted contract. Hosted proof
+> not executed. Production authorization not granted. Publication and
+> verification not started. Slice 4 not complete.
 
 **Depends on:** Accepted D-034; Accepted D-046–D-054; current migrations through
 `20260804120000_employer_owned_draft_vacancies.sql`.

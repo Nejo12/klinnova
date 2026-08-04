@@ -148,14 +148,16 @@ At the same time, validate that employers can:
 - [Slice 3 hosted-proof runbook](docs/26-slice-3-hosted-proof-runbook.md) (Production fallback executed 2026-08-03)
 - [Slice 3 closure evidence](docs/27-slice-3-closure.md) (complete; hosted Production proof recorded)
 - [Slice 4 discovery](docs/28-slice-4-discovery.md) (contracts Accepted 2026-08-03; D-046–D-054)
-- [Slice 4 build plan](docs/29-slice-4-build-plan.md) (PR 4.1–4.3 Done; PR 4.4 prepared)
-- [Slice 4 schema and journey proposal](docs/30-slice-4-schema-and-journey-proposal.md) (contracts Accepted; PR 4.4 prepared)
+- [Slice 4 build plan](docs/29-slice-4-build-plan.md) (PR 4.1–4.4 Done; PR 4.5 prepared)
+- [Slice 4 schema and journey proposal](docs/30-slice-4-schema-and-journey-proposal.md) (contracts Accepted; PR 4.5 prepared)
+- [Slice 4 exit proof (local)](docs/31-slice-4-exit-proof.md) (tooling prepared; local proof via `pnpm proof:slice4`; hosted not executed)
+- [Slice 4 hosted-proof runbook](docs/32-slice-4-hosted-proof-runbook.md) (prepared; not executed; Production not authorized)
 - [Not now](NOT_NOW.md)
 - [Agent instructions](AGENTS.md)
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, Slice 2, and Slice 3 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Slice 3 delivered candidate job detail, application preview/submit, snapshot-backed confirmation, Applied state, local exit proof, and owner-authorized Production hosted proof (PR #33–#37; closure in `docs/27-slice-3-closure.md`). Hosted Demo fixtures on `https://stint.company` / project `kvrzmzoszitdicjvrprt` remain retained until 2026-09-02. Slice 4 contracts are **Accepted** (D-046–D-054, 2026-08-03; `docs/28`–`docs/30`). **PR 4.1–4.3** (employer profile, onboarding UI, draft vacancy schema/RLS/RPCs) are Done. **PR 4.4** (employer draft vacancy UI) is implementation-prepared locally and not Done until merge. Publication and verification have **not** started. Slice 5/6 have not started. Product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, Slice 2, and Slice 3 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Slice 3 delivered candidate job detail, application preview/submit, snapshot-backed confirmation, Applied state, local exit proof, and owner-authorized Production hosted proof (PR #33–#37; closure in `docs/27-slice-3-closure.md`). Hosted Demo fixtures on `https://stint.company` / project `kvrzmzoszitdicjvrprt` remain retained until 2026-09-02. Slice 4 contracts are **Accepted** (D-046–D-054, 2026-08-03; `docs/28`–`docs/32`). **PR 4.1–4.4** (employer profile, onboarding UI, draft vacancy schema/RLS/RPCs, draft vacancy UI) are Done. **PR 4.5** (local exit proof + hosted readiness) is implementation-prepared and not Done until merge. Local proof uses `pnpm proof:slice4`. Hosted Slice 4 proof and Production authorization have **not** been executed/granted. Publication and verification have **not** started. Slice 4 is **not** complete until hosted proof and closure are accepted. Slice 5/6 have not started. Product scope remains `docs/04-mvp.md`.
 
 ## Local development
 
@@ -358,6 +360,10 @@ Environment access goes through `src/lib/env/`. Do not read `process.env` ad hoc
 | `pnpm test:run`          | Vitest single run                           |
 | `pnpm test:coverage`     | Vitest run with coverage                    |
 | `pnpm test:e2e`          | Playwright shell smoke                      |
+| `pnpm test:e2e:employer` | Employer onboarding + vacancy draft E2E     |
+| `pnpm test:e2e:slice3`   | Slice 3 candidate critical journey E2E      |
+| `pnpm proof:migrations`  | Local migration inventory (checksums only)  |
+| `pnpm proof:slice4`      | Local Slice 4 exit-proof orchestrator       |
 | `pnpm supabase:start`    | Start local Supabase (project-pinned CLI)   |
 | `pnpm supabase:stop`     | Stop local Supabase                         |
 | `pnpm supabase:status`   | Show local URL and keys                     |

@@ -10,23 +10,29 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M3 — Employer flow |
 | Active slice | Slice 4 — Employer registration to draft vacancy |
-| Slice status | PR 4.4 implementation prepared — employer draft vacancy UI locally validated; not Done until merge; D-046–D-054 remain Accepted |
+| Slice status | PR 4.5 implementation prepared — local exit proof tooling + hosted runbook; not Done until merge; hosted proof not executed; D-046–D-054 remain Accepted |
 | Next slice | Slice 5 — Employer verification to public vacancy (**not started**) |
-| Blockers | None for PR 4.4 review/merge. Publication and verification not started. Preview isolation remains an infrastructure follow-up for preferred hosted proofs (D-054). Hosted Demo fixtures remain in Production until 2026-09-02. |
+| Blockers | None for PR 4.5 review/merge. Hosted Slice 4 proof not executed. Production authorization not granted. Preview isolation remains an infrastructure follow-up for preferred hosted proofs (D-054). Publication and verification not started. Hosted Demo fixtures remain in Production until 2026-09-02. |
 
-## Slice 4 delivery (PR 4.4 prepared)
+## Slice 4 delivery (PR 4.5 prepared)
 
 | Artifact | Status |
 |----------|--------|
 | `docs/28-slice-4-discovery.md` | Locked — contracts Accepted 2026-08-03 |
-| `docs/29-slice-4-build-plan.md` | Locked — PR 4.1–4.5 sequence; PR 4.4 implementation prepared |
+| `docs/29-slice-4-build-plan.md` | Locked — PR 4.1–4.5 sequence; PR 4.5 implementation prepared |
 | `docs/30-slice-4-schema-and-journey-proposal.md` | Locked — schema/routes/RLS Accepted |
+| `docs/31-slice-4-exit-proof.md` | Prepared — local evidence matrix + `pnpm proof:slice4`; hosted not executed |
+| `docs/32-slice-4-hosted-proof-runbook.md` | Prepared — Phase A–D; Production not authorized |
 | D-034 | Accepted — private vs organisation employers (product boundary) |
 | D-046–D-054 | Accepted 2026-08-03 (type-lock + intent routing refinements) |
 | PR 4.1 — employer identity/profile schema and RLS | Done |
 | PR 4.2 — employer registration and onboarding UI | Done |
 | PR 4.3 — draft vacancy schema, languages, RLS, RPCs | Done |
-| PR 4.4 — employer draft vacancy UI | Implementation prepared — local validation; not Done until merge |
+| PR 4.4 — employer draft vacancy UI | Done |
+| PR 4.5 — local exit proof + hosted readiness | Implementation prepared — not Done until merge |
+| Local Slice 4 exit proof | Pass on `chore/slice-4-exit-proof` via `pnpm proof:slice4` (hosted still not executed) |
+| Hosted Slice 4 proof | Not executed |
+| Production authorization | Not granted |
 | Publication / verification | Not started |
 | Slice 5 / Slice 6 | Not started |
 
