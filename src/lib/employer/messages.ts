@@ -20,4 +20,4 @@ export const EMPLOYER_VERIFICATION_NOTICE =
   "Your employer profile is complete and unverified. Verification and vacancy publication come later.";
 
 export const EMPLOYER_HOME_LEAD =
-  "Your employer profile is ready. Vacancy drafts and publication are not available yet.";
+  "Your employer profile is ready. Create private vacancy drafts now. Publication and verification come later.";
