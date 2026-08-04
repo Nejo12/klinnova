@@ -7,7 +7,7 @@ fixture tooling remains `supabase/fixtures/hosted/` (D-031) for candidate seed
 inventory only. Employer proof fixtures are separate fictional Auth users and
 must not reuse personal identities.
 
-**Execution status:** Not executed. This PR prepares the runbook only.
+**Execution status:** Executed 2026-08-04 (Run ID `20260804T2039Z`) against Preview + disposable project `wbucxaquktraobrvknts`. Evidence/closure: `docs/33-slice-4-closure.md`. Production was not used.
 
 **D-054 reminder:** Accepting D-054 does **not** authorize Production hosted
 proof. Any Production fallback requires a **new** explicit written authorization
@@ -51,8 +51,13 @@ These are project/fixture identifiers only. They are not credentials.
 2. Dedicated Staging project
 3. Production only with a new explicit authorization (template below)
 
-Current Preview isolation sharing Production DB vars remains a **blocker for the
-preferred path** until corrected. That blocker is not authorization for Production.
+**Post-run state (2026-08-04):** Slice 4 hosted proof used a temporary disposable
+project + Preview overrides, then deleted the disposable project and cleared
+Preview-scoped Supabase variables. Preview currently has **no** Preview-scoped
+Supabase configuration and must not be assumed isolated or usable for the next
+hosted proof. Re-establish a new isolated database and matching Preview env
+before any future hosted mutation. Never silently fall back to Production
+credentials. This residual gap is not authorization for Production.
 
 ---
 

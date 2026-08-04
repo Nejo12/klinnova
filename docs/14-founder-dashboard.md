@@ -9,30 +9,31 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | Field | Value |
 |-------|--------|
 | Active milestone | M3 — Employer flow |
-| Active slice | Slice 4 — Employer registration to draft vacancy |
-| Slice status | PR 4.5 implementation prepared — local exit proof tooling + hosted runbook; not Done until merge; hosted proof not executed; D-046–D-054 remain Accepted |
+| Active slice | Slice 4 — Employer registration to draft vacancy (**Done**) |
+| Slice status | Done — PR 4.1–4.5 merged (#41–#45); local + Preview/disposable hosted proof complete; disposable project deleted; D-046–D-054 complete for draft path |
 | Next slice | Slice 5 — Employer verification to public vacancy (**not started**) |
-| Blockers | None for PR 4.5 review/merge. Hosted Slice 4 proof not executed. Production authorization not granted. Preview isolation remains an infrastructure follow-up for preferred hosted proofs (D-054). Publication and verification not started. Hosted Demo fixtures remain in Production until 2026-09-02. |
+| Blockers | None for Slice 4. Slice 5 not started. Publication/verification not started. Preview currently has no Preview-scoped Supabase overrides after proof cleanup (re-isolate before next hosted proof). Hosted Demo fixtures remain in Production until 2026-09-02. |
 
-## Slice 4 delivery (PR 4.5 prepared)
+## Slice 4 delivery (complete)
 
 | Artifact | Status |
 |----------|--------|
 | `docs/28-slice-4-discovery.md` | Locked — contracts Accepted 2026-08-03 |
-| `docs/29-slice-4-build-plan.md` | Locked — PR 4.1–4.5 sequence; PR 4.5 implementation prepared |
+| `docs/29-slice-4-build-plan.md` | Locked — PR 4.1–4.5 sequence complete |
 | `docs/30-slice-4-schema-and-journey-proposal.md` | Locked — schema/routes/RLS Accepted |
-| `docs/31-slice-4-exit-proof.md` | Prepared — local evidence matrix + `pnpm proof:slice4`; hosted not executed |
-| `docs/32-slice-4-hosted-proof-runbook.md` | Prepared — Phase A–D; Production not authorized |
+| `docs/31-slice-4-exit-proof.md` | Done — local evidence via `pnpm proof:slice4` |
+| `docs/32-slice-4-hosted-proof-runbook.md` | Done — Preview/disposable run executed 2026-08-04 |
+| `docs/33-slice-4-closure.md` | Done — Slice 4 closed after hosted Preview/disposable proof |
 | D-034 | Accepted — private vs organisation employers (product boundary) |
-| D-046–D-054 | Accepted 2026-08-03 (type-lock + intent routing refinements) |
-| PR 4.1 — employer identity/profile schema and RLS | Done |
-| PR 4.2 — employer registration and onboarding UI | Done |
-| PR 4.3 — draft vacancy schema, languages, RLS, RPCs | Done |
-| PR 4.4 — employer draft vacancy UI | Done |
-| PR 4.5 — local exit proof + hosted readiness | Implementation prepared — not Done until merge |
-| Local Slice 4 exit proof | Pass on `chore/slice-4-exit-proof` via `pnpm proof:slice4` (hosted still not executed) |
-| Hosted Slice 4 proof | Not executed |
-| Production authorization | Not granted |
+| D-046–D-054 | Accepted 2026-08-03; Slice 4 draft-path acceptance complete |
+| PR 4.1 — employer identity/profile schema and RLS | Done (merged; PR #41) |
+| PR 4.2 — employer registration and onboarding UI | Done (merged; PR #42) |
+| PR 4.3 — draft vacancy schema, languages, RLS, RPCs | Done (merged; PR #43) |
+| PR 4.4 — employer draft vacancy UI | Done (merged; PR #44) |
+| PR 4.5 — local exit proof + hosted readiness | Done (merged; PR #45) |
+| Local Slice 4 exit proof | Pass via `pnpm proof:slice4` |
+| Hosted Slice 4 proof | Done — Preview + disposable `wbucxaquktraobrvknts` (deleted after proof) |
+| Production authorization | Not used / not granted for Slice 4 hosted proof |
 | Publication / verification | Not started |
 | Slice 5 / Slice 6 | Not started |
 
@@ -136,7 +137,7 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 | 1 Onboarding | Register → persisted essentials | Done — PR 1.1–1.4 merged (#21–#23); hosted migration + production smoke confirmed; D-018–D-025 Accepted |
 | 2 Matches | Essentials → seeded explainable matches | Done — PR 2.1–2.4 merged (#26–#29); hosted Production proof complete; Demo fixtures expire 2026-09-02 |
 | 3 Apply | Job detail → submitted application | Done — PR 3.1–3.5 merged (#33–#37); local + Production hosted proof complete; D-035–D-045 complete; Demo fixtures expire 2026-09-02 |
-| 4 Employer draft | Register → draft vacancy | PR 4.1–4.3 Done; PR 4.4 implementation prepared — vacancy draft UI; publication not started |
+| 4 Employer draft | Register → draft vacancy | Done — PR 4.1–4.5 merged (#41–#45); local + Preview/disposable hosted proof complete; publication not started |
 | 5 Publish | Verification → public vacancy | Not started |
 | 6 Review | Applicant review → status update | Not started |
 | 7 Trust ops | Admin moderation → audit | Not started |
