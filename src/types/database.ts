@@ -239,59 +239,95 @@ export type Database = {
         Row: {
           available_from: string | null
           city: string
-          company_id: string
+          company_id: string | null
           created_at: string
+          cv_required: boolean | null
+          description: string | null
+          employer_profile_id: string | null
           employment_types: string[]
-          expires_at: string
+          experience_notes: string | null
+          expires_at: string | null
           german_requirement: string
           id: string
+          interview_english_ok: boolean | null
           job_category: string
+          public_locality: string | null
           publication_state: string
           published_at: string | null
+          salary_amount_cents: number | null
+          salary_currency: string | null
+          salary_is_gross: boolean | null
+          salary_period: string | null
           shift_requirements: string[]
           slug: string
           source: string
           summary: string
           title: string
           updated_at: string
+          work_frequency: string | null
+          workplace_type: string | null
         }
         Insert: {
           available_from?: string | null
           city: string
-          company_id: string
+          company_id?: string | null
           created_at?: string
+          cv_required?: boolean | null
+          description?: string | null
+          employer_profile_id?: string | null
           employment_types: string[]
-          expires_at: string
+          experience_notes?: string | null
+          expires_at?: string | null
           german_requirement: string
           id?: string
+          interview_english_ok?: boolean | null
           job_category: string
+          public_locality?: string | null
           publication_state: string
           published_at?: string | null
+          salary_amount_cents?: number | null
+          salary_currency?: string | null
+          salary_is_gross?: boolean | null
+          salary_period?: string | null
           shift_requirements: string[]
           slug: string
           source: string
           summary: string
           title: string
           updated_at?: string
+          work_frequency?: string | null
+          workplace_type?: string | null
         }
         Update: {
           available_from?: string | null
           city?: string
-          company_id?: string
+          company_id?: string | null
           created_at?: string
+          cv_required?: boolean | null
+          description?: string | null
+          employer_profile_id?: string | null
           employment_types?: string[]
-          expires_at?: string
+          experience_notes?: string | null
+          expires_at?: string | null
           german_requirement?: string
           id?: string
+          interview_english_ok?: boolean | null
           job_category?: string
+          public_locality?: string | null
           publication_state?: string
           published_at?: string | null
+          salary_amount_cents?: number | null
+          salary_currency?: string | null
+          salary_is_gross?: boolean | null
+          salary_period?: string | null
           shift_requirements?: string[]
           slug?: string
           source?: string
           summary?: string
           title?: string
           updated_at?: string
+          work_frequency?: string | null
+          workplace_type?: string | null
         }
         Relationships: [
           {
@@ -299,6 +335,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vacancies_employer_profile_id_fkey"
+            columns: ["employer_profile_id"]
+            isOneToOne: false
+            referencedRelation: "employer_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -370,9 +413,53 @@ export type Database = {
         }
         Returns: string
       }
+      _employer_has_draft_vacancy: {
+        Args: { p_employer_id: string }
+        Returns: boolean
+      }
       _employer_has_owned_company: {
         Args: { p_employer_id: string }
         Returns: boolean
+      }
+      _employer_owned_draft_vacancy: {
+        Args: { p_uid: string; p_vacancy_id: string }
+        Returns: {
+          available_from: string | null
+          city: string
+          company_id: string | null
+          created_at: string
+          cv_required: boolean | null
+          description: string | null
+          employer_profile_id: string | null
+          employment_types: string[]
+          experience_notes: string | null
+          expires_at: string | null
+          german_requirement: string
+          id: string
+          interview_english_ok: boolean | null
+          job_category: string
+          public_locality: string | null
+          publication_state: string
+          published_at: string | null
+          salary_amount_cents: number | null
+          salary_currency: string | null
+          salary_is_gross: boolean | null
+          salary_period: string | null
+          shift_requirements: string[]
+          slug: string
+          source: string
+          summary: string
+          title: string
+          updated_at: string
+          work_frequency: string | null
+          workplace_type: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "vacancies"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       _profile_first_incomplete_group: {
         Args: {
@@ -386,6 +473,11 @@ export type Database = {
           p_travel_radius_minutes: number
           p_work_authorisation_declared: boolean
         }
+        Returns: string
+      }
+      _slugify_vacancy_title: { Args: { p_title: string }; Returns: string }
+      _unique_employer_vacancy_slug: {
+        Args: { p_title: string }
         Returns: string
       }
       bootstrap_organisation_employer: {
@@ -402,11 +494,68 @@ export type Database = {
       }
       complete_candidate_onboarding: { Args: never; Returns: Json }
       complete_employer_onboarding: { Args: never; Returns: Json }
+      create_employer_vacancy_draft: {
+        Args: {
+          p_available_from?: string
+          p_cv_required?: boolean
+          p_description?: string
+          p_employment_types?: string[]
+          p_experience_notes?: string
+          p_german_requirement?: string
+          p_interview_english_ok?: boolean
+          p_job_category: string
+          p_public_locality: string
+          p_salary_amount_cents?: number
+          p_salary_period?: string
+          p_shift_requirements?: string[]
+          p_summary?: string
+          p_title: string
+          p_work_frequency?: string
+          p_workplace_type?: string
+        }
+        Returns: Json
+      }
+      delete_employer_vacancy_draft: {
+        Args: { p_vacancy_id: string }
+        Returns: Json
+      }
+      employer_vacancy_draft_readiness: {
+        Args: { p_vacancy_id: string }
+        Returns: Json
+      }
+      replace_employer_vacancy_languages: {
+        Args: { p_languages?: Json; p_vacancy_id: string }
+        Returns: Json
+      }
       submit_candidate_application: {
         Args: { p_vacancy_id: string }
         Returns: Json
       }
       text_array_is_unique: { Args: { input: string[] }; Returns: boolean }
+      update_employer_vacancy_draft: {
+        Args: {
+          p_available_from?: string
+          p_clear_available_from?: boolean
+          p_clear_salary?: boolean
+          p_cv_required?: boolean
+          p_description?: string
+          p_employment_types?: string[]
+          p_experience_notes?: string
+          p_german_requirement?: string
+          p_interview_english_ok?: boolean
+          p_job_category?: string
+          p_public_locality?: string
+          p_salary_amount_cents?: number
+          p_salary_period?: string
+          p_shift_requirements?: string[]
+          p_summary?: string
+          p_title?: string
+          p_vacancy_id: string
+          p_work_frequency?: string
+          p_workplace_type?: string
+        }
+        Returns: Json
+      }
       visible_seed_company_ids: { Args: never; Returns: string[] }
       visible_seed_vacancy_ids: { Args: never; Returns: string[] }
     }

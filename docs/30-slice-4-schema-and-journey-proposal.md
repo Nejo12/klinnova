@@ -1,12 +1,12 @@
 # Slice 4 Schema and Journey Proposal
 
 > Design proposal locked by Accepted D-046–D-054 (2026-08-03).
-> **Status:** PR 4.1 Done. PR 4.2 implementation prepared on the onboarding
-> branch; proposal text remains the Accepted contract. PR 4.3+ / vacancy drafts
-> not started.
+> **Status:** PR 4.1–4.2 Done. PR 4.3 implementation prepared (employer draft
+> vacancy schema/RLS/RPCs); proposal text remains the Accepted contract. Employer
+> vacancy UI, publication, and verification not started.
 
 **Depends on:** Accepted D-034; Accepted D-046–D-054; current migrations through
-`20260803120000_applications_schema_and_submit_rpc.sql`.
+`20260804120000_employer_owned_draft_vacancies.sql`.
 
 **Companion:** `docs/28-slice-4-discovery.md`, `docs/29-slice-4-build-plan.md`
 
@@ -396,6 +396,7 @@ body enforces `auth.uid()`. No publish RPC in Slice 4.
 - [x] Salary cents + period + gross EUR model (D-051)
 - [x] Hosted proof Preview-first; Production not authorized by D-054
 
-**Current step:** PR 4.2 — employer registration and onboarding UI —
-implementation prepared (local validation). Not Done until merge. Do not begin
-PR 4.3, vacancy drafts, or Slice 5/6 from this proposal.
+**Current step:** PR 4.3 — employer draft vacancy schema, languages, RLS, and
+RPCs — implementation prepared (local validation). Not Done until merge. Do not
+begin employer vacancy UI (PR 4.4), publication, verification, or Slice 5/6 from
+this proposal.
