@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { LogoutButton } from "@/components/auth/logout-button";
-import { CapabilityNav } from "@/components/employer-onboarding/capability-nav";
-import styles from "@/components/employer-onboarding/employer-onboarding.module.scss";
+import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
+import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadEmployerProfile } from "@/lib/employer/load-employer";
 import {
@@ -47,24 +46,16 @@ export default async function EmployerHomePage() {
 
   return (
     <main className={styles.page}>
-      <div className={styles.header}>
-        <Link className={styles.brand} href="/">
-          Stint
-        </Link>
-        <div className={styles.headerActions}>
-          <CapabilityNav
-            showCandidate={capabilities?.hasCandidateProfile === true}
-            showEmployer={capabilities?.hasEmployerProfile === true}
-            current="employer"
-          />
-          <LogoutButton />
-        </div>
-      </div>
+      <EmployerVacancyPageHeader
+        showCandidate={capabilities?.hasCandidateProfile === true}
+        showEmployer={capabilities?.hasEmployerProfile === true}
+        currentPath="home"
+      />
 
       <h1 className={styles.heading}>Welcome, {view.displayName}</h1>
       <p className={styles.lead}>{EMPLOYER_HOME_LEAD}</p>
 
-      <ul className={styles.statusList}>
+      <ul className={styles.meta}>
         <li>Employer type: {view.employerTypeLabel}</li>
         {view.companyName !== null ? (
           <li>Organisation company: {view.companyName}</li>
@@ -72,6 +63,15 @@ export default async function EmployerHomePage() {
         <li>Onboarding: complete</li>
         <li>Verification: {view.verificationState}</li>
       </ul>
+
+      <p className={styles.actions}>
+        <Link className={styles.button} href="/employer/vacancies">
+          Vacancy drafts
+        </Link>
+        <Link className={styles.linkButton} href="/employer/vacancies/new">
+          Create draft
+        </Link>
+      </p>
 
       <p className={styles.note}>{EMPLOYER_VERIFICATION_NOTICE}</p>
     </main>

@@ -1,0 +1,60 @@
+import { redirect } from "next/navigation";
+
+import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
+import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import { VacancyDetail } from "@/components/employer-vacancies/vacancy-detail";
+import { VacancyUnavailable } from "@/components/employer-vacancies/vacancy-unavailable";
+import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
+import { loadEmployerDraft } from "@/lib/employer/vacancies/load-employer-draft";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
+
+type EmployerVacancyDetailPageProps = {
+  params: Promise<{ vacancyId: string }>;
+};
+
+export async function generateMetadata({
+  params,
+}: EmployerVacancyDetailPageProps) {
+  const { vacancyId } = await params;
+  return {
+    title: `Vacancy draft · Stint`,
+    description: `Owner draft ${vacancyId}`,
+  };
+}
+
+export default async function EmployerVacancyDetailPage({
+  params,
+}: EmployerVacancyDetailPageProps) {
+  const { vacancyId } = await params;
+  const supabase = await createServerSupabaseClient();
+  const loaded = await loadEmployerDraft(supabase, vacancyId);
+
+  if (!loaded.ok) {
+    if (loaded.reason === "unauthenticated") {
+      redirect(`/login?next=/employer/vacancies/${vacancyId}`);
+    }
+    if (loaded.reason === "incomplete") {
+      redirect("/employer/onboarding");
+    }
+    if (loaded.reason === "unavailable") {
+      return <VacancyUnavailable />;
+    }
+    redirect("/auth/error?reason=profile");
+  }
+
+  const capabilities = await loadAccountCapabilities(supabase);
+
+  return (
+    <main className={styles.page}>
+      <EmployerVacancyPageHeader
+        showCandidate={capabilities?.hasCandidateProfile === true}
+        showEmployer={capabilities?.hasEmployerProfile === true}
+        currentPath="vacancies"
+      />
+      <h1 className={styles.heading}>{loaded.draft.title}</h1>
+      <VacancyDetail draft={loaded.draft} />
+    </main>
+  );
+}

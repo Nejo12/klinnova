@@ -1,0 +1,292 @@
+import { z } from "zod";
+
+import {
+  SALARY_PERIOD_CODES,
+  type SalaryPeriodCode,
+  WORK_FREQUENCY_CODES,
+  WORKPLACE_TYPE_CODES,
+} from "@/lib/employer/vacancies/allow-lists";
+import { eurStringToCents } from "@/lib/employer/vacancies/salary";
+import {
+  JOB_CATEGORY_CODES,
+  LANGUAGE_CODES,
+  LANGUAGE_PROFICIENCY_CODES,
+} from "@/lib/onboarding/allow-lists";
+import { isValidIsoCalendarDate } from "@/lib/matching/rules";
+
+const trimmedNonEmpty = (label: string, max: number) =>
+  z
+    .string()
+    .trim()
+    .min(1, `${label} is required.`)
+    .max(max, `${label} is too long.`);
+
+const optionalTrimmed = (max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max, "This value is too long.")
+    .transform((value) => (value.length === 0 ? null : value));
+
+const optionalIsoDate = z
+  .string()
+  .trim()
+  .transform((value) => (value.length === 0 ? null : value))
+  .refine(
+    (value) => value === null || isValidIsoCalendarDate(value),
+    "Enter a valid date.",
+  );
+
+const optionalEnum = <T extends string>(codes: readonly [T, ...T[]]) =>
+  z
+    .string()
+    .trim()
+    .superRefine((value, ctx) => {
+      if (value.length === 0) {
+        return;
+      }
+      if (!(codes as readonly string[]).includes(value)) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Choose a valid option.",
+        });
+      }
+    })
+    .transform((value) => {
+      if (value.length === 0) {
+        return null;
+      }
+      return value as T;
+    });
+
+const booleanFromForm = z
+  .union([z.boolean(), z.string()])
+  .transform((value) => {
+    if (typeof value === "boolean") {
+      return value;
+    }
+    return value === "true" || value === "on" || value === "1";
+  });
+
+const optionalBooleanFromForm = z
+  .union([z.boolean(), z.string(), z.null(), z.undefined()])
+  .transform((value) => {
+    if (value === undefined || value === null || value === "") {
+      return null;
+    }
+    if (typeof value === "boolean") {
+      return value;
+    }
+    return value === "true" || value === "on" || value === "1";
+  });
+
+export type ParsedSalaryFields = {
+  clearSalary: boolean;
+  salaryAmountCents: number | null;
+  salaryPeriod: SalaryPeriodCode | null;
+};
+
+export function parseSalaryFields(input: {
+  salaryAmountEur: string;
+  salaryPeriod: string;
+  clearSalary: boolean;
+}):
+  | { ok: true; value: ParsedSalaryFields }
+  | { ok: false; fieldErrors: Record<string, string> } {
+  if (input.clearSalary) {
+    return {
+      ok: true,
+      value: {
+        clearSalary: true,
+        salaryAmountCents: null,
+        salaryPeriod: null,
+      },
+    };
+  }
+
+  const amount = input.salaryAmountEur.trim();
+  const period = input.salaryPeriod.trim();
+
+  if (amount.length === 0 && period.length === 0) {
+    return {
+      ok: true,
+      value: {
+        clearSalary: false,
+        salaryAmountCents: null,
+        salaryPeriod: null,
+      },
+    };
+  }
+
+  const fieldErrors: Record<string, string> = {};
+
+  if (amount.length === 0) {
+    fieldErrors.salaryAmountEur = "Enter a salary amount, or clear salary.";
+  } else {
+    const cents = eurStringToCents(amount);
+    if (!cents.ok) {
+      fieldErrors.salaryAmountEur = cents.error;
+    }
+  }
+
+  if (!(SALARY_PERIOD_CODES as readonly string[]).includes(period)) {
+    fieldErrors.salaryPeriod = "Choose a salary period.";
+  }
+
+  if (Object.keys(fieldErrors).length > 0) {
+    return { ok: false, fieldErrors };
+  }
+
+  const cents = eurStringToCents(amount);
+  if (!cents.ok) {
+    return {
+      ok: false,
+      fieldErrors: { salaryAmountEur: cents.error },
+    };
+  }
+
+  return {
+    ok: true,
+    value: {
+      clearSalary: false,
+      salaryAmountCents: cents.cents,
+      salaryPeriod: period as SalaryPeriodCode,
+    },
+  };
+}
+
+export const vacancyIdSchema = z.string().uuid("Invalid vacancy.");
+
+export const languageRequirementRowSchema = z.object({
+  languageCode: z.enum(LANGUAGE_CODES, {
+    error: "Choose a language from the list.",
+  }),
+  minProficiency: z.enum(LANGUAGE_PROFICIENCY_CODES, {
+    error: "Choose a proficiency from the list.",
+  }),
+});
+
+export const languageRequirementsSchema = z
+  .array(languageRequirementRowSchema)
+  .superRefine((rows, ctx) => {
+    const seen = new Set<string>();
+    for (const [index, row] of rows.entries()) {
+      if (seen.has(row.languageCode)) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Each language can appear only once.",
+          path: [index, "languageCode"],
+        });
+      }
+      seen.add(row.languageCode);
+    }
+  });
+
+export const createDraftVacancyFormSchema = z.object({
+  title: trimmedNonEmpty("Title", 120),
+  jobCategory: z.enum(JOB_CATEGORY_CODES, {
+    error: "Choose a job category.",
+  }),
+  publicLocality: trimmedNonEmpty("Berlin public locality", 120),
+  description: optionalTrimmed(5000),
+  workplaceType: optionalEnum(WORKPLACE_TYPE_CODES),
+  workFrequency: optionalEnum(WORK_FREQUENCY_CODES),
+  availableFrom: optionalIsoDate,
+  experienceNotes: optionalTrimmed(2000),
+  cvRequired: optionalBooleanFromForm,
+  interviewEnglishOk: optionalBooleanFromForm,
+  salaryAmountEur: z.string().default(""),
+  salaryPeriod: z.string().default(""),
+  clearSalary: z.boolean().default(false),
+});
+
+export const updateDraftVacancyFormSchema = z.object({
+  vacancyId: vacancyIdSchema,
+  title: trimmedNonEmpty("Title", 120),
+  jobCategory: z.enum(JOB_CATEGORY_CODES, {
+    error: "Choose a job category.",
+  }),
+  publicLocality: trimmedNonEmpty("Berlin public locality", 120),
+  description: optionalTrimmed(5000),
+  workplaceType: optionalEnum(WORKPLACE_TYPE_CODES),
+  workFrequency: optionalEnum(WORK_FREQUENCY_CODES),
+  availableFrom: optionalIsoDate,
+  clearAvailableFrom: z.boolean().default(false),
+  experienceNotes: optionalTrimmed(2000),
+  cvRequired: booleanFromForm,
+  interviewEnglishOk: booleanFromForm,
+  salaryAmountEur: z.string().default(""),
+  salaryPeriod: z.string().default(""),
+  clearSalary: z.boolean().default(false),
+});
+
+export const replaceDraftLanguagesSchema = z.object({
+  vacancyId: vacancyIdSchema,
+  languages: languageRequirementsSchema,
+});
+
+export const deleteDraftVacancySchema = z.object({
+  vacancyId: vacancyIdSchema,
+  confirmTitle: z.string().trim().min(1, "Confirm the draft title to delete."),
+});
+
+export const createDraftRpcResultSchema = z.discriminatedUnion("status", [
+  z.object({
+    status: z.literal("ok"),
+    vacancy_id: z.string().uuid(),
+  }),
+  z.object({ status: z.literal("unauthenticated") }),
+  z.object({ status: z.literal("validation_error") }),
+  z.object({ status: z.literal("missing_profile") }),
+  z.object({ status: z.literal("incomplete_employer") }),
+  z.object({ status: z.literal("missing_company") }),
+  z.object({ status: z.literal("conflict_check") }),
+  z.object({ status: z.literal("conflict_unique") }),
+]);
+
+export const updateDraftRpcResultSchema = z.discriminatedUnion("status", [
+  z.object({
+    status: z.literal("ok"),
+    vacancy_id: z.string().uuid(),
+  }),
+  z.object({ status: z.literal("unauthenticated") }),
+  z.object({ status: z.literal("unavailable") }),
+  z.object({ status: z.literal("conflict_check") }),
+]);
+
+export const replaceLanguagesRpcResultSchema = z.discriminatedUnion("status", [
+  z.object({
+    status: z.literal("ok"),
+    vacancy_id: z.string().uuid(),
+    language_count: z.number().int().nonnegative(),
+  }),
+  z.object({ status: z.literal("unauthenticated") }),
+  z.object({ status: z.literal("unavailable") }),
+  z.object({ status: z.literal("validation_error") }),
+  z.object({ status: z.literal("conflict_check") }),
+  z.object({ status: z.literal("conflict_unique") }),
+]);
+
+export const deleteDraftRpcResultSchema = z.discriminatedUnion("status", [
+  z.object({
+    status: z.literal("ok"),
+    vacancy_id: z.string().uuid(),
+  }),
+  z.object({ status: z.literal("unauthenticated") }),
+  z.object({ status: z.literal("unavailable") }),
+  z.object({ status: z.literal("not_deletable") }),
+]);
+
+export const readinessRpcResultSchema = z.discriminatedUnion("status", [
+  z.object({
+    status: z.literal("ok"),
+    ready: z.boolean(),
+    missing: z.array(z.string()),
+  }),
+  z.object({ status: z.literal("unauthenticated") }),
+  z.object({ status: z.literal("unavailable") }),
+]);
+
+export type LanguageRequirementRow = z.infer<
+  typeof languageRequirementRowSchema
+>;

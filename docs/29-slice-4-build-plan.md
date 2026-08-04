@@ -1,10 +1,9 @@
 # Slice 4 Build Plan
 
 > Planning artifact for the PR sequence.
-> **Status:** Contracts Accepted 2026-08-03 (D-046–D-054). PR 4.1–4.2 Done.
-> PR 4.3 implementation prepared (employer draft vacancy schema/RLS/RPCs); not
-> Done until merge. Employer vacancy UI, publication, and verification not
-> started.
+> **Status:** Contracts Accepted 2026-08-03 (D-046–D-054). PR 4.1–4.3 Done.
+> PR 4.4 implementation prepared (employer draft vacancy UI); not Done until
+> merge. Publication and verification not started.
 
 **Outcome:** Employer registration → employer profile (private or organisation) →
 structured private draft vacancy.
@@ -86,8 +85,7 @@ employer home; incomplete employers cannot reach vacancy create.
 ### PR 4.3 — Draft vacancy schema, language requirements, RLS
 
 **Intent:** Persist employer drafts invisible to candidates/public.
-**Status:** Implementation prepared on `feat/slice-4-draft-vacancy-schema`
-(local validation); not Done until merge.
+**Status:** Done.
 
 **Includes:**
 
@@ -113,6 +111,8 @@ candidates/anon/unrelated employers see none; seed published behaviour intact.
 ### PR 4.4 — Draft vacancy create/edit journey
 
 **Intent:** Save and resume structured drafts.
+**Status:** Implementation prepared on `feat/slice-4-employer-vacancy-ui`
+(local validation); not Done until merge.
 
 **Includes:**
 
