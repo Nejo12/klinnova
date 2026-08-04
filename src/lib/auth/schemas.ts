@@ -34,33 +34,44 @@ export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 
 /**
- * Safe internal redirect: relative path only.
- * Rejects scheme-bearing, protocol-relative, and encoded external forms.
+ * Parse a safe internal redirect without applying a default destination.
+ * Empty input means no intent (null). Invalid / external forms also return null.
  */
-export function safeNextPath(value: string | null | undefined): string {
+export function parseInternalNextPath(
+  value: string | null | undefined,
+): string | null {
   if (value === undefined || value === null || value.length === 0) {
-    return "/candidate";
+    return null;
   }
 
   let decoded: string;
   try {
     decoded = decodeURIComponent(value);
   } catch {
-    return "/candidate";
+    return null;
   }
 
   if (!decoded.startsWith("/")) {
-    return "/candidate";
+    return null;
   }
   if (decoded.startsWith("//") || decoded.startsWith("/\\")) {
-    return "/candidate";
+    return null;
   }
   if (decoded.includes("://") || decoded.includes("\\")) {
-    return "/candidate";
+    return null;
   }
   if (/[\u0000-\u001f\u007f]/.test(decoded)) {
-    return "/candidate";
+    return null;
   }
 
   return decoded;
+}
+
+/**
+ * Safe internal redirect: relative path only.
+ * Rejects scheme-bearing, protocol-relative, and encoded external forms.
+ * Empty or invalid values fall back to `/candidate` (legacy candidate default).
+ */
+export function safeNextPath(value: string | null | undefined): string {
+  return parseInternalNextPath(value) ?? "/candidate";
 }

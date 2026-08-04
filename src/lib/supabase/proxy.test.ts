@@ -18,6 +18,7 @@ vi.mock("@/lib/env/public", () => ({
 import {
   copyCookies,
   isCandidatePath,
+  isProtectedEmployerPath,
   updateSession,
 } from "@/lib/supabase/proxy";
 
@@ -27,6 +28,15 @@ describe("isCandidatePath", () => {
     expect(isCandidatePath("/candidate/x")).toBe(true);
     expect(isCandidatePath("/login")).toBe(false);
     expect(isCandidatePath("/candidates")).toBe(false);
+  });
+});
+
+describe("isProtectedEmployerPath", () => {
+  it("protects employer app routes but not public registration", () => {
+    expect(isProtectedEmployerPath("/employer")).toBe(true);
+    expect(isProtectedEmployerPath("/employer/onboarding")).toBe(true);
+    expect(isProtectedEmployerPath("/employer/register")).toBe(false);
+    expect(isProtectedEmployerPath("/login")).toBe(false);
   });
 });
 
@@ -94,5 +104,23 @@ describe("updateSession", () => {
     expect(response.cookies.get("sb-access-token")?.value).toBe(
       "cleared-or-rotated",
     );
+  });
+
+  it("redirects anonymous employer routes while leaving register public", async () => {
+    getClaims.mockResolvedValue({ data: null, error: null });
+    createServerClient.mockImplementation(() => ({ auth: { getClaims } }));
+
+    const protectedResponse = await updateSession(
+      new NextRequest("http://localhost:3000/employer/onboarding"),
+    );
+    expect(protectedResponse.status).toBe(307);
+    expect(protectedResponse.headers.get("location")).toContain(
+      "/login?next=%2Femployer%2Fonboarding",
+    );
+
+    const publicResponse = await updateSession(
+      new NextRequest("http://localhost:3000/employer/register"),
+    );
+    expect(publicResponse.status).toBe(200);
   });
 });

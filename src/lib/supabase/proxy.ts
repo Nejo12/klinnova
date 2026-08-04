@@ -1,14 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { isCandidatePath, isProtectedEmployerPath } from "@/lib/auth/paths";
 import { resolveRedirectOrigin } from "@/lib/auth/site-origin";
 import { getPublicEnv } from "@/lib/env/public";
 import type { Database } from "@/types/database";
 
-/** True when the path is inside the protected candidate area. */
-export function isCandidatePath(pathname: string): boolean {
-  return pathname === "/candidate" || pathname.startsWith("/candidate/");
-}
+export { isCandidatePath, isProtectedEmployerPath };
 
 /** Copy Set-Cookie values from a Supabase-mutated response onto another response. */
 export function copyCookies(
@@ -21,8 +19,16 @@ export function copyCookies(
   return to;
 }
 
+function isProtectedAppPath(pathname: string): boolean {
+  return (
+    isCandidatePath(pathname) ||
+    isProtectedEmployerPath(pathname) ||
+    pathname === "/account/choose"
+  );
+}
+
 /**
- * Refresh Auth cookies and protect `/candidate/*`.
+ * Refresh Auth cookies and protect candidate/employer authenticated areas.
  * Uses verified claims (`getClaims`), not `getSession()`, for access decisions.
  * Performs no database writes and never uses a service-role client.
  */
@@ -61,15 +67,16 @@ export async function updateSession(
   // Do not insert logic between createServerClient and getClaims.
   const { data, error } = await supabase.auth.getClaims();
   const authenticated = Boolean(data?.claims?.sub) && error === null;
+  const pathname = request.nextUrl.pathname;
 
-  if (!authenticated && isCandidatePath(request.nextUrl.pathname)) {
+  if (!authenticated && isProtectedAppPath(pathname)) {
     const origin = resolveRedirectOrigin({
       hostHeader: request.headers.get("host"),
       siteUrl: env.NEXT_PUBLIC_SITE_URL,
       vercelUrl: process.env.VERCEL_URL,
     });
     const loginUrl = new URL("/login", origin);
-    loginUrl.searchParams.set("next", request.nextUrl.pathname);
+    loginUrl.searchParams.set("next", pathname);
     const redirectResponse = NextResponse.redirect(loginUrl);
     return copyCookies(supabaseResponse, redirectResponse);
   }

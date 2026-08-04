@@ -148,14 +148,14 @@ At the same time, validate that employers can:
 - [Slice 3 hosted-proof runbook](docs/26-slice-3-hosted-proof-runbook.md) (Production fallback executed 2026-08-03)
 - [Slice 3 closure evidence](docs/27-slice-3-closure.md) (complete; hosted Production proof recorded)
 - [Slice 4 discovery](docs/28-slice-4-discovery.md) (contracts Accepted 2026-08-03; D-046–D-054)
-- [Slice 4 build plan](docs/29-slice-4-build-plan.md) (PR 4.1 implementation prepared)
-- [Slice 4 schema and journey proposal](docs/30-slice-4-schema-and-journey-proposal.md) (contracts Accepted; PR 4.1 prepared)
+- [Slice 4 build plan](docs/29-slice-4-build-plan.md) (PR 4.1 Done; PR 4.2 prepared)
+- [Slice 4 schema and journey proposal](docs/30-slice-4-schema-and-journey-proposal.md) (contracts Accepted; PR 4.2 prepared)
 - [Not now](NOT_NOW.md)
 - [Agent instructions](AGENTS.md)
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, Slice 2, and Slice 3 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Slice 3 delivered candidate job detail, application preview/submit, snapshot-backed confirmation, Applied state, local exit proof, and owner-authorized Production hosted proof (PR #33–#37; closure in `docs/27-slice-3-closure.md`). Hosted Demo fixtures on `https://stint.company` / project `kvrzmzoszitdicjvrprt` remain retained until 2026-09-02. Slice 4 contracts are **Accepted** (D-046–D-054, 2026-08-03; `docs/28`–`docs/30`). **PR 4.1** (employer profile schema/RLS) is implementation-prepared locally and not Done until merge. Employer onboarding UI, draft vacancies, and PR 4.2+ have **not** started. Slice 5/6 have not started. Product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, Slice 2, and Slice 3 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Slice 3 delivered candidate job detail, application preview/submit, snapshot-backed confirmation, Applied state, local exit proof, and owner-authorized Production hosted proof (PR #33–#37; closure in `docs/27-slice-3-closure.md`). Hosted Demo fixtures on `https://stint.company` / project `kvrzmzoszitdicjvrprt` remain retained until 2026-09-02. Slice 4 contracts are **Accepted** (D-046–D-054, 2026-08-03; `docs/28`–`docs/30`). **PR 4.1** (employer profile schema/RLS) is Done. **PR 4.2** (employer registration/onboarding UI) is implementation-prepared locally and not Done until merge. Draft vacancies and PR 4.3+ have **not** started. Slice 5/6 have not started. Product scope remains `docs/04-mvp.md`.
 
 ## Local development
 

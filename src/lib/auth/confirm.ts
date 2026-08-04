@@ -1,7 +1,12 @@
 import { type EmailOtpType, type SupabaseClient } from "@supabase/supabase-js";
 
 import { ensureCandidateProfile } from "@/lib/auth/ensure-candidate-profile";
-import { safeNextPath } from "@/lib/auth/schemas";
+import { parseInternalNextPath, safeNextPath } from "@/lib/auth/schemas";
+import {
+  resolvePostAuthDestination,
+  shouldEnsureCandidateProfile,
+} from "@/lib/employer/capability-routing";
+import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import type { Database } from "@/types/database";
 
 /** OTP types accepted by the confirmation callback for Slice 1 registration. */
@@ -27,14 +32,15 @@ export function isAllowedConfirmOtpType(value: string): value is EmailOtpType {
 }
 
 /**
- * Verify email confirmation and ensure the candidate profile exists.
+ * Verify email confirmation and route by validated intent (D-047).
+ * Employer destinations do not create candidate profiles.
  * Does not log tokens. Destination is always a safe internal path.
  */
 export async function confirmAuthCallback(
   supabase: SupabaseClient<Database>,
   params: ConfirmSearchParams,
 ): Promise<ConfirmResult> {
-  const nextPath = safeNextPath(params.next);
+  const intentPath = parseInternalNextPath(params.next);
   const tokenHash = params.token_hash;
   const typeParam = params.type;
   const code = params.code;
@@ -63,13 +69,35 @@ export async function confirmAuthCallback(
     return { ok: false, reason: "invalid" };
   }
 
-  const ensured = await ensureCandidateProfile(supabase);
-  if (!ensured.ok) {
-    return {
-      ok: false,
-      reason: ensured.reason === "profile" ? "profile" : "invalid",
-    };
+  const capabilities = (await loadAccountCapabilities(supabase)) ?? {
+    hasCandidateProfile: false,
+    hasEmployerProfile: false,
+  };
+
+  const destination = resolvePostAuthDestination({
+    intentPath,
+    capabilities,
+  });
+
+  const nextPath =
+    destination.kind === "role_choice" ? "/account/choose" : destination.href;
+
+  if (
+    shouldEnsureCandidateProfile({
+      intentPath,
+      destinationHref: nextPath,
+    })
+  ) {
+    const ensured = await ensureCandidateProfile(supabase);
+    if (!ensured.ok) {
+      return {
+        ok: false,
+        reason: ensured.reason === "profile" ? "profile" : "invalid",
+      };
+    }
   }
 
-  return { ok: true, nextPath };
+  // Invalid next values are already null; keep safeNextPath fallback for
+  // any residual empty destination (should not happen).
+  return { ok: true, nextPath: safeNextPath(nextPath) };
 }

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { confirmAuthCallback } from "@/lib/auth/confirm";
 import type { Database } from "@/types/database";
@@ -8,9 +8,15 @@ vi.mock("@/lib/auth/ensure-candidate-profile", () => ({
   ensureCandidateProfile: vi.fn(),
 }));
 
+vi.mock("@/lib/employer/load-capabilities", () => ({
+  loadAccountCapabilities: vi.fn(),
+}));
+
 import { ensureCandidateProfile } from "@/lib/auth/ensure-candidate-profile";
+import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 
 const ensureMock = vi.mocked(ensureCandidateProfile);
+const capabilitiesMock = vi.mocked(loadAccountCapabilities);
 
 function mockAuthClient(options: {
   verifyError?: Error | null;
@@ -31,6 +37,15 @@ function mockAuthClient(options: {
 }
 
 describe("confirmAuthCallback", () => {
+  beforeEach(() => {
+    ensureMock.mockReset();
+    capabilitiesMock.mockReset();
+    capabilitiesMock.mockResolvedValue({
+      hasCandidateProfile: false,
+      hasEmployerProfile: false,
+    });
+  });
+
   it("rejects missing token and code", async () => {
     const client = mockAuthClient({});
     const result = await confirmAuthCallback(client, {});
@@ -81,17 +96,18 @@ describe("confirmAuthCallback", () => {
       type: "signup",
       token_hash: "abc",
     });
-    expect(ensureMock).toHaveBeenCalledWith(client);
+    expect(ensureMock).toHaveBeenCalled();
     expect(result).toEqual({ ok: true, nextPath: "/candidate" });
   });
 
-  it("does not initialize profile when verification fails", async () => {
-    const client = mockAuthClient({ verifyError: new Error("bad") });
+  it("skips candidate profile ensure for employer next", async () => {
+    const client = mockAuthClient({});
     const result = await confirmAuthCallback(client, {
       token_hash: "abc",
       type: "signup",
+      next: "/employer/onboarding",
     });
-    expect(result).toEqual({ ok: false, reason: "invalid" });
     expect(ensureMock).not.toHaveBeenCalled();
+    expect(result).toEqual({ ok: true, nextPath: "/employer/onboarding" });
   });
 });

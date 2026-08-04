@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { LogoutButton } from "@/components/auth/logout-button";
+import { CapabilityNav } from "@/components/employer-onboarding/capability-nav";
 import { MatchCount } from "@/components/candidate-matches/match-count";
 import { MatchList } from "@/components/candidate-matches/match-list";
 import { MatchesEmptyState } from "@/components/candidate-matches/matches-empty-state";
@@ -16,11 +17,13 @@ type CandidateMatchesPageProps =
       status: "success";
       matches: readonly CandidateMatch[];
       applicationsByVacancyId: ReadonlyMap<string, OwnedApplicationSummary>;
+      showEmployerNav?: boolean;
     }
-  | { status: "failure" };
+  | { status: "failure"; showEmployerNav?: boolean };
 
 export function CandidateMatchesPage(props: CandidateMatchesPageProps) {
   const brandHref = props.status === "failure" ? "/" : "/candidate";
+  const showEmployerNav = props.showEmployerNav === true;
 
   return (
     <main className={styles.page}>
@@ -28,7 +31,14 @@ export function CandidateMatchesPage(props: CandidateMatchesPageProps) {
         <Link className={styles.brand} href={brandHref}>
           Stint
         </Link>
-        <LogoutButton />
+        <div className={styles.headerActions}>
+          <CapabilityNav
+            showCandidate
+            showEmployer={showEmployerNav}
+            current="candidate"
+          />
+          <LogoutButton />
+        </div>
       </div>
 
       {props.status === "failure" ? (

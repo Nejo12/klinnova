@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { loginSchema, registerSchema, safeNextPath } from "@/lib/auth/schemas";
+import {
+  loginSchema,
+  parseInternalNextPath,
+  registerSchema,
+  safeNextPath,
+} from "@/lib/auth/schemas";
 
 describe("registerSchema", () => {
   it("accepts valid registration input and lowercases email", () => {
@@ -55,6 +60,22 @@ describe("loginSchema", () => {
         password: "",
       }).success,
     ).toBe(false);
+  });
+});
+
+describe("parseInternalNextPath", () => {
+  it("returns null for empty or unsafe values", () => {
+    expect(parseInternalNextPath("")).toBeNull();
+    expect(parseInternalNextPath(null)).toBeNull();
+    expect(parseInternalNextPath("//evil.example")).toBeNull();
+    expect(parseInternalNextPath("https://evil.example")).toBeNull();
+  });
+
+  it("returns employer and candidate relative paths", () => {
+    expect(parseInternalNextPath("/employer/onboarding")).toBe(
+      "/employer/onboarding",
+    );
+    expect(parseInternalNextPath("/candidate")).toBe("/candidate");
   });
 });
 
