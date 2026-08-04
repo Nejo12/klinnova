@@ -11,7 +11,12 @@ const initialState: AuthActionState = {
   message: null,
 };
 
-export function RegisterForm() {
+type RegisterFormProps = {
+  /** Validated internal next path preserved through signup confirmation. */
+  nextPath?: string;
+};
+
+export function RegisterForm({ nextPath }: RegisterFormProps) {
   const [state, formAction, pending] = useActionState(
     registerAction,
     initialState,
@@ -19,6 +24,10 @@ export function RegisterForm() {
 
   return (
     <form className={styles.form} action={formAction} noValidate>
+      {nextPath !== undefined ? (
+        <input type="hidden" name="next" value={nextPath} />
+      ) : null}
+
       {state.error !== null ? (
         <p className={styles.error} role="alert">
           {state.error}

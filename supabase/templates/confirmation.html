@@ -3,8 +3,9 @@
   Follow the link below to confirm this email address and finish signing up.
 </p>
 <p>
-  <a
-    href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup&next=/candidate"
-    >Confirm email address</a
-  >
+  <!--
+    Use ConfirmationURL so signup emailRedirectTo (including validated next)
+    is preserved for candidate and employer registration (D-047).
+  -->
+  <a href="{{ .ConfirmationURL }}">Confirm email address</a>
 </p>

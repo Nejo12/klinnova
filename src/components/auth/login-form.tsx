@@ -12,6 +12,7 @@ const initialState: AuthActionState = {
 };
 
 type LoginFormProps = {
+  /** Empty string means no intent (role-choice may apply after sign-in). */
   nextPath: string;
 };
 
