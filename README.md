@@ -148,16 +148,17 @@ At the same time, validate that employers can:
 - [Slice 3 hosted-proof runbook](docs/26-slice-3-hosted-proof-runbook.md) (Production fallback executed 2026-08-03)
 - [Slice 3 closure evidence](docs/27-slice-3-closure.md) (complete; hosted Production proof recorded)
 - [Slice 4 discovery](docs/28-slice-4-discovery.md) (contracts Accepted 2026-08-03; D-046–D-054)
-- [Slice 4 build plan](docs/29-slice-4-build-plan.md) (PR 4.1–4.4 Done; PR 4.5 prepared)
-- [Slice 4 schema and journey proposal](docs/30-slice-4-schema-and-journey-proposal.md) (contracts Accepted; PR 4.5 prepared)
-- [Slice 4 exit proof (local)](docs/31-slice-4-exit-proof.md) (tooling prepared; local proof via `pnpm proof:slice4`; hosted not executed)
-- [Slice 4 hosted-proof runbook](docs/32-slice-4-hosted-proof-runbook.md) (prepared; not executed; Production not authorized)
+- [Slice 4 build plan](docs/29-slice-4-build-plan.md) (PR 4.1–4.5 complete)
+- [Slice 4 schema and journey proposal](docs/30-slice-4-schema-and-journey-proposal.md) (contracts Accepted)
+- [Slice 4 exit proof (local)](docs/31-slice-4-exit-proof.md) (local proof via `pnpm proof:slice4`)
+- [Slice 4 hosted-proof runbook](docs/32-slice-4-hosted-proof-runbook.md) (executed 2026-08-04 on Preview/disposable)
+- [Slice 4 closure](docs/33-slice-4-closure.md) (Done — Preview/disposable hosted proof)
 - [Not now](NOT_NOW.md)
 - [Agent instructions](AGENTS.md)
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, Slice 2, and Slice 3 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Slice 3 delivered candidate job detail, application preview/submit, snapshot-backed confirmation, Applied state, local exit proof, and owner-authorized Production hosted proof (PR #33–#37; closure in `docs/27-slice-3-closure.md`). Hosted Demo fixtures on `https://stint.company` / project `kvrzmzoszitdicjvrprt` remain retained until 2026-09-02. Slice 4 contracts are **Accepted** (D-046–D-054, 2026-08-03; `docs/28`–`docs/32`). **PR 4.1–4.4** (employer profile, onboarding UI, draft vacancy schema/RLS/RPCs, draft vacancy UI) are Done. **PR 4.5** (local exit proof + hosted readiness) is implementation-prepared and not Done until merge. Local proof uses `pnpm proof:slice4`. Hosted Slice 4 proof and Production authorization have **not** been executed/granted. Publication and verification have **not** started. Slice 4 is **not** complete until hosted proof and closure are accepted. Slice 5/6 have not started. Product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, Slice 2, Slice 3, and Slice 4 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Slice 3 delivered candidate job detail, application preview/submit, snapshot-backed confirmation, Applied state, local exit proof, and owner-authorized Production hosted proof (PR #33–#37; closure in `docs/27-slice-3-closure.md`). Slice 4 delivered employer registration/onboarding, employer-owned draft vacancies, local exit proof, and owner-authorized Preview/disposable hosted proof (PR #41–#45; closure in `docs/33-slice-4-closure.md`). Hosted Demo fixtures on `https://stint.company` / project `kvrzmzoszitdicjvrprt` remain retained until 2026-09-02. Publication and verification have **not** started. Slice 5/6 have not started. Product scope remains `docs/04-mvp.md`.
 
 ## Local development
 
@@ -268,7 +269,7 @@ Slice 3 critical exit journey (register → complete → detail → preview → 
 pnpm test:e2e:slice3
 ```
 
-Hosted Preview/Production Auth uses the repository owner’s Supabase project, Vercel public env, Site URL `https://stint.company`, and the configured redirect allow-list. Hosted completion and applications migrations are applied on Production. Slice 3 hosted Production proof is complete — see `docs/27-slice-3-closure.md`. Preview isolation remains an infrastructure follow-up for future preferred hosted proofs.
+Hosted Production Auth uses the repository owner’s Supabase project, Vercel Production public env, Site URL `https://stint.company`, and the configured redirect allow-list. Hosted completion and applications migrations are applied on Production. Slice 3 hosted Production proof is complete — see `docs/27-slice-3-closure.md`. Slice 4 hosted proof used an isolated Preview + disposable Supabase project (deleted after proof); Preview currently has no Preview-scoped Supabase variables and must be re-isolated before any future hosted proof — see `docs/33-slice-4-closure.md`.
 
 Hosted Demo vacancy fixtures (D-031) are **owner-run only** — never applied by migrations, CI, build, or deploy. See `supabase/fixtures/hosted/README.md` and `docs/21-slice-2-closure.md`.
 

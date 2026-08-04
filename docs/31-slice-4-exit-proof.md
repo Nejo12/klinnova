@@ -3,16 +3,15 @@
 Owner-facing local exit evidence for Slice 4 — Employer registration to draft
 vacancy.
 
-**Local exit proof status:** Pass on this branch via `pnpm proof:slice4`
-(2026-08-04 UTC). **Hosted Slice 4 proof has not been executed.** **Production
-authorization has not been granted.** **Slice 4 is not Done** until
-owner-authorized hosted proof and closure are accepted under D-054.
+**Local exit proof status:** Pass via `pnpm proof:slice4` (2026-08-04 UTC).
+**Hosted Slice 4 proof:** complete on Preview / disposable
+(`docs/33-slice-4-closure.md`). **Production authorization was not used.**
+**Slice 4 is Done.**
 
 Related:
 
 - Hosted runbook: `docs/32-slice-4-hosted-proof-runbook.md`
-- Closure (after hosted proof): `docs/33-slice-4-closure.md` — not created until
-  hosted evidence exists
+- Closure: `docs/33-slice-4-closure.md`
 - Build plan: `docs/29-slice-4-build-plan.md`
 
 ## Scope delivered (implementation PRs)
@@ -23,9 +22,9 @@ Related:
 | Employer registration + onboarding UI | Merged (PR #42) |
 | Employer-owned draft vacancy schema, RPCs, RLS, pgTAP | Merged (PR #43) |
 | Employer draft vacancy UI | Merged (PR #44) |
-| Local exit proof tooling + hosted readiness | This PR (4.5) — prepared |
-| Owner-run hosted proof | Not executed |
-| Slice 4 Done | No |
+| Local exit proof tooling + hosted readiness | Merged (PR #45) |
+| Owner-run hosted proof | Complete — see `docs/33-slice-4-closure.md` |
+| Slice 4 Done | Yes |
 
 ## Pull requests
 
@@ -35,7 +34,7 @@ Related:
 | 4.2 Employer onboarding UI | #42 | Merged |
 | 4.3 Draft vacancy schema/RPCs/RLS | #43 | Merged |
 | 4.4 Employer draft vacancy UI | #44 | Merged |
-| 4.5 Local exit proof + hosted readiness | Pending review | Implementation prepared |
+| 4.5 Local exit proof + hosted readiness | #45 | Merged |
 
 ## Accepted decisions
 
@@ -96,7 +95,7 @@ Recorded from `pnpm proof:slice4` on `chore/slice-4-exit-proof` (2026-08-04 UTC)
 | Generated types check | Pass (unchanged) |
 | Employer E2E | **9 passed** |
 | Slice 3 regression E2E | **3 passed** |
-| Hosted proof | Not executed |
+| Hosted proof | Pass — see `docs/33-slice-4-closure.md` (Preview/disposable; Production not used) |
 
 ## Focused Playwright decision
 
@@ -120,7 +119,7 @@ The matrix does not replace execution. Local Pass rows require `pnpm proof:slice
 
 Columns:
 
-- **Hosted** = required for Slice 4 Done under D-054 (not passed until executed)
+- **Hosted** = required for Slice 4 Done under D-054 (passed 2026-08-04; see `docs/33`)
 - **Hosted mutation** = whether applying migrations or creating fixtures is needed
 - **Cleanup** = required cleanup/retention decision when hosted proof runs
 
@@ -207,19 +206,21 @@ checksums. **Do not infer hosted status from local files.**
 
 Hosted procedure: `docs/32-slice-4-hosted-proof-runbook.md`.
 
-Closure document (`docs/33-slice-4-closure.md`) must not be written until
-owner-authorized hosted proof is actually executed and recorded.
+Owner-authorized Preview / disposable hosted proof executed 2026-08-04
+(Run ID `20260804T2039Z`). Durable evidence: `docs/33-slice-4-closure.md`.
+Production was not used. Cleanup deleted disposable project
+`wbucxaquktraobrvknts` and cleared Preview-scoped overrides.
 
 ## Status wording (current)
 
-- PRs #41–#44 merged
-- PR 4.5 prepared (local tooling + runbook)
-- Local exit proof: **Pass** via `pnpm proof:slice4` on this branch (see below)
-- Hosted Slice 4 proof: not executed
-- Production authorization: not granted
+- PRs #41–#45 merged
+- Local exit proof: **Pass** via `pnpm proof:slice4`
+- Hosted Slice 4 proof: **Pass** (Preview + disposable; see `docs/33`)
+- Cleanup: **Pass** (disposable project deleted; Preview overrides cleared)
+- Production authorization for Slice 4 proof: not used / not required
 - Publication / verification approval / applicant review: not started
 - Slice 5 / Slice 6: not started
-- Slice 4: **not Done**
+- Slice 4: **Done**
 
 ### Local proof run record
 
@@ -228,4 +229,4 @@ owner-authorized hosted proof is actually executed and recorded.
 | Command | `pnpm proof:slice4` |
 | Result | Pass |
 | Date (UTC) | 2026-08-04 |
-| Notes | Vitest 320/1 skip; pgTAP 533; employer E2E 9/9; Slice 3 E2E 3/3; no hosted commands |
+| Notes | Vitest 320/1 skip; pgTAP 533; employer E2E 9/9; Slice 3 E2E 3/3; no hosted commands in local orchestrator |
