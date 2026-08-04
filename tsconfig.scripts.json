@@ -17,6 +17,14 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["scripts/**/*.mts", "src/lib/fixtures/**/*.ts"],
-  "exclude": ["node_modules", "src/lib/fixtures/**/*.test.ts"]
+  "include": [
+    "scripts/**/*.mts",
+    "src/lib/fixtures/**/*.ts",
+    "src/lib/proof/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/lib/fixtures/**/*.test.ts",
+    "src/lib/proof/**/*.test.ts"
+  ]
 }

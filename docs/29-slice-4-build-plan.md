@@ -1,9 +1,10 @@
 # Slice 4 Build Plan
 
 > Planning artifact for the PR sequence.
-> **Status:** Contracts Accepted 2026-08-03 (D-046–D-054). PR 4.1–4.3 Done.
-> PR 4.4 implementation prepared (employer draft vacancy UI); not Done until
-> merge. Publication and verification not started.
+> **Status:** Contracts Accepted 2026-08-03 (D-046–D-054). PR 4.1–4.4 Done.
+> PR 4.5 implementation prepared (local exit proof + hosted readiness); not Done
+> until merge. Hosted proof not executed. Production authorization not granted.
+> Publication and verification not started. Slice 4 not complete.
 
 **Outcome:** Employer registration → employer profile (private or organisation) →
 structured private draft vacancy.
@@ -137,18 +138,22 @@ candidate surfaces unchanged.
 
 **Includes:**
 
-- critical Playwright journey (register → profile → draft → resume → denial)
-- candidate invisibility + matcher/apply regression suite
+- `pnpm proof:slice4` local orchestrator (fail-fast; environment-guarded)
+- local migration inventory (`pnpm proof:migrations`)
+- evidence matrix mapping exit criteria to existing employer + Slice 3 suites
+  (no redundant focused E2E duplication)
 - static security assertions (no service-role browser paths; no caller-owned
-  verification/source)
-- local exit-proof doc + hosted-proof runbook
+  ownership/source/publication)
+- `docs/31-slice-4-exit-proof.md` + `docs/32-slice-4-hosted-proof-runbook.md`
 - Preview-isolation prerequisite recorded; Production fallback **not**
   pre-authorized
 
-**Excludes:** Running Production proof; starting Slice 5.
+**Excludes:** Running hosted/Production proof; creating hosted fixtures;
+starting Slice 5; marking Slice 4 Done.
 
-**Exit:** Local checklist green; runbook ready; Slice 4 Done only after owner
-hosted proof under Accepted D-054.
+**Exit:** Local checklist green via `pnpm proof:slice4`; runbook ready; Slice 4
+Done only after owner hosted proof under Accepted D-054 (+ new authorization if
+Production).
 
 ---
 
