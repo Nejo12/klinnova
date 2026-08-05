@@ -648,6 +648,34 @@ export type Database = {
         Returns: Json
       }
       fill_employer_vacancy: { Args: { p_vacancy_id: string }; Returns: Json }
+      get_effective_public_vacancy: {
+        Args: { p_vacancy_id: string }
+        Returns: {
+          company_name: string
+          cv_required: boolean
+          description: string
+          employer_display_name: string
+          employer_type: string
+          expires_at: string
+          interview_english_ok: boolean
+          job_category: string
+          public_locality: string
+          published_at: string
+          source: string
+          title: string
+          vacancy_id: string
+          website: string
+          work_frequency: string
+          workplace_type: string
+        }[]
+      }
+      get_effective_public_vacancy_languages: {
+        Args: { p_vacancy_id: string }
+        Returns: {
+          language_code: string
+          min_proficiency: string
+        }[]
+      }
       get_employer_verification_review: {
         Args: { p_employer_profile_id: string }
         Returns: {
@@ -670,6 +698,27 @@ export type Database = {
       is_vacancy_effectively_public: {
         Args: { p_at?: string; p_vacancy_id: string }
         Returns: boolean
+      }
+      list_effective_public_vacancies: {
+        Args: never
+        Returns: {
+          company_name: string
+          cv_required: boolean
+          description: string
+          employer_display_name: string
+          employer_type: string
+          expires_at: string
+          interview_english_ok: boolean
+          job_category: string
+          public_locality: string
+          published_at: string
+          source: string
+          title: string
+          vacancy_id: string
+          website: string
+          work_frequency: string
+          workplace_type: string
+        }[]
       }
       list_pending_employer_verifications: {
         Args: never
