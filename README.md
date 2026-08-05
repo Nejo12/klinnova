@@ -154,14 +154,14 @@ At the same time, validate that employers can:
 - [Slice 4 hosted-proof runbook](docs/32-slice-4-hosted-proof-runbook.md) (executed 2026-08-04 on Preview/disposable)
 - [Slice 4 closure](docs/33-slice-4-closure.md) (Done — Preview/disposable hosted proof)
 - [Slice 5 discovery](docs/34-slice-5-discovery.md) (planning Done; D-055–D-067 Accepted 2026-08-05)
-- [Slice 5 build plan](docs/35-slice-5-build-plan.md) (PR 5.1 in review; 5.2 gated on 5.1 merge)
-- [Slice 5 schema and publication proposal](docs/36-slice-5-schema-and-publication-proposal.md) (contract locked)
+- [Slice 5 build plan](docs/35-slice-5-build-plan.md) (PR 5.1 Done; PR 5.2 database foundation in progress)
+- [Slice 5 schema and publication proposal](docs/36-slice-5-schema-and-publication-proposal.md) (contract locked; lifecycle events decided)
 - [Not now](NOT_NOW.md)
 - [Agent instructions](AGENTS.md)
 
 ## Development status
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, Slice 2, Slice 3, and Slice 4 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Slice 3 delivered candidate job detail, application preview/submit, snapshot-backed confirmation, Applied state, local exit proof, and owner-authorized Production hosted proof (PR #33–#37; closure in `docs/27-slice-3-closure.md`). Slice 4 delivered employer registration/onboarding, employer-owned draft vacancies, local exit proof, and owner-authorized Preview/disposable hosted proof (PR #41–#45; closure in `docs/33-slice-4-closure.md`). Slice 5 planning is **Done** (`docs/34`–`docs/36`; D-055–D-067 Accepted 2026-08-05); PR 5.1 records acceptance; product implementation has not started and PR 5.2 is not authorized until PR 5.1 merges. Hosted Demo fixtures on `https://stint.company` / project `kvrzmzoszitdicjvrprt` remain retained until 2026-09-02. Preview currently has no Preview-scoped Supabase configuration and must be re-isolated before any future hosted proof. Slice 6/7/8 have not started. Product scope remains `docs/04-mvp.md`.
+Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, Slice 2, Slice 3, and Slice 4 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Slice 3 delivered candidate job detail, application preview/submit, snapshot-backed confirmation, Applied state, local exit proof, and owner-authorized Production hosted proof (PR #33–#37; closure in `docs/27-slice-3-closure.md`). Slice 4 delivered employer registration/onboarding, employer-owned draft vacancies, local exit proof, and owner-authorized Preview/disposable hosted proof (PR #41–#45; closure in `docs/33-slice-4-closure.md`). Slice 5 planning is **Done** (`docs/34`–`docs/36`; D-055–D-067 Accepted 2026-08-05). PR 5.1 is Done; PR 5.2 database foundation (verification + publication schema/RLS/RPCs/pgTAP) is in progress. Public routes, employer lifecycle UI, and candidate loaders are not started. Hosted Demo fixtures on `https://stint.company` / project `kvrzmzoszitdicjvrprt` remain retained until 2026-09-02. Preview currently has no Preview-scoped Supabase configuration and must be re-isolated before any future hosted proof. Slice 6/7/8 have not started. Product scope remains `docs/04-mvp.md`.
 
 ## Local development
 

@@ -51,11 +51,11 @@ select ok(
 );
 
 select ok(
-  exists (
+  not exists (
     select 1 from pg_constraint
     where conname = 'vacancies_employer_draft_only_chk' and contype = 'c'
   ),
-  'employer rows are draft-only'
+  'employer draft-only constraint is removed for Slice 5 lifecycle'
 );
 
 select ok(
@@ -69,9 +69,9 @@ select ok(
 select ok(
   exists (
     select 1 from pg_constraint
-    where conname = 'vacancies_draft_lifecycle_chk' and contype = 'c'
+    where conname = 'vacancies_lifecycle_chk' and contype = 'c'
   ),
-  'draft lifecycle null timestamps check exists'
+  'expanded lifecycle coherence check exists'
 );
 
 select ok(
