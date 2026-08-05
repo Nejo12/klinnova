@@ -97,7 +97,7 @@ protected-path set (`isInternalPath` in `src/lib/auth/paths.ts`) alongside
 session-refresh and encoded-redirect treatment. No new migration, RLS
 policy, or grant. No revocation UI.
 
-**PR 5.4 — in progress** (no schema change; application-layer only). Employer
+**PR 5.4 — implemented** (no schema change; application-layer only). Employer
 manage-page and Server Actions for the seven PR 5.2 lifecycle RPCs
 (`publish_employer_vacancy`, `pause_employer_vacancy`,
 `resume_employer_vacancy`, `fill_employer_vacancy`,
@@ -116,8 +116,102 @@ employer's live `verification_state`; the authoritative missing-field list
 for publish/resume is the `incomplete`/`missing` result actually returned by
 `publish_employer_vacancy`/`resume_employer_vacancy` themselves, rendered
 through the same label map. No new migration, RLS policy, or grant. No
-expiry input exposed to the caller. Next unit: PR 5.5 — public/candidate
-visibility and matching integration.
+expiry input exposed to the caller.
+
+**PR 5.5 database-contract audit (public/candidate read access).** Before
+writing any `/jobs` route or matching-loader change, the database contract
+was audited and found insufficient: `is_vacancy_effectively_public` and
+`visible_public_vacancy_ids` (PR 5.2) prove eligibility but project no
+fields; `anon` has zero table-level `SELECT` grant on `vacancies` or
+`vacancy_language_requirements` (revoked in the original PR 2.1 migration,
+never re-granted); no `authenticated` RLS policy covers another employer's
+effective-public row. `supabase/tests/database/23_effective_public_and_application_test.sql`
+already locks this in via `throws_ok($$ select * from public.vacancies $$,
+'42501', ..., 'anon still cannot select vacancies table')`. Split into
+PR 5.5a (this narrow read-contract migration) and PR 5.5b (UI).
+
+**PR 5.5a — implemented** (migration
+`20260805200000_effective_public_vacancy_read_contract.sql`, additive
+only, no table grant or RLS change):
+
+1. `list_effective_public_vacancies() returns table (vacancy_id, title,
+   description, job_category, public_locality, workplace_type,
+   work_frequency, cv_required, interview_english_ok, source,
+   employer_type, employer_display_name, company_name, website,
+   published_at, expires_at)` — **no arguments** (confirmed against
+   `pg_proc` directly, not just migration text: exactly one overload
+   exists, `pronargs = 0`; calling with any argument, including a
+   timestamp, fails with `42883 undefined_function`). Ordered
+   `published_at DESC, vacancy_id ASC`. An earlier draft of this RPC
+   accepted an optional `p_at timestamptz default now()` — removed before
+   merge: exposing a caller-controlled visibility instant could let a
+   caller ask "was this public at some other time," which can disagree
+   with "is this public right now" (e.g. a row still stored `published`
+   after its expiry elapsed but before materialization). All three RPCs
+   now evaluate exclusively against `now()`, which is stable for the
+   lifetime of one transaction.
+2. `get_effective_public_vacancy(p_vacancy_id uuid)` — same projection,
+   at most one row, gated on `is_vacancy_effectively_public(v.id, now())`.
+   Every non-eligible case (unknown id, draft, paused, filled, expired,
+   withdrawn, elapsed-but-not-materialized, unverified/rejected/revoked
+   employer) returns zero rows — structurally indistinguishable, never an
+   error, never a different shape. No visibility-time argument either.
+3. `get_effective_public_vacancy_languages(p_vacancy_id uuid) returns table
+   (language_code, min_proficiency)` — a separate RPC rather than an
+   embedded composite array, since Supabase's type generation for
+   composite arrays inside a `RETURNS TABLE` column is not reliably
+   precise; ordered by `language_code ASC`; also gated on `now()`, zero
+   rows for any vacancy that is not currently effective-public (including
+   the elapsed-but-unmaterialized case).
+
+**Projection corrections from the first draft:** `city` was removed — it is
+constrained to the literal value `'Berlin'` for every row
+(`vacancies_city_berlin_chk`), so it carries no information beyond what the
+product's whole Berlin-only scope (D-004) already establishes; only
+`public_locality` (the actual district-level field) is returned, matching
+D-061's approved public location contract exactly. `source` was reviewed
+and **kept**: it is not incidental internal provenance — D-031 requires
+seed/demo vacancies to be visibly labelled "Demo vacancy" to candidates,
+and `source` is the only field that lets PR 5.5b's UI make that call.
+
+All three are `SECURITY DEFINER`, `stable`, fixed `search_path`, `revoke all
+... from public; grant execute ... to anon, authenticated`. Confirmed
+directly against `pg_proc` (not just migration text): `anon_exec=true`,
+`authenticated_exec=true`, `service_role_exec=false` for all three — no
+`service_role` grant, unlike the PR 5.2 helpers these RPCs sit on top of,
+since nothing internal calls them. `employer_display_name`/`company_name`
+use `coalesce(c.name, ep.display_name)` / bare `c.name` via a `LEFT JOIN`,
+which is provably equivalent to `submit_candidate_application`'s existing
+accepted seed/employer branching (for seed rows `ep` is null through the
+join, so the `coalesce` reduces to `c.name` exactly as that RPC's seed
+branch already does) — no new business logic invented.
+
+**Runtime nullability** (the generated TypeScript types mark every field
+non-null — a known `RETURNS TABLE` codegen limitation, same caveat as
+PR 5.3a; these are the actual runtime semantics, pgTAP-verified against the
+local seed fixture, which intentionally omits several columns):
+`vacancy_id`, `title`, `job_category`, `source`, `published_at`,
+`expires_at` are never null. `public_locality`, `workplace_type`,
+`work_frequency`, `cv_required`, `interview_english_ok`, `description` are
+`NOT NULL` for every `source='employer'` row (the publish-readiness gate
+enforces this before a row can become effective-public) but **null for
+`source='seed'` rows** (the local/CI demo seed does not populate them —
+pgTAP asserts this directly). `employer_type` and `website` are null for
+seed rows (no real `employer_profiles` row exists). `company_name` is null
+whenever the vacancy has no `company_id` (private-employer rows).
+`employer_display_name` is not expected null for any row these RPCs can
+return, but is not enforced by a single constraint spanning the join, so
+PR 5.5b's Zod schema should still treat it as nullable defensively. PR 5.5b
+must build its Zod schemas from this list, not from the generated types'
+non-null claims.
+
+pgTAP: `supabase/tests/database/26_effective_public_vacancy_read_contract_test.sql`
+(72 assertions — corrected from an earlier 58-assertion draft after adding
+zero-argument/no-overload proof, the elapsed-expiry case re-proven through
+all three public RPCs, and explicit nullability assertions; full local
+suite is **744 assertions across 27 files**, up from the PR 5.4 baseline of
+672/26). Next unit: PR 5.5b — `/jobs` public routes and candidate matching
+integration, built on this contract.
 
 ---
 

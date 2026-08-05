@@ -52,9 +52,10 @@ PR 5.1 Accepted decisions + locked schema contract  (this unit; docs only)
       -> PR 5.3a Operator verification read contract (narrow RPCs, no UI)
         -> PR 5.3b Operator verification queue/review UI (approve/reject)
           -> PR 5.4 Employer publish + lifecycle controls UI
-            -> PR 5.5 Public/candidate visibility + matching/apply integration
-              -> PR 5.6 Local exit proof + hosted-readiness package
-                -> PR 5.7 Hosted proof + closure (owner-authorized; isolated env)
+            -> PR 5.5a Effective-public vacancy read contract (narrow RPCs, no UI)
+              -> PR 5.5b Public/candidate visibility + matching/apply integration
+                -> PR 5.6 Local exit proof + hosted-readiness package
+                  -> PR 5.7 Hosted proof + closure (owner-authorized; isolated env)
 ```
 
 ---
@@ -160,7 +161,7 @@ resubmit action. Operator verify/reject implemented in PR 5.3b.
 
 ## PR 5.3b — Operator verification queue and review UI
 
-**Status:** In progress (this unit). Do not mark Done before merge.
+**Status:** Done (merged).
 
 **Objective:** Give an allow-listed operator the smallest safe operational
 interface to review and decide pending employer verification requests, built
@@ -215,7 +216,7 @@ returned by a loader.
 
 ## PR 5.4 — Publish and lifecycle controls
 
-**Status:** In progress (this unit). Do not mark Done before merge.
+**Status:** Done (merged).
 
 **Objective:** Verified employers publish ready drafts and manage lifecycle
 including renewal from expired.
@@ -267,6 +268,21 @@ database-authoritative; editable states stay exactly `draft`/`paused`.
 
 ## PR 5.5 — Public / candidate visibility and matching integration
 
+**Status:** Blocked, then split. UI implementation was correctly stopped
+after auditing the database contract before writing any route: the PR 5.2
+helpers (`is_vacancy_effectively_public`, `visible_public_vacancy_ids`)
+return a boolean/ID-list only — `anon` has zero table-level `SELECT` grant
+on `vacancies` or `vacancy_language_requirements` (revoked in the original
+PR 2.1 migration and never re-granted), and no `authenticated` RLS policy
+lets a candidate read another employer's effective-public row. This is
+locked in, not incidental: `supabase/tests/database/23_effective_public_and_application_test.sql`
+already asserts `throws_ok($$ select * from public.vacancies $$, '42501', ...,
+'anon still cannot select vacancies table')`. "Database effects: None
+expected (uses 5.2 helpers)" below was the original assumption for this
+section and turned out to be wrong — the helpers prove eligibility but do
+not project fields. Split into **PR 5.5a** (narrow read-contract migration)
+and **PR 5.5b** (UI, on top of that contract).
+
 **Objective:** Effectively public vacancies appear in public and candidate
 surfaces; apply works; drafts stay private.
 
@@ -275,7 +291,9 @@ detail apply for employer jobs; Demo seed regression; privacy-safe location.
 
 **Excludes:** Save/unsave; CV upload; employer applicant review; opaque ranking.
 
-**Database effects:** None expected (uses 5.2 helpers).
+**Database effects:** None expected (uses 5.2 helpers) — **superseded, see
+Status above.** PR 5.5a adds the missing narrow read RPCs; PR 5.5b adds no
+further database effects.
 
 **Route effects:** Public jobs routes; candidate matches/detail updates.
 
@@ -284,6 +302,86 @@ matcher unit tests with employer fixtures.
 
 **Exit criteria:** Candidates can match/apply to effectively public employer jobs;
 canonical visibility contract shared; snapshots unaffected.
+
+**Hosted-operation boundary:** None.
+
+---
+
+## PR 5.5a — Effective-public vacancy read contract
+
+**Status:** In progress (this unit). Do not mark Done before merge.
+
+**Objective:** Add the missing narrow, field-explicit read path for
+currently effective-public vacancies, callable by both `anon` and
+`authenticated`, so PR 5.5b can build `/jobs` and the candidate matching
+expansion without any RLS/grant work of its own.
+
+**Includes:** `list_effective_public_vacancies()` (no arguments — confirmed
+against `pg_proc` directly, single overload, `pronargs = 0`),
+`get_effective_public_vacancy(p_vacancy_id uuid)`,
+`get_effective_public_vacancy_languages(p_vacancy_id uuid)` — all three
+`SECURITY DEFINER`, fixed `search_path`, every returned column explicitly
+enumerated (no `SELECT *`, no `SETOF vacancies`, no JSON), gated exclusively
+on the existing `is_vacancy_effectively_public(v.id, now())` helper — never
+a caller-supplied visibility timestamp, so a row still stored `published`
+after its expiry elapsed but before materialization cannot be surfaced by
+passing an earlier instant. A separate languages RPC rather than an
+embedded composite array, since Supabase's type generation for composite
+arrays inside a `RETURNS TABLE` column is not reliably precise.
+
+**Excludes:** Any UI; any anon table grant; any new/broadened RLS policy;
+candidate-specific fields (matching eligibility, missing requirements,
+application state) — those stay separate authenticated-only contracts in
+PR 5.5b, never mixed into the public projection.
+
+**Database effects:** One migration
+(`20260805200000_effective_public_vacancy_read_contract.sql`), additive
+only. No table grant change, no RLS policy change — confirmed by pgTAP
+(anon `throws_ok` on direct table `SELECT` still passes unchanged).
+
+**Route effects:** None.
+
+**Tests:** pgTAP — privileges, list/detail eligibility across every
+lifecycle-exclusion case (draft/paused/filled/expired/withdrawn/elapsed-
+expiry/unverified/rejected employer), projection-safety (structural
+absence of forbidden fields), public employer presentation (organisation
+vs private company-name nullability, seed company name, seed
+`employer_type` null), language projection, and live state-change removal
+(pause/resume/fill/withdraw/verification-revocation).
+
+**Exit criteria:** Both RPCs return exactly the approved public projection
+for currently effective-public vacancies only, with anon/authenticated
+executing identically (no role-based field difference); direct table
+access remains exactly as narrow as before this PR.
+
+**Hosted-operation boundary:** None.
+
+---
+
+## PR 5.5b — Public and candidate vacancy discovery UI
+
+**Status:** Not started. Next unit after PR 5.5a merges.
+
+**Objective:** Original PR 5.5 objective, now built entirely on the PR 5.5a
+read contract instead of a direct table/RLS path.
+
+**Includes:** `/jobs` + `/jobs/[vacancyId]`; expand matches loader; candidate
+detail apply for employer jobs (existing `submit_candidate_application`,
+unchanged); Demo seed regression; privacy-safe location.
+
+**Excludes:** Save/unsave; CV upload; employer applicant review; opaque
+ranking; any new database migration (PR 5.5a already provides the needed
+read path).
+
+**Database effects:** None (consumes PR 5.5a RPCs only).
+
+**Route effects:** Public jobs routes; candidate matches/detail updates.
+
+**Tests:** Playwright public/candidate visibility; isolation; Slice 3
+regression; matcher unit tests with employer fixtures.
+
+**Exit criteria:** Candidates can match/apply to effectively public employer
+jobs; canonical visibility contract shared; snapshots unaffected.
 
 **Hosted-operation boundary:** None.
 
