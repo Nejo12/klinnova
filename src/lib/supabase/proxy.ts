@@ -1,12 +1,16 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { isCandidatePath, isProtectedEmployerPath } from "@/lib/auth/paths";
+import {
+  isCandidatePath,
+  isInternalPath,
+  isProtectedEmployerPath,
+} from "@/lib/auth/paths";
 import { resolveRedirectOrigin } from "@/lib/auth/site-origin";
 import { getPublicEnv } from "@/lib/env/public";
 import type { Database } from "@/types/database";
 
-export { isCandidatePath, isProtectedEmployerPath };
+export { isCandidatePath, isInternalPath, isProtectedEmployerPath };
 
 /** Copy Set-Cookie values from a Supabase-mutated response onto another response. */
 export function copyCookies(
@@ -23,12 +27,16 @@ function isProtectedAppPath(pathname: string): boolean {
   return (
     isCandidatePath(pathname) ||
     isProtectedEmployerPath(pathname) ||
+    isInternalPath(pathname) ||
     pathname === "/account/choose"
   );
 }
 
 /**
- * Refresh Auth cookies and protect candidate/employer authenticated areas.
+ * Refresh Auth cookies and protect candidate/employer/internal authenticated
+ * areas. Session/authentication gating only — operator membership for
+ * `/internal/*` is checked separately, server-side, via
+ * `is_current_user_verification_operator()`.
  * Uses verified claims (`getClaims`), not `getSession()`, for access decisions.
  * Performs no database writes and never uses a service-role client.
  */

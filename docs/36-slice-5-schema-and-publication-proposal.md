@@ -83,8 +83,20 @@ policies (select/insert/update) — confirmed by pgTAP file `25`. pgTAP:
 (47 assertions; full local suite is 672 assertions across 26 files). PR 5.3b
 must call `is_current_user_verification_operator()` first and deny the
 internal route on `false` — an empty pending list alone must never be treated
-as proof of operator authorization. Next unit: PR 5.3b — minimal operator
-list/detail and approve/reject UI, built on these three RPCs.
+as proof of operator authorization.
+
+**PR 5.3b — implemented** (no schema change; application-layer only).
+`/internal/verification` and `/internal/verification/[employerProfileId]`
+call the three PR 5.3a RPCs through a shared `requireActiveOperator` gate,
+and `approve_employer_verification` / `reject_employer_verification`
+(PR 5.2) remain the authoritative mutation path — the gate and read RPCs are
+defense in depth, not a substitute for the mutation RPCs' own operator and
+state rechecks under row lock. `/internal/*` was added to the proxy's
+protected-path set (`isInternalPath` in `src/lib/auth/paths.ts`) alongside
+`/candidate/*` and `/employer/*`, so unauthenticated requests get the same
+session-refresh and encoded-redirect treatment. No new migration, RLS
+policy, or grant. No revocation UI. Next unit: PR 5.4 — publish and
+lifecycle controls.
 
 ---
 

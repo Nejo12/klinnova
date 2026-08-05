@@ -18,6 +18,7 @@ vi.mock("@/lib/env/public", () => ({
 import {
   copyCookies,
   isCandidatePath,
+  isInternalPath,
   isProtectedEmployerPath,
   updateSession,
 } from "@/lib/supabase/proxy";
@@ -37,6 +38,16 @@ describe("isProtectedEmployerPath", () => {
     expect(isProtectedEmployerPath("/employer/onboarding")).toBe(true);
     expect(isProtectedEmployerPath("/employer/register")).toBe(false);
     expect(isProtectedEmployerPath("/login")).toBe(false);
+  });
+});
+
+describe("isInternalPath", () => {
+  it("matches internal operator routes only", () => {
+    expect(isInternalPath("/internal/verification")).toBe(true);
+    expect(isInternalPath("/internal")).toBe(true);
+    expect(isInternalPath("/internal/verification/abc")).toBe(true);
+    expect(isInternalPath("/employer")).toBe(false);
+    expect(isInternalPath("/internals")).toBe(false);
   });
 });
 
@@ -122,5 +133,18 @@ describe("updateSession", () => {
       new NextRequest("http://localhost:3000/employer/register"),
     );
     expect(publicResponse.status).toBe(200);
+  });
+
+  it("redirects anonymous internal verification routes with an encoded next", async () => {
+    getClaims.mockResolvedValue({ data: null, error: null });
+    createServerClient.mockImplementation(() => ({ auth: { getClaims } }));
+
+    const response = await updateSession(
+      new NextRequest("http://localhost:3000/internal/verification"),
+    );
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toContain(
+      "/login?next=%2Finternal%2Fverification",
+    );
   });
 });

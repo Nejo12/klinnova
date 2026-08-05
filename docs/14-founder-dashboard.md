@@ -10,10 +10,10 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M3 — Employer flow |
 | Active slice | Slice 5 — Employer verification to public vacancy |
-| Slice status | Active — D-055–D-067 Accepted; PR 5.1 Done; PR 5.2 Done; PR 5.3 employer verification UI Done; PR 5.3a operator read contract landed (database only, awaiting merge), operator UI still not built |
-| Next unit | PR 5.3b — minimal operator list/detail + approve/reject UI on top of the PR 5.3a read RPCs; then PR 5.4 publish/lifecycle controls |
+| Slice status | Active — D-055–D-067 Accepted; PR 5.1 Done; PR 5.2 Done; PR 5.3 employer verification UI Done; PR 5.3a operator read contract Done (merged); PR 5.3b operator queue/review/approve/reject UI in progress (this unit) |
+| Next unit | PR 5.3b (in progress) — minimal operator list/detail + approve/reject UI at `/internal/verification`; then PR 5.4 publish/lifecycle controls. Revocation UI, publication UI, and public jobs routes remain excluded from PR 5.3b. |
 | Next slice | Slice 6 — Applicant review (**not started**) |
-| Blockers | Preview has no Preview-scoped Supabase configuration (re-isolate before any Slice 5 hosted proof). Hosted Demo fixtures remain in Production until 2026-09-02. Operator UI still not built (PR 5.3b); the missing-read-RPC blocker itself is resolved by PR 5.3a. |
+| Blockers | Preview has no Preview-scoped Supabase configuration (re-isolate before any Slice 5 hosted proof). Hosted Demo fixtures remain in Production until 2026-09-02. |
 
 ## Slice 4 delivery (complete)
 
@@ -49,8 +49,9 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | D-055–D-067 | **Accepted** 2026-08-05 |
 | PR 5.1 — decision acceptance and schema contract | Done |
 | PR 5.2 — schema / RLS / RPCs / pgTAP | Done (merged; PR #49) |
-| PR 5.3 — employer verification request/status UI | Employer UI Done; operator UI **blocked** — no narrow read RPC for operator-membership check or pending-list (see `docs/35`) |
-| PR 5.3a — operator verification read contract | Database contract landed (migration + 47 pgTAP assertions, full local suite 672 assertions / 26 files + generated types), awaiting merge; do not mark Done before merge. Resolves the PR 5.3 read-RPC blocker; operator UI itself is PR 5.3b (not started) |
+| PR 5.3 — employer verification request/status UI | Done (merged; PR #50). Employer-facing `/employer/verification` request/status UI |
+| PR 5.3a — operator verification read contract | Done (merged; PR #51). Migration + 47 pgTAP assertions (full local suite 672 assertions / 26 files) + generated types |
+| PR 5.3b — operator verification queue/review UI | In progress (this unit). `/internal/verification` queue + `/internal/verification/[employerProfileId]` review detail; approve/reject Server Actions on the PR 5.3a read RPCs and existing approve/reject RPCs. No revocation UI, no publication UI, no public jobs routes, no general admin dashboard. Do not mark Done before merge. |
 | Vacancy lifecycle evidence | Narrow append-only `vacancy_lifecycle_events` selected per D-065 |
 | Slice 5 implementation | In progress — database foundation done; employer verification UI done; publication UI not started |
 | Preview isolated environment | Not configured |
