@@ -33,3 +33,13 @@ export function isEmployerIntentPath(pathname: string): boolean {
 export function isCandidateIntentPath(pathname: string): boolean {
   return isCandidatePath(pathname);
 }
+
+/**
+ * True for internal operator app paths (e.g. `/internal/verification`).
+ * Every internal path is protected — there is no public entry equivalent
+ * to `/employer/register`, and no candidate/employer intent is expressed
+ * here.
+ */
+export function isInternalPath(pathname: string): boolean {
+  return pathname === "/internal" || pathname.startsWith("/internal/");
+}

@@ -48,11 +48,13 @@ candidate visibility for eligible employer jobs, and lifecycle controls
 ```text
 PR 5.1 Accepted decisions + locked schema contract  (this unit; docs only)
   -> PR 5.2 Verification + publication schema, RLS, RPCs, pgTAP
-    -> PR 5.3 Employer verification request / status UI (+ minimal operator path)
-      -> PR 5.4 Employer publish + lifecycle controls UI
-        -> PR 5.5 Public/candidate visibility + matching/apply integration
-          -> PR 5.6 Local exit proof + hosted-readiness package
-            -> PR 5.7 Hosted proof + closure (owner-authorized; isolated env)
+    -> PR 5.3 Employer verification request / status UI
+      -> PR 5.3a Operator verification read contract (narrow RPCs, no UI)
+        -> PR 5.3b Operator verification queue/review UI (approve/reject)
+          -> PR 5.4 Employer publish + lifecycle controls UI
+            -> PR 5.5 Public/candidate visibility + matching/apply integration
+              -> PR 5.6 Local exit proof + hosted-readiness package
+                -> PR 5.7 Hosted proof + closure (owner-authorized; isolated env)
 ```
 
 ---
@@ -108,7 +110,7 @@ vacancies non-public; seed path green; types check passes.
 
 ## PR 5.3 — Employer verification request / status UI
 
-**Status:** Employer-facing UI Done. Operator UI **blocked** — see below.
+**Status:** Employer-facing UI Done. Operator UI moved to PR 5.3b — see below.
 
 **Objective:** Employer can request verification and see status; operator can
 approve/reject through the minimal Accepted path (not full Slice 7 queue).
@@ -141,17 +143,71 @@ on top of these three RPCs.
 
 **Database effects:** None. No migration added.
 
-**Route effects:** `/employer/verification` only. `/internal/verification` not
-implemented (blocked).
+**Route effects:** `/employer/verification` only. `/internal/verification`
+implemented in PR 5.3b.
 
 **Tests:** Vitest loader/action/view-resolver unit tests; Playwright employer
-verification journey (request → pending, reload-safe). No operator tests (no
-operator UI implemented).
+verification journey (request → pending, reload-safe). Operator tests moved
+to PR 5.3b.
 
 **Exit criteria:** Completed unverified employer can reach `pending`; rejected
 employer can resubmit; revoked employer sees blocked state with no working
-resubmit action. Operator verify/reject remains deferred to PR 5.3a UI once a
-narrow read RPC exists.
+resubmit action. Operator verify/reject implemented in PR 5.3b.
+
+**Hosted-operation boundary:** None.
+
+---
+
+## PR 5.3b — Operator verification queue and review UI
+
+**Status:** In progress (this unit). Do not mark Done before merge.
+
+**Objective:** Give an allow-listed operator the smallest safe operational
+interface to review and decide pending employer verification requests, built
+entirely on the PR 5.3a read RPCs and the PR 5.2 approve/reject RPCs.
+
+**Includes:** `/internal/verification` queue (minimum fields, ordered by the
+RPC, empty state); `/internal/verification/[employerProfileId]` review detail
+(read-only for non-pending states, approve/reject controls for pending);
+approve/reject Server Actions (`approve_employer_verification`,
+`reject_employer_verification`) with explicit confirmation, Zod validation,
+stale-`invalid_state` handling, and generic-safe error messages; a shared
+`requireActiveOperator` gate calling
+`is_current_user_verification_operator()` — never inferring authorization
+from an empty list/detail result and never querying `verification_operators`
+directly; `/internal/*` added to the proxy's protected-path set
+(`isInternalPath`) so unauthenticated requests get the same
+session-refresh + encoded-redirect treatment as `/candidate/*` and
+`/employer/*`.
+
+**Excludes:** Revocation UI (`verified → revoked` stays operator-mutation-only
+via existing RPC, no UI in this PR); publication UI; public jobs routes;
+applicant review; Storage/documents; a general admin dashboard; any new
+migration or RLS/grant change; hosted mutation.
+
+**Database effects:** None. Uses PR 5.2/5.3a RPCs unchanged.
+
+**Route effects:** `/internal/verification`,
+`/internal/verification/[employerProfileId]`. No public navigation link.
+
+**Tests:** Vitest for the operator gate, both loaders, and both actions;
+Playwright `internal-verification-journey.spec.ts` — unauthenticated redirect
+(no journey gate needed), authenticated non-operator generic-unavailable, and
+a full operator journey (register employer → complete onboarding → request
+verification → provision a local-only operator fixture via
+`withLocalPostgres` → approve → confirm queue/detail/employer-side update).
+Operator fixture provisioning has no application RPC or UI path by design
+(D-056); the E2E helper uses the same localhost-only direct-Postgres boundary
+already established by `e2e/helpers/local-application-proof.ts`, never a
+service-role client.
+
+**Exit criteria:** Active operator can approve a pending request; active
+operator can reject a pending request with a 1–500 character reason;
+non-operators and unauthenticated callers cannot reach queue or detail
+content; a stale pending view cannot bypass the mutation RPC's own
+transition check; no sensitive field (reviewer identity, email, auth
+metadata, exact address, candidate/application data) is ever rendered or
+returned by a loader.
 
 **Hosted-operation boundary:** None.
 
