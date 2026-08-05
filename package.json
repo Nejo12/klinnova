@@ -20,7 +20,7 @@
     "test:e2e:onboarding": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/auth-journey.spec.ts e2e/onboarding-journey.spec.ts e2e/completion-journey.spec.ts e2e/matches-journey.spec.ts",
     "test:e2e:slice2": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/slice2-critical-journey.spec.ts",
     "test:e2e:slice3": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/slice3-critical-journey.spec.ts",
-    "test:e2e:employer": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/employer-onboarding-journey.spec.ts e2e/employer-vacancy-draft-journey.spec.ts",
+    "test:e2e:employer": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/employer-onboarding-journey.spec.ts e2e/employer-vacancy-draft-journey.spec.ts e2e/employer-verification-journey.spec.ts",
     "proof:migrations": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/proof/migration-inventory.mts",
     "proof:slice4": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/proof/slice4.mts",
     "fixtures:hosted:apply": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/fixtures/hosted-demo.mts apply",

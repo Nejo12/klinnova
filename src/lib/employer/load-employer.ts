@@ -21,6 +21,9 @@ export type EmployerProfileData = {
   organisationLegalName: string | null;
   lawfulHiringDeclared: boolean | null;
   verificationState: string;
+  verificationRequestedAt: string | null;
+  verificationReviewedAt: string | null;
+  verificationReviewReason: string | null;
   onboardingCompletedAt: string | null;
   company: EmployerCompanySummary | null;
   typeLocked: boolean;
@@ -58,7 +61,7 @@ export async function loadEmployerProfile(
   const { data: profile, error: profileError } = await supabase
     .from("employer_profiles")
     .select(
-      "id, employer_type, display_name, berlin_locality, phone, website, organisation_legal_name, lawful_hiring_declared, verification_state, onboarding_completed_at",
+      "id, employer_type, display_name, berlin_locality, phone, website, organisation_legal_name, lawful_hiring_declared, verification_state, verification_requested_at, verification_reviewed_at, verification_review_reason, onboarding_completed_at",
     )
     .eq("id", user.id)
     .maybeSingle();
@@ -106,6 +109,9 @@ export async function loadEmployerProfile(
       organisationLegalName: profile.organisation_legal_name,
       lawfulHiringDeclared: profile.lawful_hiring_declared,
       verificationState: profile.verification_state,
+      verificationRequestedAt: profile.verification_requested_at,
+      verificationReviewedAt: profile.verification_reviewed_at,
+      verificationReviewReason: profile.verification_review_reason,
       onboardingCompletedAt: profile.onboarding_completed_at,
       company:
         company === null

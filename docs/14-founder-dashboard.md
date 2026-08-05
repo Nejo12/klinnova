@@ -10,10 +10,10 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M3 — Employer flow |
 | Active slice | Slice 5 — Employer verification to public vacancy |
-| Slice status | Active — D-055–D-067 Accepted; PR 5.1 Done; PR 5.2 database foundation in progress |
-| Next unit | Complete PR 5.2 — verification/publication schema, RLS, RPCs, pgTAP |
+| Slice status | Active — D-055–D-067 Accepted; PR 5.1 Done; PR 5.2 Done; PR 5.3 employer verification UI Done, operator UI blocked |
+| Next unit | PR 5.3a (proposed) — narrow operator-membership + pending-list RPCs, then operator UI; or proceed to PR 5.4 publish/lifecycle controls |
 | Next slice | Slice 6 — Applicant review (**not started**) |
-| Blockers | Preview has no Preview-scoped Supabase configuration (re-isolate before any Slice 5 hosted proof). Hosted Demo fixtures remain in Production until 2026-09-02. |
+| Blockers | Preview has no Preview-scoped Supabase configuration (re-isolate before any Slice 5 hosted proof). Hosted Demo fixtures remain in Production until 2026-09-02. Operator review UI blocked on missing narrow read RPCs (see PR 5.3 entry below). |
 
 ## Slice 4 delivery (complete)
 
@@ -48,9 +48,10 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | `docs/36-slice-5-schema-and-publication-proposal.md` | Done — PR 5.2 schema contract locked |
 | D-055–D-067 | **Accepted** 2026-08-05 |
 | PR 5.1 — decision acceptance and schema contract | Done |
-| PR 5.2 — schema / RLS / RPCs / pgTAP | In progress |
+| PR 5.2 — schema / RLS / RPCs / pgTAP | Done (merged; PR #49) |
+| PR 5.3 — employer verification request/status UI | Employer UI Done; operator UI **blocked** — no narrow read RPC for operator-membership check or pending-list (see `docs/35`) |
 | Vacancy lifecycle evidence | Narrow append-only `vacancy_lifecycle_events` selected per D-065 |
-| Slice 5 implementation | In progress — database foundation only |
+| Slice 5 implementation | In progress — database foundation done; employer verification UI done; publication UI not started |
 | Preview isolated environment | Not configured |
 | Production | Untouched for Slice 5 |
 | Publication / verification approval UI (full admin) | Slice 7 (not started) |
