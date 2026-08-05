@@ -86,7 +86,9 @@ Each slice is the unit of planning, implementation, and review. Size for roughly
 
 **Accepted Slice 3 narrowings (D-035–D-045; Accepted 2026-08-03):** authenticated `/candidate/jobs/[vacancyId]` detail for RLS-visible seed vacancies using schema-backed fields only; profile-based preview and atomic submit; reload-safe confirmation from RPC-generated versioned snapshots; Applied-state feedback; permanent DB unique one application per candidate per vacancy; status constrained to `submitted` only. Deferred from this slice: save/unsave; CV/Storage; salary/distance/experience/verification/interview-language fields; employer status transitions; withdrawal/resubmission; future application statuses beyond `submitted`; full applications dashboard. Employer implementation remains Slice 4+.
 
-**Planning artifacts:** discovery `docs/22-slice-3-discovery.md`, build plan `docs/23-slice-3-build-plan.md`, schema/journey proposal `docs/24-slice-3-schema-and-journey-proposal.md`. PR 3.1 is the next implementation unit; implementation has not started.
+**Planning artifacts:** discovery `docs/22-slice-3-discovery.md`, build plan `docs/23-slice-3-build-plan.md`, schema/journey proposal `docs/24-slice-3-schema-and-journey-proposal.md`.
+
+**Status:** **Done** — PR 3.1–3.5 merged (#33–#37); local + Production hosted proof complete (`docs/25`–`docs/27`).
 
 **Exit criteria (operational for narrowed Slice 3):**
 
@@ -109,17 +111,24 @@ Each slice is the unit of planning, implementation, and review. Size for roughly
 - required eligibility fields are explicit before publish is possible later
 - exact private residential addresses are not publicly exposed
 
-**Planning status:** Contracts Accepted 2026-08-03 (D-046–D-054) in
-`docs/10-decisions.md`. Planning package `docs/28`–`docs/30` locked. Slice 4
-implementation has **not** started. Next authorized unit after
-decision-acceptance merge: **PR 4.1 — employer identity/profile schema and RLS**.
-Verification and publication remain Slice 5.
+**Planning status:** Contracts Accepted 2026-08-03 (D-046–D-054). Planning
+package `docs/28`–`docs/30` locked.
+
+**Status:** **Done** — PR 4.1–4.5 merged (#41–#45); local + Preview/disposable
+hosted proof complete (`docs/31`–`docs/33`). Verification and publication remain
+Slice 5.
 
 ### Slice 5 — Employer verification to public vacancy
 
 **Outcome:** only verified employers can publish public vacancies.
 
 **Includes:** type-specific employer verification state (D-034); create/edit/publish/pause/expire/fill flows; public job visibility rules with privacy-safe location for private workplaces.
+
+**Planning status:** Discovery/planning package `docs/34`–`docs/36`; decisions
+D-055–D-067 **Proposed** (not Accepted). Slice 5 implementation has **not**
+started. Preview currently has no Preview-scoped Supabase configuration after
+Slice 4 teardown — future hosted proof requires explicit re-isolation (`docs/33`,
+D-067). Slice 6 / 7 / 8 have not started.
 
 **Exit criteria:**
 
