@@ -39,25 +39,52 @@ path). Building it would require either a service-role client in the
 application (forbidden by D-066) or broadening RLS/grants (a schema change,
 which PR 5.3 was instructed to avoid absent an explicit blocker report).
 
-**Proposed PR 5.3a (database follow-up, not yet implemented):**
+**PR 5.3a — implemented** (migration
+`20260805170000_operator_verification_read_contract.sql`, one file, additive
+only — no existing table, policy, or grant changed):
 
-1. `is_current_user_verification_operator() returns boolean` — `SECURITY
-   DEFINER`, `stable`, derives identity from `auth.uid()`, no parameters,
-   `grant execute to authenticated`. Returns `false` for unauthenticated/
-   non-operator/inactive-operator; `true` only for an active allow-listed
-   operator matching the caller's own session.
-2. `list_pending_employer_verifications() returns setof <narrow row type>` —
-   `SECURITY DEFINER`, callable by `authenticated`, internally checks
-   `_is_active_verification_operator(auth.uid())` and returns `forbidden`-
-   equivalent empty result (or raises) for non-operators. Row shape limited to
-   the minimum operational fields already specified in PR 5.3 scope: employer
-   display name, employer type, company name (organisation only), public
-   website, request timestamp, verification state. No addresses, no candidate
-   data, no operator identities, no auth metadata.
+1. `is_current_user_verification_operator() returns boolean` — `language
+   sql`, `SECURITY DEFINER`, `stable`, fixed `search_path`, no parameters,
+   derives identity from `auth.uid()` via the existing
+   `_is_active_verification_operator(uuid)` helper. `anon` has no EXECUTE
+   grant, so a genuine anonymous call is denied by privilege
+   (`permission denied`, SQLSTATE `42501`) before the function body runs.
+   For an authenticated caller, `false` covers no session identity,
+   non-operator, and inactive operator; `true` only for the caller's own
+   active allow-listed operator membership.
+2. `list_pending_employer_verifications() returns table (employer_profile_id,
+   employer_type, display_name, company_name, website, onboarding_completed,
+   verification_state, verification_requested_at, verification_attested_at,
+   verification_attestation_version)` — `language sql`, `SECURITY DEFINER`,
+   `stable`. The operator gate is a `WHERE ... AND
+   _is_active_verification_operator(auth.uid())` predicate, so non-operators
+   get a deterministic empty result (no exception, no partial row). Ordered
+   `verification_requested_at ASC, employer_profile_id ASC`. `company_name`
+   comes from the employer's owned `companies.name` (organisation only, via
+   `owner_employer_id`) and is `null` for private employers. No reviewer
+   identity, auth metadata, address, candidate, or application data.
+3. `get_employer_verification_review(p_employer_profile_id uuid) returns
+   table (employer_profile_id, employer_type, display_name, company_name,
+   website, berlin_locality, onboarding_completed, verification_state,
+   verification_requested_at, verification_attested_at,
+   verification_attestation_version, verification_reviewed_at,
+   verification_review_reason)` — same shape as above, plus review
+   timestamps/reason, still excluding `verification_reviewed_by`. Eligible
+   states: `pending`, `verified`, `rejected` (not `unverified`/`revoked`).
+   Non-operators, non-eligible states, and unknown ids all return zero rows.
 
-Both functions are additive, narrowly scoped, and do not change existing
-grants, RLS policies, or the `verification_operators` table shape. They should
-land as their own reviewed migration before any operator UI is implemented.
+All three are `revoke all ... from public, anon; grant execute ... to
+authenticated`, and `anon`'s lack of EXECUTE is proven at the API layer (not
+just by ACL inspection) via `throws_ok(..., '42501', ...)` invocation tests
+for each RPC. `verification_operators` still has no authenticated SELECT
+policy; `employer_profiles` still has exactly its original 3 owner-only
+policies (select/insert/update) — confirmed by pgTAP file `25`. pgTAP:
+`supabase/tests/database/25_operator_verification_read_contract_test.sql`
+(47 assertions; full local suite is 672 assertions across 26 files). PR 5.3b
+must call `is_current_user_verification_operator()` first and deny the
+internal route on `false` — an empty pending list alone must never be treated
+as proof of operator authorization. Next unit: PR 5.3b — minimal operator
+list/detail and approve/reject UI, built on these three RPCs.
 
 ---
 

@@ -127,11 +127,17 @@ revoked from `authenticated` (service-role only). The existing
 internally gate on operator membership and are safe to call, but there is no
 safe way to *render* an operator route (auth-gate it or list pending rows)
 without either a new narrow RPC or broadening RLS/grants — both out of scope
-for this PR per the instruction not to add a migration or weaken RLS. Proposed
-follow-up: **PR 5.3a** — add two narrow SECURITY DEFINER RPCs: one returning
-the caller's own active-operator boolean, one listing minimal pending-request
-fields for active operators only. No document upload; no suspension UI; no
-reports; no moderation; no general admin dashboard in either PR.
+for this PR per the instruction not to add a migration or weaken RLS.
+
+**Resolved by PR 5.3a** (database contract landed, `docs/36`):
+`is_current_user_verification_operator()`,
+`list_pending_employer_verifications()`, and
+`get_employer_verification_review(uuid)` — three narrow, additive,
+`SECURITY DEFINER` read RPCs gated on the existing operator helper. No
+grant/RLS change, no operator-management RPC, no document upload, no
+suspension UI, no reports, no moderation, no general admin dashboard, no UI
+of any kind. Operator UI itself remains **PR 5.3b** — the next unit — built
+on top of these three RPCs.
 
 **Database effects:** None. No migration added.
 

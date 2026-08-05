@@ -648,9 +648,43 @@ export type Database = {
         Returns: Json
       }
       fill_employer_vacancy: { Args: { p_vacancy_id: string }; Returns: Json }
+      get_employer_verification_review: {
+        Args: { p_employer_profile_id: string }
+        Returns: {
+          berlin_locality: string
+          company_name: string
+          display_name: string
+          employer_profile_id: string
+          employer_type: string
+          onboarding_completed: boolean
+          verification_attestation_version: string
+          verification_attested_at: string
+          verification_requested_at: string
+          verification_review_reason: string
+          verification_reviewed_at: string
+          verification_state: string
+          website: string
+        }[]
+      }
+      is_current_user_verification_operator: { Args: never; Returns: boolean }
       is_vacancy_effectively_public: {
         Args: { p_at?: string; p_vacancy_id: string }
         Returns: boolean
+      }
+      list_pending_employer_verifications: {
+        Args: never
+        Returns: {
+          company_name: string
+          display_name: string
+          employer_profile_id: string
+          employer_type: string
+          onboarding_completed: boolean
+          verification_attestation_version: string
+          verification_attested_at: string
+          verification_requested_at: string
+          verification_state: string
+          website: string
+        }[]
       }
       materialize_employer_vacancy_expiry: {
         Args: { p_vacancy_id: string }
