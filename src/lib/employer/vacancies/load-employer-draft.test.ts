@@ -14,7 +14,7 @@ import { loadEmployerDraft } from "@/lib/employer/vacancies/load-employer-draft"
 function makeClient() {
   const eqId = vi.fn(() => ({
     eq: vi.fn(() => ({
-      eq: vi.fn(() => ({
+      in: vi.fn(() => ({
         eq: vi.fn(() => ({ maybeSingle })),
       })),
     })),
@@ -195,5 +195,69 @@ describe("loadEmployerDraft", () => {
       { languageCode: "en", minProficiency: "basic" },
     ]);
     expect(result.draft.ready).toBe(false);
+    expect(result.draft.publicationState).toBe("draft");
+  });
+
+  it("loads an owned paused vacancy as editable (D-058 editing matrix)", async () => {
+    loadEmployerProfile.mockResolvedValue({
+      ok: true,
+      userId: "emp-1",
+      data: {
+        id: "emp-1",
+        employerType: "private",
+        displayName: "Ada",
+        berlinLocality: "Mitte",
+        phone: null,
+        website: null,
+        organisationLegalName: null,
+        lawfulHiringDeclared: true,
+        verificationState: "verified",
+        onboardingCompletedAt: "2026-08-01T00:00:00Z",
+        company: null,
+        typeLocked: true,
+      },
+    });
+    maybeSingle.mockResolvedValue({
+      data: {
+        id: "22222222-2222-4222-8222-222222222299",
+        title: "Cleaner",
+        job_category: "cleaning",
+        public_locality: "Mitte",
+        description: "Wash floors",
+        workplace_type: null,
+        work_frequency: null,
+        available_from: null,
+        experience_notes: null,
+        cv_required: null,
+        interview_english_ok: null,
+        salary_amount_cents: 1500,
+        salary_currency: "EUR",
+        salary_period: "hourly",
+        salary_is_gross: true,
+        updated_at: "2026-08-04T00:00:00Z",
+        created_at: "2026-08-04T00:00:00Z",
+        source: "employer",
+        publication_state: "paused",
+        employer_profile_id: "emp-1",
+        companies: null,
+      },
+      error: null,
+    });
+    languageOrder.mockResolvedValue({ data: [], error: null });
+    rpc.mockResolvedValue({
+      data: { status: "ok", ready: true, missing: [] },
+      error: null,
+    });
+
+    const result = await loadEmployerDraft(
+      makeClient() as never,
+      "22222222-2222-4222-8222-222222222299",
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.draft.publicationState).toBe("paused");
   });
 });

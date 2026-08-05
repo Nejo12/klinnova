@@ -1,6 +1,8 @@
 import {
   VACANCY_GENERIC_FAILURE,
   VACANCY_INCOMPLETE_EMPLOYER,
+  VACANCY_LIFECYCLE_INCOMPLETE,
+  VACANCY_LIFECYCLE_STALE,
   VACANCY_NOT_DELETABLE,
   VACANCY_UNAUTHENTICATED,
   VACANCY_UNAVAILABLE,
@@ -62,6 +64,106 @@ export function mapDeleteDraftStatus(status: string): string {
       return VACANCY_UNAVAILABLE;
     case "not_deletable":
       return VACANCY_NOT_DELETABLE;
+    default:
+      return VACANCY_GENERIC_FAILURE;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// PR 5.4 — lifecycle status mapping. `incomplete` carries a `missing` array
+// handled separately by the caller (mapped through
+// `mapReadinessChecklist`) — these functions only cover the plain error
+// message shown alongside it.
+// ---------------------------------------------------------------------------
+
+export function mapPublishStatus(status: string): string {
+  switch (status) {
+    case "unauthenticated":
+      return VACANCY_UNAUTHENTICATED;
+    case "unavailable":
+      return VACANCY_UNAVAILABLE;
+    case "invalid_state":
+      return VACANCY_LIFECYCLE_STALE;
+    case "incomplete":
+      return VACANCY_LIFECYCLE_INCOMPLETE;
+    default:
+      return VACANCY_GENERIC_FAILURE;
+  }
+}
+
+export function mapPauseStatus(status: string): string {
+  switch (status) {
+    case "unauthenticated":
+      return VACANCY_UNAUTHENTICATED;
+    case "unavailable":
+      return VACANCY_UNAVAILABLE;
+    case "invalid_state":
+      return VACANCY_LIFECYCLE_STALE;
+    default:
+      return VACANCY_GENERIC_FAILURE;
+  }
+}
+
+export function mapResumeStatus(status: string): string {
+  switch (status) {
+    case "unauthenticated":
+      return VACANCY_UNAUTHENTICATED;
+    case "unavailable":
+      return VACANCY_UNAVAILABLE;
+    case "invalid_state":
+      return VACANCY_LIFECYCLE_STALE;
+    case "incomplete":
+      return VACANCY_LIFECYCLE_INCOMPLETE;
+    default:
+      return VACANCY_GENERIC_FAILURE;
+  }
+}
+
+export function mapFillStatus(status: string): string {
+  switch (status) {
+    case "unauthenticated":
+      return VACANCY_UNAUTHENTICATED;
+    case "unavailable":
+      return VACANCY_UNAVAILABLE;
+    case "invalid_state":
+      return VACANCY_LIFECYCLE_STALE;
+    default:
+      return VACANCY_GENERIC_FAILURE;
+  }
+}
+
+export function mapWithdrawStatus(status: string): string {
+  switch (status) {
+    case "unauthenticated":
+      return VACANCY_UNAUTHENTICATED;
+    case "unavailable":
+      return VACANCY_UNAVAILABLE;
+    case "invalid_state":
+      return VACANCY_LIFECYCLE_STALE;
+    default:
+      return VACANCY_GENERIC_FAILURE;
+  }
+}
+
+export function mapMaterializeExpiryStatus(status: string): string {
+  switch (status) {
+    case "unauthenticated":
+      return VACANCY_UNAUTHENTICATED;
+    case "unavailable":
+      return VACANCY_UNAVAILABLE;
+    default:
+      return VACANCY_GENERIC_FAILURE;
+  }
+}
+
+export function mapRenewStatus(status: string): string {
+  switch (status) {
+    case "unauthenticated":
+      return VACANCY_UNAUTHENTICATED;
+    case "unavailable":
+      return VACANCY_UNAVAILABLE;
+    case "invalid_state":
+      return VACANCY_LIFECYCLE_STALE;
     default:
       return VACANCY_GENERIC_FAILURE;
   }

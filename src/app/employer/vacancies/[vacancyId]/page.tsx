@@ -5,7 +5,7 @@ import styles from "@/components/employer-vacancies/employer-vacancies.module.sc
 import { VacancyDetail } from "@/components/employer-vacancies/vacancy-detail";
 import { VacancyUnavailable } from "@/components/employer-vacancies/vacancy-unavailable";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
-import { loadEmployerDraft } from "@/lib/employer/vacancies/load-employer-draft";
+import { loadEmployerVacancy } from "@/lib/employer/vacancies/load-employer-vacancy";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -29,7 +29,7 @@ export default async function EmployerVacancyDetailPage({
 }: EmployerVacancyDetailPageProps) {
   const { vacancyId } = await params;
   const supabase = await createServerSupabaseClient();
-  const loaded = await loadEmployerDraft(supabase, vacancyId);
+  const loaded = await loadEmployerVacancy(supabase, vacancyId);
 
   if (!loaded.ok) {
     if (loaded.reason === "unauthenticated") {
@@ -53,8 +53,8 @@ export default async function EmployerVacancyDetailPage({
         showEmployer={capabilities?.hasEmployerProfile === true}
         currentPath="vacancies"
       />
-      <h1 className={styles.heading}>{loaded.draft.title}</h1>
-      <VacancyDetail draft={loaded.draft} />
+      <h1 className={styles.heading}>{loaded.vacancy.title}</h1>
+      <VacancyDetail vacancy={loaded.vacancy} />
     </main>
   );
 }

@@ -55,8 +55,17 @@ export default async function EditEmployerVacancyPage({
         currentPath="vacancies"
       />
       <h1 className={styles.heading}>Edit vacancy draft</h1>
-      <p className={styles.note}>{VACANCY_PRIVATE_NOTICE}</p>
-      <p className={styles.note}>{VACANCY_VERIFICATION_INFO}</p>
+      {loaded.draft.publicationState === "paused" ? (
+        <p className={styles.note}>
+          This vacancy is currently paused. Changes are saved immediately, but
+          it stays paused until you resume it from the manage page.
+        </p>
+      ) : (
+        <>
+          <p className={styles.note}>{VACANCY_PRIVATE_NOTICE}</p>
+          <p className={styles.note}>{VACANCY_VERIFICATION_INFO}</p>
+        </>
+      )}
       {loaded.draft.companyName !== null ? (
         <p className={styles.support}>
           Organisation company: {loaded.draft.companyName}

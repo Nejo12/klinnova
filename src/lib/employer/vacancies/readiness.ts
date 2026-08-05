@@ -10,6 +10,15 @@ export const READINESS_ITEM_LABELS: Record<string, string> = {
   company: "Organisation company link",
   employer_completion: "Completed employer profile",
   publication_state: "Draft publication state",
+  // Returned by publish_employer_vacancy / resume_employer_vacancy
+  // (`incomplete` status, PR 5.2) rather than employer_vacancy_draft_readiness
+  // (PR 4.3, pre-verification) — that older RPC does not check these.
+  verification: "Employer verification",
+  workplace_type: "Workplace type",
+  work_frequency: "Work frequency",
+  cv_required: "CV requirement declaration",
+  interview_english_ok: "English-interview declaration",
+  expiry: "Valid publication expiry (up to 90 days)",
 };
 
 export type ReadinessChecklistItem = {

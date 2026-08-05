@@ -39,3 +39,40 @@ export const VACANCY_UPDATED = "Draft changes saved.";
 export const VACANCY_LANGUAGES_UPDATED = "Language requirements saved.";
 
 export const VACANCY_DELETED = "Draft deleted.";
+
+// ---------------------------------------------------------------------------
+// PR 5.4 — lifecycle controls
+// ---------------------------------------------------------------------------
+
+export const VACANCY_LIFECYCLE_STALE =
+  "This vacancy's status changed since the page loaded. It has been refreshed below.";
+
+export const VACANCY_LIFECYCLE_INCOMPLETE =
+  "This vacancy is not ready to publish yet. See the missing items below.";
+
+export const VACANCY_PUBLISH_CONFIRM =
+  "Publishing may make this vacancy publicly visible. Only currently eligible vacancies become effectively public, and publishing does not create applications automatically.";
+
+export const VACANCY_PAUSE_CONFIRM =
+  "Pausing stops this vacancy from being publicly visible. Existing applications are preserved.";
+
+export const VACANCY_RESUME_CONFIRM =
+  "Resuming checks readiness and verification again. This vacancy becomes public only if every requirement still passes.";
+
+export const VACANCY_FILL_CONFIRM =
+  "Marking this vacancy filled is final. It cannot be resumed or edited afterward. Existing applications are preserved.";
+
+export const VACANCY_WITHDRAW_CONFIRM =
+  "Withdrawing this vacancy is final. It cannot be resumed. Existing applications are preserved.";
+
+export const VACANCY_RENEW_CONFIRM =
+  "Renewing returns this vacancy to draft. It must be reviewed and published again with a new expiry. Its publication history is preserved.";
+
+export const VACANCY_PUBLISH_EXPIRY_NOTE =
+  "Publishing sets a 30-day expiry by default (maximum 90 days). Renew after expiry to publish again.";
+
+export const VACANCY_VERIFICATION_BLOCKER =
+  "Employer verification is required before this vacancy can be published.";
+
+export const VACANCY_EFFECTIVE_EXPIRED_NOTE =
+  "This vacancy's expiry date has passed. It is no longer publicly visible even though its stored status has not been refreshed yet.";
