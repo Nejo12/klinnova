@@ -1,13 +1,63 @@
 # Slice 5 Schema and Publication Proposal
 
 > Contract for Slice 5. **Status:** Locked with Accepted D-055–D-067 (2026-08-05).
-> PR 5.2 is implementing this database contract.
+> PR 5.2 implemented this database contract (merged, PR #49; migration
+> `20260805110000_verification_and_vacancy_publication.sql`).
 
-**Baseline schema:** seven migrations through
-`20260804120000_employer_owned_draft_vacancies.sql`. Types:
+**Baseline schema:** eight migrations through
+`20260805110000_verification_and_vacancy_publication.sql`. Types:
 `src/types/database.ts`.
 
 **Authoritative decisions:** D-055–D-067 in `docs/10-decisions.md` (**Accepted**).
+
+## PR 5.3 database-contract audit (operator read access)
+
+During PR 5.3 implementation, the following was confirmed against the merged
+PR 5.2 migration:
+
+- `verification_operators` has `revoke all ... from public, anon, authenticated`
+  and `grant all ... to service_role` only — no authenticated SELECT policy.
+- `_is_active_verification_operator(uuid)` is `revoke all ... from public, anon,
+  authenticated` — callable only by other `SECURITY DEFINER` functions
+  internally, not directly by an authenticated Server Action.
+- `approve_employer_verification`, `reject_employer_verification`, and
+  `revoke_employer_verification` all correctly gate on operator membership
+  internally and are `grant execute ... to authenticated` — these three RPCs
+  are safe to invoke from an authenticated Server Action once a caller already
+  knows (or is willing to attempt and receive a `forbidden` result for) an
+  employer profile id.
+- There is **no RPC to let a caller check their own operator status**, and
+  **no RPC to list pending verification requests** for active operators.
+- `employer_profiles` RLS remains owner-only SELECT — no operator-scoped read
+  policy exists for listing other employers' profiles.
+
+**Consequence:** an operator review route (`/internal/verification`) cannot be
+safely gated (no way to distinguish "operator" from "non-operator" without
+either calling `approve`/`reject` blind, which would create real side effects
+just to probe membership) and cannot safely render a pending list (no read
+path). Building it would require either a service-role client in the
+application (forbidden by D-066) or broadening RLS/grants (a schema change,
+which PR 5.3 was instructed to avoid absent an explicit blocker report).
+
+**Proposed PR 5.3a (database follow-up, not yet implemented):**
+
+1. `is_current_user_verification_operator() returns boolean` — `SECURITY
+   DEFINER`, `stable`, derives identity from `auth.uid()`, no parameters,
+   `grant execute to authenticated`. Returns `false` for unauthenticated/
+   non-operator/inactive-operator; `true` only for an active allow-listed
+   operator matching the caller's own session.
+2. `list_pending_employer_verifications() returns setof <narrow row type>` —
+   `SECURITY DEFINER`, callable by `authenticated`, internally checks
+   `_is_active_verification_operator(auth.uid())` and returns `forbidden`-
+   equivalent empty result (or raises) for non-operators. Row shape limited to
+   the minimum operational fields already specified in PR 5.3 scope: employer
+   display name, employer type, company name (organisation only), public
+   website, request timestamp, verification state. No addresses, no candidate
+   data, no operator identities, no auth metadata.
+
+Both functions are additive, narrowly scoped, and do not change existing
+grants, RLS policies, or the `verification_operators` table shape. They should
+land as their own reviewed migration before any operator UI is implemented.
 
 ---
 

@@ -108,22 +108,44 @@ vacancies non-public; seed path green; types check passes.
 
 ## PR 5.3 — Employer verification request / status UI
 
+**Status:** Employer-facing UI Done. Operator UI **blocked** — see below.
+
 **Objective:** Employer can request verification and see status; operator can
 approve/reject through the minimal Accepted path (not full Slice 7 queue).
 
-**Includes:** Employer verification status surfaces; request/attestation; operator
-approve/reject Server Actions bound to allow-list.
+**Includes:** Employer verification status surfaces (`/employer/verification`);
+attestation-based request/resubmission Server Action; state-specific panels for
+unverified/pending/verified/rejected/revoked; employer navigation entry.
 
-**Excludes:** Document upload; suspension UI; reports; moderation.
+**Blocked and excluded from this PR:** Operator review UI
+(`/internal/verification`). Database-contract audit found no narrow, Auth-bound
+RPC that lets an authenticated caller (a) confirm their own operator membership
+or (b) list pending verification requests. `verification_operators` has no
+authenticated SELECT policy, and `_is_active_verification_operator(uuid)` is
+revoked from `authenticated` (service-role only). The existing
+`approve_employer_verification` / `reject_employer_verification` RPCs
+internally gate on operator membership and are safe to call, but there is no
+safe way to *render* an operator route (auth-gate it or list pending rows)
+without either a new narrow RPC or broadening RLS/grants — both out of scope
+for this PR per the instruction not to add a migration or weaken RLS. Proposed
+follow-up: **PR 5.3a** — add two narrow SECURITY DEFINER RPCs: one returning
+the caller's own active-operator boolean, one listing minimal pending-request
+fields for active operators only. No document upload; no suspension UI; no
+reports; no moderation; no general admin dashboard in either PR.
 
-**Database effects:** None beyond using PR 5.2 RPCs.
+**Database effects:** None. No migration added.
 
-**Route effects:** Employer verification status routes/sections as designed.
+**Route effects:** `/employer/verification` only. `/internal/verification` not
+implemented (blocked).
 
-**Tests:** Vitest actions; Playwright verification journey; non-operator deny.
+**Tests:** Vitest loader/action/view-resolver unit tests; Playwright employer
+verification journey (request → pending, reload-safe). No operator tests (no
+operator UI implemented).
 
-**Exit criteria:** Completed unverified employer can reach `pending`; operator can
-verify/reject; non-operators cannot approve.
+**Exit criteria:** Completed unverified employer can reach `pending`; rejected
+employer can resubmit; revoked employer sees blocked state with no working
+resubmit action. Operator verify/reject remains deferred to PR 5.3a UI once a
+narrow read RPC exists.
 
 **Hosted-operation boundary:** None.
 

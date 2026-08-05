@@ -71,6 +71,9 @@ export default async function EmployerHomePage() {
         <Link className={styles.linkButton} href="/employer/vacancies/new">
           Create draft
         </Link>
+        <Link className={styles.linkButton} href="/employer/verification">
+          Verification
+        </Link>
       </p>
 
       <p className={styles.note}>{EMPLOYER_VERIFICATION_NOTICE}</p>
