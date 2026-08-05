@@ -9,10 +9,10 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | Field | Value |
 |-------|--------|
 | Active milestone | M3 — Employer flow |
-| Active slice | Slice 4 — Employer registration to draft vacancy (**Done**) |
-| Slice status | Done — PR 4.1–4.5 merged (#41–#45); local + Preview/disposable hosted proof complete; disposable project deleted; D-046–D-054 complete for draft path |
-| Next slice | Slice 5 — Employer verification to public vacancy (**not started**) |
-| Blockers | None for Slice 4. Slice 5 not started. Publication/verification not started. Preview currently has no Preview-scoped Supabase overrides after proof cleanup (re-isolate before next hosted proof). Hosted Demo fixtures remain in Production until 2026-09-02. |
+| Active slice | Slice 5 — Employer verification to public vacancy (**discovery/planning**) |
+| Slice status | Planning — `docs/34`–`docs/36`; D-055–D-067 Proposed (not Accepted); no Slice 5 implementation |
+| Next slice | Slice 6 — Applicant review (**not started**) |
+| Blockers | Slice 5 decisions not yet Accepted. Preview has no Preview-scoped Supabase configuration (re-isolate before any Slice 5 hosted proof). Hosted Demo fixtures remain in Production until 2026-09-02. |
 
 ## Slice 4 delivery (complete)
 
@@ -34,8 +34,22 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | Local Slice 4 exit proof | Pass via `pnpm proof:slice4` |
 | Hosted Slice 4 proof | Done — Preview + disposable `wbucxaquktraobrvknts` (deleted after proof) |
 | Production authorization | Not used / not granted for Slice 4 hosted proof |
-| Publication / verification | Not started |
-| Slice 5 / Slice 6 | Not started |
+| Publication / verification | Not started (Slice 5) |
+| Slice 5 | Discovery/planning — D-055–D-067 Proposed |
+| Slice 6 / Slice 7 / Slice 8 | Not started |
+
+## Slice 5 planning (active)
+
+| Artifact | Status |
+|----------|--------|
+| `docs/34-slice-5-discovery.md` | Draft — decision-ready; awaiting owner acceptance |
+| `docs/35-slice-5-build-plan.md` | Draft — PR 5.1–5.7 sequence proposed |
+| `docs/36-slice-5-schema-and-publication-proposal.md` | Draft — schema/RPC/RLS contract proposed |
+| D-055–D-067 | **Proposed** — not Accepted |
+| Slice 5 implementation | Not started |
+| Publication / verification approval UI (full admin) | Slice 7 (not started) |
+| Applicant review | Slice 6 (not started) |
+| Preview isolation | Not configured — must re-isolate before hosted proof |
 
 ## Slice 3 delivery (complete)
 
@@ -138,6 +152,7 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 | 2 Matches | Essentials → seeded explainable matches | Done — PR 2.1–2.4 merged (#26–#29); hosted Production proof complete; Demo fixtures expire 2026-09-02 |
 | 3 Apply | Job detail → submitted application | Done — PR 3.1–3.5 merged (#33–#37); local + Production hosted proof complete; D-035–D-045 complete; Demo fixtures expire 2026-09-02 |
 | 4 Employer draft | Register → draft vacancy | Done — PR 4.1–4.5 merged (#41–#45); local + Preview/disposable hosted proof complete; publication not started |
+| 5 Verification → public vacancy | Verified publish + lifecycle | Planning — `docs/34`–`docs/36`; D-055–D-067 Proposed; implementation not started |
 | 5 Publish | Verification → public vacancy | Not started |
 | 6 Review | Applicant review → status update | Not started |
 | 7 Trust ops | Admin moderation → audit | Not started |

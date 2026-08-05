@@ -753,3 +753,174 @@ Behaviour: unauthenticated → login with validated `next`; candidate-only accou
 **Consequences:** Preview infrastructure fix is a preferred-proof prerequisite, not a Slice 4 product scope item.
 
 **Acceptance note:** Accepted 2026-08-03 by repository owner after PR #39 discovery review; Production remains unauthorized until a later explicit decision.
+
+## D-055 — Slice 5 boundary
+
+**Status:** Proposed
+**Must accept before:** PR 5.1 / any Slice 5 schema work
+
+**Context:** Slice 4 Done (`docs/33`). Roadmap Slice 5 outcome: only verified employers publish public vacancies. MVP also lists admin verification queue (Slice 7) and applicant review (Slice 6).
+
+**Decision:** Slice 5 delivers: type-specific verification **request + operator approval gate** (not full admin product); employer publish and lifecycle (`publish` / `pause` / `resume` / `fill` / `withdraw` / `expire`); public and candidate visibility for eligible published vacancies; matching and application eligibility expansion to employer published jobs; privacy-safe location only.
+
+Slice 5 does **not** include: applicant list/detail; application status changes; interviews; messaging; reports; moderation dashboard; suspension UI; full admin verification queue UI; identity/business document uploads; exact private address storage; GDPR export/deletion; save/unsave; CV upload; opaque ranking; Slice 6 / 7 / 8 features.
+
+**Alternatives:** Bundle full admin UI into Slice 5; defer all verification to Slice 7; allow unverified publish.
+
+**Consequences:** Trust gate lands before applicant review; Slice 7 still owns ops UI depth.
+
+## D-056 — Verification authority and state model
+
+**Status:** Proposed
+**Must accept before:** PR 5.2
+
+**Context:** `verification_state` is locked to `unverified`. MVP requires manual verification. Slice 7 owns admin queue UI.
+
+**Decision:** States: `unverified | pending | verified | rejected | revoked`. Completed employers may request (`→ pending`). Platform operators (allow-listed `auth.uid()` via a minimal `platform_operators` table) approve/reject/revoke through Auth-bound SECURITY DEFINER RPCs + Server Actions. Employers cannot self-verify. No service-role browser/ordinary SSR path. Break-glass SQL/service-role approval is emergency-only and documented, not default. Suspension is distinct and deferred to Slice 7. No verification expiration in Slice 5. Private and organisation employers share the same state enum. Store request/review timestamps, reviewer id, optional short note. Completion remains independent of verification.
+
+**Alternatives:** Self-declared verified; email-domain-only gate; full admin UI now; defer approval until Slice 7.
+
+**Consequences:** Founder/operator must be allow-listed to unlock publish; full queue UX waits for Slice 7.
+
+## D-057 — Verification evidence and storage
+
+**Status:** Proposed
+**Must accept before:** PR 5.2 / PR 5.3
+
+**Context:** Document vaulting pulls Storage, retention, and GDPR complexity forward. Profile already has org legal name, website, phone, locality, lawful-hiring declaration.
+
+**Decision:** Slice 5 collects **no** identity or business document uploads and does **not** introduce Supabase Storage for verification. Evidence is existing type-specific profile fields plus an explicit verification-request attestation. Organisation: legal name required (already). Website optional. Registration/tax numbers deferred. Private: no ID docs; display name + locality + optional phone. Exact address evidence prohibited. Passport/residence-permit verification remains out of scope (`docs/04`, `NOT_NOW.md`).
+
+**Alternatives:** Require document uploads now; email-domain proof as hard requirement.
+
+**Consequences:** Trust is human review of profile + attestation; Storage deferred.
+
+## D-058 — Publication lifecycle
+
+**Status:** Proposed
+**Must accept before:** PR 5.2
+
+**Context:** DB allows `draft|published|withdrawn`; employer rows forced draft. Roadmap needs pause/expire/fill.
+
+**Decision:** Employer-capable `publication_state`: `draft | published | paused | filled | expired | withdrawn`. Explicit Auth-bound RPCs per transition (no generic status setter). Seed continues to use `published`/`withdrawn` + time window. Drop employer-draft-only CHECK; enforce transitions in RPCs. Filled ≠ withdrawn ≠ expired ≠ paused. Existing candidate applications remain readable via snapshots; new applications only when `published` and inside `[published_at, expires_at)` and employer verified.
+
+**Alternatives:** Keep three states and overload withdrawn; UI-only hide without state changes.
+
+**Consequences:** Migration expands CHECK; pgTAP must cover matrix in `docs/36`.
+
+## D-059 — Publication readiness
+
+**Status:** Proposed
+**Must accept before:** PR 5.2 / PR 5.4
+
+**Context:** `employer_vacancy_draft_readiness` checks draft completeness without verification.
+
+**Decision:** Publish requires: owner session; employer complete; `verification_state=verified`; draft readiness fields (title, category, public_locality, description, salary cents/period/currency/gross, ≥1 language, company rules); non-empty employment_types and shift_requirements; workplace_type; work_frequency; cv_required; interview_english_ok; available_from; expires_at within allowed window. Do **not** add experience-requirement columns, exact address, or new contract enums in Slice 5. Draft readiness RPC may stay draft-focused; publish RPC revalidates and adds verification + expiry.
+
+**Alternatives:** Require experience fields; allow publish without salary/languages (reject).
+
+**Consequences:** Aligns publish gate with Accepted Slice 4 field surface + verification.
+
+## D-060 — Public visibility and route model
+
+**Status:** Proposed
+**Must accept before:** PR 5.5
+
+**Context:** Anon currently denied; candidates see seed only. Roadmap asks for public visibility rules.
+
+**Decision:** Add `/jobs` and `/jobs/[vacancyId]` for anonymous-readable **active published** vacancies (seed + eligible employer) with privacy-safe projection only. Completed candidates use `/candidate/matches` and `/candidate/jobs/[vacancyId]` for match/apply. Owners manage via `/employer/vacancies/*`. Expand visibility helpers beyond seed-only. Drafts and non-published employer states remain invisible to anon/candidates/unrelated employers. Incomplete candidates cannot apply. Share projections; do not invent a second vacancy model.
+
+**Alternatives:** Authenticated-only employer jobs (no public `/jobs`); fully public apply without Auth (reject).
+
+**Consequences:** New anon SELECT policies must be narrow and field-safe.
+
+## D-061 — Location privacy
+
+**Status:** Proposed
+**Must accept before:** PR 5.2 / PR 5.5
+
+**Context:** D-034 / D-051 — no public exact private addresses; `public_locality` exists.
+
+**Decision:** Public and candidate surfaces may show `city` (Berlin) and `public_locality` only. Street, house number, postcode, and map coordinates are prohibited. Exact private residential address is **not stored** in Slice 5. Same public location rules for private and organisation employers; `workplace_type` may clarify on-site/hybrid/remote without exposing exact address.
+
+**Alternatives:** Store encrypted exact address now (reject for Slice 5).
+
+**Consequences:** Continues Slice 4 privacy posture into publication.
+
+## D-062 — Candidate matching and application integration
+
+**Status:** Proposed
+**Must accept before:** PR 5.2 / PR 5.5
+
+**Context:** Matcher is seed-only via `visible_seed_*` and TypeScript rules.
+
+**Decision:** Expand loaders/helpers so eligible employer published vacancies enter matching, detail, and `submit_candidate_application` under the same explainable rules and deterministic sort. Drafts never match. Paused/filled/expired/withdrawn never accept new applications. Seed path unchanged. Snapshots remain immutable; existing applications survive later lifecycle changes. No opaque scores. No matcher persistence table.
+
+**Alternatives:** Separate employer-only job board without matcher integration.
+
+**Consequences:** Submit RPC and visibility helpers are high-sensitivity changes; require pgTAP + Slice 3 regression.
+
+## D-063 — Expiry behaviour
+
+**Status:** Proposed
+**Must accept before:** PR 5.2 / PR 5.4
+
+**Context:** Published rows already require `expires_at`; drafts null. No cron infrastructure assumed.
+
+**Decision:** `expires_at` mandatory at publish; employer chooses within min 1 day and max 90 days; UI default 30 days. Eligibility always checks the time window. Materialize `expired` lazily when observed (and via optional ops RPC); no hard dependency on a scheduler for MVP. Extension while published deferred. After expiry, new applications blocked; republish requires a deliberate owner path (see `docs/36`). Stale-vacancy admin tooling remains Slice 7.
+
+**Alternatives:** Require always-on cron; unlimited expiry; no materialized expired state.
+
+**Consequences:** Deterministic without new infra; seed compatibility preserved.
+
+## D-064 — Verification-loss behaviour
+
+**Status:** Proposed
+**Must accept before:** PR 5.2
+
+**Context:** Revocation must not leave public vacancies reachable by UI-only hiding.
+
+**Decision:** On `verified → revoked`, in one transaction: update employer verification fields and set all owned `published` vacancies to `paused`. Visibility helpers also require current `verified` for employer-source public eligibility. Publish RPC refuses non-verified. Re-verification does not auto-resume; employer must resume explicitly while verified. Rejected/unverified/pending cannot publish.
+
+**Alternatives:** Auto-withdraw on revoke; leave published and hide in UI only (reject UI-only).
+
+**Consequences:** DB-enforced safety; pause remains reversible after re-verify.
+
+## D-065 — Audit / event model
+
+**Status:** Proposed
+**Must accept before:** PR 5.2
+
+**Context:** Full `audit_events` and admin audit browsing are Slice 7 roadmap items.
+
+**Decision:** Slice 5 stores durable minimum evidence on source rows: verification request/review timestamps, reviewer id, optional note; vacancy lifecycle timestamps (`published_at`, `expires_at`, plus pause/fill/withdraw/expire timestamps as needed). Do **not** require a generic `audit_events` table in Slice 5. Do not claim richer operational auditability than these columns provide. Full audit stream + admin browsing remain Slice 7.
+
+**Alternatives:** Land full audit_events now.
+
+**Consequences:** Smaller Slice 5 schema; ops depth waits for Slice 7.
+
+## D-066 — Implementation security and RPC boundary
+
+**Status:** Proposed
+**Must accept before:** PR 5.2
+
+**Context:** Slice 4 established Server Action → Zod → Auth-bound RPC; no client-trusted ownership/verification/publication.
+
+**Decision:** All verification and publication transitions use Server Action → Zod → session → SECURITY DEFINER RPC with locked `search_path`. Callers must not supply owner ids, verification state (except request), operator identity, arbitrary publication_state, or forged timestamps. Generic unavailable errors for wrong-owner/missing resources. No service-role in browser or ordinary SSR session paths. Direct authenticated INSERT/UPDATE/DELETE on vacancies remains denied.
+
+**Alternatives:** Client-writable verification_state (reject).
+
+**Consequences:** Continues Slice 3/4 security posture.
+
+## D-067 — Slice 5 hosted-proof and Production authorization boundary
+
+**Status:** Proposed
+**Must accept before:** PR 5.6 / PR 5.7 / any hosted Slice 5 mutation
+
+**Context:** After Slice 4 teardown, Preview has no Preview-scoped Supabase configuration (`docs/33`). Prior Production authorizations do not carry forward.
+
+**Decision:** Local/CI proof first. Preferred hosted proof uses a **newly** isolated disposable or Staging Supabase project with explicitly matching Preview env. Preview must never silently use Production credentials. Accepting D-067 does **not** authorize Production hosted proof. Any Production fallback requires a **new** explicit owner authorization for that run. Hosted proof must verify environment identity, migrations, verification gates, publish/lifecycle, visibility/isolation, candidate regressions, and cleanup — without secrets in evidence.
+
+**Alternatives:** Pre-authorize Production now; treat uncleansed Preview as isolated (reject).
+
+**Consequences:** Infrastructure re-isolation is a proof prerequisite, not optional product scope.
