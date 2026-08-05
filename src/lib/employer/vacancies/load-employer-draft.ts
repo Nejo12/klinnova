@@ -34,6 +34,7 @@ export type EmployerDraftDetail = {
   salaryIsGross: boolean | null;
   employerType: EmployerType;
   companyName: string | null;
+  publicationState: "draft" | "paused";
   updatedAt: string;
   createdAt: string;
   languages: LanguageRequirementRow[];
@@ -53,8 +54,12 @@ export type LoadEmployerDraftResult =
 type EmployerClient = SupabaseClient<Database>;
 
 /**
- * Load a single owned employer draft with languages and readiness.
- * Missing, seed, foreign, and non-draft IDs all map to unavailable.
+ * Load a single owned, currently-editable employer vacancy with languages
+ * and readiness. Editable states are `draft` and `paused` (D-058 editing
+ * matrix, mirrored by `update_employer_vacancy_draft` /
+ * `replace_employer_vacancy_languages`, which enforce the same states
+ * server-side). Missing, seed, foreign, and non-editable-state IDs all map
+ * to unavailable.
  */
 export async function loadEmployerDraft(
   supabase: EmployerClient,
@@ -103,7 +108,7 @@ export async function loadEmployerDraft(
     )
     .eq("id", idParsed.data)
     .eq("source", "employer")
-    .eq("publication_state", "draft")
+    .in("publication_state", ["draft", "paused"])
     .eq("employer_profile_id", gate.userId)
     .maybeSingle();
 
@@ -185,6 +190,7 @@ export async function loadEmployerDraft(
       employerType: gate.profile.employerType,
       companyName:
         gate.profile.employerType === "organisation" ? companyName : null,
+      publicationState: row.publication_state as "draft" | "paused",
       updatedAt: row.updated_at,
       createdAt: row.created_at,
       languages: languageRows.flatMap((language) => {

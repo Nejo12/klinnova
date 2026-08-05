@@ -95,8 +95,29 @@ state rechecks under row lock. `/internal/*` was added to the proxy's
 protected-path set (`isInternalPath` in `src/lib/auth/paths.ts`) alongside
 `/candidate/*` and `/employer/*`, so unauthenticated requests get the same
 session-refresh and encoded-redirect treatment. No new migration, RLS
-policy, or grant. No revocation UI. Next unit: PR 5.4 — publish and
-lifecycle controls.
+policy, or grant. No revocation UI.
+
+**PR 5.4 — in progress** (no schema change; application-layer only). Employer
+manage-page and Server Actions for the seven PR 5.2 lifecycle RPCs
+(`publish_employer_vacancy`, `pause_employer_vacancy`,
+`resume_employer_vacancy`, `fill_employer_vacancy`,
+`withdraw_employer_vacancy`, `materialize_employer_vacancy_expiry`,
+`renew_employer_vacancy_to_draft`). Each RPC remains the sole authority for
+its own transition — the new Server Actions add only Zod input validation,
+explicit server-validated confirmation, and result-status mapping, never a
+client-side readiness/eligibility recomputation. Confirmed the pre-PR-5.2
+`employer_vacancy_draft_readiness` RPC (PR 4.3) is stale relative to the
+PR 5.2 publish gate (`_employer_vacancy_publish_missing`): it does not check
+`verification_state`, `workplace_type`, `work_frequency`, `cv_required`,
+`interview_english_ok`, or `expires_at`. Rather than adding a migration to
+fix it, the draft-stage readiness panel keeps using it unchanged (structural
+completeness only, as before) and the manage page separately surfaces the
+employer's live `verification_state`; the authoritative missing-field list
+for publish/resume is the `incomplete`/`missing` result actually returned by
+`publish_employer_vacancy`/`resume_employer_vacancy` themselves, rendered
+through the same label map. No new migration, RLS policy, or grant. No
+expiry input exposed to the caller. Next unit: PR 5.5 — public/candidate
+visibility and matching integration.
 
 ---
 

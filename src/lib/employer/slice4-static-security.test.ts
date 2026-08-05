@@ -13,17 +13,22 @@ const EMPLOYER_FLOW_FILES = [
   "src/app/employer/vacancies/new/page.tsx",
   "src/app/employer/vacancies/[vacancyId]/page.tsx",
   "src/app/employer/vacancies/[vacancyId]/edit/page.tsx",
+  "src/app/employer/vacancies/[vacancyId]/lifecycle-actions.ts",
   "src/app/employer/vacancies/actions.ts",
   "src/lib/employer/load-employer.ts",
   "src/lib/employer/vacancies/load-employer-draft.ts",
   "src/lib/employer/vacancies/load-employer-drafts.ts",
+  "src/lib/employer/vacancies/load-employer-vacancy.ts",
   "src/lib/employer/vacancies/require-completed-employer.ts",
+  "src/lib/employer/vacancies/require-authenticated-employer.ts",
   "src/lib/supabase/server.ts",
   "src/lib/supabase/browser.ts",
   "src/lib/supabase/proxy.ts",
   "src/components/employer-vacancies/vacancy-draft-form.tsx",
   "src/components/employer-vacancies/vacancy-list.tsx",
   "src/components/employer-vacancies/vacancy-detail.tsx",
+  "src/components/employer-vacancies/vacancy-lifecycle-actions.tsx",
+  "src/components/employer-vacancies/vacancy-lifecycle-status.tsx",
   "src/components/employer-vacancies/delete-draft-form.tsx",
   "src/components/employer-vacancies/language-requirements-editor.tsx",
   "src/components/employer-vacancies/readiness-checklist.tsx",
@@ -52,10 +57,11 @@ function collectTsFiles(relativeDirectory: string): string[] {
 }
 
 /**
- * Static source invariants for Slice 4 employer flows.
+ * Static source invariants for Slice 4/5 employer vacancy flows (PR 4.3
+ * draft CRUD through PR 5.4 lifecycle controls).
  * One proof layer only — use with pgTAP, action/loader tests, and Playwright.
  */
-describe("Slice 4 static security proof", () => {
+describe("Slice 4/5 employer vacancy static security proof", () => {
   it("employer flow sources avoid service-role clients", () => {
     for (const file of EMPLOYER_FLOW_FILES) {
       const source = readSource(file);
@@ -83,7 +89,12 @@ describe("Slice 4 static security proof", () => {
     expect(source).not.toMatch(/p_source|publication_state|published_at/);
   });
 
-  it("employer vacancy UI does not expose Publish or applicant controls", () => {
+  it("employer vacancy UI does not expose applicant review or a generic state setter", () => {
+    // Publish/pause/resume/fill/withdraw controls are PR 5.4 in-scope
+    // (D-058 lifecycle contract); this only guards the boundaries PR 5.4
+    // still excludes: applicant review (Slice 6), public job routes, and
+    // any generic/unrestricted lifecycle status setter (D-058 forbids one —
+    // every transition must be its own named RPC).
     const uiFiles = [
       ...collectTsFiles("src/components/employer-vacancies"),
       ...collectTsFiles("src/app/employer/vacancies"),
@@ -91,13 +102,31 @@ describe("Slice 4 static security proof", () => {
 
     for (const file of uiFiles) {
       const source = readSource(file);
-      expect(source, file).not.toMatch(
-        /Publish vacancy|Publish draft|Applicants|Public preview/i,
-      );
-      expect(source, file).not.toMatch(
-        /publish_employer_vacancy|set_publication_state/i,
-      );
+      expect(source, file).not.toMatch(/Applicants|Public preview/i);
+      expect(source, file).not.toMatch(/set_publication_state/i);
     }
+  });
+
+  it("lifecycle actions call only the named PR 5.2 RPCs with no caller-controlled owner, state, or timestamps", () => {
+    const source = readSource(
+      "src/app/employer/vacancies/[vacancyId]/lifecycle-actions.ts",
+    );
+    expect(source).toMatch(/publish_employer_vacancy/);
+    expect(source).toMatch(/pause_employer_vacancy/);
+    expect(source).toMatch(/resume_employer_vacancy/);
+    expect(source).toMatch(/fill_employer_vacancy/);
+    expect(source).toMatch(/withdraw_employer_vacancy/);
+    expect(source).toMatch(/materialize_employer_vacancy_expiry/);
+    expect(source).toMatch(/renew_employer_vacancy_to_draft/);
+    expect(source).not.toMatch(
+      /\.from\(["']vacancies["']\)\s*\.(insert|update|delete)/i,
+    );
+    expect(source).not.toMatch(/p_employer_profile_id/);
+    expect(source).not.toMatch(/p_company_id/);
+    expect(source).not.toMatch(/p_source|p_publication_state/);
+    expect(source).not.toMatch(
+      /p_published_at|p_paused_at|p_filled_at|p_withdrawn_at/,
+    );
   });
 
   it("loaders never accept caller-owned employer UUIDs as ownership inputs", () => {
@@ -107,10 +136,16 @@ describe("Slice 4 static security proof", () => {
     const draftsLoader = readSource(
       "src/lib/employer/vacancies/load-employer-drafts.ts",
     );
+    const vacancyLoader = readSource(
+      "src/lib/employer/vacancies/load-employer-vacancy.ts",
+    );
     expect(draftLoader).toMatch(/requireCompletedEmployer/);
     expect(draftsLoader).toMatch(/requireCompletedEmployer/);
+    expect(vacancyLoader).toMatch(/requireCompletedEmployer/);
     expect(draftLoader).toMatch(/employer_profile_id/);
+    expect(vacancyLoader).toMatch(/employer_profile_id/);
     expect(draftLoader).not.toMatch(/p_owner|ownerId|employerProfileId:/);
     expect(draftsLoader).not.toMatch(/p_owner|ownerId|employerProfileId:/);
+    expect(vacancyLoader).not.toMatch(/p_owner|ownerId|employerProfileId:/);
   });
 });

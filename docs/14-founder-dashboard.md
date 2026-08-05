@@ -10,8 +10,8 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M3 — Employer flow |
 | Active slice | Slice 5 — Employer verification to public vacancy |
-| Slice status | Active — D-055–D-067 Accepted; PR 5.1 Done; PR 5.2 Done; PR 5.3 employer verification UI Done; PR 5.3a operator read contract Done (merged); PR 5.3b operator queue/review/approve/reject UI in progress (this unit) |
-| Next unit | PR 5.3b (in progress) — minimal operator list/detail + approve/reject UI at `/internal/verification`; then PR 5.4 publish/lifecycle controls. Revocation UI, publication UI, and public jobs routes remain excluded from PR 5.3b. |
+| Slice status | Active — D-055–D-067 Accepted; PR 5.1 Done; PR 5.2 Done; PR 5.3 Done; PR 5.3a Done (merged); PR 5.3b Done (merged); PR 5.4 employer vacancy publish/pause/resume/fill/withdraw/renew UI in progress (this unit) |
+| Next unit | PR 5.4 (in progress) — employer-facing lifecycle controls at `/employer/vacancies/[vacancyId]` on the existing PR 5.2 RPCs; then PR 5.5 public/candidate visibility + matching integration. Public `/jobs` routes, candidate matching integration, and applicant review remain excluded from PR 5.4. |
 | Next slice | Slice 6 — Applicant review (**not started**) |
 | Blockers | Preview has no Preview-scoped Supabase configuration (re-isolate before any Slice 5 hosted proof). Hosted Demo fixtures remain in Production until 2026-09-02. |
 
@@ -51,7 +51,8 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | PR 5.2 — schema / RLS / RPCs / pgTAP | Done (merged; PR #49) |
 | PR 5.3 — employer verification request/status UI | Done (merged; PR #50). Employer-facing `/employer/verification` request/status UI |
 | PR 5.3a — operator verification read contract | Done (merged; PR #51). Migration + 47 pgTAP assertions (full local suite 672 assertions / 26 files) + generated types |
-| PR 5.3b — operator verification queue/review UI | In progress (this unit). `/internal/verification` queue + `/internal/verification/[employerProfileId]` review detail; approve/reject Server Actions on the PR 5.3a read RPCs and existing approve/reject RPCs. No revocation UI, no publication UI, no public jobs routes, no general admin dashboard. Do not mark Done before merge. |
+| PR 5.3b — operator verification queue/review UI | Done (merged). `/internal/verification` queue + `/internal/verification/[employerProfileId]` review detail; approve/reject Server Actions on the PR 5.3a read RPCs and existing approve/reject RPCs. No revocation UI, no publication UI, no public jobs routes, no general admin dashboard. |
+| PR 5.4 — vacancy publication lifecycle controls | In progress (this unit). Employer-facing publish/pause/resume/fill/withdraw/materialize-expiry/renew at `/employer/vacancies/[vacancyId]`, on the existing PR 5.2 lifecycle RPCs (no migration). No public `/jobs` routes, no candidate matching integration, no applicant review. Do not mark Done before merge. |
 | Vacancy lifecycle evidence | Narrow append-only `vacancy_lifecycle_events` selected per D-065 |
 | Slice 5 implementation | In progress — database foundation done; employer verification UI done; publication UI not started |
 | Preview isolated environment | Not configured |

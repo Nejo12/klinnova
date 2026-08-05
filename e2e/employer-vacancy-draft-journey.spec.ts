@@ -129,7 +129,7 @@ test.describe("employer vacancy draft journeys", () => {
     await page.getByRole("link", { name: "Vacancies", exact: true }).click();
     await expect(page.getByRole("heading", { name: title })).toBeVisible();
 
-    await page.getByRole("link", { name: "View" }).click();
+    await page.getByRole("link", { name: "Manage" }).click();
     await page.getByLabel("Type the draft title to confirm").fill(title);
     await page
       .getByRole("button", { name: "Delete draft permanently" })

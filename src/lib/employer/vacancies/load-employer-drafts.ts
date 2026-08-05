@@ -11,6 +11,9 @@ import { readinessRpcResultSchema } from "@/lib/employer/vacancies/schemas";
 import type { EmployerType } from "@/lib/employer/schemas";
 import type { Database } from "@/types/database";
 
+export type VacancyLifecycleState =
+  "draft" | "published" | "paused" | "filled" | "expired" | "withdrawn";
+
 export type EmployerDraftListItem = {
   id: string;
   title: string;
@@ -18,6 +21,9 @@ export type EmployerDraftListItem = {
   publicLocality: string | null;
   employerType: EmployerType;
   companyName: string | null;
+  publicationState: VacancyLifecycleState;
+  expiresAt: string | null;
+  isEffectivelyExpired: boolean;
   updatedAt: string;
   ready: boolean | null;
   checklist: ReadinessChecklistItem[];
@@ -34,11 +40,15 @@ export type LoadEmployerDraftsResult =
 type EmployerClient = SupabaseClient<Database>;
 
 /**
- * Load owned employer drafts ordered by updated_at DESC.
+ * Load every owned employer vacancy (any lifecycle state) ordered by
+ * updated_at DESC. Named for its PR 4.3 origin; PR 5.4 broadened the state
+ * filter so the list also shows published/paused/filled/expired/withdrawn
+ * rows, not only drafts.
  *
- * Readiness uses the per-draft RPC (PR 4.3). There is no bulk readiness
- * interface yet; list pages call readiness once per draft. Acceptable for
- * early employer draft counts; revisit if lists grow large (no migration in PR 4.4).
+ * Readiness uses the per-draft RPC (PR 4.3) and is only meaningful — and
+ * only fetched — for rows still in `draft`. There is no bulk readiness
+ * interface yet; list pages call readiness once per draft row. Acceptable
+ * for early employer draft counts; revisit if lists grow large.
  */
 export async function loadEmployerDrafts(
   supabase: EmployerClient,
@@ -51,10 +61,9 @@ export async function loadEmployerDrafts(
   const { data: rows, error } = await gate.supabase
     .from("vacancies")
     .select(
-      "id, title, job_category, public_locality, updated_at, source, publication_state, employer_profile_id, company_id, companies(name)",
+      "id, title, job_category, public_locality, updated_at, source, publication_state, expires_at, employer_profile_id, company_id, companies(name)",
     )
     .eq("source", "employer")
-    .eq("publication_state", "draft")
     .eq("employer_profile_id", gate.userId)
     .order("updated_at", { ascending: false })
     .order("id", { ascending: true });
@@ -67,22 +76,25 @@ export async function loadEmployerDrafts(
     };
   }
 
+  const now = Date.now();
   const drafts: EmployerDraftListItem[] = [];
 
   for (const row of rows) {
-    const readiness = await gate.supabase.rpc(
-      "employer_vacancy_draft_readiness",
-      { p_vacancy_id: row.id },
-    );
-
     let ready: boolean | null = null;
     let checklist: ReadinessChecklistItem[] = [];
 
-    if (readiness.error === null) {
-      const parsed = readinessRpcResultSchema.safeParse(readiness.data);
-      if (parsed.success && parsed.data.status === "ok") {
-        ready = parsed.data.ready;
-        checklist = mapReadinessChecklist(parsed.data.missing);
+    if (row.publication_state === "draft") {
+      const readiness = await gate.supabase.rpc(
+        "employer_vacancy_draft_readiness",
+        { p_vacancy_id: row.id },
+      );
+
+      if (readiness.error === null) {
+        const parsed = readinessRpcResultSchema.safeParse(readiness.data);
+        if (parsed.success && parsed.data.status === "ok") {
+          ready = parsed.data.ready;
+          checklist = mapReadinessChecklist(parsed.data.missing);
+        }
       }
     }
 
@@ -95,6 +107,11 @@ export async function loadEmployerDrafts(
         ? companyRelation.name
         : (gate.profile.company?.name ?? null);
 
+    const isEffectivelyExpired =
+      row.publication_state === "published" &&
+      row.expires_at !== null &&
+      new Date(row.expires_at).getTime() <= now;
+
     drafts.push({
       id: row.id,
       title: row.title,
@@ -103,6 +120,9 @@ export async function loadEmployerDrafts(
       employerType: gate.profile.employerType,
       companyName:
         gate.profile.employerType === "organisation" ? companyName : null,
+      publicationState: row.publication_state as VacancyLifecycleState,
+      expiresAt: row.expires_at,
+      isEffectivelyExpired,
       updatedAt: row.updated_at,
       ready,
       checklist,

@@ -215,22 +215,51 @@ returned by a loader.
 
 ## PR 5.4 — Publish and lifecycle controls
 
+**Status:** In progress (this unit). Do not mark Done before merge.
+
 **Objective:** Verified employers publish ready drafts and manage lifecycle
 including renewal from expired.
 
-**Includes:** Publish (verified + ready); pause/resume; fill; withdraw; expiry
-selection; renew `expired → draft`; employer list/detail lifecycle UX.
+**Includes:** Publish (verified + ready); pause/resume; fill; withdraw;
+materialize-expiry; renew `expired → draft`; employer manage-page and list
+lifecycle UX at `/employer/vacancies/[vacancyId]` and `/employer/vacancies`
+— on the seven existing PR 5.2 RPCs
+(`publish_employer_vacancy`, `pause_employer_vacancy`,
+`resume_employer_vacancy`, `fill_employer_vacancy`,
+`withdraw_employer_vacancy`, `materialize_employer_vacancy_expiry`,
+`renew_employer_vacancy_to_draft`), each called through its own narrow
+Server Action with server-validated explicit confirmation. No expiry input
+exposed to the employer — publish uses the RPC's own 30-day default; resume
+passes a server-computed 30-day fallback that the RPC only uses when the
+stored expiry has already elapsed. The `draft`/`paused` edit-loader
+(`load-employer-draft.ts`) and the list loader
+(`load-employer-drafts.ts`) were broadened from draft-only to their full
+D-058 scope (edit: draft+paused; list: every lifecycle state); a new
+`load-employer-vacancy.ts` loads any state read-only for the manage page.
 
-**Excludes:** Applicant list; admin stale tools.
+**Excludes:** Applicant list; admin stale tools; public `/jobs` routes;
+candidate matching/apply integration (PR 5.5); a caller-controlled expiry
+input; revocation UI (unchanged from PR 5.3b — revoke stays operator-only).
 
-**Database effects:** None beyond RPCs from 5.2.
+**Database effects:** None beyond RPCs from 5.2. No migration.
 
-**Route effects:** Employer vacancy lifecycle actions.
+**Route effects:** `/employer/vacancies` (list, broadened) and
+`/employer/vacancies/[vacancyId]` (manage page, now shows every lifecycle
+state instead of draft-only). No new routes; no public routes.
 
-**Tests:** Playwright publish/pause/fill/withdraw/renew; readiness + verification
-gates; deterministic duplicate transitions.
+**Tests:** Vitest for both broadened loaders, the new manage-page loader, and
+all seven lifecycle actions (ownership, stale-state `invalid_state`,
+`incomplete`+missing-fields mapping, raw-error normalization, no
+caller-controlled owner/state/timestamps); static-security proof extended to
+the new files; Playwright
+`employer-vacancy-lifecycle-journey.spec.ts` — full verified-employer
+publish → pause → resume → withdraw journey using the PR 5.3a/5.3b operator
+fixture path, plus the full pre-existing employer/candidate/auth regression
+suite.
 
-**Exit criteria:** Only verified + ready drafts publish; lifecycle matches D-058.
+**Exit criteria:** Only verified + ready drafts publish; lifecycle matches
+D-058; stale/duplicate transitions remain deterministic and
+database-authoritative; editable states stay exactly `draft`/`paused`.
 
 **Hosted-operation boundary:** None.
 

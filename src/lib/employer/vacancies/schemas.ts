@@ -290,3 +290,94 @@ export const readinessRpcResultSchema = z.discriminatedUnion("status", [
 export type LanguageRequirementRow = z.infer<
   typeof languageRequirementRowSchema
 >;
+
+// ---------------------------------------------------------------------------
+// PR 5.4 — vacancy lifecycle (publish/pause/resume/fill/withdraw/materialize/
+// renew). One form/result schema per RPC, matching the exact status literals
+// in supabase/migrations/20260805110000_verification_and_vacancy_publication.sql.
+// The caller supplies only a vacancy id — never state, timestamps, owner, or
+// expiry.
+// ---------------------------------------------------------------------------
+
+export const vacancyLifecycleFormSchema = z.object({
+  vacancyId: vacancyIdSchema,
+});
+
+const confirmedBoolean = z
+  .union([z.boolean(), z.string()])
+  .transform((value) =>
+    typeof value === "boolean"
+      ? value
+      : value === "true" || value === "on" || value === "1",
+  )
+  .refine((value) => value === true, {
+    message: "Confirm before continuing.",
+  });
+
+/**
+ * Consequential lifecycle transitions (publish/pause/resume/fill/withdraw/
+ * renew) require an explicit, server-validated confirmation — not just a
+ * disabled submit button. `materialize_employer_vacancy_expiry` is
+ * idempotent and non-destructive, so it uses the plain
+ * `vacancyLifecycleFormSchema` above without a confirmation field.
+ */
+export const vacancyLifecycleConfirmFormSchema = z.object({
+  vacancyId: vacancyIdSchema,
+  confirmed: confirmedBoolean,
+});
+
+export const publishVacancyRpcResultSchema = z.discriminatedUnion("status", [
+  z.object({ status: z.literal("ok"), vacancy_id: z.string().uuid() }),
+  z.object({ status: z.literal("unauthenticated") }),
+  z.object({ status: z.literal("unavailable") }),
+  z.object({ status: z.literal("invalid_state") }),
+  z.object({
+    status: z.literal("incomplete"),
+    missing: z.array(z.string()),
+  }),
+]);
+
+export const pauseVacancyRpcResultSchema = z.discriminatedUnion("status", [
+  z.object({ status: z.literal("ok"), vacancy_id: z.string().uuid() }),
+  z.object({ status: z.literal("unauthenticated") }),
+  z.object({ status: z.literal("unavailable") }),
+  z.object({ status: z.literal("invalid_state") }),
+]);
+
+export const resumeVacancyRpcResultSchema = z.discriminatedUnion("status", [
+  z.object({ status: z.literal("ok"), vacancy_id: z.string().uuid() }),
+  z.object({ status: z.literal("unauthenticated") }),
+  z.object({ status: z.literal("unavailable") }),
+  z.object({ status: z.literal("invalid_state") }),
+  z.object({
+    status: z.literal("incomplete"),
+    missing: z.array(z.string()),
+  }),
+]);
+
+export const fillVacancyRpcResultSchema = z.discriminatedUnion("status", [
+  z.object({ status: z.literal("ok"), vacancy_id: z.string().uuid() }),
+  z.object({ status: z.literal("unauthenticated") }),
+  z.object({ status: z.literal("unavailable") }),
+  z.object({ status: z.literal("invalid_state") }),
+]);
+
+export const withdrawVacancyRpcResultSchema = z.discriminatedUnion("status", [
+  z.object({ status: z.literal("ok"), vacancy_id: z.string().uuid() }),
+  z.object({ status: z.literal("unauthenticated") }),
+  z.object({ status: z.literal("unavailable") }),
+  z.object({ status: z.literal("invalid_state") }),
+]);
+
+export const materializeExpiryRpcResultSchema = z.discriminatedUnion("status", [
+  z.object({ status: z.literal("ok"), vacancy_id: z.string().uuid() }),
+  z.object({ status: z.literal("unauthenticated") }),
+  z.object({ status: z.literal("unavailable") }),
+]);
+
+export const renewVacancyRpcResultSchema = z.discriminatedUnion("status", [
+  z.object({ status: z.literal("ok"), vacancy_id: z.string().uuid() }),
+  z.object({ status: z.literal("unauthenticated") }),
+  z.object({ status: z.literal("unavailable") }),
+  z.object({ status: z.literal("invalid_state") }),
+]);

@@ -1,0 +1,335 @@
+"use client";
+
+import {
+  useActionState,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import {
+  fillEmployerVacancyAction,
+  materializeEmployerVacancyExpiryAction,
+  pauseEmployerVacancyAction,
+  publishEmployerVacancyAction,
+  renewEmployerVacancyAction,
+  resumeEmployerVacancyAction,
+  withdrawEmployerVacancyAction,
+  type EmployerVacancyLifecycleActionState,
+} from "@/app/employer/vacancies/[vacancyId]/lifecycle-actions";
+import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import type { EmployerVacancyDetail } from "@/lib/employer/vacancies/load-employer-vacancy";
+import {
+  VACANCY_FILL_CONFIRM,
+  VACANCY_PAUSE_CONFIRM,
+  VACANCY_PUBLISH_CONFIRM,
+  VACANCY_PUBLISH_EXPIRY_NOTE,
+  VACANCY_RENEW_CONFIRM,
+  VACANCY_RESUME_CONFIRM,
+  VACANCY_WITHDRAW_CONFIRM,
+} from "@/lib/employer/vacancies/messages";
+import { mapReadinessChecklist } from "@/lib/employer/vacancies/readiness";
+
+const initialState: EmployerVacancyLifecycleActionState = {
+  error: null,
+  message: null,
+};
+
+type LifecycleAction = (
+  state: EmployerVacancyLifecycleActionState,
+  formData: FormData,
+) => Promise<EmployerVacancyLifecycleActionState>;
+
+type ConfirmedFormProps = {
+  formKey: string;
+  action: LifecycleAction;
+  vacancyId: string;
+  confirmLabel: string;
+  submitLabel: string;
+  pendingLabel: string;
+  buttonClassName: string | undefined;
+  disabledByOther: boolean;
+  onPendingChange: (formKey: string, pending: boolean) => void;
+  note?: string;
+};
+
+function ConfirmedLifecycleForm({
+  formKey,
+  action,
+  vacancyId,
+  confirmLabel,
+  submitLabel,
+  pendingLabel,
+  buttonClassName,
+  disabledByOther,
+  onPendingChange,
+  note,
+}: ConfirmedFormProps) {
+  const [state, formAction, pending] = useActionState(action, initialState);
+  const errorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    onPendingChange(formKey, pending);
+  }, [formKey, pending, onPendingChange]);
+
+  // A successful transition changes publicationState, which flips this
+  // slot's `show*` flag to false and unmounts this form — often while
+  // `pending` was still true, so the effect above never gets a final
+  // `pending=false` call. Without this, the key leaks in the parent's
+  // pendingKeys set and permanently disables every sibling form.
+  useEffect(() => {
+    return () => onPendingChange(formKey, false);
+  }, [formKey, onPendingChange]);
+
+  useEffect(() => {
+    if (state.error !== null) {
+      errorRef.current?.focus();
+    }
+  }, [state.error]);
+
+  const disabled = pending || disabledByOther;
+  const checkboxId = `confirm-${formKey}`;
+
+  return (
+    <form className={styles.form} action={formAction} noValidate>
+      <input type="hidden" name="vacancyId" value={vacancyId} />
+      {note !== undefined ? <p className={styles.note}>{note}</p> : null}
+      <div className={styles.checkboxRow}>
+        <input
+          type="checkbox"
+          id={checkboxId}
+          name="confirmed"
+          value="true"
+          disabled={disabled}
+        />
+        <label htmlFor={checkboxId}>{confirmLabel}</label>
+      </div>
+
+      <div ref={errorRef} tabIndex={-1}>
+        {state.error !== null ? (
+          <p className={styles.error} role="alert">
+            {state.error}
+          </p>
+        ) : null}
+      </div>
+
+      {state.missing !== undefined && state.missing.length > 0 ? (
+        <ul className={styles.checklist}>
+          {mapReadinessChecklist(state.missing).map((item) => (
+            <li key={item.id} className={styles.checklistItem}>
+              <span className={styles.checklistMarker}>Missing</span>
+              <span>{item.label}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
+      {state.message !== null ? (
+        <p className={styles.status} role="status">
+          {state.message}
+        </p>
+      ) : null}
+
+      <div className={styles.actions}>
+        <button className={buttonClassName} type="submit" disabled={disabled}>
+          {pending ? pendingLabel : submitLabel}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+type VacancyLifecycleActionsProps = {
+  vacancyId: string;
+  publicationState: EmployerVacancyDetail["publicationState"];
+  isEffectivelyExpired: boolean;
+};
+
+export function VacancyLifecycleActions({
+  vacancyId,
+  publicationState,
+  isEffectivelyExpired,
+}: VacancyLifecycleActionsProps) {
+  const [materializeState, materializeFormAction, materializePending] =
+    useActionState(materializeEmployerVacancyExpiryAction, initialState);
+
+  const [pendingKeys, setPendingKeys] = useState<Set<string>>(new Set());
+
+  // Stable across renders: an unmemoized callback here would change the
+  // `onPendingChange` prop identity on every render, re-triggering each
+  // child's effect and looping indefinitely, since setPendingKeys always
+  // fires (even as a same-membership no-op below prevents that).
+  const handlePendingChange = useCallback(
+    (formKey: string, pending: boolean) => {
+      setPendingKeys((previous) => {
+        const alreadyPending = previous.has(formKey);
+        if (alreadyPending === pending) {
+          return previous;
+        }
+        const next = new Set(previous);
+        if (pending) {
+          next.add(formKey);
+        } else {
+          next.delete(formKey);
+        }
+        return next;
+      });
+    },
+    [],
+  );
+
+  const anyConfirmedFormPending = pendingKeys.size > 0;
+  const anyPending = anyConfirmedFormPending || materializePending;
+
+  const showPublish = publicationState === "draft";
+  const showPause = publicationState === "published";
+  const showResume = publicationState === "paused";
+  const showFill =
+    publicationState === "published" || publicationState === "paused";
+  const showWithdraw =
+    publicationState === "published" || publicationState === "paused";
+  const showRenew = publicationState === "expired";
+  const showMaterialize =
+    (publicationState === "published" || publicationState === "paused") &&
+    isEffectivelyExpired;
+
+  const nothingToShow =
+    !showPublish &&
+    !showPause &&
+    !showResume &&
+    !showFill &&
+    !showWithdraw &&
+    !showRenew &&
+    !showMaterialize;
+
+  if (nothingToShow) {
+    return null;
+  }
+
+  return (
+    <section
+      className={styles.section}
+      aria-labelledby="lifecycle-actions-heading"
+    >
+      <h2 id="lifecycle-actions-heading" className={styles.sectionHeading}>
+        Lifecycle actions
+      </h2>
+
+      {showPublish ? (
+        <ConfirmedLifecycleForm
+          formKey="publish"
+          action={publishEmployerVacancyAction}
+          vacancyId={vacancyId}
+          confirmLabel={VACANCY_PUBLISH_CONFIRM}
+          submitLabel="Publish"
+          pendingLabel="Publishing…"
+          buttonClassName={styles.button}
+          disabledByOther={anyPending && !pendingKeys.has("publish")}
+          onPendingChange={handlePendingChange}
+          note={VACANCY_PUBLISH_EXPIRY_NOTE}
+        />
+      ) : null}
+
+      {showPause ? (
+        <ConfirmedLifecycleForm
+          formKey="pause"
+          action={pauseEmployerVacancyAction}
+          vacancyId={vacancyId}
+          confirmLabel={VACANCY_PAUSE_CONFIRM}
+          submitLabel="Pause"
+          pendingLabel="Pausing…"
+          buttonClassName={styles.buttonSecondary}
+          disabledByOther={anyPending && !pendingKeys.has("pause")}
+          onPendingChange={handlePendingChange}
+        />
+      ) : null}
+
+      {showResume ? (
+        <ConfirmedLifecycleForm
+          formKey="resume"
+          action={resumeEmployerVacancyAction}
+          vacancyId={vacancyId}
+          confirmLabel={VACANCY_RESUME_CONFIRM}
+          submitLabel="Resume"
+          pendingLabel="Resuming…"
+          buttonClassName={styles.button}
+          disabledByOther={anyPending && !pendingKeys.has("resume")}
+          onPendingChange={handlePendingChange}
+        />
+      ) : null}
+
+      {showFill ? (
+        <ConfirmedLifecycleForm
+          formKey="fill"
+          action={fillEmployerVacancyAction}
+          vacancyId={vacancyId}
+          confirmLabel={VACANCY_FILL_CONFIRM}
+          submitLabel="Mark filled"
+          pendingLabel="Marking filled…"
+          buttonClassName={styles.buttonSecondary}
+          disabledByOther={anyPending && !pendingKeys.has("fill")}
+          onPendingChange={handlePendingChange}
+        />
+      ) : null}
+
+      {showWithdraw ? (
+        <ConfirmedLifecycleForm
+          formKey="withdraw"
+          action={withdrawEmployerVacancyAction}
+          vacancyId={vacancyId}
+          confirmLabel={VACANCY_WITHDRAW_CONFIRM}
+          submitLabel="Withdraw"
+          pendingLabel="Withdrawing…"
+          buttonClassName={styles.buttonDanger}
+          disabledByOther={anyPending && !pendingKeys.has("withdraw")}
+          onPendingChange={handlePendingChange}
+        />
+      ) : null}
+
+      {showRenew ? (
+        <ConfirmedLifecycleForm
+          formKey="renew"
+          action={renewEmployerVacancyAction}
+          vacancyId={vacancyId}
+          confirmLabel={VACANCY_RENEW_CONFIRM}
+          submitLabel="Renew to draft"
+          pendingLabel="Renewing…"
+          buttonClassName={styles.button}
+          disabledByOther={anyPending && !pendingKeys.has("renew")}
+          onPendingChange={handlePendingChange}
+        />
+      ) : null}
+
+      {showMaterialize ? (
+        <form
+          className={styles.form}
+          action={materializeFormAction}
+          aria-label="Refresh expired status"
+          noValidate
+        >
+          <input type="hidden" name="vacancyId" value={vacancyId} />
+          {materializeState.error !== null ? (
+            <p className={styles.error} role="alert">
+              {materializeState.error}
+            </p>
+          ) : null}
+          {materializeState.message !== null ? (
+            <p className={styles.status} role="status">
+              {materializeState.message}
+            </p>
+          ) : null}
+          <div className={styles.actions}>
+            <button
+              className={styles.buttonSecondary}
+              type="submit"
+              disabled={anyPending}
+            >
+              {materializePending ? "Refreshing…" : "Refresh expired status"}
+            </button>
+          </div>
+        </form>
+      ) : null}
+    </section>
+  );
+}
