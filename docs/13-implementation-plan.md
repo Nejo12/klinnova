@@ -124,11 +124,12 @@ Slice 5.
 
 **Includes:** type-specific employer verification state (D-034); create/edit/publish/pause/expire/fill flows; public job visibility rules with privacy-safe location for private workplaces.
 
-**Planning status:** Discovery/planning package `docs/34`–`docs/36`; decisions
-D-055–D-067 **Proposed** (not Accepted). Slice 5 implementation has **not**
-started. Preview currently has no Preview-scoped Supabase configuration after
-Slice 4 teardown — future hosted proof requires explicit re-isolation (`docs/33`,
-D-067). Slice 6 / 7 / 8 have not started.
+**Planning status:** Planning package `docs/34`–`docs/36` locked; decisions
+D-055–D-067 **Accepted** 2026-08-05. PR 5.1 records acceptance (docs only).
+Slice 5 product implementation has **not** started. **PR 5.2 is not authorized
+until PR 5.1 merges.** Preview currently has no Preview-scoped Supabase
+configuration after Slice 4 teardown — future hosted proof requires explicit
+re-isolation (`docs/33`, D-067). Slice 6 / 7 / 8 have not started.
 
 **Exit criteria:**
 
