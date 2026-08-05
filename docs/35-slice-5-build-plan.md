@@ -1,9 +1,7 @@
 # Slice 5 Build Plan
 
-> Planning artifact only. No application code lands in the decision-acceptance PR.
-> **Status:** Decisions D-055–D-067 **Accepted** 2026-08-05. PR 5.1 records
-> acceptance and locks the schema contract. Slice 5 product implementation has
-> **not** started. **PR 5.2 is not authorized until PR 5.1 merges.**
+> **Status:** Decisions D-055–D-067 **Accepted** 2026-08-05. PR 5.1 is Done.
+> PR 5.2 database foundation is in progress; no UI or hosted mutation is included.
 
 **Goal:** Deliver verified-employer publication of public vacancies, public and
 candidate visibility for eligible employer jobs, and lifecycle controls
@@ -247,7 +245,7 @@ fictional fixtures; cleanup; durable evidence. Never silent Production fallback.
 ## Slice 5 close checklist
 
 - [x] D-055–D-067 Accepted (PR 5.1)
-- [ ] PR 5.1 merged
+- [x] PR 5.1 merged
 - [ ] PR 5.2–5.6 merged; local proof green
 - [ ] Hosted proof authorized and executed
 - [ ] Cleanup complete

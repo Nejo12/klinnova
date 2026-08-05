@@ -200,6 +200,12 @@ export type Database = {
           organisation_legal_name: string | null
           phone: string | null
           updated_at: string
+          verification_attestation_version: string | null
+          verification_attested_at: string | null
+          verification_requested_at: string | null
+          verification_review_reason: string | null
+          verification_reviewed_at: string | null
+          verification_reviewed_by: string | null
           verification_state: string
           website: string | null
         }
@@ -215,6 +221,12 @@ export type Database = {
           organisation_legal_name?: string | null
           phone?: string | null
           updated_at?: string
+          verification_attestation_version?: string | null
+          verification_attested_at?: string | null
+          verification_requested_at?: string | null
+          verification_review_reason?: string | null
+          verification_reviewed_at?: string | null
+          verification_reviewed_by?: string | null
           verification_state?: string
           website?: string | null
         }
@@ -230,6 +242,12 @@ export type Database = {
           organisation_legal_name?: string | null
           phone?: string | null
           updated_at?: string
+          verification_attestation_version?: string | null
+          verification_attested_at?: string | null
+          verification_requested_at?: string | null
+          verification_review_reason?: string | null
+          verification_reviewed_at?: string | null
+          verification_reviewed_by?: string | null
           verification_state?: string
           website?: string | null
         }
@@ -246,11 +264,14 @@ export type Database = {
           employer_profile_id: string | null
           employment_types: string[]
           experience_notes: string | null
+          expired_at: string | null
           expires_at: string | null
+          filled_at: string | null
           german_requirement: string
           id: string
           interview_english_ok: boolean | null
           job_category: string
+          paused_at: string | null
           public_locality: string | null
           publication_state: string
           published_at: string | null
@@ -264,6 +285,7 @@ export type Database = {
           summary: string
           title: string
           updated_at: string
+          withdrawn_at: string | null
           work_frequency: string | null
           workplace_type: string | null
         }
@@ -277,11 +299,14 @@ export type Database = {
           employer_profile_id?: string | null
           employment_types: string[]
           experience_notes?: string | null
+          expired_at?: string | null
           expires_at?: string | null
+          filled_at?: string | null
           german_requirement: string
           id?: string
           interview_english_ok?: boolean | null
           job_category: string
+          paused_at?: string | null
           public_locality?: string | null
           publication_state: string
           published_at?: string | null
@@ -295,6 +320,7 @@ export type Database = {
           summary: string
           title: string
           updated_at?: string
+          withdrawn_at?: string | null
           work_frequency?: string | null
           workplace_type?: string | null
         }
@@ -308,11 +334,14 @@ export type Database = {
           employer_profile_id?: string | null
           employment_types?: string[]
           experience_notes?: string | null
+          expired_at?: string | null
           expires_at?: string | null
+          filled_at?: string | null
           german_requirement?: string
           id?: string
           interview_english_ok?: boolean | null
           job_category?: string
+          paused_at?: string | null
           public_locality?: string | null
           publication_state?: string
           published_at?: string | null
@@ -326,6 +355,7 @@ export type Database = {
           summary?: string
           title?: string
           updated_at?: string
+          withdrawn_at?: string | null
           work_frequency?: string | null
           workplace_type?: string | null
         }
@@ -381,11 +411,77 @@ export type Database = {
           },
         ]
       }
+      vacancy_lifecycle_events: {
+        Row: {
+          actor_user_id: string | null
+          event_type: string
+          id: string
+          metadata: Json
+          occurred_at: string
+          vacancy_id: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json
+          occurred_at?: string
+          vacancy_id: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json
+          occurred_at?: string
+          vacancy_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vacancy_lifecycle_events_vacancy_id_fkey"
+            columns: ["vacancy_id"]
+            isOneToOne: false
+            referencedRelation: "vacancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      verification_operators: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      _append_vacancy_lifecycle_event: {
+        Args: {
+          p_actor_user_id: string
+          p_event_type: string
+          p_metadata?: Json
+          p_occurred_at: string
+          p_vacancy_id: string
+        }
+        Returns: string
+      }
       _candidate_first_incomplete_group: {
         Args: { p_uid: string }
         Returns: string
@@ -417,6 +513,10 @@ export type Database = {
         Args: { p_employer_id: string }
         Returns: boolean
       }
+      _employer_has_employer_vacancy: {
+        Args: { p_employer_id: string }
+        Returns: boolean
+      }
       _employer_has_owned_company: {
         Args: { p_employer_id: string }
         Returns: boolean
@@ -433,11 +533,14 @@ export type Database = {
           employer_profile_id: string | null
           employment_types: string[]
           experience_notes: string | null
+          expired_at: string | null
           expires_at: string | null
+          filled_at: string | null
           german_requirement: string
           id: string
           interview_english_ok: boolean | null
           job_category: string
+          paused_at: string | null
           public_locality: string | null
           publication_state: string
           published_at: string | null
@@ -451,6 +554,7 @@ export type Database = {
           summary: string
           title: string
           updated_at: string
+          withdrawn_at: string | null
           work_frequency: string | null
           workplace_type: string | null
         }
@@ -460,6 +564,18 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      _employer_vacancy_publish_missing: {
+        Args: {
+          p_at: string
+          p_employer: Database["public"]["Tables"]["employer_profiles"]["Row"]
+          p_vacancy: Database["public"]["Tables"]["vacancies"]["Row"]
+        }
+        Returns: string[]
+      }
+      _is_active_verification_operator: {
+        Args: { p_uid: string }
+        Returns: boolean
       }
       _profile_first_incomplete_group: {
         Args: {
@@ -476,9 +592,17 @@ export type Database = {
         Returns: string
       }
       _slugify_vacancy_title: { Args: { p_title: string }; Returns: string }
+      _transition_employer_vacancy: {
+        Args: { p_action: string; p_expires_at?: string; p_vacancy_id: string }
+        Returns: Json
+      }
       _unique_employer_vacancy_slug: {
         Args: { p_title: string }
         Returns: string
+      }
+      approve_employer_verification: {
+        Args: { p_employer_profile_id: string }
+        Returns: Json
       }
       bootstrap_organisation_employer: {
         Args: {
@@ -523,8 +647,39 @@ export type Database = {
         Args: { p_vacancy_id: string }
         Returns: Json
       }
+      fill_employer_vacancy: { Args: { p_vacancy_id: string }; Returns: Json }
+      is_vacancy_effectively_public: {
+        Args: { p_at?: string; p_vacancy_id: string }
+        Returns: boolean
+      }
+      materialize_employer_vacancy_expiry: {
+        Args: { p_vacancy_id: string }
+        Returns: Json
+      }
+      pause_employer_vacancy: { Args: { p_vacancy_id: string }; Returns: Json }
+      publish_employer_vacancy: {
+        Args: { p_expires_at?: string; p_vacancy_id: string }
+        Returns: Json
+      }
+      reject_employer_verification: {
+        Args: { p_employer_profile_id: string; p_reason: string }
+        Returns: Json
+      }
+      renew_employer_vacancy_to_draft: {
+        Args: { p_vacancy_id: string }
+        Returns: Json
+      }
       replace_employer_vacancy_languages: {
         Args: { p_languages?: Json; p_vacancy_id: string }
+        Returns: Json
+      }
+      request_employer_verification: { Args: never; Returns: Json }
+      resume_employer_vacancy: {
+        Args: { p_expires_at?: string; p_vacancy_id: string }
+        Returns: Json
+      }
+      revoke_employer_verification: {
+        Args: { p_employer_profile_id: string; p_reason: string }
         Returns: Json
       }
       submit_candidate_application: {
@@ -556,8 +711,13 @@ export type Database = {
         }
         Returns: Json
       }
+      visible_public_vacancy_ids: { Args: { p_at?: string }; Returns: string[] }
       visible_seed_company_ids: { Args: never; Returns: string[] }
       visible_seed_vacancy_ids: { Args: never; Returns: string[] }
+      withdraw_employer_vacancy: {
+        Args: { p_vacancy_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never

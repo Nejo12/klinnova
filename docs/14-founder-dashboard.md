@@ -10,10 +10,10 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M3 — Employer flow |
 | Active slice | Slice 5 — Employer verification to public vacancy |
-| Slice status | Planning Done — D-055–D-067 Accepted 2026-08-05; PR 5.1 in review; schema contract locked in `docs/36`; implementation not started |
-| Next unit | PR 5.2 after PR 5.1 merges — verification/publication schema, RLS, RPCs, pgTAP |
+| Slice status | Active — D-055–D-067 Accepted; PR 5.1 Done; PR 5.2 database foundation in progress |
+| Next unit | Complete PR 5.2 — verification/publication schema, RLS, RPCs, pgTAP |
 | Next slice | Slice 6 — Applicant review (**not started**) |
-| Blockers | PR 5.2 not authorized until PR 5.1 merges. Preview has no Preview-scoped Supabase configuration (re-isolate before any Slice 5 hosted proof). Hosted Demo fixtures remain in Production until 2026-09-02. |
+| Blockers | Preview has no Preview-scoped Supabase configuration (re-isolate before any Slice 5 hosted proof). Hosted Demo fixtures remain in Production until 2026-09-02. |
 
 ## Slice 4 delivery (complete)
 
@@ -35,8 +35,8 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | Local Slice 4 exit proof | Pass via `pnpm proof:slice4` |
 | Hosted Slice 4 proof | Done — Preview + disposable `wbucxaquktraobrvknts` (deleted after proof) |
 | Production authorization | Not used / not granted for Slice 4 hosted proof |
-| Publication / verification | Accepted contracts (D-055–D-067); implementation not started |
-| Slice 5 | Planning Done; PR 5.1 in review |
+| Publication / verification | Accepted contracts (D-055–D-067); PR 5.2 database foundation in progress |
+| Slice 5 | Active; PR 5.1 Done; PR 5.2 in progress |
 | Slice 6 / Slice 7 / Slice 8 | Not started |
 
 ## Slice 5 delivery (active)
@@ -47,9 +47,10 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | `docs/35-slice-5-build-plan.md` | Done — PR 5.1–5.7 sequence; 5.2 gated on 5.1 merge |
 | `docs/36-slice-5-schema-and-publication-proposal.md` | Done — PR 5.2 schema contract locked |
 | D-055–D-067 | **Accepted** 2026-08-05 |
-| PR 5.1 — decision acceptance and schema contract | In review (docs only) |
-| PR 5.2 — schema / RLS / RPCs / pgTAP | Not authorized until PR 5.1 merges |
-| Slice 5 implementation | Not started |
+| PR 5.1 — decision acceptance and schema contract | Done |
+| PR 5.2 — schema / RLS / RPCs / pgTAP | In progress |
+| Vacancy lifecycle evidence | Narrow append-only `vacancy_lifecycle_events` selected per D-065 |
+| Slice 5 implementation | In progress — database foundation only |
 | Preview isolated environment | Not configured |
 | Production | Untouched for Slice 5 |
 | Publication / verification approval UI (full admin) | Slice 7 (not started) |
@@ -156,7 +157,7 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 | 2 Matches | Essentials → seeded explainable matches | Done — PR 2.1–2.4 merged (#26–#29); hosted Production proof complete; Demo fixtures expire 2026-09-02 |
 | 3 Apply | Job detail → submitted application | Done — PR 3.1–3.5 merged (#33–#37); local + Production hosted proof complete; D-035–D-045 complete; Demo fixtures expire 2026-09-02 |
 | 4 Employer draft | Register → draft vacancy | Done — PR 4.1–4.5 merged (#41–#45); local + Preview/disposable hosted proof complete; publication not started |
-| 5 Verification → public vacancy | Verified publish + lifecycle | Planning Done — D-055–D-067 Accepted; PR 5.1 in review; implementation not started |
+| 5 Verification → public vacancy | Verified publish + lifecycle | Active — D-055–D-067 Accepted; PR 5.1 Done; PR 5.2 in progress |
 | 5 Publish | Verification → public vacancy | Not started |
 | 6 Review | Applicant review → status update | Not started |
 | 7 Trust ops | Admin moderation → audit | Not started |

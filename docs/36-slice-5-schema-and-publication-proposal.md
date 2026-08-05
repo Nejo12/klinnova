@@ -1,7 +1,7 @@
 # Slice 5 Schema and Publication Proposal
 
 > Contract for Slice 5. **Status:** Locked with Accepted D-055–D-067 (2026-08-05).
-> No migrations land until PR 5.2 is authorized after PR 5.1 merges.
+> PR 5.2 is implementing this database contract.
 
 **Baseline schema:** seven migrations through
 `20260804120000_employer_owned_draft_vacancies.sql`. Types:
@@ -68,6 +68,10 @@ Effectively public employer vacancy: `source=employer` AND `publication_state=pu
 - Existing eligible draft deletion remains available
 - Published or historically published vacancies cannot use the draft-delete path
 - Filled, withdrawn, expired, paused, and published records are retained
+
+### Edit rules
+
+`update_employer_vacancy_draft` and `replace_employer_vacancy_languages` remain allowed for `publication_state` in (`draft`, `paused`); other lifecycle states are not editable via those RPCs.
 
 ### Terminal / renewal rules
 
@@ -205,8 +209,9 @@ errors.
 
 ## 10. Audit model (Accepted interim)
 
-Source-row evidence per D-065. PR 5.2 decides narrow lifecycle event table for
-repeated pause/resume if needed. No general `audit_events` platform in Slice 5.
+Source-row evidence per D-065. PR 5.2 uses the narrow append-only
+`vacancy_lifecycle_events` table because repeated pause/resume history cannot be
+represented by one timestamp. No general `audit_events` platform in Slice 5.
 
 ---
 

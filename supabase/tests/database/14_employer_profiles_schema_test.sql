@@ -55,10 +55,10 @@ select ok(
 select ok(
   exists (
     select 1 from pg_constraint
-    where conname = 'employer_profiles_verification_unverified_chk'
+    where conname = 'employer_profiles_verification_state_chk'
       and contype = 'c'
   ),
-  'verification_state constrained to unverified'
+  'verification_state uses Slice 5 vocabulary constraint'
 );
 
 select ok(
