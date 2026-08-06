@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 
 import { resolveJobDetailPageView } from "@/app/candidate/jobs/[vacancyId]/resolve-job-detail-view";
 import { CandidateJobDetailPage } from "@/components/candidate-job-detail/candidate-job-detail-page";
-import { loadCandidateVacancyDetail } from "@/lib/matching/load-candidate-vacancy-detail";
+import { loadCurrentCandidateVacancyDetail } from "@/lib/matching/resolve-current-candidate-vacancy-detail";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,8 @@ export default async function CandidateJobDetailRoutePage({
   params,
 }: CandidateJobDetailRoutePageProps) {
   const { vacancyId } = await params;
-  const result = await loadCandidateVacancyDetail(vacancyId);
+  const supabase = await createServerSupabaseClient();
+  const result = await loadCurrentCandidateVacancyDetail(supabase, vacancyId);
   const view = resolveJobDetailPageView(vacancyId, result);
 
   if (view.kind === "redirect") {
@@ -33,15 +35,17 @@ export default async function CandidateJobDetailRoutePage({
     return (
       <CandidateJobDetailPage
         status="ready"
-        detail={view.detail}
-        preview={view.preview}
+        eligible={view.eligible}
+        missingRequirements={view.missingRequirements}
+        vacancy={view.vacancy}
+        languages={view.languages}
         application={view.application}
       />
     );
   }
 
   if (view.kind === "unavailable") {
-    return <CandidateJobDetailPage status="unavailable" reason={view.reason} />;
+    return <CandidateJobDetailPage status="unavailable" />;
   }
 
   return <CandidateJobDetailPage status="failure" />;

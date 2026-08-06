@@ -12,10 +12,10 @@ export const APPLICATION_ALREADY_APPLIED_HEADING =
 export const APPLICATION_ALREADY_APPLIED_BODY =
   "This vacancy already has your application.";
 
-export const APPLICATION_NOT_MATCHING_HEADING =
-  "This job no longer matches your profile";
-export const APPLICATION_NOT_MATCHING_BODY =
-  "Your current preferences no longer match this vacancy. Return to matches to see current options.";
+export const APPLICATION_INELIGIBLE_HEADING =
+  "This job needs an updated profile";
+export const APPLICATION_INELIGIBLE_BODY =
+  "Your saved preferences no longer meet the requirements below for this vacancy.";
 
 export const APPLICATION_UNAVAILABLE_HEADING = "This job is not available";
 export const APPLICATION_UNAVAILABLE_BODY =

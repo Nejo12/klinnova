@@ -7,8 +7,8 @@ import { useFormStatus } from "react-dom";
 import { submitCandidateApplicationAction } from "@/app/candidate/jobs/[vacancyId]/actions";
 import {
   APPLICATION_FAILURE_MESSAGE,
-  APPLICATION_NOT_MATCHING_BODY,
-  APPLICATION_NOT_MATCHING_HEADING,
+  APPLICATION_INELIGIBLE_BODY,
+  APPLICATION_INELIGIBLE_HEADING,
   APPLICATION_SUBMIT_DISCLOSURE,
   APPLICATION_UNAVAILABLE_BODY,
   APPLICATION_UNAVAILABLE_HEADING,
@@ -18,7 +18,9 @@ import {
   initialSubmitCandidateApplicationState,
   type SubmitCandidateApplicationState,
 } from "@/lib/applications/submit-action-state";
+import { onboardingGroupHref } from "@/lib/onboarding/navigation";
 
+import { MissingRequirementsList } from "./missing-requirements-list";
 import styles from "./candidate-job-detail.module.scss";
 
 type ApplicationSubmitFormProps = {
@@ -52,11 +54,11 @@ function resultCopy(state: SubmitCandidateApplicationState): {
     case "already_applied":
       // Successful outcomes redirect server-side to confirmation.
       return null;
-    case "not_matching":
+    case "ineligible":
       return {
         kind: "alert",
-        heading: APPLICATION_NOT_MATCHING_HEADING,
-        body: APPLICATION_NOT_MATCHING_BODY,
+        heading: APPLICATION_INELIGIBLE_HEADING,
+        body: APPLICATION_INELIGIBLE_BODY,
       };
     case "unavailable":
       return {
@@ -117,12 +119,23 @@ export function ApplicationSubmitForm({
           role="alert"
           tabIndex={-1}
         >
-          <p className={styles.resultHeading}>{result.heading}</p>
+          <p
+            className={styles.resultHeading}
+            id="application-submit-result-heading"
+          >
+            {result.heading}
+          </p>
           <p className={styles.resultBody}>{result.body}</p>
-          {state.status === "not_matching" ? (
-            <Link className={styles.cta} href="/candidate/matches">
-              Back to matches
-            </Link>
+          {state.status === "ineligible" ? (
+            <>
+              <MissingRequirementsList
+                codes={state.missingRequirements}
+                labelledBy="application-submit-result-heading"
+              />
+              <Link className={styles.cta} href={onboardingGroupHref("review")}>
+                Review your saved preferences
+              </Link>
+            </>
           ) : null}
         </div>
       ) : null}

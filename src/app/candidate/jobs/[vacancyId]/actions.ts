@@ -5,7 +5,7 @@ import { z } from "zod";
 
 import { submitApplicationRpcResultSchema } from "@/lib/applications/submit-application-result";
 import type { SubmitCandidateApplicationState } from "@/lib/applications/submit-action-state";
-import { resolveCandidateVacancyMatch } from "@/lib/matching/resolve-candidate-vacancy-match";
+import { parseMissingRequirementCodes } from "@/lib/matching/missing-requirement-codes";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const vacancyIdSchema = z.string().uuid();
@@ -18,9 +18,11 @@ function formString(formData: FormData, key: string): string {
 
 /**
  * Explicit candidate application submission.
- * Rechecks Auth, completion, RLS-visible vacancy, and the TypeScript matcher
- * before calling Auth-bound `submit_candidate_application` with vacancy ID only.
- * Successful and duplicate outcomes redirect to the canonical confirmation.
+ * Rechecks the Auth session, then relies entirely on `submit_candidate_application`
+ * (PR 5.5c) for completion, availability, and eligibility — no TypeScript
+ * matcher pre-check. The RPC evaluates eligibility transactionally with a
+ * row lock, so this action's only job is to validate input, confirm a
+ * session, call the RPC, and translate its result.
  */
 export async function submitCandidateApplicationAction(
   _prev: SubmitCandidateApplicationState,
@@ -37,30 +39,15 @@ export async function submitCandidateApplicationAction(
   const vacancyId = parsedId.data;
   const detailPath = `/candidate/jobs/${vacancyId}`;
 
-  const resolved = await resolveCandidateVacancyMatch(vacancyId);
-
-  switch (resolved.status) {
-    case "unauthenticated":
-      redirect(`/login?next=${encodeURIComponent(detailPath)}`);
-    case "profile_missing":
-      redirect("/auth/error?reason=profile");
-    case "incomplete":
-      redirect("/candidate/onboarding");
-    case "unavailable":
-      return { status: "unavailable" };
-    case "not_matching":
-      return { status: "not_matching" };
-    case "failure":
-      return { status: "failure" };
-    case "ready":
-      break;
-    default: {
-      const _exhaustive: never = resolved;
-      return _exhaustive;
-    }
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+  if (authError !== null || user === null) {
+    redirect(`/login?next=${encodeURIComponent(detailPath)}`);
   }
 
-  const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase.rpc("submit_candidate_application", {
     p_vacancy_id: vacancyId,
   });
@@ -89,6 +76,15 @@ export async function submitCandidateApplicationAction(
       redirect("/candidate/onboarding");
     case "unavailable":
       return { status: "unavailable" };
+    case "ineligible": {
+      const missingRequirements = parseMissingRequirementCodes(
+        parsed.data.missing_requirements,
+      );
+      if (missingRequirements === null) {
+        return { status: "failure" };
+      }
+      return { status: "ineligible", missingRequirements };
+    }
     default: {
       const _exhaustive: never = parsed.data;
       return _exhaustive;

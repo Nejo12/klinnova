@@ -77,11 +77,14 @@ describe("Slice 3 static security proof", () => {
     );
   });
 
-  it("does not invent RPC not_matching and keeps matcher TypeScript-only in the action", () => {
+  it("does not invent RPC not_matching and does not use the TypeScript matcher in the action (PR 5.5d)", () => {
     const action = readSource("src/app/candidate/jobs/[vacancyId]/actions.ts");
-    expect(action).toMatch(/case "not_matching"/);
+    expect(action).not.toMatch(/case "not_matching"/);
     expect(action).not.toMatch(/result:\s*["']not_matching["']/);
-    expect(action).toMatch(/resolveCandidateVacancyMatch/);
+    expect(action).not.toMatch(
+      /resolveCandidateVacancyMatch|matchCandidateToVacancy/,
+    );
+    expect(action).toMatch(/case "ineligible"/);
   });
 
   it("keeps confirmation and job detail under authenticated candidate routes", () => {
@@ -92,7 +95,7 @@ describe("Slice 3 static security proof", () => {
       "src/app/candidate/jobs/[vacancyId]/page.tsx",
     );
     expect(confirmationPage).toMatch(/loadCandidateApplicationConfirmation/);
-    expect(jobDetailPage).toMatch(/loadCandidateVacancyDetail/);
+    expect(jobDetailPage).toMatch(/loadCurrentCandidateVacancyDetail/);
     expect(confirmationPage).not.toMatch(/employer/);
     expect(jobDetailPage).not.toMatch(/\/employer\//);
   });

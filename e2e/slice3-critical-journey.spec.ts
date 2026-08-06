@@ -145,14 +145,9 @@ test.describe("Slice 3 critical exit journey", () => {
     ).toBeVisible();
     await expect(page.getByText("Demo Berlin Work Co").first()).toBeVisible();
     await expect(page.getByText("Berlin").first()).toBeVisible();
-    await expect(page.getByText(/Why this matches/i)).toBeVisible();
     await expect(
       page.getByText(WORK_AUTHORISATION_NOTICE).first(),
     ).toBeVisible();
-    await expect(
-      page.getByRole("heading", { level: 2, name: "Application preview" }),
-    ).toBeVisible();
-    await expect(page.getByText(displayName)).toBeVisible();
     await expect(page.getByText(APPLICATION_SUBMIT_DISCLOSURE)).toBeVisible();
     await expect(page.getByRole("checkbox")).toHaveCount(0);
     await expect(
@@ -205,9 +200,6 @@ test.describe("Slice 3 critical exit journey", () => {
     await expect(page.getByText("Applied").first()).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Submit application" }),
-    ).toHaveCount(0);
-    await expect(
-      page.getByRole("heading", { level: 2, name: "Application preview" }),
     ).toHaveCount(0);
     await expect(
       page.getByRole("link", {
@@ -439,7 +431,10 @@ test.describe("Slice 3 critical exit journey", () => {
       page.getByRole("button", { name: "Submit application" }),
     ).toHaveCount(0);
 
-    // Non-matching completed candidate cannot reach Submit for morning kitchen.
+    // Ineligible completed candidate does not see morning kitchen in the
+    // eligible-only matches list, but can still open its detail page and
+    // sees the vacancy plus its missing requirements instead of a hidden
+    // "no longer matches" state (canonical eligibility contract, PR 5.5d).
     await context.clearCookies();
     await registerAndConfirm(page, stamp + 5, "nomatch");
     await completeMatchingEssentials(page, { category: "Cleaning" });
@@ -453,11 +448,14 @@ test.describe("Slice 3 critical exit journey", () => {
 
     await page.goto(`/candidate/jobs/${MORNING_KITCHEN_ID}`);
     await expect(
+      page.getByRole("heading", { level: 1, name: MORNING_KITCHEN_TITLE }),
+    ).toBeVisible();
+    await expect(
       page.getByRole("heading", {
-        level: 1,
-        name: "This job no longer matches your preferences",
+        name: /you don.t currently meet these requirements/i,
       }),
     ).toBeVisible();
+    await expect(page.getByText("Preferred job category")).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Submit application" }),
     ).toHaveCount(0);

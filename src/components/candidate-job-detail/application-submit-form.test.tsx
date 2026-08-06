@@ -9,11 +9,12 @@ const actionMock = vi.hoisted(() =>
         | "idle"
         | "validation_error"
         | "unavailable"
-        | "not_matching"
+        | "ineligible"
         | "submitted"
         | "already_applied"
         | "failure";
       applicationId?: string;
+      missingRequirements?: string[];
     }> => ({
       status: "failure",
     }),
@@ -26,7 +27,7 @@ vi.mock("@/app/candidate/jobs/[vacancyId]/actions", () => ({
 
 import { ApplicationSubmitForm } from "@/components/candidate-job-detail/application-submit-form";
 import {
-  APPLICATION_NOT_MATCHING_HEADING,
+  APPLICATION_INELIGIBLE_HEADING,
   APPLICATION_SUBMIT_DISCLOSURE,
   APPLICATION_FAILURE_MESSAGE,
 } from "@/lib/applications/messages";
@@ -98,9 +99,12 @@ describe("ApplicationSubmitForm", () => {
     ).toBeNull();
   });
 
-  it("shows not-matching alert with a matches link", async () => {
+  it("shows an ineligible alert with labelled missing requirements and a review link", async () => {
     const user = userEvent.setup();
-    actionMock.mockResolvedValueOnce({ status: "not_matching" });
+    actionMock.mockResolvedValueOnce({
+      status: "ineligible",
+      missingRequirements: ["category", "german"],
+    });
 
     render(<ApplicationSubmitForm vacancyId={VACANCY_ID} />);
     await user.click(
@@ -108,11 +112,15 @@ describe("ApplicationSubmitForm", () => {
     );
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      APPLICATION_NOT_MATCHING_HEADING,
+      APPLICATION_INELIGIBLE_HEADING,
     );
+    expect(screen.getByText("Preferred job category")).toBeInTheDocument();
+    expect(screen.getByText("German level")).toBeInTheDocument();
+    expect(screen.queryByText("category")).toBeNull();
+    expect(screen.queryByText("german")).toBeNull();
     expect(
-      screen.getByRole("link", { name: "Back to matches" }),
-    ).toHaveAttribute("href", "/candidate/matches");
+      screen.getByRole("link", { name: "Review your saved preferences" }),
+    ).toHaveAttribute("href", "/candidate/onboarding?group=review");
   });
 
   it("shows a safe failure alert without internal details", async () => {

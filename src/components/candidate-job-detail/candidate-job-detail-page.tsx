@@ -1,28 +1,45 @@
 import Link from "next/link";
 
 import { LogoutButton } from "@/components/auth/logout-button";
-import { ApplicationPreviewSection } from "@/components/candidate-job-detail/application-preview-section";
 import { ApplicationSubmitForm } from "@/components/candidate-job-detail/application-submit-form";
 import { JobDetailUnavailable } from "@/components/candidate-job-detail/job-detail-unavailable";
+import { MissingRequirementsList } from "@/components/candidate-job-detail/missing-requirements-list";
 import { WorkAuthorisationNotice } from "@/components/candidate-matches/work-authorisation-notice";
-import type { ApplicationPreview } from "@/lib/applications/application-preview";
 import {
   APPLIED_STATUS_LABEL,
   formatSubmittedAtUtc,
 } from "@/lib/applications/application-confirmation";
 import type { OwnedApplicationSummary } from "@/lib/applications/owned-application";
-import type { CandidateVacancyDetail } from "@/lib/matching/candidate-vacancy-detail";
+import type { MissingRequirementCode } from "@/lib/matching/missing-requirement-codes";
+import type {
+  PublicVacancy,
+  PublicVacancyLanguage,
+} from "@/lib/public-jobs/domain";
+import { splitDescriptionParagraphs } from "@/lib/public-jobs/description";
+import { safeExternalHref } from "@/lib/public-jobs/external-link";
+import {
+  formatListingDate,
+  jobCategoryLabel,
+  languageLabel,
+  languageProficiencyLabel,
+  workFrequencyLabel,
+  workplaceTypeLabel,
+} from "@/lib/public-jobs/labels";
+import { DEMO_VACANCY_LABEL } from "@/lib/public-jobs/messages";
+import { onboardingGroupHref } from "@/lib/onboarding/navigation";
 
 import styles from "./candidate-job-detail.module.scss";
 
 type CandidateJobDetailPageProps =
   | {
       status: "ready";
-      detail: CandidateVacancyDetail;
-      preview: ApplicationPreview;
+      eligible: boolean;
+      missingRequirements: MissingRequirementCode[];
+      vacancy: PublicVacancy;
+      languages: PublicVacancyLanguage[];
       application: OwnedApplicationSummary | null;
     }
-  | { status: "unavailable"; reason: "unavailable" | "not_matching" }
+  | { status: "unavailable" }
   | { status: "failure" };
 
 export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
@@ -35,18 +52,23 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
           </Link>
           <LogoutButton />
         </div>
-        <JobDetailUnavailable
-          reason={props.status === "failure" ? "failure" : props.reason}
-        />
+        <JobDetailUnavailable />
       </main>
     );
   }
 
-  const { detail, preview, application } = props;
-  const reasonsHeadingId = `job-reasons-${detail.vacancyId}`;
-  const languagesHeadingId = `job-languages-${detail.vacancyId}`;
+  const { eligible, missingRequirements, vacancy, languages, application } =
+    props;
+  const languagesHeadingId = `job-languages-${vacancy.vacancyId}`;
+  const missingHeadingId = `job-missing-requirements-${vacancy.vacancyId}`;
   const submittedAtLabel =
     application === null ? null : formatSubmittedAtUtc(application.submittedAt);
+  const externalHref = safeExternalHref(vacancy.website);
+  const paragraphs =
+    vacancy.description !== null
+      ? splitDescriptionParagraphs(vacancy.description)
+      : [];
+  const closingDate = formatListingDate(vacancy.expiresAt);
 
   return (
     <main className={styles.page}>
@@ -62,16 +84,21 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
       </Link>
 
       <div className={styles.titleRow}>
-        <h1 className={styles.heading}>{detail.title}</h1>
+        <h1 className={styles.heading}>{vacancy.title}</h1>
         <div className={styles.badgeGroup}>
-          <p className={styles.demoLabel}>{detail.demoLabel}</p>
+          {vacancy.source === "seed" ? (
+            <p className={styles.demoLabel}>{DEMO_VACANCY_LABEL}</p>
+          ) : null}
           {application !== null ? (
             <p className={styles.appliedLabel}>{APPLIED_STATUS_LABEL}</p>
           ) : null}
         </div>
       </div>
 
-      <p className={styles.company}>{detail.employerDisplayName}</p>
+      <p className={styles.company}>
+        {vacancy.employerDisplayName ?? "Berlin employer"}
+        {vacancy.companyName !== null ? ` · ${vacancy.companyName}` : ""}
+      </p>
 
       <WorkAuthorisationNotice />
 
@@ -81,43 +108,63 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
         </h2>
         <dl className={styles.meta}>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Location</dt>
-            <dd className={styles.metaValue}>{detail.city}</dd>
-          </div>
-          <div className={styles.metaRow}>
             <dt className={styles.metaLabel}>Category</dt>
-            <dd className={styles.metaValue}>{detail.jobCategoryLabel}</dd>
-          </div>
-          <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Employment</dt>
-            <dd className={styles.metaValue}>{detail.employmentTypesLabel}</dd>
-          </div>
-          <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Shifts</dt>
             <dd className={styles.metaValue}>
-              {detail.shiftRequirementsLabel}
+              {jobCategoryLabel(vacancy.jobCategory)}
             </dd>
           </div>
-          <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>German</dt>
-            <dd className={styles.metaValue}>
-              {detail.germanRequirementLabel}
-            </dd>
-          </div>
-          <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Available</dt>
-            <dd className={styles.metaValue}>{detail.availableFromLabel}</dd>
-          </div>
-          {detail.listedOnLabel !== null ? (
+          {vacancy.publicLocality !== null ? (
             <div className={styles.metaRow}>
-              <dt className={styles.metaLabel}>Listed</dt>
-              <dd className={styles.metaValue}>{detail.listedOnLabel}</dd>
+              <dt className={styles.metaLabel}>Location</dt>
+              <dd className={styles.metaValue}>
+                {vacancy.publicLocality}, Berlin
+              </dd>
+            </div>
+          ) : null}
+          {vacancy.workplaceType !== null ? (
+            <div className={styles.metaRow}>
+              <dt className={styles.metaLabel}>Workplace</dt>
+              <dd className={styles.metaValue}>
+                {workplaceTypeLabel(vacancy.workplaceType)}
+              </dd>
+            </div>
+          ) : null}
+          {vacancy.workFrequency !== null ? (
+            <div className={styles.metaRow}>
+              <dt className={styles.metaLabel}>Frequency</dt>
+              <dd className={styles.metaValue}>
+                {workFrequencyLabel(vacancy.workFrequency)}
+              </dd>
+            </div>
+          ) : null}
+          {vacancy.cvRequired !== null ? (
+            <div className={styles.metaRow}>
+              <dt className={styles.metaLabel}>CV</dt>
+              <dd className={styles.metaValue}>
+                {vacancy.cvRequired ? "CV required" : "CV not required"}
+              </dd>
+            </div>
+          ) : null}
+          {vacancy.interviewEnglishOk !== null ? (
+            <div className={styles.metaRow}>
+              <dt className={styles.metaLabel}>Interview</dt>
+              <dd className={styles.metaValue}>
+                {vacancy.interviewEnglishOk
+                  ? "Interview can be in English"
+                  : "Interview in German"}
+              </dd>
+            </div>
+          ) : null}
+          {closingDate !== null ? (
+            <div className={styles.metaRow}>
+              <dt className={styles.metaLabel}>Closes</dt>
+              <dd className={styles.metaValue}>{closingDate}</dd>
             </div>
           ) : null}
         </dl>
       </section>
 
-      {detail.languageRequirements.length > 0 ? (
+      {languages.length > 0 ? (
         <section
           className={styles.section}
           aria-labelledby={languagesHeadingId}
@@ -126,31 +173,43 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
             Additional languages
           </h2>
           <ul className={styles.languageList}>
-            {detail.languageRequirements.map((requirement) => (
-              <li
-                key={requirement.languageCode}
-                className={styles.languageItem}
-              >
-                {requirement.languageLabel} — {requirement.minProficiencyLabel}
+            {languages.map((language) => (
+              <li key={language.languageCode} className={styles.languageItem}>
+                {languageLabel(language.languageCode)} —{" "}
+                {languageProficiencyLabel(language.minProficiency)}
               </li>
             ))}
           </ul>
         </section>
       ) : null}
 
-      {detail.matchReasons.length > 0 ? (
-        <section className={styles.section} aria-labelledby={reasonsHeadingId}>
-          <h2 className={styles.sectionHeading} id={reasonsHeadingId}>
-            Why this matches
+      {paragraphs.length > 0 ? (
+        <section
+          className={styles.section}
+          aria-labelledby="job-description-heading"
+        >
+          <h2 className={styles.sectionHeading} id="job-description-heading">
+            About this job
           </h2>
-          <ul className={styles.reasons} aria-labelledby={reasonsHeadingId}>
-            {detail.matchReasons.map((reason) => (
-              <li key={reason.key} className={styles.reason}>
-                {reason.text}
-              </li>
-            ))}
-          </ul>
+          {paragraphs.map((paragraph, index) => (
+            <p key={index} className={styles.metaValue}>
+              {paragraph}
+            </p>
+          ))}
         </section>
+      ) : null}
+
+      {externalHref !== null ? (
+        <p>
+          <a
+            className={styles.backLink}
+            href={externalHref}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Employer website
+          </a>
+        </p>
       ) : null}
 
       {application !== null ? (
@@ -178,16 +237,26 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
           <Link
             className={styles.cta}
             href={`/candidate/applications/${application.applicationId}`}
-            aria-label={`View application: ${detail.title}`}
+            aria-label={`View application: ${vacancy.title}`}
           >
             View application
           </Link>
         </section>
+      ) : eligible ? (
+        <ApplicationSubmitForm vacancyId={vacancy.vacancyId} />
       ) : (
-        <>
-          <ApplicationPreviewSection preview={preview} />
-          <ApplicationSubmitForm vacancyId={detail.vacancyId} />
-        </>
+        <section className={styles.section} aria-labelledby={missingHeadingId}>
+          <h2 className={styles.sectionHeading} id={missingHeadingId}>
+            You don&rsquo;t currently meet these requirements
+          </h2>
+          <MissingRequirementsList
+            codes={missingRequirements}
+            labelledBy={missingHeadingId}
+          />
+          <Link className={styles.cta} href={onboardingGroupHref("review")}>
+            Review your saved preferences
+          </Link>
+        </section>
       )}
     </main>
   );
