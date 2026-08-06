@@ -1,9 +1,9 @@
 # Slice 6 Build Plan — Employer Applicant Review and Application-Status Workflow
 
-> **Status:** Planning only. Decision **D-070 (proposed, not yet Accepted)** —
-> see `docs/38-application-status-and-review-proposal.md` §18. No PR in this
-> plan may start before D-070 is formally accepted. No migration, route,
-> component, or commit exists yet.
+> **Status:** Decision **D-070 Accepted** 2026-08-06 — see `docs/10-decisions.md`.
+> **PR 6.1 (database contract) is in progress; do not mark PR 6.1 Done before
+> merge.** PR 6.2 (employer UI), PR 6.3 (candidate status UI), and PR 6.4
+> (exit proof/closure) are not started.
 
 **Goal:** Let a completed, vacancy-owning employer review applicants and move
 each application through a narrow, auditable status lifecycle
@@ -100,6 +100,11 @@ DB-contract-then-UI split already proven in Slice 5 (5.5c database contract,
 from an isolated, audit-heavy review pass before any UI depends on it.
 
 ### PR 6.1 — Application status and review database contract
+
+**Status:** In progress. Migration
+`supabase/migrations/20260806140000_application_status_and_review_contract.sql`
+(12th) and `supabase/tests/database/28_application_status_and_review_contract_test.sql`
+(87 assertions) implemented and passing locally. Do not mark Done before merge.
 
 **Objective:** Add the status vocabulary, audit-history table, and five
 narrow RPCs from `docs/38-application-status-and-review-proposal.md`. No UI.
@@ -264,13 +269,16 @@ application has exactly one synthesized `submitted` history row after
 migration, with `occurred_at` matching its own `submitted_at` and
 `actor_user_id` matching its own `candidate_id`); **atomic future-submission
 history** (a fresh `submit_candidate_application` call produces both the
-`applications` row and its initial history row in one transaction — no
-window where a new application has zero history rows); **reason
-normalization** (empty/whitespace-only `p_reason` on a `rejected` transition
-normalizes to `NULL`, not an error; a `p_reason` over 500 trimmed characters
-is rejected as a typed validation result, not a raw constraint-violation
-error; a `p_reason` supplied on any non-`rejected` transition is silently
-discarded, not stored, not erroring).
+`applications` row and its initial history row in one transaction, using one
+shared timestamp for `applications.submitted_at`/`created_at`/`updated_at`
+and `application_status_history.occurred_at` — no window where a new
+application has zero history rows, and no drift between the two
+timestamps); **reason normalization** (empty/whitespace-only `p_reason`
+normalizes to `NULL`, not an error; a non-null, post-trim `p_reason`
+supplied for any target other than `rejected` is a caller error —
+`invalid_transition`, no state change, no history row, never silently
+discarded; a `rejected` target accepts a 1–1000 trimmed-character reason;
+longer is `invalid_transition`, not a raw constraint-violation error).
 
 ## Vitest strategy (PR 6.2/6.3)
 

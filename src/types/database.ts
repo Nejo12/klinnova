@@ -9,6 +9,47 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      application_status_history: {
+        Row: {
+          actor_role: string
+          actor_user_id: string
+          application_id: string
+          from_status: string | null
+          id: string
+          occurred_at: string
+          reason: string | null
+          to_status: string
+        }
+        Insert: {
+          actor_role: string
+          actor_user_id: string
+          application_id: string
+          from_status?: string | null
+          id?: string
+          occurred_at?: string
+          reason?: string | null
+          to_status: string
+        }
+        Update: {
+          actor_role?: string
+          actor_user_id?: string
+          application_id?: string
+          from_status?: string | null
+          id?: string
+          occurred_at?: string
+          reason?: string | null
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_status_history_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       applications: {
         Row: {
           candidate_id: string
@@ -482,6 +523,10 @@ export type Database = {
         }
         Returns: string
       }
+      _application_allowed_transitions: {
+        Args: { p_current_status: string }
+        Returns: string[]
+      }
       _candidate_first_incomplete_group: {
         Args: { p_uid: string }
         Returns: string
@@ -657,6 +702,10 @@ export type Database = {
         Returns: Json
       }
       fill_employer_vacancy: { Args: { p_vacancy_id: string }; Returns: Json }
+      get_current_employer_application: {
+        Args: { p_application_id: string }
+        Returns: Json
+      }
       get_effective_public_vacancy: {
         Args: { p_vacancy_id: string }
         Returns: {
@@ -708,6 +757,13 @@ export type Database = {
         Args: { p_at?: string; p_vacancy_id: string }
         Returns: boolean
       }
+      list_current_candidate_application_status_history: {
+        Args: { p_application_id: string }
+        Returns: {
+          occurred_at: string
+          to_status: string
+        }[]
+      }
       list_current_candidate_vacancy_matches: {
         Args: never
         Returns: {
@@ -729,6 +785,21 @@ export type Database = {
           website: string
           work_frequency: string
           workplace_type: string
+        }[]
+      }
+      list_current_employer_applications: {
+        Args: { p_status?: string; p_vacancy_id?: string }
+        Returns: {
+          application_id: string
+          available_from: string
+          candidate_display_name: string
+          current_status: string
+          german_comfort: string
+          job_category: string
+          submitted_at: string
+          updated_at: string
+          vacancy_id: string
+          vacancy_title: string
         }[]
       }
       list_effective_public_vacancies: {
@@ -810,6 +881,14 @@ export type Database = {
         Returns: Json
       }
       text_array_is_unique: { Args: { input: string[] }; Returns: boolean }
+      transition_current_employer_application_status: {
+        Args: {
+          p_application_id: string
+          p_reason?: string
+          p_target_status: string
+        }
+        Returns: Json
+      }
       update_employer_vacancy_draft: {
         Args: {
           p_available_from?: string
