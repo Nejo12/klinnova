@@ -99,8 +99,16 @@ values
     30,
     date '2026-02-01',
     array['hospitality', 'cleaning', 'food_production']::text[],
-    array['mini_job', 'part_time']::text[],
-    array['daytime', 'morning']::text[],
+    -- PR 5.5c: submit_candidate_application now enforces the full
+    -- canonical eligibility evaluator (not category-only), so this
+    -- candidate's preferences must genuinely satisfy every rule for the
+    -- target seed vacancy 222222222206 (food_production / full_time /
+    -- night / basic German / en-conversational), not just its category.
+    -- full_time/night are added alongside the original mini_job/part_time
+    -- and daytime/morning values so this candidate remains eligible for
+    -- any other seed vacancy that only needed the original preferences.
+    array['mini_job', 'part_time', 'full_time']::text[],
+    array['daytime', 'morning', 'night']::text[],
     null
   ),
   (
@@ -464,7 +472,7 @@ select is(
     where candidate_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
       and vacancy_id = '22222222-2222-4222-8222-222222222206'
   ),
-  '["mini_job", "part_time"]'::jsonb,
+  '["full_time", "mini_job", "part_time"]'::jsonb,
   'employment_types are deterministically ordered'
 );
 
@@ -810,7 +818,12 @@ select is(
   'empty languages array when vacancy has no additional language requirements'
 );
 
--- Narrow category membership only — not a full matcher; miss → unavailable.
+-- PR 5.5c: category membership is now enforced by the canonical
+-- eligibility evaluator shared with candidate discovery, not a narrow
+-- duplicate category-only check — a category mismatch is reported as
+-- 'ineligible' (with 'category' in missing_requirements), not 'unavailable'.
+-- 'unavailable' remains reserved for vacancy-level unavailability (not
+-- found / not effectively public), never candidate-eligibility outcomes.
 select set_config(
   'request.jwt.claim.sub',
   'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
@@ -827,8 +840,8 @@ select is(
   public.submit_candidate_application(
     '22222222-2222-4222-8222-222222222202'
   ) ->> 'result',
-  'unavailable',
-  'missing preferred category returns unavailable (not not_matching)'
+  'ineligible',
+  'missing preferred category returns ineligible via the canonical evaluator (not not_matching, not unavailable)'
 );
 
 reset role;

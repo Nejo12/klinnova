@@ -1118,3 +1118,21 @@ Production fallback requires a new explicit authorization that names: Production
 **Consequences:** Infrastructure re-isolation is a proof prerequisite, not optional product scope.
 
 **Acceptance note:** Accepted 2026-08-05 by repository owner for PR 5.1 decision lock.
+
+## D-068 — Canonical SQL eligibility evaluator (PR 5.5c)
+
+**Status:** Accepted
+**Accepted:** 2026-08-06
+**Must accept before:** PR 5.5c merge
+
+**Context:** D-041 (2026-08-03) accepted that "the full matcher is not duplicated in SQL" — the TypeScript matcher in `src/lib/matching/` was the sole eligibility source of truth, with `submit_candidate_application` enforcing only a narrow category-membership check plus visibility/completion/duplicate protection (confirmed by the pre-existing pgTAP comment in `13_applications_submit_rpc_test.sql`: "Narrow category membership only — not a full matcher; miss → unavailable"). PR 5.5b's database-contract audit found this insufficient for candidate discovery of *employer* vacancies: the fields the TypeScript matcher requires (`employment_types`, `shift_requirements`, `german_requirement`, `available_from`) are not exposed by the PR 5.5a public projection, and no RLS policy lets a candidate read another employer's `vacancies` row directly.
+
+**Decision:** Add one canonical, non-short-circuiting SQL evaluator (`_evaluate_candidate_vacancy_eligibility`, internal only — no anon/authenticated grant) that ports every TypeScript matcher rule (category, employment type, shift, German, other languages, availability) rule-for-rule, verified against the TypeScript source before implementation. This evaluator is shared by two new narrow authenticated RPCs (`resolve_current_candidate_vacancy_match(uuid)`, `list_current_candidate_vacancy_matches()`) and by a modified `submit_candidate_application(uuid)`, which now rejects an ineligible submission transactionally with `{"result":"ineligible","missing_requirements":[...]}` instead of only checking category. This **supersedes D-041's "not duplicated in SQL" premise for the transactional submission path only** — the TypeScript matcher remains the source of truth for `/candidate/matches` and `/candidate/jobs/[vacancyId]` in this PR (both untouched; PR 5.5d will integrate the new RPCs there) and both implementations were proven to agree via pgTAP fixtures exercised through both paths.
+
+The new `ineligible` result is purely additive to `submit_candidate_application`'s existing JSONB shape; the existing `submitApplicationRpcResultSchema` Zod discriminated union (PR 5.5b/earlier) does not yet include it and will fail-safe into the existing generic `{status:"failure"}` path until PR 5.5d updates the caller. The one pre-existing pgTAP assertion that encoded the old category-only/`unavailable` behavior was updated to expect `ineligible`, with the change documented inline.
+
+**Alternatives:** Leave `submit_candidate_application` category-only and only add discovery RPCs (rejected — reopens the exact gap D-041/PR 5.5b's audit found, since a candidate could still successfully apply to a vacancy they don't actually match on shift/German/language); duplicate the evaluator logic separately per RPC instead of one shared internal function (rejected — risks discovery/mutation rule drift, which PR 5.5c's own pgTAP suite explicitly guards against).
+
+**Consequences:** `submit_candidate_application` is stricter than before (closes a real eligibility gap); one pre-existing pgTAP fixture required updating from a category-only-eligible candidate to a genuinely fully-eligible candidate for its target seed vacancy; PR 5.5d owns integrating the new RPCs into candidate-facing routes and updating `submitApplicationRpcResultSchema`/the Server Action for the `ineligible` result.
+
+**Acceptance note:** Accepted 2026-08-06 for PR 5.5c implementation, based on the rule-by-rule audit recorded in the PR 5.5c pre-commit report.
