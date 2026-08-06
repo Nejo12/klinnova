@@ -11,4 +11,12 @@ describe("ShellHeader", () => {
     expect(within(header).getByText("Stint")).toBeInTheDocument();
     expect(within(header).getByText("One step closer.")).toBeInTheDocument();
   });
+
+  it("exposes a Jobs navigation link to /jobs", () => {
+    render(<ShellHeader />);
+
+    const nav = screen.getByRole("navigation", { name: "Site" });
+    const link = within(nav).getByRole("link", { name: "Jobs" });
+    expect(link).toHaveAttribute("href", "/jobs");
+  });
 });
