@@ -210,8 +210,55 @@ pgTAP: `supabase/tests/database/26_effective_public_vacancy_read_contract_test.s
 zero-argument/no-overload proof, the elapsed-expiry case re-proven through
 all three public RPCs, and explicit nullability assertions; full local
 suite is **744 assertions across 27 files**, up from the PR 5.4 baseline of
-672/26). Next unit: PR 5.5b — `/jobs` public routes and candidate matching
-integration, built on this contract.
+672/26). Next unit: PR 5.5b — `/jobs` public routes, built on this contract.
+
+**PR 5.5b database-contract audit (candidate matching).** Before writing any
+candidate-facing code, the existing candidate-matching read path was
+audited and found insufficient for effectively public *employer* vacancies.
+`resolveCandidateVacancyMatch()` (`src/lib/matching/resolve-candidate-vacancy-match.ts`)
+— shared by `/candidate/matches`, `/candidate/jobs/[vacancyId]`, and the
+apply Server Action (`submitCandidateApplicationAction`) — does a direct
+`supabase.from("vacancies").select(...)` requesting `employment_types`,
+`shift_requirements`, `german_requirement`, `available_from`. The
+deterministic matcher (`matchCandidateToVacancy` in
+`src/lib/matching/match-candidate-to-vacancy.ts`) is a hard filter over
+exactly those fields (plus `languageRequirements`, already available via
+`get_effective_public_vacancy_languages`) — location, category, employment
+type, shift, German requirement, additional languages, and availability
+must all pass or the candidate never sees the vacancy as a match.
+
+Grepping every `create policy` for `vacancies` across all 10 migrations
+finds exactly three authenticated SELECT policies:
+`vacancies_select_completed_seed_active` (seed only),
+`vacancies_select_own_employer_draft`, and `vacancies_select_own_employer`
+(both owner-only). None let a candidate read another employer's row.
+Grepping every `create or replace function public.` across all 10
+migrations finds no RPC that projects `employment_types`,
+`shift_requirements`, `german_requirement`, or `available_from` for
+effective-public employer vacancies to `authenticated` — PR 5.5a's
+projection deliberately excludes them (D-060/D-061 scoped the public
+projection to display fields only).
+
+`submit_candidate_application` (unchanged by PR 5.5b) does not independently
+enforce the deterministic matcher either — inspecting its body shows it
+checks candidate completion, `is_vacancy_effectively_public`, the
+candidate's job-category preference, and application uniqueness, but never
+employment type, shift, German requirement, language proficiency, or
+availability fit. The existing Server Action's TypeScript matcher pre-check
+(D-041) is the only thing enforcing full eligibility today; skipping it for
+employer vacancies would silently drop that guarantee while the seed path
+keeps enforcing it — an inconsistency, not a simplification.
+
+This is exactly the "schema incompatibility requiring a separately reviewed
+decision" D-062 anticipated. Per instruction, PR 5.5b does not add a
+migration, broaden RLS, use a service-role client, or invent ad hoc
+candidate eligibility in application code to close this gap — it reports
+the gap and leaves `/candidate/matches`, `/candidate/jobs/[vacancyId]`,
+`resolveCandidateVacancyMatch`, `matchCandidateToVacancy`, and the
+application Server Action untouched. **PR 5.5c** (planned, not started)
+owns designing and migrating the missing contract; **PR 5.5d** (planned,
+not started) owns the resulting candidate-facing UI/application
+integration.
 
 ---
 

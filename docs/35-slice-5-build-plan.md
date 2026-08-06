@@ -53,9 +53,11 @@ PR 5.1 Accepted decisions + locked schema contract  (this unit; docs only)
         -> PR 5.3b Operator verification queue/review UI (approve/reject)
           -> PR 5.4 Employer publish + lifecycle controls UI
             -> PR 5.5a Effective-public vacancy read contract (narrow RPCs, no UI)
-              -> PR 5.5b Public/candidate visibility + matching/apply integration
-                -> PR 5.6 Local exit proof + hosted-readiness package
-                  -> PR 5.7 Hosted proof + closure (owner-authorized; isolated env)
+              -> PR 5.5b Public vacancy discovery only (blocked on candidate matching)
+                -> PR 5.5c Canonical candidate-matching/application-eligibility contract (planned)
+                  -> PR 5.5d Candidate discovery UI + application integration (planned)
+                    -> PR 5.6 Local exit proof + hosted-readiness package
+                      -> PR 5.7 Hosted proof + closure (owner-authorized; isolated env)
 ```
 
 ---
@@ -358,30 +360,98 @@ access remains exactly as narrow as before this PR.
 
 ---
 
-## PR 5.5b — Public and candidate vacancy discovery UI
+## PR 5.5b — Public vacancy discovery (public-discovery-only)
 
-**Status:** Not started. Next unit after PR 5.5a merges.
+**Status:** In progress (this unit). Do not mark Done before merge.
 
-**Objective:** Original PR 5.5 objective, now built entirely on the PR 5.5a
-read contract instead of a direct table/RLS path.
+**Objective:** Deliver the public-facing half of the original PR 5.5
+objective — `/jobs` and `/jobs/[vacancyId]` — built entirely on the PR 5.5a
+read contract. The candidate-matching half was audited before any
+candidate-facing code was written and found blocked; it is deferred rather
+than worked around.
 
-**Includes:** `/jobs` + `/jobs/[vacancyId]`; expand matches loader; candidate
-detail apply for employer jobs (existing `submit_candidate_application`,
-unchanged); Demo seed regression; privacy-safe location.
+**Database-contract audit (candidate matching):** `resolveCandidateVacancyMatch()`
+(`src/lib/matching/resolve-candidate-vacancy-match.ts`), shared by
+`/candidate/matches`, `/candidate/jobs/[vacancyId]`, and the apply Server
+Action, does a direct `supabase.from("vacancies").select(...)` requesting
+`employment_types`, `shift_requirements`, `german_requirement`,
+`available_from` — fields the deterministic matcher
+(`matchCandidateToVacancy`) hard-requires. Grepping every RLS policy on
+`vacancies` across all 10 migrations confirms exactly three authenticated
+SELECT policies exist (`vacancies_select_completed_seed_active`,
+`vacancies_select_own_employer_draft`, `vacancies_select_own_employer`) —
+none let a candidate read another employer's row. Grepping every RPC
+definition across all 10 migrations confirms none expose those four fields
+for effective-public employer vacancies to `authenticated`. PR 5.5a's
+projection deliberately excludes them (out of the approved public field
+list). `submit_candidate_application` itself does not check
+employment/shift/German/language fit — only completion, effective
+visibility, category preference, and duplicate — so calling it without the
+existing matcher pre-check would silently drop the eligibility guarantee
+the product's "matches your profile" language relies on. This is exactly
+the "schema incompatibility requiring a separately reviewed decision"
+D-062 anticipated. No migration, RLS broadening, or ad hoc eligibility
+logic was added to close this gap in PR 5.5b — it is reported here instead,
+per instruction.
 
-**Excludes:** Save/unsave; CV upload; employer applicant review; opaque
-ranking; any new database migration (PR 5.5a already provides the needed
-read path).
+**Includes:** `/jobs` + `/jobs/[vacancyId]` (list + detail), loading only
+through `list_effective_public_vacancies()`, `get_effective_public_vacancy(uuid)`,
+`get_effective_public_vacancy_languages(uuid)`; public navigation ("Jobs"
+link in `ShellHeader`); public metadata; safe plain-text description
+rendering; safe http/https-only employer website links; a neutral
+"Sign in to check your eligibility and apply." application-entry notice
+(anonymous → `/login?next=/jobs/<id>`, authenticated → `/candidate`, no
+eligibility claim); Demo vacancy labelling for `source=seed`; uniform
+`notFound()` for malformed/unknown/non-public vacancy ids; local Playwright
+public-discovery journey.
+
+**Excludes:** `/candidate/matches` changes; `/candidate/jobs/[vacancyId]`
+changes; `resolveCandidateVacancyMatch`/`matchCandidateToVacancy` changes;
+candidate application Server Actions/components; `submit_candidate_application`
+callers; already-applied state; employer applicant review; any new database
+migration; RLS changes; service role.
 
 **Database effects:** None (consumes PR 5.5a RPCs only).
 
-**Route effects:** Public jobs routes; candidate matches/detail updates.
+**Route effects:** `/jobs`, `/jobs/[vacancyId]`. No candidate route changes.
 
-**Tests:** Playwright public/candidate visibility; isolation; Slice 3
-regression; matcher unit tests with employer fixtures.
+**Tests:** Vitest for schemas/domain/labels/loaders/components (public list,
+public detail, static security); Playwright focused public-discovery
+journey (employer publish → anonymous sees it → employer withdraws →
+anonymous no longer sees it, 404 on detail); full existing employer/auth
+regression suite unchanged.
 
-**Exit criteria:** Candidates can match/apply to effectively public employer
-jobs; canonical visibility contract shared; snapshots unaffected.
+**Exit criteria:** Anonymous and authenticated visitors can browse
+effectively public vacancies and reach a neutral sign-in entry point;
+candidate matching/application behavior is provably unchanged; no migration.
+
+**Hosted-operation boundary:** None.
+
+---
+
+## PR 5.5c — Canonical candidate-matching/application-eligibility database contract (planned)
+
+**Status:** Not started. Blocked-on report from PR 5.5b is the trigger for
+this unit.
+
+**Objective:** Close the exact gap PR 5.5b identified — give candidates a
+safe, RLS-independent, field-complete read path (or equivalent RPC-level
+eligibility contract) for effectively public employer vacancies, matching
+what the existing deterministic TypeScript matcher requires, without
+broadening direct table RLS.
+
+**Hosted-operation boundary:** None expected; requires a migration and a
+new Accepted decision before implementation.
+
+---
+
+## PR 5.5d — Candidate discovery UI + application integration (planned)
+
+**Status:** Not started. Depends on PR 5.5c merging.
+
+**Objective:** Expand `/candidate/matches` and the existing apply flow to
+include effectively public employer vacancies on top of the PR 5.5c
+contract, restoring the original PR 5.5 candidate-facing objective.
 
 **Hosted-operation boundary:** None.
 
