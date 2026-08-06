@@ -1,12 +1,13 @@
 # Application Status and Employer Review — Schema and Contract Proposal
 
-> Planning-stage contract for Slice 6. **Status:** Proposed, not yet Accepted.
-> No migration exists yet. Baseline schema: 11 migrations through
-> `20260806000000_candidate_eligibility_contract.sql`. Baseline decisions:
-> D-001–D-069 in `docs/10-decisions.md` (all Accepted). This document proposes
-> **D-070** (Slice 6 boundary, resolving a scope conflict — see §18) as a new
-> decision to be formally added to `docs/10-decisions.md` at the start of PR
-> 6.1, not by this planning document itself.
+> Database contract for Slice 6 PR 6.1. **Status:** **D-070 Accepted**
+> 2026-08-06 — see `docs/10-decisions.md`. Implemented in migration
+> `20260806140000_application_status_and_review_contract.sql` (12th) and
+> proven by `supabase/tests/database/28_application_status_and_review_contract_test.sql`
+> (87 assertions, all passing locally). PR 6.1 itself is in progress; do not
+> mark Done before merge. Baseline schema before this migration: 11
+> migrations through `20260806000000_candidate_eligibility_contract.sql`.
+> Baseline decisions: D-001–D-070 in `docs/10-decisions.md` (all Accepted).
 
 **Companion document:** `docs/37-slice-6-build-plan.md` (PR decomposition,
 route/component architecture, test strategy, rollout plan).
@@ -153,9 +154,9 @@ Forward-only, no backward transitions, no undo of terminal states, forward skips
 | `accepted` | ❌ | ❌ | — (already_in_state) | ❌ |
 | `rejected` | ❌ | ❌ | ❌ | — (already_in_state) |
 
-- **Reason:** optional, employer-only, **only accepted on the `rejected` transition** (mirrors `verification_review_reason`'s exact CHECK: 1–500 chars, trimmed, non-empty if present). Never candidate-visible. Not accepted on any other transition — keeps the MVP narrow; an employer wanting to note *why* they shortlisted or accepted someone has no product need for that today.
-  - **Normalization (explicit):** the RPC applies `btrim(p_reason)` before use. An empty string or whitespace-only input normalizes to `NULL` (treated identically to "no reason given") rather than failing — a candidate transition should never be blocked by a caller sending `""` instead of omitting the argument. A non-empty, post-trim value longer than 500 characters is **rejected as a validation error inside the RPC** (returned as a typed result, e.g. folded into `invalid_transition`, or `validation_error` if the caller-facing contract needs to distinguish "bad status" from "bad reason" — decided at implementation time in PR 6.1), **not** left to raise the raw `application_status_history_reason_len_chk` constraint violation as an uncaught Postgres error — matches D-066's "no raw PostgreSQL errors" rule and the same pre-validate-then-insert pattern `submit_candidate_application` already uses for its own CHECK-backed columns. A `p_reason` supplied on any transition other than `rejected` is silently discarded (forced to `NULL` before insert), not rejected as an error — supplying an unused argument is a caller mistake, not a security or data-integrity concern worth failing the whole transition over.
-- **Timestamp:** always database `now()` inside the transaction, never client-supplied.
+- **Reason:** optional, employer-only, **only accepted on the `rejected` transition** (same shape family as `verification_review_reason`'s CHECK, but bounded 1–1000 chars, trimmed, non-empty if present — see the accepted implementation in the migration). Never candidate-visible. Not accepted on any other transition.
+  - **Normalization (as implemented):** the RPC computes `nullif(btrim(coalesce(p_reason, '')), '')`. An empty string or whitespace-only input normalizes to `NULL` (treated identically to "no reason given"). If the normalized value is **non-null and the target status is not `rejected`, the whole request is rejected as `invalid_transition`** — no application update, no history row. Supplying a reason for the wrong transition is treated as a caller/UI defect worth surfacing, not silently discarded. A non-null, post-trim value longer than 1000 characters on a `rejected` target is also `invalid_transition`, never a raw `application_status_history_reason_len_chk` constraint violation — matches D-066's "no raw PostgreSQL errors" rule and the same pre-validate-then-insert pattern `submit_candidate_application` already uses for its own CHECK-backed columns. The table's own CHECK constraint remains as defense-in-depth; the RPC is expected to reject invalid input before ever attempting the write.
+- **Timestamp:** one shared value per submission/transition (`clock_timestamp()`, captured once into a local variable and reused for every column it touches in that call — e.g. `applications.submitted_at`/`created_at`/`updated_at` and `application_status_history.occurred_at` are byte-identical for a given submission), never client-supplied.
 - **Reversibility:** none. `accepted`/`rejected` are hard-terminal in Slice 6. An employer mistake is an acknowledged limitation of this narrow MVP, not silently worked around with an undo path that would need its own history-integrity rules.
 - **Vacancy lifecycle side effects:** none, by design (see §9). `accepted` does not auto-call `fill_employer_vacancy`; filling a vacancy does not auto-reject remaining applications. The two state machines stay decoupled in Slice 6. Considered and rejected: coupling them was judged to add cross-domain side-effect complexity disproportionate to the MVP's needs; revisit as a later, separately-decided enhancement if real usage shows friction.
 
@@ -369,24 +370,6 @@ A candidate applications index (`/candidate/applications`) needs no new RPC — 
 
 One additive migration for PR 6.1: widen `applications_status_chk`; create `application_status_history` (table + index + grants, no RLS policy needed since there's no `authenticated` grant); create the five RPCs above (three employer, two candidate) with explicit grants/revokes; add table/function comments. No change to `applications`' column set, no change to `snapshot_version`, no change to any Slice 5 (PR 5.5a/5.5c) function. Migration count goes from 11 to 12.
 
-## 18. Unresolved decisions requiring a new Accepted decision entry (D-070)
+## 18. D-070 — Accepted
 
-`docs/13-implementation-plan.md`'s existing Slice 6 scope line includes *"interview invitation metadata without full messaging"* and *"status notification emails,"* both outside this proposal's scope (interviews/scheduling and notifications are explicit non-goals here, per the planning brief). Per `AGENTS.md`: *"When documents conflict, stop and report the conflict. Do not invent a resolution."* **This is that report.** The precedent for resolving it is D-035/D-046/D-055 — each prior slice recorded a narrowing decision the first time its actual build scope came in under `docs/13`'s earlier, broader description. Slice 6 needs the same treatment. A complete, ready-to-accept draft is below; it is **not yet added to `docs/10-decisions.md`** — recommended to be formally accepted at the start of PR 6.1, giving the owner an explicit checkpoint before any migration lands.
-
----
-
-### Proposed D-070 — Slice 6 boundary: application status and employer review (draft, not yet Accepted)
-
-**Status:** Proposed
-**Accepted:** _pending_
-**Must accept before:** PR 6.1
-
-**Context:** `docs/13-implementation-plan.md`'s Slice 6 entry (written before Slices 3–5 were built) describes broader scope than this planning pass supports with current evidence: *"applicant list and detail; application status changes; interview invitation metadata without full messaging; candidate-visible timeline updates; status notification emails."* D-039 (2026-08-03) already deferred every status beyond `submitted` pending *"a later Accepted decision, defined transition ownership, authorization rules, and an additive migration."* D-055 (2026-08-05) confirmed Slice 5 excludes applicant list/detail, status changes, interview workflow, messaging, and scheduling, deferring all of it to Slice 6. D-062 confirmed Slice 5 gives employers zero access to applicant records. This decision is the first to grant employers any read of `applications`, and the first to fulfill D-039's deferred status-vocabulary decision.
-
-**Decision:** Slice 6 delivers exactly: a 5-status state machine (`submitted → reviewing/shortlisted/accepted/rejected`, forward-only, no reversal, detailed in `docs/38-application-status-and-review-proposal.md` §5–6); an immutable, RPC-mediated `application_status_history` audit table (§7); three narrow employer `SECURITY DEFINER` RPCs for list/detail/transition (§10–12), gated on completed-employer + vacancy ownership (**not** current verification state — see build plan §3 for the ownership-rule audit); two narrow candidate-facing status RPCs/reads (§13); and the corresponding employer and candidate UI. Employer review reads the existing immutable `candidate_snapshot`/`vacancy_snapshot` (D-038), never a live `candidate_profiles` join. Slice 6 explicitly does **not** include: interview invitation metadata or scheduling of any kind; status notification emails, SMS, or any other notification channel; candidate-initiated withdrawal; CV/document upload or storage; employer notes visible to candidates; internal scoring or AI ranking; candidate messaging; bulk status changes; automated/system-initiated rejection; operator participation in applicant review; contracts, payroll, or invoicing; and the general `audit_events` platform (reserved for Slice 7 per D-065). Vacancy publication lifecycle and application status remain two independent state machines in this slice — accepting an application does not automatically fill its vacancy, and filling a vacancy does not automatically reject its remaining applications.
-
-**Alternatives:** Build the full `docs/13`/`docs/05-features.md` 9-state pipeline with interview tracking and notifications now (rejected — none of it is evidenced as required for a working review-and-decide loop, and D-039 explicitly asked for a *later* decision once transition ownership/authorization were concrete, not a blanket adoption of the discovery-stage brainstorm); let employers read live `candidate_profiles` for review instead of the snapshot (rejected — reopens exactly the unnecessary-PII exposure D-038 was written to prevent, and breaks the stability guarantee already proven for the candidate's own confirmation page); couple `accepted` to automatic vacancy fill (rejected — see build plan/proposal §9 for the decoupling rationale).
-
-**Consequences:** A future slice that wants interview scheduling, notifications, candidate withdrawal, or richer audit infrastructure needs its own new decision, not a silent extension of this one. The status vocabulary is intentionally small; adding a 6th status later requires an additive migration and a new decision, matching how `snapshot_version` and vacancy lifecycle states have each been treated as versioned, decision-gated surfaces throughout this project.
-
-**Acceptance note:** _Proposed during Slice 6 planning; not yet Accepted. Recommend accepting at the start of PR 6.1._
+`docs/13-implementation-plan.md`'s existing Slice 6 scope line included *"interview invitation metadata without full messaging"* and *"status notification emails,"* both outside this proposal's scope. Per `AGENTS.md`'s conflict-reporting rule, this was reported (not silently resolved) during planning, matching the identical precedent of D-035/D-046/D-055 narrowing their own slices' earlier `docs/13` descriptions. **D-070 is now Accepted** — see `docs/10-decisions.md` for the full, final decision text (accepted 2026-08-06, at the start of PR 6.1, before the migration below was applied). It codifies exactly the 5-status state machine, the ownership-not-verification employer access rule, the immutable-snapshot review model, and the full non-goals list from this document.
