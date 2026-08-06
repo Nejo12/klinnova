@@ -255,10 +255,118 @@ migration, broaden RLS, use a service-role client, or invent ad hoc
 candidate eligibility in application code to close this gap — it reports
 the gap and leaves `/candidate/matches`, `/candidate/jobs/[vacancyId]`,
 `resolveCandidateVacancyMatch`, `matchCandidateToVacancy`, and the
-application Server Action untouched. **PR 5.5c** (planned, not started)
-owns designing and migrating the missing contract; **PR 5.5d** (planned,
-not started) owns the resulting candidate-facing UI/application
-integration.
+application Server Action untouched. **PR 5.5c** owns designing and
+migrating the missing contract; **PR 5.5d** (planned, not started) owns the
+resulting candidate-facing UI/application integration.
+
+**PR 5.5c — implemented** (migration
+`20260806000000_candidate_eligibility_contract.sql`, additive only — no
+table change, no RLS policy change; D-068):
+
+1. `_evaluate_candidate_vacancy_eligibility(p_candidate_id uuid, p_vacancy_id
+   uuid, p_at timestamptz) returns table (eligible boolean,
+   missing_requirements text[])` — internal only (`revoke all ... from
+   public, anon, authenticated`; callable only from within other
+   `SECURITY DEFINER` functions via the owner's implicit EXECUTE right, the
+   same pattern already established by `_is_active_verification_operator`).
+   `language plpgsql`, `stable`, fixed `search_path`. Ports every
+   TypeScript matcher rule rule-for-rule, audited against
+   `src/lib/matching/{rules,ranks,match-candidate-to-vacancy}.ts` before
+   implementation: category (`vacancy.job_category = any(candidate.job_categories)`);
+   employment type (non-empty array intersection); shift (candidate
+   `'flexible'` short-circuits true, else non-empty concrete-array
+   intersection); German (`_german_comfort_rank(candidate) >=
+   _german_comfort_rank(vacancy)`, ranks 0–3 matching
+   `src/lib/matching/ranks.ts` exactly); other languages (every
+   `vacancy_language_requirements` row must be met by a
+   `candidate_languages` row of the same code at
+   `_language_proficiency_rank(candidate) >= _language_proficiency_rank(required)`,
+   ranks 0–3; zero requirement rows always satisfied); availability
+   (`vacancy.available_from is null` always satisfied — flexible — else
+   `candidate.available_from <= vacancy.available_from`). `city`/location is
+   deliberately not a rule: `candidate_profiles_city_berlin_chk` and
+   `vacancies_city_berlin_chk` already force both sides to literal `'Berlin'`
+   whenever set, and candidate completion requires `city` to be set, so the
+   rule can never fail in practice (D-030). Unlike the TypeScript matcher
+   (which short-circuits on the first failing rule), the evaluator checks
+   every rule independently so callers can report every unmet requirement —
+   an explicit PR 5.5c requirement, not a behavioural drift, since the
+   eligibility *conclusion* (eligible iff every rule passes) is identical.
+2. `resolve_current_candidate_vacancy_match(p_vacancy_id uuid) returns table
+   (status text, eligible boolean, missing_requirements text[])` —
+   authenticated-only (`revoke all ... from public, anon; grant execute ...
+   to authenticated`). Identity from `auth.uid()` only. Mirrors the
+   existing `resolveCandidateVacancyMatch` status split
+   (`unavailable | incomplete | eligible | ineligible`) that
+   `/candidate/jobs/[vacancyId]`'s redirect targets already depend on, so
+   collapsing it to a single shape would have been a PR 5.5d regression,
+   not a simplification. Vacancy unavailability (unknown id, not
+   effective-public — draft/paused/filled/expired/withdrawn/elapsed-expiry/
+   unverified/rejected/revoked employer, all proven via the same
+   `is_vacancy_effectively_public` gate PR 5.5a uses) and candidate
+   incompleteness are structurally indistinguishable from each other in
+   shape (both return one row with a status column), preserving the "no
+   existence oracle" property. Does not return public vacancy fields — PR
+   5.5d composes this with the PR 5.5a `get_effective_public_vacancy*` RPCs
+   rather than duplicating that projection.
+3. `list_current_candidate_vacancy_matches() returns table (vacancy_id uuid,
+   title text, description text, job_category text, public_locality text,
+   workplace_type text, work_frequency text, cv_required boolean,
+   interview_english_ok boolean, source text, employer_type text,
+   employer_display_name text, company_name text, website text,
+   published_at timestamptz, expires_at timestamptz, eligible boolean,
+   missing_requirements text[])` — authenticated-only, no arguments,
+   identity from `auth.uid()` only. Reuses the PR 5.5a public projection
+   field set exactly (no new anon-visible fields — this RPC itself is never
+   anon-executable) plus two candidate-specific columns. Returns
+   **eligible rows only**, matching `/candidate/matches`'s existing hard
+   filter (`matchCandidateToVacancies` never returns a non-match) rather
+   than "all effective-public with match status" — confirmed by reading the
+   existing loader/UI, not assumed. Ordered `published_at desc,
+   vacancy_id asc`, identical to PR 5.5a. Incomplete/missing/unauthenticated
+   candidates simply see zero rows (list semantics tolerate an empty result
+   without a typed distinction, unlike the detail RPC).
+4. `submit_candidate_application(p_vacancy_id uuid) returns jsonb` —
+   signature unchanged. The pre-existing narrow category-only check
+   ("Narrow category membership only — not a full matcher; miss →
+   unavailable", the pgTAP comment this PR updates) is replaced by a call
+   to the same canonical evaluator, positioned after the `already_applied`
+   duplicate check (so a stale/retried submission for an existing
+   application stays idempotent per D-040, never newly rejected as
+   ineligible) and before snapshot construction. An ineligible result
+   returns `{"result":"ineligible","missing_requirements":[...]}` — purely
+   additive to the existing JSONB shape. PR 5.5b's
+   `submitApplicationRpcResultSchema` (a `z.discriminatedUnion`) does not
+   know this discriminant yet; `safeParse` fails validation safely into the
+   action's existing generic `{status:"failure"}` path — not a crash, not
+   silent success, just a less-specific error until PR 5.5d updates the
+   parser and the Server Action's exhaustive switch. This was evaluated
+   against "do not modify UI unless compilation requires it" (per the PR
+   5.5c brief): TypeScript compilation does not require the change (the
+   existing schema/switch still compile and fail safely at runtime), so it
+   is deferred rather than made here.
+
+**Regression note:** one pre-existing pgTAP fixture and one pre-existing
+assertion needed updating as a direct, intentional consequence of closing
+the eligibility gap, not a weakening:
+`13_applications_submit_rpc_test.sql`'s "Complete Candidate" fixture
+previously satisfied only the category-only check for seed vacancy
+`222222222206` (food_production/full_time/night/basic German); its
+`employment_types`/`shift_preferences` arrays were extended
+(`mini_job,part_time` → `+full_time`; `daytime,morning` → `+night`) so the
+same candidate is now genuinely eligible on every rule, and the one
+assertion expecting the old category-only-miss behaviour
+(`'unavailable'` for a genuine category mismatch on vacancy `222202`) was
+updated to expect `'ineligible'` with an inline comment explaining why. No
+assertion was deleted or had its expected value loosened to hide a
+regression — every other assertion in the file, and the entire rest of the
+744-assertion PR 5.5a/5.5b baseline plus the 79 new PR 5.5c assertions,
+passes unchanged. Full suite: **823 assertions across 28 files**, up from
+the PR 5.5b baseline of 744/27.
+
+pgTAP: `supabase/tests/database/27_candidate_eligibility_contract_test.sql`
+(79 assertions). Next unit: PR 5.5d — candidate discovery UI + application
+integration on this contract (no candidate UI landed in PR 5.5c itself).
 
 ---
 

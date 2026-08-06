@@ -573,10 +573,19 @@ export type Database = {
         }
         Returns: string[]
       }
+      _evaluate_candidate_vacancy_eligibility: {
+        Args: { p_at: string; p_candidate_id: string; p_vacancy_id: string }
+        Returns: {
+          eligible: boolean
+          missing_requirements: string[]
+        }[]
+      }
+      _german_comfort_rank: { Args: { p_level: string }; Returns: number }
       _is_active_verification_operator: {
         Args: { p_uid: string }
         Returns: boolean
       }
+      _language_proficiency_rank: { Args: { p_level: string }; Returns: number }
       _profile_first_incomplete_group: {
         Args: {
           p_available_from: string
@@ -699,6 +708,29 @@ export type Database = {
         Args: { p_at?: string; p_vacancy_id: string }
         Returns: boolean
       }
+      list_current_candidate_vacancy_matches: {
+        Args: never
+        Returns: {
+          company_name: string
+          cv_required: boolean
+          description: string
+          eligible: boolean
+          employer_display_name: string
+          employer_type: string
+          expires_at: string
+          interview_english_ok: boolean
+          job_category: string
+          missing_requirements: string[]
+          public_locality: string
+          published_at: string
+          source: string
+          title: string
+          vacancy_id: string
+          website: string
+          work_frequency: string
+          workplace_type: string
+        }[]
+      }
       list_effective_public_vacancies: {
         Args: never
         Returns: {
@@ -757,6 +789,14 @@ export type Database = {
         Returns: Json
       }
       request_employer_verification: { Args: never; Returns: Json }
+      resolve_current_candidate_vacancy_match: {
+        Args: { p_vacancy_id: string }
+        Returns: {
+          eligible: boolean
+          missing_requirements: string[]
+          status: string
+        }[]
+      }
       resume_employer_vacancy: {
         Args: { p_expires_at?: string; p_vacancy_id: string }
         Returns: Json

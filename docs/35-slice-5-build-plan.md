@@ -429,19 +429,69 @@ candidate matching/application behavior is provably unchanged; no migration.
 
 ---
 
-## PR 5.5c — Canonical candidate-matching/application-eligibility database contract (planned)
+## PR 5.5c — Canonical candidate-matching/application-eligibility database contract
 
-**Status:** Not started. Blocked-on report from PR 5.5b is the trigger for
-this unit.
+**Status:** In progress (this unit). Do not mark Done before merge.
 
 **Objective:** Close the exact gap PR 5.5b identified — give candidates a
-safe, RLS-independent, field-complete read path (or equivalent RPC-level
-eligibility contract) for effectively public employer vacancies, matching
-what the existing deterministic TypeScript matcher requires, without
-broadening direct table RLS.
+safe, RLS-independent, field-complete eligibility contract for effectively
+public employer vacancies (seed included), matching what the existing
+deterministic TypeScript matcher requires, without broadening direct table
+RLS, and enforce the same contract transactionally inside
+`submit_candidate_application` (D-068).
 
-**Hosted-operation boundary:** None expected; requires a migration and a
-new Accepted decision before implementation.
+**Includes:** One additive migration (11th) —
+`_evaluate_candidate_vacancy_eligibility(p_candidate_id uuid, p_vacancy_id
+uuid, p_at timestamptz)` (internal, `SECURITY DEFINER`, no anon/authenticated
+grant, non-short-circuiting evaluator ported rule-for-rule from
+`src/lib/matching/{rules,ranks}.ts`: category, employment type, shift,
+German, other languages, availability); `resolve_current_candidate_vacancy_match(uuid)`
+(authenticated-only, identity from `auth.uid()`, returns `status` in
+`unavailable | incomplete | eligible | ineligible` plus
+`eligible`/`missing_requirements`, mirroring the existing
+`resolveCandidateVacancyMatch` status split so PR 5.5d does not regress
+redirect behaviour); `list_current_candidate_vacancy_matches()`
+(authenticated-only, no arguments, eligible-rows-only — mirrors
+`/candidate/matches`'s existing hard-filter semantics — reusing the PR 5.5a
+public projection field set plus `eligible`/`missing_requirements`,
+`published_at desc, vacancy_id asc` ordering); `submit_candidate_application`
+updated to call the same evaluator after the duplicate check and before
+snapshot construction, returning `{"result":"ineligible","missing_requirements":[...]}`
+for an ineligible submission instead of only checking category membership.
+
+**Excludes:** Any candidate UI; any change to `/jobs`, `/candidate/matches`,
+`/candidate/jobs/[vacancyId]`, `resolveCandidateVacancyMatch`,
+`matchCandidateToVacancy`, or the candidate application Server Action;
+removing the TypeScript matcher; expanding the anonymous public projection;
+employer applicant review.
+
+**Database effects:** One migration
+(`20260806000000_candidate_eligibility_contract.sql`), additive only. No
+table change, no RLS policy change. `submit_candidate_application`'s
+signature (`p_vacancy_id uuid) returns jsonb`) is unchanged; its result
+gains one new discriminant value (`ineligible`) that PR 5.5b's
+`submitApplicationRpcResultSchema` does not yet parse (fails safely into
+the existing generic `failure` state until PR 5.5d).
+
+**Route effects:** None.
+
+**Tests:** pgTAP — privileges/signatures, candidate identity handling,
+effective-public exclusion parity with PR 5.5a, every matching rule
+(positive/negative, multiple simultaneous failures, deterministic ordering,
+null/empty semantics, seed/employer parity), list/detail RPC behaviour,
+full application-transaction coverage (eligible/ineligible per rule,
+duplicate idempotency, stale-page and verification-revocation races), and
+full-suite regression (one pre-existing pgTAP fixture and one pre-existing
+assertion updated — see PR 5.5c pre-commit report for exact justification).
+
+**Exit criteria:** `_evaluate_candidate_vacancy_eligibility` agrees with the
+TypeScript matcher's eligibility conclusion for every audited rule;
+`submit_candidate_application` rejects every rule failure transactionally;
+`/jobs`, `/candidate/matches`, `/candidate/jobs/[vacancyId]`, and the
+existing application Server Action are provably unchanged; full local
+pgTAP/Vitest/Playwright suites green.
+
+**Hosted-operation boundary:** None.
 
 ---
 
