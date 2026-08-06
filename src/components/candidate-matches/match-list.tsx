@@ -1,26 +1,26 @@
 import type { OwnedApplicationSummary } from "@/lib/applications/owned-application";
-import type { CandidateMatch } from "@/lib/matching/types";
+import type { PublicVacancy } from "@/lib/public-jobs/domain";
 
 import { MatchCard } from "@/components/candidate-matches/match-card";
 
 import styles from "./candidate-matches.module.scss";
 
 type MatchListProps = {
-  matches: readonly CandidateMatch[];
+  vacancies: readonly PublicVacancy[];
   applicationsByVacancyId: ReadonlyMap<string, OwnedApplicationSummary>;
 };
 
 export function MatchList({
-  matches,
+  vacancies,
   applicationsByVacancyId,
 }: MatchListProps) {
   return (
     <ul className={styles.list}>
-      {matches.map((match) => (
-        <li key={match.vacancy.id}>
+      {vacancies.map((vacancy) => (
+        <li key={vacancy.vacancyId}>
           <MatchCard
-            match={match}
-            application={applicationsByVacancyId.get(match.vacancy.id) ?? null}
+            vacancy={vacancy}
+            application={applicationsByVacancyId.get(vacancy.vacancyId) ?? null}
           />
         </li>
       ))}

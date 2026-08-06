@@ -1,34 +1,25 @@
 import Link from "next/link";
 
-import {
-  employmentTypeLabel,
-  formatIsoCalendarDate,
-  germanRequirementLabel,
-  joinLabels,
-  shiftLabel,
-} from "@/lib/matching/labels";
-import type { CandidateMatch } from "@/lib/matching/types";
 import { APPLIED_STATUS_LABEL } from "@/lib/applications/application-confirmation";
 import type { OwnedApplicationSummary } from "@/lib/applications/owned-application";
-
-import { MatchReasons } from "@/components/candidate-matches/match-reasons";
+import type { PublicVacancy } from "@/lib/public-jobs/domain";
+import {
+  jobCategoryLabel,
+  workFrequencyLabel,
+  workplaceTypeLabel,
+} from "@/lib/public-jobs/labels";
+import { DEMO_VACANCY_LABEL } from "@/lib/public-jobs/messages";
 
 import styles from "./candidate-matches.module.scss";
 
 type MatchCardProps = {
-  match: CandidateMatch;
+  vacancy: PublicVacancy;
   application: OwnedApplicationSummary | null;
 };
 
-export function MatchCard({ match, application }: MatchCardProps) {
-  const { vacancy, reasons } = match;
-  const titleId = `match-title-${vacancy.id}`;
-  const reasonsId = `match-reasons-${vacancy.id}`;
-  const detailHref = `/candidate/jobs/${vacancy.id}`;
-  const availableFromText =
-    vacancy.availableFrom === null
-      ? "Flexible start"
-      : `From ${formatIsoCalendarDate(vacancy.availableFrom)}`;
+export function MatchCard({ vacancy, application }: MatchCardProps) {
+  const titleId = `match-title-${vacancy.vacancyId}`;
+  const detailHref = `/candidate/jobs/${vacancy.vacancyId}`;
 
   return (
     <article className={styles.card} aria-labelledby={titleId}>
@@ -37,48 +28,55 @@ export function MatchCard({ match, application }: MatchCardProps) {
           {vacancy.title}
         </h2>
         <div className={styles.badgeGroup}>
-          <p className={styles.demoLabel}>Demo vacancy</p>
+          {vacancy.source === "seed" ? (
+            <p className={styles.demoLabel}>{DEMO_VACANCY_LABEL}</p>
+          ) : null}
           {application !== null ? (
             <p className={styles.appliedLabel}>{APPLIED_STATUS_LABEL}</p>
           ) : null}
         </div>
       </div>
 
-      <p className={styles.company}>{vacancy.company.name}</p>
-      {vacancy.summary.trim().length > 0 ? (
-        <p className={styles.summary}>{vacancy.summary}</p>
+      <p className={styles.company}>
+        {vacancy.employerDisplayName ?? "Berlin employer"}
+        {vacancy.companyName !== null ? ` · ${vacancy.companyName}` : ""}
+      </p>
+      {vacancy.description !== null && vacancy.description.trim().length > 0 ? (
+        <p className={styles.summary}>{vacancy.description}</p>
       ) : null}
 
       <dl className={styles.meta}>
         <div className={styles.metaRow}>
-          <dt className={styles.metaLabel}>Location</dt>
-          <dd className={styles.metaValue}>Berlin</dd>
-        </div>
-        <div className={styles.metaRow}>
-          <dt className={styles.metaLabel}>Employment</dt>
+          <dt className={styles.metaLabel}>Category</dt>
           <dd className={styles.metaValue}>
-            {joinLabels(vacancy.employmentTypes.map(employmentTypeLabel))}
+            {jobCategoryLabel(vacancy.jobCategory)}
           </dd>
         </div>
-        <div className={styles.metaRow}>
-          <dt className={styles.metaLabel}>Shifts</dt>
-          <dd className={styles.metaValue}>
-            {joinLabels(vacancy.shiftRequirements.map(shiftLabel))}
-          </dd>
-        </div>
-        <div className={styles.metaRow}>
-          <dt className={styles.metaLabel}>German</dt>
-          <dd className={styles.metaValue}>
-            {germanRequirementLabel(vacancy.germanRequirement)}
-          </dd>
-        </div>
-        <div className={styles.metaRow}>
-          <dt className={styles.metaLabel}>Available</dt>
-          <dd className={styles.metaValue}>{availableFromText}</dd>
-        </div>
+        {vacancy.publicLocality !== null ? (
+          <div className={styles.metaRow}>
+            <dt className={styles.metaLabel}>Location</dt>
+            <dd className={styles.metaValue}>
+              {vacancy.publicLocality}, Berlin
+            </dd>
+          </div>
+        ) : null}
+        {vacancy.workplaceType !== null ? (
+          <div className={styles.metaRow}>
+            <dt className={styles.metaLabel}>Workplace</dt>
+            <dd className={styles.metaValue}>
+              {workplaceTypeLabel(vacancy.workplaceType)}
+            </dd>
+          </div>
+        ) : null}
+        {vacancy.workFrequency !== null ? (
+          <div className={styles.metaRow}>
+            <dt className={styles.metaLabel}>Frequency</dt>
+            <dd className={styles.metaValue}>
+              {workFrequencyLabel(vacancy.workFrequency)}
+            </dd>
+          </div>
+        ) : null}
       </dl>
-
-      <MatchReasons reasons={reasons} labelledBy={reasonsId} />
 
       <div className={styles.cardActions}>
         <Link

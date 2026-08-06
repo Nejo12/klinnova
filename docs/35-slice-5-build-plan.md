@@ -362,7 +362,7 @@ access remains exactly as narrow as before this PR.
 
 ## PR 5.5b — Public vacancy discovery (public-discovery-only)
 
-**Status:** In progress (this unit). Do not mark Done before merge.
+**Status:** Done. Merged (PR #56).
 
 **Objective:** Deliver the public-facing half of the original PR 5.5
 objective — `/jobs` and `/jobs/[vacancyId]` — built entirely on the PR 5.5a
@@ -431,7 +431,7 @@ candidate matching/application behavior is provably unchanged; no migration.
 
 ## PR 5.5c — Canonical candidate-matching/application-eligibility database contract
 
-**Status:** In progress (this unit). Do not mark Done before merge.
+**Status:** Done. Merged (PR #57).
 
 **Objective:** Close the exact gap PR 5.5b identified — give candidates a
 safe, RLS-independent, field-complete eligibility contract for effectively
@@ -495,13 +495,88 @@ pgTAP/Vitest/Playwright suites green.
 
 ---
 
-## PR 5.5d — Candidate discovery UI + application integration (planned)
+## PR 5.5d — Candidate discovery UI + application integration
 
-**Status:** Not started. Depends on PR 5.5c merging.
+**Status:** In progress (this unit). Do not mark Done before merge.
 
-**Objective:** Expand `/candidate/matches` and the existing apply flow to
-include effectively public employer vacancies on top of the PR 5.5c
-contract, restoring the original PR 5.5 candidate-facing objective.
+**Objective:** Switch `/candidate/matches` and `/candidate/jobs/[vacancyId]`
+onto the PR 5.5c canonical RPCs, restoring the original PR 5.5
+candidate-facing objective (candidates can discover and apply to
+effectively public employer vacancies, not just seed vacancies) and closing
+the direct-table-read gap the PR 5.5b audit found — without any new
+migration (D-069).
+
+**Includes:** `list_current_candidate_vacancy_matches()` and
+`resolve_current_candidate_vacancy_match(uuid)` (PR 5.5c) as the sole
+eligibility source for `/candidate/matches` and
+`/candidate/jobs/[vacancyId]`, composed with the PR 5.5a effective-public
+read contract for rendered vacancy content; a Zod-validated exhaustive
+missing-requirement code contract
+(`category|employment_type|shift|german|language|availability`,
+`missingRequirementLabel()`, never raw codes, never re-sorted client-side);
+an `ineligible` result added to `submitApplicationRpcResultSchema`, the
+candidate application Server Action's typed state, and the submit-form
+feedback UI, with the old TypeScript pre-submit matcher check removed from
+the Server Action entirely (it now only validates input, confirms the Auth
+session, and interprets `submit_candidate_application`'s own transactional
+result); the "Application preview" section (D-043) dropped from
+`/candidate/jobs/[vacancyId]` since its fields are not available under the
+new read boundary — replaced by a direct Submit control (eligible) or a
+labelled missing-requirements section (ineligible), with the disclosure and
+Submit button preserved; a new narrow completion guard,
+`loadCandidateCompletionStatus` (`src/lib/onboarding/candidate-completion-status.ts`),
+selecting only `onboarding_completed_at` under the existing
+`candidate_profiles_select_own` RLS policy — `/candidate/matches`'s existing
+unauthenticated/missing-profile/incomplete redirect guards are preserved
+exactly (D-069); the list RPC is only ever called for a candidate the guard
+reports `complete`, so its own empty-array result can only mean "zero
+current eligible matches"; `/candidate/jobs/[vacancyId]`'s
+incomplete-candidate onboarding redirect is unaffected either way
+(RPC-provided `incomplete` status, not a table read); a new static-security
+proof file enumerating every new candidate integration source file and
+asserting no direct read of `vacancies`, `vacancy_language_requirements`,
+`employer_profiles`, `companies`, verification tables, or
+`candidate_languages`, with the candidate-owned `applications` read
+(RLS-audited) and the one narrow `candidate_profiles` completion-guard read
+(column-restricted to `onboarding_completed_at`, asserted in the same test)
+as the only approved exceptions.
+
+**Excludes:** Any migration or change to PR 5.5c's migration file or
+generated database types; deleting the TypeScript matcher or its old
+callers (`load-candidate-matches.ts`, `resolve-candidate-vacancy-match.ts`,
+`load-candidate-vacancy-detail.ts`, `application-preview.ts`,
+`application-preview-section.tsx` — left in place, unused by any candidate
+route); expanding the anonymous public projection; employer applicant
+review; changes to the post-submission confirmation route
+(`/candidate/applications/[applicationId]`), which already renders from
+immutable snapshot columns and is unaffected by this read-boundary change.
+
+**Database effects:** None. No migration; migration count stays 11;
+generated types unchanged.
+
+**Route effects:** `/candidate/matches`, `/candidate/jobs/[vacancyId]`, and
+the candidate application Server Action. No employer or public route
+changes.
+
+**Tests:** Vitest for the new loaders/schemas/view-resolvers/components and
+the reworked Server Action/feedback UI, plus a dedicated static-security
+proof for the new candidate integration files; existing Playwright
+candidate-matches/job-detail/critical-exit journeys updated for the new
+behavior (no "Why this matches" copy, no "Application preview" section, an
+ineligible candidate sees full vacancy content plus a missing-requirements
+list instead of a hidden "no longer matches" state) while preserving the
+pre-existing unauthenticated/missing-profile/incomplete redirect assertions
+on `/candidate/matches` and `/candidate/jobs/[vacancyId]` unchanged; a new
+`test:e2e:candidate-integration` script covers the two dedicated candidate
+discovery/detail journeys; full local Vitest/pgTAP regression (pgTAP
+unchanged — no SQL touched).
+
+**Exit criteria:** `/candidate/matches` and `/candidate/jobs/[vacancyId]`
+read eligibility and content exclusively through the PR 5.5a/5.5c RPCs and
+the candidate-owned `applications` table; the TypeScript matcher is no
+longer an eligibility authority on any candidate route; full local
+Vitest/typecheck/pgTAP suites green; no migration, generated-type, or PR
+5.5c function change.
 
 **Hosted-operation boundary:** None.
 

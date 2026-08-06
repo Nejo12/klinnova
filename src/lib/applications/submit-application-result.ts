@@ -1,6 +1,8 @@
 import { z } from "zod";
 
-/** RPC result codes from `submit_candidate_application` (no `not_matching`). */
+import { missingRequirementCodeSchema } from "@/lib/matching/missing-requirement-codes";
+
+/** RPC result codes from `submit_candidate_application` (PR 5.5c/5.5d; no `not_matching`). */
 export const submitApplicationRpcResultSchema = z.discriminatedUnion("result", [
   z.object({
     result: z.literal("submitted"),
@@ -15,6 +17,10 @@ export const submitApplicationRpcResultSchema = z.discriminatedUnion("result", [
   }),
   z.object({
     result: z.literal("unavailable"),
+  }),
+  z.object({
+    result: z.literal("ineligible"),
+    missing_requirements: z.array(missingRequirementCodeSchema),
   }),
 ]);
 

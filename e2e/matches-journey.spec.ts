@@ -115,7 +115,6 @@ test.describe("Slice 2 candidate matches journey", () => {
       }),
     ).toBeVisible();
     await expect(page.getByText(/Demo vacancy/i).first()).toBeVisible();
-    await expect(page.getByText(/Why this matches/i).first()).toBeVisible();
     await expect(
       page.getByText(/Based in Berlin|Berlin/i).first(),
     ).toBeVisible();

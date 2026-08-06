@@ -255,9 +255,9 @@ migration, broaden RLS, use a service-role client, or invent ad hoc
 candidate eligibility in application code to close this gap — it reports
 the gap and leaves `/candidate/matches`, `/candidate/jobs/[vacancyId]`,
 `resolveCandidateVacancyMatch`, `matchCandidateToVacancy`, and the
-application Server Action untouched. **PR 5.5c** owns designing and
-migrating the missing contract; **PR 5.5d** (planned, not started) owns the
-resulting candidate-facing UI/application integration.
+application Server Action untouched. **PR 5.5c** (Done, merged) owns
+designing and migrating the missing contract; **PR 5.5d** (in progress)
+owns the resulting candidate-facing UI/application integration.
 
 **PR 5.5c — implemented** (migration
 `20260806000000_candidate_eligibility_contract.sql`, additive only — no
@@ -365,8 +365,9 @@ passes unchanged. Full suite: **823 assertions across 28 files**, up from
 the PR 5.5b baseline of 744/27.
 
 pgTAP: `supabase/tests/database/27_candidate_eligibility_contract_test.sql`
-(79 assertions). Next unit: PR 5.5d — candidate discovery UI + application
-integration on this contract (no candidate UI landed in PR 5.5c itself).
+(79 assertions). PR 5.5d (in progress) integrates `/candidate/matches` and
+`/candidate/jobs/[vacancyId]` onto this contract (D-069) with no migration
+and no change to this file's RPCs — pgTAP stays unchanged from PR 5.5c.
 
 ---
 

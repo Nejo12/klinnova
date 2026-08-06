@@ -1,8 +1,10 @@
+import type { MissingRequirementCode } from "@/lib/matching/missing-requirement-codes";
+
 export type SubmitCandidateApplicationState =
   | { status: "idle" }
   | { status: "validation_error" }
   | { status: "unavailable" }
-  | { status: "not_matching" }
+  | { status: "ineligible"; missingRequirements: MissingRequirementCode[] }
   | { status: "submitted"; applicationId: string }
   | { status: "already_applied"; applicationId: string }
   | { status: "failure" };

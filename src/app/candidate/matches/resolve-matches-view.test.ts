@@ -1,8 +1,24 @@
 import { describe, expect, it } from "vitest";
 
 import { resolveMatchesPageView } from "@/app/candidate/matches/resolve-matches-view";
-import { makeCandidate, makeVacancy } from "@/lib/matching/test-fixtures";
-import { matchCandidateToVacancy } from "@/lib/matching/match-candidate-to-vacancy";
+import type { PublicVacancy } from "@/lib/public-jobs/domain";
+
+const vacancy: PublicVacancy = {
+  vacancyId: "11111111-1111-4111-8111-111111111111",
+  title: "Evening cleaner",
+  description: "Two hours, weekday evenings.",
+  jobCategory: "cleaning",
+  publicLocality: "Mitte",
+  workplaceType: "private_home",
+  workFrequency: "recurring",
+  cvRequired: false,
+  interviewEnglishOk: true,
+  source: "employer",
+  employerDisplayName: "Ada Lovelace",
+  companyName: null,
+  website: "https://example.test",
+  expiresAt: "2026-09-01T00:00:00Z",
+};
 
 describe("resolveMatchesPageView", () => {
   it("routes unauthenticated users to login with safe next path", () => {
@@ -20,43 +36,37 @@ describe("resolveMatchesPageView", () => {
   });
 
   it("routes incomplete onboarding to onboarding", () => {
-    expect(resolveMatchesPageView({ status: "onboarding_incomplete" })).toEqual(
-      {
-        kind: "redirect",
-        href: "/candidate/onboarding",
-      },
-    );
+    expect(resolveMatchesPageView({ status: "incomplete" })).toEqual({
+      kind: "redirect",
+      href: "/candidate/onboarding",
+    });
   });
 
-  it("returns success matches and empty success distinctly from failure", () => {
-    const match = matchCandidateToVacancy(makeCandidate(), makeVacancy());
-    expect(match).not.toBeNull();
+  it("returns success vacancies and empty success distinctly from failure", () => {
     const applicationsByVacancyId = new Map();
     expect(
       resolveMatchesPageView({
         status: "success",
-        matches: [match!],
+        vacancies: [vacancy],
         applicationsByVacancyId,
       }),
     ).toEqual({
       kind: "success",
-      matches: [match],
+      vacancies: [vacancy],
       applicationsByVacancyId,
     });
     expect(
       resolveMatchesPageView({
         status: "success",
-        matches: [],
+        vacancies: [],
         applicationsByVacancyId,
       }),
     ).toEqual({
       kind: "success",
-      matches: [],
+      vacancies: [],
       applicationsByVacancyId,
     });
-    expect(
-      resolveMatchesPageView({ status: "failure", reason: "load" }),
-    ).toEqual({
+    expect(resolveMatchesPageView({ status: "failure" })).toEqual({
       kind: "failure",
     });
   });

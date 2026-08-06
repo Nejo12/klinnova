@@ -90,7 +90,6 @@ async function expectDemoMatchInventory(page: import("@playwright/test").Page) {
   await expect(page.getByText(/Demo vacancy/i).first()).toBeVisible();
   await expect(page.getByText("Demo Berlin Work Co").first()).toBeVisible();
   await expect(page.getByText(/Berlin/i).first()).toBeVisible();
-  await expect(page.getByText(/Why this matches/i).first()).toBeVisible();
   await expect(page.getByText(WORK_AUTHORISATION_NOTICE)).toBeVisible();
   await expect(
     page.getByText(/\d+\s*%|match score|perfect match/i),

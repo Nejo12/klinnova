@@ -1,41 +1,31 @@
 import { describe, expect, it } from "vitest";
 
 import { resolveJobDetailPageView } from "@/app/candidate/jobs/[vacancyId]/resolve-job-detail-view";
-import type { ApplicationPreview } from "@/lib/applications/application-preview";
-import type { CandidateVacancyDetail } from "@/lib/matching/candidate-vacancy-detail";
+import type {
+  PublicVacancy,
+  PublicVacancyLanguage,
+} from "@/lib/public-jobs/domain";
 
 const VACANCY_ID = "22222222-2222-4222-8222-222222222201";
 
-const detail = {
+const vacancy: PublicVacancy = {
   vacancyId: VACANCY_ID,
   title: "Demo vacancy — Morning kitchen support",
+  description: "Fictional demo hospitality role.",
+  jobCategory: "hospitality",
+  publicLocality: "Mitte",
+  workplaceType: "shop",
+  workFrequency: "recurring",
+  cvRequired: false,
+  interviewEnglishOk: true,
+  source: "seed",
   employerDisplayName: "Demo Berlin Work Co",
-  demoLabel: "Demo vacancy",
-  city: "Berlin",
-  jobCategoryLabel: "Hospitality",
-  employmentTypesLabel: "Part time",
-  shiftRequirementsLabel: "Morning",
-  germanRequirementLabel: "Basic German",
-  languageRequirements: [],
-  availableFromLabel: "Flexible start",
-  listedOnLabel: "15 January 2026",
-  matchReasons: [{ key: "berlin_job", text: "Based in Berlin" }],
-} satisfies CandidateVacancyDetail;
+  companyName: null,
+  website: null,
+  expiresAt: "2026-09-01T00:00:00Z",
+};
 
-const preview = {
-  vacancyId: VACANCY_ID,
-  vacancyTitle: "Demo vacancy — Morning kitchen support",
-  employerDisplayName: "Demo Berlin Work Co",
-  candidateDisplayName: "Ada",
-  matchedJobCategoryLabel: "Hospitality",
-  germanComfortLabel: "I can understand and use some basic German",
-  relevantLanguages: [],
-  noAdditionalLanguagesLabel: "No additional language requirements",
-  workAuthorisationDeclaredLabel: "Yes",
-  availableFromLabel: "4 August 2026",
-  employmentPreferencesLabel: "Part time",
-  shiftPreferencesLabel: "Morning",
-} satisfies ApplicationPreview;
+const languages: PublicVacancyLanguage[] = [];
 
 describe("resolveJobDetailPageView", () => {
   it("redirects unauthenticated visitors to login with next", () => {
@@ -56,33 +46,54 @@ describe("resolveJobDetailPageView", () => {
     });
   });
 
-  it("maps unavailable and not_matching to safe unavailable views", () => {
+  it("maps unavailable to a safe unavailable view", () => {
     expect(
       resolveJobDetailPageView(VACANCY_ID, { status: "unavailable" }),
-    ).toEqual({
-      kind: "unavailable",
-      reason: "unavailable",
-    });
-    expect(
-      resolveJobDetailPageView(VACANCY_ID, { status: "not_matching" }),
-    ).toEqual({
-      kind: "unavailable",
-      reason: "not_matching",
-    });
+    ).toEqual({ kind: "unavailable" });
   });
 
-  it("returns ready detail and preview without redirects", () => {
+  it("maps failure to a safe failure view", () => {
+    expect(resolveJobDetailPageView(VACANCY_ID, { status: "failure" })).toEqual(
+      { kind: "failure" },
+    );
+  });
+
+  it("returns ready with eligible=true and no redirect", () => {
     expect(
       resolveJobDetailPageView(VACANCY_ID, {
         status: "ready",
-        detail,
-        preview,
+        eligible: true,
+        missingRequirements: [],
+        vacancy,
+        languages,
         application: null,
       }),
     ).toEqual({
       kind: "ready",
-      detail,
-      preview,
+      eligible: true,
+      missingRequirements: [],
+      vacancy,
+      languages,
+      application: null,
+    });
+  });
+
+  it("returns ready with eligible=false and ordered missing requirements, not a separate unavailable view", () => {
+    expect(
+      resolveJobDetailPageView(VACANCY_ID, {
+        status: "ready",
+        eligible: false,
+        missingRequirements: ["category", "german"],
+        vacancy,
+        languages,
+        application: null,
+      }),
+    ).toEqual({
+      kind: "ready",
+      eligible: false,
+      missingRequirements: ["category", "german"],
+      vacancy,
+      languages,
       application: null,
     });
   });

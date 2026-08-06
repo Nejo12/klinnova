@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { resolveMatchesPageView } from "@/app/candidate/matches/resolve-matches-view";
 import { CandidateMatchesPage } from "@/components/candidate-matches/candidate-matches-page";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
-import { loadCandidateMatches } from "@/lib/matching/load-candidate-matches";
+import { loadCurrentCandidateMatchesPage } from "@/lib/matching/load-current-candidate-matches-page";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -13,14 +13,14 @@ export const metadata = {
 };
 
 export default async function CandidateMatchesRoutePage() {
-  const result = await loadCandidateMatches();
+  const supabase = await createServerSupabaseClient();
+  const result = await loadCurrentCandidateMatchesPage(supabase);
   const view = resolveMatchesPageView(result);
 
   if (view.kind === "redirect") {
     redirect(view.href);
   }
 
-  const supabase = await createServerSupabaseClient();
   const capabilities = await loadAccountCapabilities(supabase);
   const showEmployerNav = capabilities?.hasEmployerProfile === true;
 
@@ -36,7 +36,7 @@ export default async function CandidateMatchesRoutePage() {
   return (
     <CandidateMatchesPage
       status="success"
-      matches={view.matches}
+      vacancies={view.vacancies}
       applicationsByVacancyId={view.applicationsByVacancyId}
       showEmployerNav={showEmployerNav}
     />

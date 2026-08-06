@@ -8,14 +8,14 @@ import { MatchesEmptyState } from "@/components/candidate-matches/matches-empty-
 import { MatchesErrorState } from "@/components/candidate-matches/matches-error-state";
 import { WorkAuthorisationNotice } from "@/components/candidate-matches/work-authorisation-notice";
 import type { OwnedApplicationSummary } from "@/lib/applications/owned-application";
-import type { CandidateMatch } from "@/lib/matching/types";
+import type { PublicVacancy } from "@/lib/public-jobs/domain";
 
 import styles from "./candidate-matches.module.scss";
 
 type CandidateMatchesPageProps =
   | {
       status: "success";
-      matches: readonly CandidateMatch[];
+      vacancies: readonly PublicVacancy[];
       applicationsByVacancyId: ReadonlyMap<string, OwnedApplicationSummary>;
       showEmployerNav?: boolean;
     }
@@ -54,13 +54,13 @@ export function CandidateMatchesPage(props: CandidateMatchesPageProps) {
             profile.
           </p>
           <WorkAuthorisationNotice />
-          {props.matches.length === 0 ? (
+          {props.vacancies.length === 0 ? (
             <MatchesEmptyState />
           ) : (
             <>
-              <MatchCount count={props.matches.length} />
+              <MatchCount count={props.vacancies.length} />
               <MatchList
-                matches={props.matches}
+                vacancies={props.vacancies}
                 applicationsByVacancyId={props.applicationsByVacancyId}
               />
             </>

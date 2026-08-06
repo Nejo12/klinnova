@@ -121,12 +121,8 @@ test.describe("Slice 3 candidate job detail journey", () => {
     await expect(page.getByText("Demo vacancy").first()).toBeVisible();
     await expect(page.getByText("Demo Berlin Work Co").first()).toBeVisible();
     await expect(page.getByText("Berlin").first()).toBeVisible();
-    await expect(page.getByText(/Why this matches/i)).toBeVisible();
     await expect(
       page.getByText(WORK_AUTHORISATION_NOTICE).first(),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("heading", { level: 2, name: "Application preview" }),
     ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Submit application" }),
@@ -158,10 +154,6 @@ test.describe("Slice 3 candidate job detail journey", () => {
     await completeMatchingEssentials(page);
     await openMorningKitchenDetail(page);
 
-    await expect(
-      page.getByRole("heading", { level: 2, name: "Application preview" }),
-    ).toBeVisible();
-    await expect(page.getByText(displayName)).toBeVisible();
     await expect(page.getByText(APPLICATION_SUBMIT_DISCLOSURE)).toBeVisible();
     await expect(page.getByRole("checkbox")).toHaveCount(0);
 
