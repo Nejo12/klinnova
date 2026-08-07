@@ -106,6 +106,47 @@ describe("parseApplicationSnapshots", () => {
     ).toEqual({ ok: false, reason: "malformed" });
   });
 
+  it("accepts a real employer vacancy snapshot (source: employer, demo_label: null) — regression for the demo_label bug", () => {
+    const parsed = parseApplicationSnapshots({
+      ...validRow,
+      vacancy_snapshot: {
+        ...validVacancy,
+        source: "employer",
+        demo_label: null,
+      },
+    });
+    expect(parsed.ok).toBe(true);
+    if (parsed.ok) {
+      expect(parsed.vacancy.source).toBe("employer");
+      expect(parsed.vacancy.demo_label).toBeNull();
+    }
+  });
+
+  it("rejects an unknown vacancy source", () => {
+    expect(
+      parseApplicationSnapshots({
+        ...validRow,
+        vacancy_snapshot: { ...validVacancy, source: "unknown" },
+      }),
+    ).toEqual({ ok: false, reason: "malformed" });
+  });
+
+  it("accepts every non-submitted application status (regression: PR 6.2 status transitions)", () => {
+    for (const status of ["reviewing", "shortlisted", "accepted", "rejected"]) {
+      const parsed = parseApplicationSnapshots({ ...validRow, status });
+      expect(parsed.ok, status).toBe(true);
+      if (parsed.ok) {
+        expect(parsed.row.status).toBe(status);
+      }
+    }
+  });
+
+  it("rejects an unknown application status", () => {
+    expect(
+      parseApplicationSnapshots({ ...validRow, status: "archived" }),
+    ).toEqual({ ok: false, reason: "malformed" });
+  });
+
   it("allows nullable dates and ignores extra keys without exposing them", () => {
     const parsed = parseApplicationSnapshots({
       ...validRow,

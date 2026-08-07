@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { applicationStatusSchema } from "@/lib/applications/status";
 import {
   EMPLOYMENT_TYPE_CODES,
   GERMAN_COMFORT_CODES,
@@ -41,13 +42,24 @@ export const candidateSnapshotV1Schema = z.object({
   shift_preferences: z.array(z.enum(SHIFT_PREFERENCE_CODES)).min(1),
 });
 
-/** Accepted vacancy_snapshot shape for snapshot_version = 1. */
+/**
+ * Accepted vacancy_snapshot shape for snapshot_version = 1.
+ *
+ * `source`/`demo_label` were originally seed-only literals; a real employer
+ * vacancy stores `source: "employer"` and `demo_label: null` (see
+ * `submit_candidate_application` in
+ * supabase/migrations/20260806000000_candidate_eligibility_contract.sql,
+ * which sets `demo_label` to `'Demo vacancy'` only `when vacancy.source =
+ * 'seed'`). The stricter seed-only schema caused every real employer
+ * application's confirmation/detail page to fail parsing and render
+ * "Application not available" — fixed here to accept both sources.
+ */
 export const vacancySnapshotV1Schema = z.object({
   vacancy_id: z.string().uuid(),
   title: z.string().min(1),
   employer_display_name: z.string().min(1),
-  source: z.literal("seed"),
-  demo_label: z.literal("Demo vacancy"),
+  source: z.enum(["seed", "employer"]),
+  demo_label: z.literal("Demo vacancy").nullable(),
   city: z.literal("Berlin"),
   job_category: z.enum(JOB_CATEGORY_CODES),
   employment_types: z.array(z.enum(EMPLOYMENT_TYPE_CODES)).min(1),
@@ -59,12 +71,37 @@ export const vacancySnapshotV1Schema = z.object({
 
 export const applicationConfirmationRowSchema = z.object({
   id: z.string().uuid(),
-  status: z.literal("submitted"),
+  status: applicationStatusSchema,
   submitted_at: z.string().min(1),
   snapshot_version: z.literal(APPLICATION_SNAPSHOT_VERSION),
   candidate_snapshot: z.unknown(),
   vacancy_snapshot: z.unknown(),
 });
+
+/**
+ * Candidate application inventory row (`/candidate/applications`). Reuses
+ * the same strict `vacancySnapshotV1Schema` the confirmation route
+ * validates against — inventory only reads `title`/`employer_display_name`/
+ * `city` from it, but validating the whole snapshot keeps a single source
+ * of truth for "what a valid frozen vacancy snapshot looks like" rather
+ * than a second, narrower, driftable schema.
+ */
+export const applicationInventoryRowSchema = z.object({
+  id: z.string().uuid(),
+  vacancy_id: z.string().uuid(),
+  status: applicationStatusSchema,
+  submitted_at: z.string().min(1),
+  snapshot_version: z.literal(APPLICATION_SNAPSHOT_VERSION),
+  vacancy_snapshot: vacancySnapshotV1Schema,
+});
+
+export const applicationInventorySchema = z.array(
+  applicationInventoryRowSchema,
+);
+
+export type ApplicationInventoryRow = z.infer<
+  typeof applicationInventoryRowSchema
+>;
 
 export type CandidateSnapshotV1 = z.infer<typeof candidateSnapshotV1Schema>;
 export type VacancySnapshotV1 = z.infer<typeof vacancySnapshotV1Schema>;

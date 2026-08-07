@@ -5,15 +5,22 @@ import {
   APPLICATION_CONFIRMATION_HEADING,
   type ApplicationConfirmation,
 } from "@/lib/applications/application-confirmation";
+import type { CandidateApplicationHistoryEntry } from "@/lib/applications/load-candidate-application-history";
+import { ApplicationStatusTimeline } from "@/components/candidate-application-confirmation/application-status-timeline";
+import { CandidateApplicationsPageHeader } from "@/components/candidate-applications/candidate-applications-page-header";
 import { WORK_AUTHORISATION_NOTICE } from "@/components/candidate-matches/work-authorisation-notice";
-import { LogoutButton } from "@/components/auth/logout-button";
 
 import styles from "./application-confirmation.module.scss";
 
-type ApplicationConfirmationPageProps =
-  | { status: "ready"; confirmation: ApplicationConfirmation }
+type ApplicationConfirmationPageProps = { showEmployerNav: boolean } & (
+  | {
+      status: "ready";
+      confirmation: ApplicationConfirmation;
+      history: CandidateApplicationHistoryEntry[];
+    }
   | { status: "unavailable" }
-  | { status: "failure" };
+  | { status: "failure" }
+);
 
 export function ApplicationConfirmationPage(
   props: ApplicationConfirmationPageProps,
@@ -21,12 +28,9 @@ export function ApplicationConfirmationPage(
   if (props.status !== "ready") {
     return (
       <main className={styles.page}>
-        <div className={styles.header}>
-          <Link className={styles.brand} href="/candidate">
-            Stint
-          </Link>
-          <LogoutButton />
-        </div>
+        <CandidateApplicationsPageHeader
+          showEmployerNav={props.showEmployerNav}
+        />
         <section
           className={styles.unavailable}
           aria-labelledby="unavailable-heading"
@@ -46,22 +50,21 @@ export function ApplicationConfirmationPage(
     );
   }
 
-  const { confirmation } = props;
+  const { confirmation, history } = props;
   const vacancyLanguagesHeadingId = "confirmation-vacancy-languages";
   const candidateLanguagesHeadingId = "confirmation-candidate-languages";
 
   return (
     <main className={styles.page}>
-      <div className={styles.header}>
-        <Link className={styles.brand} href="/candidate">
-          Stint
-        </Link>
-        <LogoutButton />
-      </div>
+      <CandidateApplicationsPageHeader
+        showEmployerNav={props.showEmployerNav}
+      />
 
       <div className={styles.titleRow}>
         <h1 className={styles.heading}>{APPLICATION_CONFIRMATION_HEADING}</h1>
-        <p className={styles.demoLabel}>{confirmation.demoLabel}</p>
+        {confirmation.demoLabel !== null ? (
+          <p className={styles.demoLabel}>{confirmation.demoLabel}</p>
+        ) : null}
       </div>
       <p className={styles.lead}>{APPLICATION_CONFIRMATION_BODY}</p>
 
@@ -237,6 +240,8 @@ export function ApplicationConfirmationPage(
 
         <p className={styles.notice}>{WORK_AUTHORISATION_NOTICE}</p>
       </section>
+
+      <ApplicationStatusTimeline history={history} />
 
       <nav className={styles.nav} aria-label="Application next steps">
         <Link

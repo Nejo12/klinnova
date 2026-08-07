@@ -104,6 +104,7 @@ export async function loadCandidateApplicationConfirmation(
 
   const confirmation = buildApplicationConfirmation({
     applicationId: parsed.row.id,
+    status: parsed.row.status,
     submittedAt: parsed.row.submitted_at,
     candidate: parsed.candidate,
     vacancy: parsed.vacancy,
