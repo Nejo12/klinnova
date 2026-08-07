@@ -30,7 +30,7 @@ const ZERO_ROWS: Record<string, Record<string, unknown>> = {
   },
   vacancy: {
     vacancies_created: 0,
-    vacancies_published: 0,
+    vacancies_ever_published: 0,
     vacancies_effective_public: 0,
   },
   vacancy_with_application: { vacancies_with_application: 0 },
@@ -104,7 +104,7 @@ describe("buildPilotFunnelReport", () => {
     ]);
     expect(Object.keys(report.funnels.vacancy)).toEqual([
       "vacancies_created",
-      "vacancies_published",
+      "vacancies_ever_published",
       "vacancies_effective_public",
       "vacancies_with_application",
     ]);
@@ -231,6 +231,48 @@ describe("buildPilotFunnelReport", () => {
     expect(text).not.toMatch(
       /email|phone|display_name|company_name|candidate_snapshot|actor_user_id/i,
     );
+  });
+
+  it("reports exactly 16 metrics across all four domains", async () => {
+    const report = await buildPilotFunnelReport(zeroStateExecutor());
+    const total = Object.values(report.funnels).reduce(
+      (sum, domain) => sum + Object.keys(domain).length,
+      0,
+    );
+
+    expect(total).toBe(16);
+  });
+
+  describe("vacancies_ever_published metric semantics", () => {
+    it("uses the exact key vacancies_ever_published, not vacancies_published", async () => {
+      const report = await buildPilotFunnelReport(zeroStateExecutor());
+
+      expect(report.funnels.vacancy).toHaveProperty("vacancies_ever_published");
+      expect(report.funnels.vacancy).not.toHaveProperty("vacancies_published");
+    });
+
+    it("defines the metric as a historical milestone, not current publication state", async () => {
+      const report = await buildPilotFunnelReport(zeroStateExecutor());
+      const definition = metric(
+        report.funnels.vacancy,
+        "vacancies_ever_published",
+      ).definition;
+
+      expect(definition).toMatch(/published at least once/i);
+      expect(definition).toMatch(/published_at IS NOT NULL/i);
+      expect(definition).toMatch(/paused, filled, expired, or withdrawn/i);
+    });
+
+    it("leaves vacancies_effective_public untouched by the rename", async () => {
+      const report = await buildPilotFunnelReport(zeroStateExecutor());
+
+      expect(report.funnels.vacancy).toHaveProperty(
+        "vacancies_effective_public",
+      );
+      expect(
+        metric(report.funnels.vacancy, "vacancies_effective_public").definition,
+      ).toMatch(/is_vacancy_effectively_public/);
+    });
   });
 
   describe("measurement timestamp", () => {

@@ -235,13 +235,17 @@ callback issues.
 **Transaction-stable measurement instant:** the report's `measuredAt`
 field and the `vacancies_effective_public` metric's expiry evaluation both
 use PostgreSQL's `transaction_timestamp()`, which is fixed for the whole
-transaction — not `now()` (which can itself vary within one transaction
-in some contexts) and never a JavaScript `Date.now()`/serialization-time
-read. The candidate query captures `transaction_timestamp()` once as
-`measured_at`; because it runs inside the same transaction as the other
-four queries, that captured instant is provably the same instant the
-vacancy query's `is_vacancy_effectively_public(id, transaction_timestamp())`
-call evaluates against, without threading a timestamp parameter between
+transaction. PostgreSQL's `now()` is also transaction-stable — the two are
+effectively equivalent for this purpose — but this implementation uses
+`transaction_timestamp()` explicitly so the report names its measurement
+semantics directly, rather than relying on readers to already know that
+`now()` is an alias for it. Neither is ever substituted with a JavaScript
+`Date.now()`/serialization-time read. The candidate query captures
+`transaction_timestamp()` once as `measured_at`; because it runs inside
+the same transaction as the other four queries, that captured instant is
+provably the same instant the vacancy query's
+`is_vacancy_effectively_public(id, transaction_timestamp())` call
+evaluates against, without threading a timestamp parameter between
 queries. `pilot-funnel.test.ts` and `pilot-funnel-static-security.test.ts`
 both assert this — including that node-postgres's `Date`-typed
 `timestamptz` result is normalised correctly, and that a malformed
@@ -284,7 +288,7 @@ call count.
 | employer | `employers_verification_pending` | `verification_state = 'pending'` |
 | employer | `employers_verified` | `verification_state = 'verified'` |
 | vacancy | `vacancies_created` | `vacancies` rows, `source = 'employer'` (seed/demo fixtures excluded) |
-| vacancy | `vacancies_published` | employer-sourced, `published_at is not null` |
+| vacancy | `vacancies_ever_published` | employer-sourced, `published_at is not null` — a historical milestone (published at least once); does **not** mean currently published, since a paused/filled/expired/withdrawn vacancy still counts |
 | vacancy | `vacancies_effective_public` | employer-sourced, `is_vacancy_effectively_public(id, transaction_timestamp())` — the canonical predicate evaluated at the report's own transaction-stable measurement instant, not `now()`, not a `publication_state` approximation |
 | vacancy | `vacancies_with_application` | distinct employer-sourced vacancies with ≥1 `applications` row |
 | application | `applications_submitted` | `applications` rows (any vacancy, including seed/demo — a real candidate submission regardless of target) |
@@ -301,16 +305,17 @@ exists for a future historical view but is not queried here, avoiding any
 lifetime-transition count.
 
 **Sample local output** (fresh `pnpm supabase:db:reset`, re-run against the
-corrected read-only-transaction implementation, 2026-08-07 UTC — legitimate
-all-zero state, since a clean reset seeds only `source = 'seed'` demo
-fixtures, which every vacancy/application metric above deliberately
-excludes or which have no candidate/employer accounts to begin with).
-`measuredAt` is the actual `transaction_timestamp()` value the database
-returned for this run, not a fabricated or JS-side timestamp:
+corrected read-only-transaction implementation with the
+`vacancies_ever_published` rename, 2026-08-07 UTC — legitimate all-zero
+state, since a clean reset seeds only `source = 'seed'` demo fixtures,
+which every vacancy/application metric above deliberately excludes or
+which have no candidate/employer accounts to begin with). `measuredAt` is
+the actual `transaction_timestamp()` value the database returned for this
+run, not a fabricated or JS-side timestamp:
 
 ```json
 {
-  "measuredAt": "2026-08-07T16:10:41.707Z",
+  "measuredAt": "2026-08-07T16:48:22.814Z",
   "source": "local-supabase",
   "funnels": {
     "candidate": {
@@ -325,7 +330,7 @@ returned for this run, not a fabricated or JS-side timestamp:
     },
     "vacancy": {
       "vacancies_created": { "count": 0, "definition": "vacancies rows with source = 'employer' (excludes seed/demo fixtures)." },
-      "vacancies_published": { "count": 0, "definition": "employer-sourced vacancies with published_at is not null." },
+      "vacancies_ever_published": { "count": 0, "definition": "Employer-sourced vacancies that have been published at least once (published_at IS NOT NULL), regardless of current publication state — a vacancy counted here may currently be paused, filled, expired, or withdrawn." },
       "vacancies_effective_public": { "count": 0, "definition": "employer-sourced vacancies where is_vacancy_effectively_public(id, transaction_timestamp()) is true — the canonical predicate, evaluated at the report's own measurement instant, honouring verification, expiry, suspension, and moderation state." },
       "vacancies_with_application": { "count": 0, "definition": "distinct employer-sourced vacancies with at least one row in applications." }
     },
@@ -344,16 +349,18 @@ returned for this run, not a fabricated or JS-side timestamp:
 This is **local proof data from a freshly reset database, not pilot or
 business performance** — it demonstrates the mechanism works correctly for
 the "all-zero legitimate state" case specifically required by the PR 7.4
-kickoff, now running inside the `REPEATABLE READ READ ONLY` transaction
+kickoff, running inside the `REPEATABLE READ READ ONLY` transaction
 described above. An earlier run of the pre-correction script (five
-independent statements, no shared transaction) was also manually executed
-against a database populated by this session's own E2E test runs and
-produced internally consistent non-zero counts (e.g. `applications_submitted`
-exactly equal to the sum of its five status buckets; `vacancies_effective_public`
-≤ `vacancies_published` ≤ `vacancies_created`) — consistent by coincidence
-of a quiescent database, not by any guarantee the pre-correction
-implementation provided. That run is not reproduced here since it reflects
-session test data, not a reproducible baseline, and no longer reflects the
+independent statements, no shared transaction, and the ambiguously-named
+`vacancies_published` key) was also manually executed against a database
+populated by this session's own E2E test runs and produced internally
+consistent non-zero counts (e.g. `applications_submitted` exactly equal to
+the sum of its five status buckets; `vacancies_effective_public` ≤
+`vacancies_ever_published` ≤ `vacancies_created`) — consistent by
+coincidence of a quiescent database, not by any guarantee the
+pre-correction implementation provided. That run is not reproduced here
+since it reflects session test data, not a reproducible baseline, and no
+longer reflects the
 current (corrected) implementation.
 
 ## Legal placeholder pages

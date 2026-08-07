@@ -27,7 +27,7 @@
  * `vacancies`/`applications` join queries are scoped to
  * `vacancies.source = 'employer'` for the vacancy-side metrics — seed/demo
  * fixture vacancies are fixed platform content, not pilot growth, and
- * counting them would make "vacancies published" a constant offset
+ * counting them would make "vacancies ever published" a constant offset
  * unrelated to real employer activity. Application-side metrics are NOT
  * source-filtered: every row in `applications` is a real candidate
  * submission through the one authoritative `submit_candidate_application`
@@ -176,7 +176,7 @@ async function buildEmployerFunnel(
 const VACANCY_QUERY = `
   select
     count(*) as vacancies_created,
-    count(*) filter (where published_at is not null) as vacancies_published,
+    count(*) filter (where published_at is not null) as vacancies_ever_published,
     count(*) filter (
       where public.is_vacancy_effectively_public(id, transaction_timestamp())
     ) as vacancies_effective_public
@@ -206,9 +206,10 @@ async function buildVacancyFunnel(
       definition:
         "vacancies rows with source = 'employer' (excludes seed/demo fixtures).",
     },
-    vacancies_published: {
-      count: toCount(row.vacancies_published, "vacancies_published"),
-      definition: "employer-sourced vacancies with published_at is not null.",
+    vacancies_ever_published: {
+      count: toCount(row.vacancies_ever_published, "vacancies_ever_published"),
+      definition:
+        "Employer-sourced vacancies that have been published at least once (published_at IS NOT NULL), regardless of current publication state — a vacancy counted here may currently be paused, filled, expired, or withdrawn.",
     },
     vacancies_effective_public: {
       count: toCount(

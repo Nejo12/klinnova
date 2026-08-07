@@ -103,6 +103,17 @@ describe("pilot-funnel read-only static security proof", () => {
     expect(source).not.toMatch(/is_vacancy_effectively_public\([^)]*\bnow\(\)/);
   });
 
+  it("the ever-published metric keeps its published_at is not null condition and the exact renamed alias", () => {
+    const source = readSource("src/lib/proof/pilot-funnel.ts");
+    expect(source).toMatch(
+      /count\(\*\) filter \(where published_at is not null\) as vacancies_ever_published/,
+    );
+    // "vacancies_published" is not a substring of the renamed
+    // "vacancies_ever_published", so this word-boundary check correctly
+    // proves the old identifier is gone, not just differently spelled.
+    expect(source).not.toMatch(/\bvacancies_published\b/);
+  });
+
   it("avoids service-role clients and secret keys", () => {
     for (const file of PILOT_FUNNEL_FILES) {
       const source = readSource(file);
