@@ -97,9 +97,11 @@ here):**
 
 - one general `admin_audit_events` ledger table
   (`event_type`/`target_kind`/`target_id`/`actor_user_id`/`reason`/`occurred_at`,
-  zero `authenticated` grant, RPC-mediated only, append-only, **no**
-  polymorphic FK or cross-table CHECK — integrity is procedural, proven by
-  pgTAP, per `docs/43` §2.3);
+  zero `authenticated` grant, RPC-mediated only, append-only; `event_type`/
+  `target_kind` pairing is CHECK-constrained declaratively (same-row,
+  implementable); `target_id` existence has **no** polymorphic FK or
+  cross-table CHECK — that integrity is procedural, proven by pgTAP,
+  per `docs/43` §2.3);
 - an employer-suspension state (`employer_suspension`, a narrow parallel
   table with a real FK to `employer_profiles` — current-state row, not
   audit history);
@@ -112,10 +114,13 @@ here):**
 - suspension enforcement across **every authoritative employer mutation
   path**, not only RPCs — `docs/43` §4.1's audit found the employer
   mutation surface is a mix of `SECURITY DEFINER` RPCs (the majority) and
-  three direct-table `UPDATE` paths on `employer_profiles` authorized by
-  the existing `employer_profiles_update_own` RLS policy alone. This PR
+  direct-table `UPDATE` paths on `employer_profiles` authorized by the
+  existing `employer_profiles_update_own` RLS policy alone. This PR
   therefore includes **one narrowing change to that RLS policy** in
-  addition to the internal RPC-body checks — this is a real RLS policy
+  addition to the internal RPC-body checks — the narrowing applies at the
+  policy level, so it blocks every own-row `UPDATE` that policy governs
+  (including the pre-lock `employer_type` path, `docs/43` §4.1) with no
+  per-call-site exception list to maintain; this is a real RLS policy
   change and must be reported as one, not described as "no RLS changes";
 - suspension enforcement extended to the three Slice 6 employer applicant-
   review RPCs (`list_current_employer_applications`,
@@ -123,16 +128,28 @@ here):**
   `transition_current_employer_application_status`) — corrected from an
   earlier, mistaken exemption; see `docs/43` §4.2 for the exact
   deny-branch reuse (no new result discriminant, no new existence oracle);
+- suspension enforcement extended to **public/candidate discoverability**,
+  not only to the employer's own access — the canonical
+  `is_vacancy_effectively_public` predicate gains an `employer_not_suspended`
+  condition composed alongside D-073's `vacancy_not_moderated` condition
+  (`docs/43` §4.3/§4.4/§5.3), inherited automatically by every function
+  that delegates to it (public list/detail, candidate match list/detail,
+  application submission) — without rewriting `publication_state`, and
+  without a new candidate-facing "suspended" result reason;
 - full pgTAP coverage: authorization, RLS/grants (including the narrowed
   `employer_profiles_update_own` policy), concurrency
   (row-lock/re-read/idempotent-result), audit-event correctness (actor
   DB-derived, timestamp DB-derived, append-only, no direct authenticated
-  access, nonexistent-target and mismatched-`target_kind` impossibility),
-  restoration semantics, historical-retention behavior (no `ON DELETE
-  CASCADE` from the ledger to its targets), and a proof that suspension
-  cannot be bypassed by any existing employer-initiated mutation or read
-  path — RPC or direct-table — enumerated exactly, not asserted once and
-  assumed to generalize.
+  access, same-row `event_type`/`target_kind` CHECK rejection, nonexistent-
+  target impossibility through any approved RPC), restoration semantics,
+  historical-retention behavior (no `ON DELETE CASCADE` from the ledger to
+  its targets), suspension-driven effective-public visibility (published →
+  suspend → hidden across every `docs/43` §4.4 function → unsuspend →
+  visible only if current live state independently qualifies, composed
+  correctly with a separate vacancy-moderation hold), and a proof that
+  suspension cannot be bypassed by any existing employer-initiated mutation
+  or read path — RPC or direct-table — enumerated exactly, not asserted
+  once and assumed to generalize.
 
 **Excludes:** any UI; analytics; email; legal placeholders; candidate
 suspension; operator self-management.
@@ -410,11 +427,31 @@ timestamp. While an employer is suspended:
 - **suspension itself does not mutate `verification_state`**;
 - **suspension itself does not mutate any `applications.status` value**;
 - **suspension itself does not rewrite any `vacancies.publication_state`
-  value** (a currently-published vacancy stays `published` in the
-  database — it is the RLS/RPC access paths that are blocked, not the
-  underlying lifecycle state, so effective-public visibility for
-  candidates is unaffected by employer suspension alone, only by explicit
-  vacancy moderation, D-073).
+  value** — a currently-published vacancy stays `published` in the
+  database; suspension never touches stored lifecycle state;
+- **all of the suspended employer's vacancies nonetheless become
+  non-effective-public while the suspension is active** — corrected from
+  an earlier, unacceptable draft that treated "does not rewrite
+  `publication_state`" as equivalent to "leaves public/candidate
+  visibility unaffected." An operator-imposed suspension means the
+  employer has been judged unsafe; candidates must not continue
+  discovering or applying to that employer's vacancies while the hold is
+  active. This is achieved **without** rewriting `publication_state`: the
+  canonical `is_vacancy_effectively_public` predicate (`docs/43` §4.4/§5.3)
+  gains an independent `employer_not_suspended` condition, composed
+  exactly the same way vacancy moderation (D-073) already narrows the same
+  predicate — `effective_public = existing_conditions AND
+  employer_not_suspended AND vacancy_not_moderated`. Every public/candidate
+  read and write path that delegates to that one predicate (public
+  list/detail, candidate match list/detail, application submission —
+  `docs/43` §4.4's full inventory) is covered automatically, with no
+  candidate-facing "employer suspended" reason exposed — a suspended
+  employer's vacancy is simply `'unavailable'`, the same discriminant
+  already used for paused/expired/withdrawn/unverified-employer vacancies;
+- **unsuspension does not republish anything and does not restore any
+  captured state** — it only removes the suspension gate; each vacancy
+  becomes visible again solely if its current live publication/
+  verification/expiry/moderation state independently qualifies it.
 
 Suspension is independent of `verification_state`; suspending does not
 itself change verification, and revoking verification does not itself
@@ -433,14 +470,27 @@ governs revocation, not suspension, and a suspended employer's continued
 candidate-snapshot access is a real privacy exposure, not a candidate-
 protective one); enforce suspension only via RPC-body checks (rejected —
 `docs/41` §3.1's audit found this would leave three direct-table
-`employer_profiles` update paths completely unblocked).
+`employer_profiles` update paths completely unblocked); leave public/
+candidate visibility unaffected by suspension, blocking only mutations and
+reads (rejected — this was the original, now-corrected error; an
+operator-judged-unsafe employer's vacancies remaining publicly discoverable
+and applicable-to defeats the purpose of the safety hold; `docs/43`
+§4.3/§5.3 corrects this by adding an `employer_not_suspended` condition to
+the canonical effective-public predicate, composed the same way as vacancy
+moderation, D-073).
 
 **Consequences:** One new small table with a real FK to `employer_profiles`;
 every Mechanism A RPC and all three Slice 6 employer RPCs gain one
 additional internal check; **one existing RLS policy
 (`employer_profiles_update_own`) is narrowed** — this is a real, if small,
 RLS change, and PR 7.2's migration/build-plan description must state it
-explicitly rather than claiming no RLS changes.
+explicitly rather than claiming no RLS changes; the canonical
+`is_vacancy_effectively_public` predicate also gains one additional
+condition (`docs/43` §4.4/§5.3) — a `SECURITY DEFINER` function-body
+change, not a further RLS change — which every public/candidate read and
+write path inherits automatically by delegation, with no per-path
+duplication and no new candidate-facing "suspended" oracle, and without
+rewriting any stored `publication_state` value.
 
 ---
 
@@ -459,9 +509,8 @@ overloading employer-controlled semantics (`docs/41` §4).
 **Decision:** A new, independent vacancy-moderation state (proposed
 `vacancy_moderation` table, `docs/43` §2.2/§5.2), composing with rather
 than replacing `publication_state`. Effective public/candidate visibility
-(the existing Slice 5 `is_vacancy_effectively_public`/
-`get_effective_public_vacancy`/`list_effective_public_vacancies`
-functions) gains one additive narrowing condition: a vacancy is never
+(the canonical `is_vacancy_effectively_public` predicate, `docs/43`
+§4.4/§5.3) gains one additive narrowing condition: a vacancy is never
 effectively public while moderated, regardless of its `publication_state`.
 Restoration re-reads the vacancy's *current* live `publication_state`
 rather than assuming a prior one, so a since-withdrawn vacancy is not
@@ -470,6 +519,28 @@ moderation events are written to the new general audit ledger (D-074),
 never to `vacancy_lifecycle_events` (whose owner-readable RLS would leak
 the operator's identity to the employer being moderated — `docs/41` §4).
 
+**Relationship to D-072 — two independent gates, deliberately not
+collapsed.** Employer suspension (D-072) and vacancy moderation (D-073)
+are kept as two separate concepts with two separate tables, because they
+operate at different scopes: suspension is an **actor-level** safety gate
+that narrows visibility for every vacancy a suspended employer owns;
+moderation is a **vacancy-level** safety gate that narrows visibility for
+one specific vacancy regardless of who owns it. Both compose into the same
+canonical predicate without either subsuming the other:
+
+```
+effective_public =
+  existing_publication_conditions
+  AND employer_not_suspended   -- D-072
+  AND vacancy_not_moderated    -- D-073
+```
+
+Both conditions can be independently true or false for the same vacancy
+(e.g. a moderated vacancy owned by a suspended employer is hidden by both;
+restoring only one leaves it hidden by the other). This composition is the
+same principle already used for `publication_state`/expiry, extended by
+one more independent AND-clause per safety gate, not a new pattern.
+
 **Alternatives:** Overload `withdrawn` or `paused` for moderation
 (rejected — both remain employer-reversible via existing RPCs, which would
 let an employer silently undo an operator's moderation hold); write
@@ -477,7 +548,9 @@ moderation events into `vacancy_lifecycle_events` (rejected — that table's
 RLS already exposes `actor_user_id` to the owning employer).
 
 **Consequences:** One new small table; one additive (narrowing-only)
-change to three already-shipped Slice 5 read functions, with every
+change to the single canonical `is_vacancy_effectively_public` predicate,
+inherited by delegation across every function in `docs/43` §4.4's
+inventory (not only the three PR 5.5a public-read RPCs), with every
 existing pgTAP assertion about them required to keep passing unchanged.
 
 ---
@@ -509,21 +582,37 @@ revoke as first-class events from the three already-shipped Slice 5 RPCs,
 whose parameters/result contracts/existing pgTAP assertions remain
 unchanged.
 
-**Corrected: `target_id` has no polymorphic FK or cross-table CHECK.** An
-earlier draft claimed a CHECK constraint could validate `target_id`
-against whichever table `target_kind` implies — **PostgreSQL CHECK
-constraints cannot perform cross-table existence queries**, so that claim
-is withdrawn. Referential integrity is procedural instead: every audit-
-producing RPC resolves and locks its target *before* writing the event;
-`target_kind` is hard-coded per RPC, never caller-supplied, so it cannot
-be mismatched against the RPC's own fixed domain; `target_id` is the id of
-the row the RPC just locked, never a separately re-typed parameter;
-**there is no generic client-callable "append an audit event" RPC** —
-every event is a side effect of a specific, already-authorized domain RPC.
-PR 7.2's pgTAP suite proves all of this behaviorally (nonexistent target
-cannot create an event; mismatched `event_type`/`target_kind` cannot be
-produced through any approved RPC; no direct `authenticated`
-INSERT/UPDATE/DELETE succeeds against the table).
+**`event_type`/`target_kind` pairing is declaratively CHECK-constrained
+(same-row, unlike `target_id`).** `event_type` and `target_kind` are both
+columns of the same row, so — unlike `target_id`'s cross-table problem
+below — their legal pairing is an ordinary same-row CHECK constraint, the
+same class already used for `application_status_history`'s
+`reason`/`to_status` pairing. Both enums are closed and the pairing is
+fixed: `target_kind = 'employer'` only for `event_type in
+('employer_suspended', 'employer_unsuspended', 'verification_approved',
+'verification_rejected', 'verification_revoked')`; `target_kind =
+'vacancy'` only for `event_type in ('vacancy_moderated',
+'vacancy_restored')`. Exact SQL is PR 7.2 implementation work.
+
+**Corrected: `target_id` existence has no polymorphic FK or cross-table
+CHECK.** An earlier draft claimed a CHECK constraint could validate
+`target_id` against whichever table `target_kind` implies — **PostgreSQL
+CHECK constraints cannot perform cross-table existence queries**, so that
+claim is withdrawn. Referential integrity for `target_id` is procedural
+instead: every audit-producing RPC resolves and locks its target *before*
+writing the event; `target_kind` is hard-coded per RPC, never
+caller-supplied (and is additionally constrained by the same-row CHECK
+above, so it cannot even be self-inconsistent with `event_type`);
+`target_id` is the id of the row the RPC just locked, never a separately
+re-typed parameter; **there is no generic client-callable "append an audit
+event" RPC** — every event is a side effect of a specific,
+already-authorized domain RPC. PR 7.2's pgTAP suite proves all of this
+behaviorally: an invalid `event_type`/`target_kind` pairing is rejected by
+the table CHECK directly; a valid pairing succeeds only through an approved
+domain RPC; a nonexistent target cannot create an event through any
+approved RPC; `target_kind` cannot be caller-supplied independently by any
+domain RPC; actor/timestamp remain DB-derived; no direct `authenticated`
+INSERT/UPDATE/DELETE succeeds against the table.
 
 Actor and timestamp are always DB-derived (`auth.uid()`,
 `clock_timestamp()`); reason is required for punitive event types,
@@ -554,10 +643,14 @@ implementable in PostgreSQL; procedural integrity via the RPC boundary is
 the corrected design).
 
 **Consequences:** One new table with no FK to any domain table (by
-design — see retention above); three existing Slice 5 RPCs gain one
+design — see retention above), but with a same-row `event_type`/
+`target_kind` CHECK constraint (a normal, implementable constraint, unlike
+the rejected cross-table one); three existing Slice 5 RPCs gain one
 additional insert each inside their existing transactions, with no change
 to their external contracts; PR 7.2's pgTAP suite carries the full
-integrity burden that a declarative constraint cannot.
+`target_id`-existence integrity burden that a declarative constraint
+cannot express, while the CHECK constraint carries the `event_type`/
+`target_kind` pairing burden declaratively.
 
 ---
 

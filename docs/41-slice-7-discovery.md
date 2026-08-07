@@ -228,6 +228,18 @@ fully enumerated, not an open-ended architectural problem.
   current verification state, and likely needs to be operator-lift-only
   (not reversible by employer resubmission alone).
 
+**Suspension's scope is not limited to blocking the employer's own
+mutations/reads.** Because suspension means an operator judged the
+employer unsafe, the design must also cut the employer's vacancies out of
+public/candidate discoverability while the hold is active — otherwise a
+candidate can still find and apply to an unsafe employer's listings even
+though the employer itself is locked out. This is achieved without
+touching `publication_state`: the canonical `is_vacancy_effectively_public`
+predicate (§11's threat-table correction, `docs/43` §4.3/§4.4/§5.3) gains
+an independent `employer_not_suspended` condition, composed the same way
+vacancy moderation (§4) already composes its own `vacancy_not_moderated`
+condition into the same predicate.
+
 ---
 
 ## 4. Vacancy moderation model audit
@@ -516,6 +528,7 @@ public traffic yet.
 |---|---|
 | A suspended (unsafe) employer retains candidate-snapshot read access | **Corrected finding.** Suspension must block the three Slice 6 employer applicant-review RPCs (`list_current_employer_applications`, `get_current_employer_application`, `transition_current_employer_application_status`), not exempt them — an operator-judged-unsafe employer should not keep reading candidate PII (display name, languages, work-authorisation declaration, availability, etc.) via `get_current_employer_application` for the duration of a punitive hold. Each RPC reuses its own existing deny-branch result (zero rows / `{"status":"unavailable"}` / `{"result":"employer_unavailable"}`) — no new oracle. See `docs/43` §4.2. |
 | Direct-table employer mutation bypassing RPC-only suspension checks | **Corrected finding.** `employer_profiles_update_own`'s RLS policy grants direct authenticated `UPDATE` independent of any RPC (§3.1) — an RPC-only suspension design would not block it. The narrowed policy itself is the mitigation; see `docs/43` §4.1/§6. |
+| A suspended (unsafe) employer's vacancies remain publicly discoverable/applicable-to | **Corrected finding.** An earlier draft treated "suspension does not rewrite `publication_state`" as equivalent to "suspension leaves public/candidate visibility unaffected" — it does not. An operator-imposed suspension means the employer was judged unsafe; candidates must not keep discovering or applying to that employer's vacancies while the hold is active. Mitigation: an independent `employer_not_suspended` condition on the canonical `is_vacancy_effectively_public` predicate, composed the same way as vacancy moderation's `vacancy_not_moderated` condition — no `publication_state` rewrite, no new candidate-facing "suspended" result reason (reuses the existing `'unavailable'` discriminant). See `docs/43` §4.3/§4.4/§5.3. |
 | Unauthorized internal route access | Reuse `requireActiveOperator` exactly as-is for every new `/internal/*` route; non-operator and unauthenticated both collapse to the existing generic-unavailable/redirect pattern already proven in `/internal/verification` |
 | IDOR across employers/vacancies | Every new RPC must re-derive its target row server-side from the caller-supplied id and re-check operator status inside the function body — never trust a route param alone, exactly the D-066 pattern already used everywhere |
 | Client-supplied operator identity | Never accept a `p_operator_id`/`p_actor_*` parameter on any write RPC — derive from `auth.uid()` only, exactly the Slice 5/6 precedent |
