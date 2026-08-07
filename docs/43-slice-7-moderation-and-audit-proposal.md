@@ -95,28 +95,74 @@ mirroring `application_status_history`'s zero-grant, RPC-mediated pattern
 Proposed shape (conceptual, not SQL):
 
 - `id` — primary key
-- `target_type` — bounded enum: proposed
+- `event_type` — bounded enum (the action/event discriminator): proposed
   `employer_suspended | employer_unsuspended | vacancy_moderated | vacancy_restored | verification_approved | verification_rejected | verification_revoked`
   (the last three optionally re-emitted from the existing Slice 5 RPCs to
   close the "second review overwrites first review's evidence" gap
   identified in `docs/41` §2.7 — see open question 2 there)
-- `target_id` — the employer_profile_id or vacancy_id the event concerns
-  (not a foreign key to a single table, since the target type varies — a
-  CHECK-constrained pairing between `target_type` and which table
-  `target_id` must exist in is the kind of invariant PR 7.2's pgTAP suite
-  should prove, even if the column itself can't be a literal FK)
+- `target_kind` — a second, independently bounded enum: `employer | vacancy`
+  — **not** the same field as `event_type**, and not derived from it by
+  string-matching; each approved audit-producing RPC sets `target_kind`
+  itself, from its own fixed domain, never from caller input
+- `target_id` — `uuid`, the employer_profile_id or vacancy_id the event
+  concerns, whichever `target_kind` says
 - `actor_user_id` — the operator, `auth.uid()`-derived only, never
   client-supplied
 - `occurred_at` — `clock_timestamp()`-derived only, never client-supplied
 - `reason` — nullable at the ledger level (some event types, like
   `verification_approved`, have no reason; punitive event types require
-  one — enforced by a CHECK tying `target_type` to reason-required-ness,
+  one — enforced by a CHECK tying `event_type` to reason-required-ness,
   mirroring `application_status_history`'s existing
-  `reason`/`to_status`-pairing CHECK pattern from Slice 6)
+  `reason`/`to_status`-pairing CHECK pattern from Slice 6 — this CHECK is
+  valid because it only compares columns *within the same row*, unlike the
+  cross-table existence claim corrected below)
 - `metadata` — bounded `jsonb` object (mirrors
   `vacancy_lifecycle_events.metadata`'s `jsonb_typeof = 'object'` CHECK),
   for narrow, event-type-specific extra fields only — never a dumping
   ground, never raw snapshot data, never secrets
+
+**Corrected referential-integrity strategy (no polymorphic FK, no
+cross-table CHECK).** An earlier draft of this proposal claimed a
+CHECK constraint could validate that `target_id` exists in whichever table
+`target_kind`/`event_type` implies. **This is not implementable in
+PostgreSQL** — a CHECK constraint cannot perform a cross-table existence
+query (subqueries are not permitted inside CHECK expressions). That
+claim is withdrawn. The actual integrity guarantee is procedural, not
+declarative, and is proposed as follows:
+
+- every approved audit-producing RPC (§4) first resolves and row-locks its
+  target (the employer or vacancy row) exactly as every existing Slice 5/6
+  mutating RPC already does;
+- `target_kind` is hard-coded per RPC (e.g. `suspend_employer` always
+  writes `target_kind = 'employer'`) — it is never a caller-supplied
+  parameter, so there is no way to mismatch it against the RPC's own
+  domain;
+- `target_id` is the id of the row the RPC just locked, not a
+  separately-supplied parameter re-typed into the insert;
+- the ledger insert happens only *after* target existence/authorization is
+  already proven by that lock — an event for a nonexistent target is
+  structurally impossible because the RPC would already have returned
+  `unavailable` before reaching the insert;
+- there is **no generic "append an audit event" RPC** a client could call
+  with an arbitrary `event_type`/`target_kind`/`target_id` triple — every
+  event is a side effect of a specific, narrow, already-authorized
+  domain RPC;
+- PR 7.2's pgTAP suite proves this behaviorally (§11), since it cannot be
+  proven declaratively.
+
+**Retention — deliberately not `ON DELETE CASCADE` from the target.**
+`admin_audit_events.target_id` is historical evidence, not a live
+reference — the ledger must not lose an employer's or vacancy's
+moderation/suspension history merely because that employer or vacancy row
+is later deleted (e.g. via a future Slice 8 account-deletion flow). This
+proposal does **not** decide Slice 8's final GDPR retention/deletion
+policy — it only states the constraint Slice 8 must respect: **Slice 8
+must explicitly reconcile administrative-audit retention with account
+deletion requirements; PR 7.2 must not accidentally erase the
+administrative ledger merely because a domain row is deleted.** Contrast
+this with the two *current-state* tables in §2.1/§2.2, which legitimately
+use real foreign keys with `on delete cascade`, because they represent
+live state tied to a still-existing row, not durable cross-domain history.
 
 **Grants:** zero `authenticated` grant, exactly `application_status_history`'s
 model. Reads are RPC-mediated and scoped to "this operator, for this
@@ -128,15 +174,15 @@ paginated, target-scoped read is sufficient for the stated exit criteria.
 
 ## 3. Proposed audit-event taxonomy
 
-| `target_type` | Fired by | Reason required | Notes |
-|---|---|---|---|
-| `employer_suspended` | new suspend RPC | Yes | |
-| `employer_unsuspended` | new unsuspend RPC | No (proposed — restoration is not punitive) | |
-| `vacancy_moderated` | new moderate RPC | Yes | |
-| `vacancy_restored` | new restore RPC | No | |
-| `verification_approved` | existing `approve_employer_verification`, extended | No | Closes `docs/41` §2.7's history gap; existing RPC signature/result contract unchanged |
-| `verification_rejected` | existing `reject_employer_verification`, extended | Yes (already required by the existing RPC) | Same |
-| `verification_revoked` | existing `revoke_employer_verification`, extended | Yes (already required) | Same |
+| `event_type` | `target_kind` | Fired by | Reason required | Notes |
+|---|---|---|---|---|
+| `employer_suspended` | `employer` | new suspend RPC | Yes | |
+| `employer_unsuspended` | `employer` | new unsuspend RPC | No (proposed — restoration is not punitive) | |
+| `vacancy_moderated` | `vacancy` | new moderate RPC | Yes | |
+| `vacancy_restored` | `vacancy` | new restore RPC | No | |
+| `verification_approved` | `employer` | existing `approve_employer_verification`, extended | No | Closes `docs/41` §2.7's history gap; existing RPC signature/result contract unchanged |
+| `verification_rejected` | `employer` | existing `reject_employer_verification`, extended | Yes (already required by the existing RPC) | Same |
+| `verification_revoked` | `employer` | existing `revoke_employer_verification`, extended | Yes (already required) | Same |
 
 Extending the three existing verification RPCs to also write an audit-ledger
 row is additive only — their JSON result contracts, parameters, and every
@@ -167,34 +213,133 @@ None of these accept `p_actor_user_id`, `p_actor_role`, or
 exactly, and PR 7.3's static-security test should assert their absence the
 same way `pr-6.2-static-security.test.ts` did for the transition RPC.
 
-### 4.1 Every existing employer-mutating RPC must additionally check "not suspended"
+### 4.1 Suspension enforcement inventory — every authoritative employer mutation *and* sensitive read path
 
-`docs/41`'s threat model (§11) requires this to be proven, not assumed.
-Proposed exact enumeration for PR 7.2's pgTAP suite to verify — a
-suspended employer's session must receive a deterministic `forbidden`-style
-result (never a raw permission error, never a silent success) from:
+**Corrected framing.** An earlier draft of this section said "every
+existing employer-mutating **RPC**." That was incomplete and, left
+uncorrected, would have shipped a suspension that a suspended employer
+could trivially bypass. The current codebase's employer-mutation surface
+is **not** RPC-only — it is a genuine mix of two mechanisms, and the
+enumeration below covers both, by file and line, not by assumption.
 
-- `create_employer_vacancy_draft`
-- `update_employer_vacancy_draft`
-- `replace_employer_vacancy_languages`
-- `delete_employer_vacancy_draft`
-- `publish_employer_vacancy`
-- `pause_employer_vacancy` / `resume_employer_vacancy`
-- `fill_employer_vacancy` / `withdraw_employer_vacancy`
-- `renew_employer_vacancy_to_draft`
+**Mechanism A — `SECURITY DEFINER` RPC** (the majority of the surface):
+
+- `create_employer_vacancy_draft`, `update_employer_vacancy_draft`,
+  `replace_employer_vacancy_languages`, `delete_employer_vacancy_draft`
+- `publish_employer_vacancy`, `pause_employer_vacancy`,
+  `resume_employer_vacancy`, `fill_employer_vacancy`,
+  `withdraw_employer_vacancy`, `renew_employer_vacancy_to_draft`
 - `request_employer_verification`
+- `bootstrap_organisation_employer` (organisation profile + company
+  creation, called from `saveOrganisationEmployerAction`/
+  `completeEmployerOnboardingAction`'s organisation branch)
+- `complete_employer_onboarding` (the onboarding-completion flip)
 
-Employer applicant-review RPCs (Slice 6: list/detail/transition) are
-**deliberately excluded** from this list at proposal stage — D-070 already
-established that employer review of *already-submitted* applications
-should not be gated on the employer's current standing (mirroring "review
-survives verification revocation"), and a suspended employer withholding a
-decision from candidates who already applied is arguably worse for those
-candidates than letting the review continue. This is flagged as an
-explicit design question for PR 7.2's own review, not silently decided
-here — but the default proposed behavior is: **suspension blocks new
-employer-initiated changes; it does not retroactively hide already-
-submitted candidates' pending review from the employer.**
+For every RPC in this list, enforcement is proposed as an additional
+internal check (`not suspended`) inside the function body, exactly
+mirroring how every existing RPC already checks ownership/completion —
+**no RLS change needed for this group**, since the RPC itself is the
+sole gate.
+
+**Mechanism B — direct authenticated table write under plain RLS
+(confirmed by grepping every `.update(`/`.insert(`/`.upsert(`/`.delete(`
+call across `src/app/employer` and `src/lib/employer`, cross-referenced
+against `employer_profiles`' actual RLS policies in
+`20260803200000_employer_profiles_and_company_ownership.sql`):**
+
+| Call site | Operation | RLS policy in effect |
+|---|---|---|
+| `src/app/employer/onboarding/actions.ts:129` (`savePrivateEmployerAction`) | `UPDATE employer_profiles` (display_name, berlin_locality, phone, website, lawful_hiring_declared) | `employer_profiles_update_own` — `auth.uid() = id`, **no suspension check today** |
+| `src/app/employer/onboarding/actions.ts:257` (`completeEmployerOnboardingAction`, private branch) | Same `UPDATE employer_profiles` | Same |
+| `src/app/employer/onboarding/actions.ts:348` (`setLawfulHiringDeclared`) | `UPDATE employer_profiles` (lawful_hiring_declared only) | Same |
+| `src/lib/employer/ensure-employer-profile.ts:60` | `INSERT employer_profiles` (initial profile bootstrap) | `employer_profiles_insert_own` — not suspension-relevant, since a not-yet-existing profile cannot already be suspended |
+| `src/lib/employer/ensure-employer-profile.ts:109` | `UPDATE employer_profiles.employer_type` (pre-type-lock only) | `employer_profiles_update_own` — early-onboarding only, low risk, but technically reachable |
+
+No direct write path exists on `companies` (verified: the only
+`.from("companies")` call in employer app code is a read in
+`load-employer.ts`) or on `vacancies` from employer app code (verified:
+the three `.from("vacancies")` files under `src/lib/employer/vacancies`
+are read-only loaders — grepped for `.update(`/`.insert(`/`.upsert(`/
+`.delete(` and found none). Vacancy mutation is 100% Mechanism A.
+
+**Architectural implication — stated explicitly, not hidden.** The three
+`savePrivateEmployerAction`/`completeEmployerOnboardingAction`/
+`setLawfulHiringDeclared` update paths are genuine "employer business
+mutations" (editing the employer's own displayed profile detail) that a
+suspended private employer could still perform today, because
+`employer_profiles_update_own`'s RLS `USING`/`WITH CHECK` clauses only
+check `auth.uid() = id` — nothing about suspension state. **Blocking
+these three paths requires an RLS policy change, not just a new RPC.**
+PR 7.2's migration must therefore include one additive change to
+`employer_profiles_update_own` (proposed: extend the existing `USING`
+clause with an additional `and not exists (select 1 from
+employer_suspension es where es.employer_profile_id = employer_profiles.id
+and es.suspended_at is not null)` condition), in addition to the new
+tables/RPCs above. This is an **RLS policy change**, and the build plan
+(`docs/42`) is corrected accordingly — it must not claim "no RLS changes."
+The `employer_profiles_insert_own`/early-`employer_type`-update paths are
+lower risk (pre-suspension-relevant / early-onboarding-only) and are
+proposed to remain unchanged for MVP, flagged here for completeness rather
+than as a required PR 7.2 change — PR 7.2's own review may still choose to
+cover them for consistency.
+
+**Mechanism C/D:** no Server-Action-with-direct-table-access pattern
+beyond Mechanism B was found, and no other mechanism (e.g. a trigger-based
+write path, a webhook, a scheduled job) exists for employer mutation.
+
+### 4.2 Sensitive read paths: Slice 6 employer applicant-review RPCs are **included**, not excluded
+
+**Corrected framing.** An earlier draft of this proposal excluded
+`list_current_employer_applications`, `get_current_employer_application`,
+and `transition_current_employer_application_status` from suspension
+enforcement, citing D-070's "review survives verification revocation" as
+precedent. **That citation was a reasoning error and is withdrawn.**
+Verification revocation and employer suspension are deliberately distinct
+trust states (`docs/41` §3): revocation is a trust-gate reset the employer
+can undo by simply resubmitting, while suspension is an operator-imposed,
+operator-lift-only safety hold against an actor already judged unsafe.
+D-070's precedent describes the former; it does not, and must not, govern
+the latter.
+
+**Corrected decision: all three Slice 6 employer RPCs are blocked while
+suspended.**
+
+- `list_current_employer_applications` — a suspended employer's session
+  receives the RPC's own existing "not a completed employer" behavior:
+  **zero rows**, exactly the deterministic, no-error, no-existence-oracle
+  result the RPC already returns for an incomplete employer. No new
+  discriminant is needed — suspension is simply folded into the existing
+  gate check as one more reason the RPC declines to return rows.
+- `get_current_employer_application` — a suspended employer's session
+  receives the RPC's own existing `{"status":"unavailable"}` result,
+  exactly as it already returns for an incomplete employer or an
+  unowned/unknown application. This uniformly denies access without
+  creating a new "you're suspended, specifically" oracle distinguishable
+  from "this application doesn't exist" — consistent with the no-
+  existence-oracle discipline already established for this RPC.
+- `transition_current_employer_application_status` — a suspended
+  employer's session receives the RPC's own existing
+  `{"result":"employer_unavailable"}` result, exactly the discriminant
+  already used for an incomplete employer.
+
+**Rationale (candidate-snapshot privacy).** `get_current_employer_application`
+returns the full candidate snapshot (display name, matched category,
+German comfort, languages, work-authorisation declaration, availability,
+employment types, shift preferences) for every application on the
+employer's vacancies. An employer under an active operator safety hold —
+by definition, judged unsafe enough to warrant a punitive suspension —
+retaining unrestricted read access to that PII for as long as the
+suspension lasts is a real, avoidable privacy exposure, not merely a
+"nice to also block" convenience. Blocking it costs nothing functionally:
+the underlying `applications`/`candidate_snapshot` data is untouched and
+becomes visible again immediately on unsuspension, exactly like every
+other suspension-blocked action.
+
+Exact result-shape wiring (which internal helper each RPC calls, whether
+the check is folded into the existing employer-completion gate or added as
+a sibling check) remains PR 7.2 implementation work — this document locks
+the **denial semantics** (deterministic, existing-discriminant reuse, no
+new oracle), not the literal SQL.
 
 ---
 
@@ -248,15 +393,25 @@ must continue to pass unchanged; new assertions are added, not modified.
 | `vacancy_moderation` (table) | none | none | ALL |
 | `admin_audit_events` (table) | none | none | ALL |
 | `suspend_employer` / `unsuspend_employer` / `moderate_vacancy` / `restore_vacancy` | revoked | EXECUTE (operator-gated internally) | n/a |
+| `employer_profiles_update_own` (existing RLS policy) | unchanged (no `anon` access) | **narrowed** — adds a `not suspended` condition (§4.1); previously any own-row update, now any own-row update while not suspended | n/a |
 | `get_employer_moderation_status` / `get_vacancy_moderation_status` | revoked | EXECUTE (operator-gated internally) | n/a |
 | `is_current_employer_suspended` (or equivalent inline field) | revoked | EXECUTE (own-account-scoped) | n/a |
 
-No new RLS policy is proposed on `employer_profiles`, `vacancies`, or any
-other existing table — exactly D-070's own precedent ("no RLS policy is
-added to `applications` itself"; operator access is RPC-only). The only
-existing-table change is `employer_profiles`/`vacancies`' own mutating
-RPCs gaining an additional internal suspension/moderation check (§4.1),
-not a new RLS policy.
+**Corrected: one existing RLS policy does require a change.** An earlier
+draft of this section claimed no RLS policy change was needed anywhere,
+by analogy to D-070's "no RLS policy is added to `applications` itself."
+That analogy does not hold here — D-070 never needed to *restrict* an
+already-existing RLS grant; §4.1's audit found that
+`employer_profiles_update_own` already grants direct authenticated
+`UPDATE` access independent of any RPC, so blocking a suspended employer
+from using it requires narrowing that policy's `USING`/`WITH CHECK`
+clauses (§4.1), not merely adding an internal RPC-body check. This is the
+**only** proposed RLS change in the entire Slice 7 contract — `vacancies`
+has no direct-write RLS grant to narrow (all vacancy mutation is
+Mechanism A, RPC-only), and no new RLS policy is proposed on any table
+this document introduces (§2) beyond the zero-grant baseline already
+stated above. `employer_profiles_insert_own` and the early-`employer_type`
+`UPDATE` path (§4.1) are not proposed for RLS narrowing at MVP scope.
 
 ---
 
@@ -329,38 +484,74 @@ restoring `vacancy_moderation` to "not moderated" simply removes the
 independent operator hold; it does not, and must not, also attempt to
 resurrect a since-withdrawn vacancy back to `published`. This composes
 correctly with §5.3's "both conditions required" visibility rule without
-any special-casing.
+any special-casing. Restoration never touches `admin_audit_events` — the
+original suspend/moderate event remains permanently in the ledger
+regardless of later restoration, exactly per §2.3's retention rule.
 
 ---
 
 ## 11. Migration and testing plan (for PR 7.2 to execute against)
 
-- One additive migration (13th): the three new tables, their grants/RLS
-  (zero-`authenticated`, mirroring `application_status_history`), the new
-  RPCs, and the additive "not suspended" check folded into each RPC
-  enumerated in §4.1, plus the additive "not moderated" clause folded into
-  the three existing effective-public functions (§5.3).
-- No change to any existing table's column set, CHECK constraint, or RLS
-  policy beyond the internal-function-body additions above.
+- One additive migration (13th): the three new tables (§2), their
+  grants/RLS (zero-`authenticated` on all three, mirroring
+  `application_status_history`), the new RPCs (§4), the additive "not
+  suspended" check folded into every RPC enumerated in §4.1 Mechanism A,
+  **one narrowing change to the existing `employer_profiles_update_own`
+  RLS policy** to close the Mechanism B gap (§4.1, §6 — this is a real
+  RLS policy change, not merely new RPC-body logic, and must not be
+  described as "no RLS changes"), the additive "not suspended" denial
+  folded into the three Slice 6 employer RPCs (§4.2), and the additive
+  "not moderated" clause folded into the three existing effective-public
+  functions (§5.3).
+- No change to any existing table's column set or CHECK constraint beyond
+  the additions above; the one RLS policy change is explicitly called out,
+  not hidden inside a general "internal check" description.
 - pgTAP suite (new file, following `28_application_status_and_review_contract_test.sql`'s
   structure) must prove, at minimum:
   - non-operator and unauthenticated calls to every new RPC return
     `forbidden`/`unauthenticated`, never raw errors, never partial success;
-  - suspend → every RPC in §4.1's list returns a blocked result for that
-    employer, proven individually per RPC, not asserted once and assumed
-    to generalize;
-  - suspend does not affect Slice 6 employer applicant-review RPCs (the
-    explicit exclusion in §4.1);
+  - suspend → every Mechanism A RPC in §4.1 returns a blocked result for
+    that employer, proven individually per RPC, not asserted once and
+    assumed to generalize;
+  - suspend → the three Mechanism B direct-write paths (§4.1) are denied
+    by the narrowed `employer_profiles_update_own` RLS policy — proven by
+    attempting the same `UPDATE` shape the real Server Actions issue,
+    under a suspended employer's session, and asserting zero rows
+    affected/RLS denial, not merely asserting the *policy exists*;
+  - suspend → all three Slice 6 employer RPCs
+    (`list_current_employer_applications`,
+    `get_current_employer_application`,
+    `transition_current_employer_application_status`) return their
+    existing deny-branch results for a suspended employer, proven
+    individually, closing the reversed §4.2 finding;
+  - a nonexistent target cannot produce an audit-ledger event (attempting
+    `suspend_employer`/`moderate_vacancy` against a fabricated id returns
+    `unavailable` and writes nothing);
+  - a mismatched `event_type`/`target_kind` pairing cannot be produced
+    through any approved RPC (each RPC hard-codes its own `target_kind`;
+    this is proven by exhaustively calling every approved RPC and
+    asserting the resulting row's `target_kind`, not by attempting a
+    direct insert, since no role can insert directly);
+  - no direct `authenticated` INSERT/UPDATE/DELETE succeeds against
+    `admin_audit_events` (zero grant, proven via `throws_ok`/permission
+    assertions, mirroring `application_status_history`'s own proof
+    pattern);
+  - actor and timestamp on every ledger row are DB-derived — no RPC
+    accepts a `p_actor_*`/`p_occurred_at`-shaped parameter (proven the
+    same way Slice 6's static-security test proves it for TypeScript, plus
+    a pgTAP signature-inspection assertion for the RPCs themselves);
+  - successful state transition (suspension/moderation row) and its
+    audit-ledger event are written atomically, sharing one captured
+    timestamp variable — the exact Slice 6 "shared-timestamp proof"
+    pattern (`docs/39` §"shared-timestamp proof"), re-proven here for the
+    new tables;
   - moderate → the vacancy disappears from all three effective-public
     functions, proven against existing Slice 5 pgTAP fixtures without
     breaking any existing assertion;
   - moderate does not affect a *different* vacancy from the same employer;
   - restore reverses visibility correctly, including the "employer changed
-    state underneath the hold" case from §10;
-  - audit-ledger events are append-only (no UPDATE/DELETE grant to any
-    role but `service_role`), have DB-derived actor and timestamp
-    (attempting to pass one has no effect / is not accepted as a
-    parameter), and are correctly scoped per target;
+    state underneath the hold" case from §10, and does not remove the
+    original event from `admin_audit_events`;
   - concurrency: two simultaneous suspend attempts on the same employer
     resolve deterministically (one `ok`, one `already_in_state`), matching
     Slice 5/6's own concurrency pgTAP precedent.

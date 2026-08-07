@@ -169,6 +169,45 @@ contents).
 | Distinguish moderation action from normal employer-controlled state | **No** | `vacancy_lifecycle_events`'s `paused` event type is shared between employer-initiated pause and the revocation side effect; the `metadata.reason` field is the only differentiator, and it is not queryable/filterable by any operator UI today |
 | Restore a moderated employer/vacancy | Partial | An employer can resubmit for verification after revocation (`revoked → pending` via `request_employer_verification`, requires operator re-approval) and can resume a paused vacancy themselves (`resume_employer_vacancy`) — but there is no operator-initiated "undo this moderation action" primitive distinct from those employer-initiated ones |
 
+### 3.1 Employer mutation mechanism audit — RPC-only is not the whole picture
+
+A first draft of this planning package assumed every employer mutation runs
+through a `SECURITY DEFINER` RPC (the D-066 pattern). **That assumption was
+wrong and has been corrected.** Grepping every `.update(`/`.insert(`/
+`.upsert(`/`.delete(` call across `src/app/employer` and
+`src/lib/employer`, cross-referenced against the actual RLS policies in
+`20260803200000_employer_profiles_and_company_ownership.sql`, found the
+employer-mutation surface is a genuine mix of two mechanisms:
+
+- **RPC-mediated** (the majority): every vacancy mutation
+  (`create_employer_vacancy_draft` through `renew_employer_vacancy_to_draft`),
+  `request_employer_verification`, `bootstrap_organisation_employer`
+  (organisation profile + company creation), and
+  `complete_employer_onboarding`.
+- **Direct authenticated table write under plain RLS** (three real call
+  sites, all on `employer_profiles`, none on `vacancies` or `companies`):
+  `savePrivateEmployerAction`, `completeEmployerOnboardingAction`'s private
+  branch, and `setLawfulHiringDeclared` — all in
+  `src/app/employer/onboarding/actions.ts` — each issuing a plain
+  `.from("employer_profiles").update(...)` authorized entirely by the
+  `employer_profiles_update_own` RLS policy (`auth.uid() = id`, nothing
+  about suspension state). A private employer's profile-detail edits
+  (display name, Berlin locality, phone, website, lawful-hiring
+  declaration) never touch an RPC at all.
+
+**This matters directly for Slice 7's suspension design.** A suspension
+enforced only by adding checks inside RPCs would leave these three direct
+write paths completely unblocked — a suspended private employer could
+still freely edit their public-facing profile detail. Closing this
+requires narrowing the `employer_profiles_update_own` RLS policy itself,
+not only adding new RPCs. This is a genuine, if narrow, required RLS
+change for PR 7.2 — see `docs/43` §4.1/§6 for the exact enumeration and
+the proposed policy narrowing. `companies` has no direct-write path at all
+(only a read in `load-employer.ts`), and `vacancies` mutation is 100%
+RPC-mediated (verified: the three `src/lib/employer/vacancies/*` files are
+read-only loaders with zero write calls) — so the RLS gap is narrow and
+fully enumerated, not an open-ended architectural problem.
+
 **"Verification revoked" is not equivalent to "employer suspended."** Concretely:
 
 - Revocation only fires from `verification_state = 'verified'` — it cannot
@@ -250,8 +289,10 @@ Trade-offs considered:
   query "what has this operator done," one schema/RLS/grant pattern to get
   right once, avoids repeating the `vacancy_lifecycle_events`
   owner-readable-actor mistake for operator actions; cons: a generic
-  `target_type`/`target_id` design is slightly less type-safe than a
-  dedicated column per domain.
+  `target_kind`/`target_id` design is slightly less type-safe than a
+  dedicated column per domain, and cannot use a declarative cross-table
+  FK/CHECK for integrity (PostgreSQL cannot express that) — integrity
+  becomes procedural, proven by pgTAP instead (§5's corrected note below).
 - **(B) Extend domain-specific histories only** (add moderation columns to
   `vacancy_lifecycle_events`, add a parallel `employer_moderation_events`)
   — pros: keeps each domain's history colocated with its table; cons:
@@ -272,14 +313,27 @@ Trade-offs considered:
   application+initial-history insert).
 
 **Recommendation: (C), narrowly.** A single `admin_audit_events` ledger
-(target_type/target_id/event_type/actor/reason/occurred_at, zero
-`authenticated` grant, RPC-read-only for operators) covers suspension and
-gives one place to browse "what operators have done." Vacancy moderation
-additionally needs a small `vacancy_moderation` state (not a second event
-stream) so the effective-public/candidate-visibility computation can join
-against it directly and cheaply, with every moderation *transition* also
-appended to the same general ledger for a unified history view. Full
-column-level design in `docs/43` (proposal only, no SQL).
+(`event_type`/`target_kind`/`target_id`/`actor_user_id`/`reason`/`occurred_at`,
+zero `authenticated` grant, RPC-read-only for operators) covers suspension
+and gives one place to browse "what operators have done." Vacancy
+moderation additionally needs a small `vacancy_moderation` state (not a
+second event stream) so the effective-public/candidate-visibility
+computation can join against it directly and cheaply, with every
+moderation *transition* also appended to the same general ledger for a
+unified history view. Full column-level design in `docs/43` (proposal
+only, no SQL).
+
+**Corrected referential-integrity note.** An earlier draft of this
+document (and `docs/43`) assumed a CHECK constraint could validate that
+`target_id` exists in whichever table the event's target implies.
+**PostgreSQL CHECK constraints cannot perform cross-table existence
+queries** — that claim has been withdrawn from `docs/43`. The actual
+integrity guarantee is procedural: every audit-producing RPC resolves and
+locks its target *before* writing the event, and `target_kind` is
+hard-coded per RPC rather than caller-supplied, so a mismatched or
+nonexistent-target event is structurally unreachable through any approved
+RPC — proven by pgTAP, not by a declarative constraint. Full detail in
+`docs/43` §2.3/§11.
 
 ---
 
@@ -460,6 +514,8 @@ public traffic yet.
 
 | Threat | Mitigation direction |
 |---|---|
+| A suspended (unsafe) employer retains candidate-snapshot read access | **Corrected finding.** Suspension must block the three Slice 6 employer applicant-review RPCs (`list_current_employer_applications`, `get_current_employer_application`, `transition_current_employer_application_status`), not exempt them — an operator-judged-unsafe employer should not keep reading candidate PII (display name, languages, work-authorisation declaration, availability, etc.) via `get_current_employer_application` for the duration of a punitive hold. Each RPC reuses its own existing deny-branch result (zero rows / `{"status":"unavailable"}` / `{"result":"employer_unavailable"}`) — no new oracle. See `docs/43` §4.2. |
+| Direct-table employer mutation bypassing RPC-only suspension checks | **Corrected finding.** `employer_profiles_update_own`'s RLS policy grants direct authenticated `UPDATE` independent of any RPC (§3.1) — an RPC-only suspension design would not block it. The narrowed policy itself is the mitigation; see `docs/43` §4.1/§6. |
 | Unauthorized internal route access | Reuse `requireActiveOperator` exactly as-is for every new `/internal/*` route; non-operator and unauthenticated both collapse to the existing generic-unavailable/redirect pattern already proven in `/internal/verification` |
 | IDOR across employers/vacancies | Every new RPC must re-derive its target row server-side from the caller-supplied id and re-check operator status inside the function body — never trust a route param alone, exactly the D-066 pattern already used everywhere |
 | Client-supplied operator identity | Never accept a `p_operator_id`/`p_actor_*` parameter on any write RPC — derive from `auth.uid()` only, exactly the Slice 5/6 precedent |
