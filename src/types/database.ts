@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_audit_events: {
+        Row: {
+          actor_user_id: string
+          event_type: string
+          id: string
+          occurred_at: string
+          reason: string | null
+          target_id: string
+          target_kind: string
+        }
+        Insert: {
+          actor_user_id: string
+          event_type: string
+          id?: string
+          occurred_at?: string
+          reason?: string | null
+          target_id: string
+          target_kind: string
+        }
+        Update: {
+          actor_user_id?: string
+          event_type?: string
+          id?: string
+          occurred_at?: string
+          reason?: string | null
+          target_id?: string
+          target_kind?: string
+        }
+        Relationships: []
+      }
       application_status_history: {
         Row: {
           actor_role: string
@@ -294,6 +324,38 @@ export type Database = {
         }
         Relationships: []
       }
+      employer_suspension: {
+        Row: {
+          employer_profile_id: string
+          suspended_at: string
+          suspended_by: string
+          suspended_reason: string
+          updated_at: string
+        }
+        Insert: {
+          employer_profile_id: string
+          suspended_at?: string
+          suspended_by: string
+          suspended_reason: string
+          updated_at?: string
+        }
+        Update: {
+          employer_profile_id?: string
+          suspended_at?: string
+          suspended_by?: string
+          suspended_reason?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employer_suspension_employer_profile_id_fkey"
+            columns: ["employer_profile_id"]
+            isOneToOne: true
+            referencedRelation: "employer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vacancies: {
         Row: {
           available_from: string | null
@@ -487,6 +549,38 @@ export type Database = {
           },
         ]
       }
+      vacancy_moderation: {
+        Row: {
+          moderated_at: string
+          moderated_by: string
+          moderated_reason: string
+          updated_at: string
+          vacancy_id: string
+        }
+        Insert: {
+          moderated_at?: string
+          moderated_by: string
+          moderated_reason: string
+          updated_at?: string
+          vacancy_id: string
+        }
+        Update: {
+          moderated_at?: string
+          moderated_by?: string
+          moderated_reason?: string
+          updated_at?: string
+          vacancy_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vacancy_moderation_vacancy_id_fkey"
+            columns: ["vacancy_id"]
+            isOneToOne: true
+            referencedRelation: "vacancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       verification_operators: {
         Row: {
           active: boolean
@@ -513,6 +607,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _append_admin_audit_event: {
+        Args: {
+          p_actor_user_id: string
+          p_event_type: string
+          p_occurred_at: string
+          p_reason?: string
+          p_target_id: string
+          p_target_kind: string
+        }
+        Returns: string
+      }
       _append_vacancy_lifecycle_event: {
         Args: {
           p_actor_user_id: string
@@ -630,6 +735,15 @@ export type Database = {
         Args: { p_uid: string }
         Returns: boolean
       }
+      _is_current_employer_suspended: { Args: never; Returns: boolean }
+      _is_employer_suspended: {
+        Args: { p_employer_profile_id: string }
+        Returns: boolean
+      }
+      _is_vacancy_moderated: {
+        Args: { p_vacancy_id: string }
+        Returns: boolean
+      }
       _language_proficiency_rank: { Args: { p_level: string }; Returns: number }
       _profile_first_incomplete_group: {
         Args: {
@@ -734,6 +848,10 @@ export type Database = {
           min_proficiency: string
         }[]
       }
+      get_employer_moderation_status: {
+        Args: { p_employer_profile_id: string }
+        Returns: Json
+      }
       get_employer_verification_review: {
         Args: { p_employer_profile_id: string }
         Returns: {
@@ -752,6 +870,11 @@ export type Database = {
           website: string
         }[]
       }
+      get_vacancy_moderation_status: {
+        Args: { p_vacancy_id: string }
+        Returns: Json
+      }
+      is_current_employer_suspended: { Args: never; Returns: boolean }
       is_current_user_verification_operator: { Args: never; Returns: boolean }
       is_vacancy_effectively_public: {
         Args: { p_at?: string; p_vacancy_id: string }
@@ -823,6 +946,35 @@ export type Database = {
           workplace_type: string
         }[]
       }
+      list_employer_vacancies_for_operator: {
+        Args: {
+          p_employer_profile_id: string
+          p_limit?: number
+          p_offset?: number
+        }
+        Returns: {
+          moderated: boolean
+          moderated_at: string
+          publication_state: string
+          published_at: string
+          title: string
+          vacancy_id: string
+        }[]
+      }
+      list_employers_for_operator: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          company_name: string
+          created_at: string
+          display_name: string
+          employer_profile_id: string
+          employer_type: string
+          onboarding_completed: boolean
+          suspended: boolean
+          suspended_at: string
+          verification_state: string
+        }[]
+      }
       list_pending_employer_verifications: {
         Args: never
         Returns: {
@@ -840,6 +992,10 @@ export type Database = {
       }
       materialize_employer_vacancy_expiry: {
         Args: { p_vacancy_id: string }
+        Returns: Json
+      }
+      moderate_vacancy: {
+        Args: { p_reason: string; p_vacancy_id: string }
         Returns: Json
       }
       pause_employer_vacancy: { Args: { p_vacancy_id: string }; Returns: Json }
@@ -868,6 +1024,7 @@ export type Database = {
           status: string
         }[]
       }
+      restore_vacancy: { Args: { p_vacancy_id: string }; Returns: Json }
       resume_employer_vacancy: {
         Args: { p_expires_at?: string; p_vacancy_id: string }
         Returns: Json
@@ -880,6 +1037,10 @@ export type Database = {
         Args: { p_vacancy_id: string }
         Returns: Json
       }
+      suspend_employer: {
+        Args: { p_employer_profile_id: string; p_reason: string }
+        Returns: Json
+      }
       text_array_is_unique: { Args: { input: string[] }; Returns: boolean }
       transition_current_employer_application_status: {
         Args: {
@@ -887,6 +1048,10 @@ export type Database = {
           p_reason?: string
           p_target_status: string
         }
+        Returns: Json
+      }
+      unsuspend_employer: {
+        Args: { p_employer_profile_id: string }
         Returns: Json
       }
       update_employer_vacancy_draft: {
