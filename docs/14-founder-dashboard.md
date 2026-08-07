@@ -10,8 +10,8 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M3 — Employer flow |
 | Active slice | Slice 6 — Applicant review to status update |
-| Slice status | Slice 5 Done (PR 5.1–5.5d all merged; D-055–D-069 Accepted). Slice 6: D-070 Accepted; PR 6.1 (application status, audit history, and review database contract) in progress (this unit) — migration count 12, database contract implemented and passing locally; no employer or candidate UI yet. |
-| Next unit | PR 6.1 (in progress, this unit) — one additive migration (12th): widens `applications.status` to `submitted \| reviewing \| shortlisted \| accepted \| rejected` (D-070); adds an append-only, RPC-mediated `application_status_history` table (zero direct `authenticated` grant); adds `list_current_employer_applications`, `get_current_employer_application`, `transition_current_employer_application_status`, and `list_current_candidate_application_status_history`; updates `submit_candidate_application` to write its initial history event atomically. No employer UI, no candidate status UI, no notifications, no interview scheduling, no Storage/documents. After merge: PR 6.2 — employer applicant list/detail/transition UI. |
+| Slice status | Slice 5 Done (PR 5.1–5.5d all merged; D-055–D-069 Accepted). Slice 6: D-070 Accepted; **PR 6.1 Done** (merged PR #60, `a3e0a28ba8295cee501bf631cab591a0ef86d33f`) — migration count 12. **PR 6.2 (employer applicant list/detail/status-transition UI) in progress (this unit)**; candidate UI not started. |
+| Next unit | PR 6.2 (in progress, this unit) — `/employer/applications` (list, vacancy/status filters) and `/employer/applications/[applicationId]` (detail, status history, transition form) built entirely on the PR 6.1 RPCs; no migration, no generated-type change, no candidate-facing UI, no notifications, no interview scheduling, no Storage/documents. After merge: PR 6.3 — candidate application inventory and status-history UI. |
 | Next slice | Slice 7 — general admin/audit platform (**not started**) |
 | Blockers | Preview has no Preview-scoped Supabase configuration (re-isolate before any Slice 6 hosted proof). Hosted Demo fixtures remain in Production until 2026-09-02. |
 
@@ -63,7 +63,7 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | Preview isolated environment | Not configured |
 | Production | Untouched for Slice 5 |
 | Publication / verification approval UI (full admin) | Slice 7 (not started) |
-| Applicant review | Slice 6 — D-070 Accepted; PR 6.1 database contract in progress (this unit); employer/candidate UI not started |
+| Applicant review | Slice 6 — D-070 Accepted; PR 6.1 database contract Done (PR #60); PR 6.2 employer applicant review UI in progress (this unit); candidate UI not started |
 
 ## Slice 3 delivery (complete)
 
@@ -168,7 +168,7 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 | 4 Employer draft | Register → draft vacancy | Done — PR 4.1–4.5 merged (#41–#45); local + Preview/disposable hosted proof complete; publication not started |
 | 5 Verification → public vacancy | Verified publish + lifecycle | Active — D-055–D-067 Accepted; PR 5.1 Done; PR 5.2 in progress |
 | 5 Publish | Verification → public vacancy | Not started |
-| 6 Review | Applicant review → status update | Active — D-070 Accepted; PR 6.1 database contract in progress |
+| 6 Review | Applicant review → status update | Active — D-070 Accepted; PR 6.1 Done; PR 6.2 employer applicant review UI in progress |
 | 7 Trust ops | Admin moderation → audit | Not started |
 | 8 Deletion | Export/delete → confirmed removal | Not started |
 

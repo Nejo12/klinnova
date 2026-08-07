@@ -7,7 +7,7 @@ import styles from "@/components/employer-vacancies/employer-vacancies.module.sc
 type EmployerVacancyPageHeaderProps = {
   showCandidate: boolean;
   showEmployer: boolean;
-  currentPath: "home" | "vacancies" | "verification";
+  currentPath: "home" | "vacancies" | "applications" | "verification";
 };
 
 export function EmployerVacancyPageHeader({
@@ -39,6 +39,17 @@ export function EmployerVacancyPageHeader({
                 aria-current={currentPath === "vacancies" ? "page" : undefined}
               >
                 Vacancies
+              </Link>
+            </li>
+            <li>
+              <Link
+                className={styles.appNavLink}
+                href="/employer/applications"
+                aria-current={
+                  currentPath === "applications" ? "page" : undefined
+                }
+              >
+                Applications
               </Link>
             </li>
             <li>

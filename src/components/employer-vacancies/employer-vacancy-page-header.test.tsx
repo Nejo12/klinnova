@@ -1,0 +1,63 @@
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+
+import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
+
+describe("EmployerVacancyPageHeader", () => {
+  it("renders an Applications nav link to /employer/applications", () => {
+    render(
+      <EmployerVacancyPageHeader
+        showCandidate={false}
+        showEmployer={true}
+        currentPath="vacancies"
+      />,
+    );
+    expect(screen.getByRole("link", { name: "Applications" })).toHaveAttribute(
+      "href",
+      "/employer/applications",
+    );
+  });
+
+  it("marks the Applications link as the current page only when currentPath is applications", () => {
+    render(
+      <EmployerVacancyPageHeader
+        showCandidate={false}
+        showEmployer={true}
+        currentPath="applications"
+      />,
+    );
+    expect(screen.getByRole("link", { name: "Applications" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(screen.getByRole("link", { name: "Vacancies" })).not.toHaveAttribute(
+      "aria-current",
+    );
+  });
+
+  it("does not mark Applications current on other paths", () => {
+    render(
+      <EmployerVacancyPageHeader
+        showCandidate={false}
+        showEmployer={true}
+        currentPath="verification"
+      />,
+    );
+    expect(
+      screen.getByRole("link", { name: "Applications" }),
+    ).not.toHaveAttribute("aria-current");
+  });
+
+  it("is visible for completed employers with no verification-specific hiding", () => {
+    render(
+      <EmployerVacancyPageHeader
+        showCandidate={false}
+        showEmployer={true}
+        currentPath="home"
+      />,
+    );
+    expect(
+      screen.getByRole("link", { name: "Applications" }),
+    ).toBeInTheDocument();
+  });
+});

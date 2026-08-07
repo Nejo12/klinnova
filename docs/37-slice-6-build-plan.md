@@ -1,9 +1,11 @@
 # Slice 6 Build Plan — Employer Applicant Review and Application-Status Workflow
 
 > **Status:** Decision **D-070 Accepted** 2026-08-06 — see `docs/10-decisions.md`.
-> **PR 6.1 (database contract) is in progress; do not mark PR 6.1 Done before
-> merge.** PR 6.2 (employer UI), PR 6.3 (candidate status UI), and PR 6.4
-> (exit proof/closure) are not started.
+> **PR 6.1 (database contract) Done** — merged as PR #60
+> (`a3e0a28ba8295cee501bf631cab591a0ef86d33f`).
+> **PR 6.2 (employer applicant list/detail/status-transition UI) is in
+> progress.** PR 6.3 (candidate status UI) and PR 6.4 (exit proof/closure)
+> are not started.
 
 **Goal:** Let a completed, vacancy-owning employer review applicants and move
 each application through a narrow, auditable status lifecycle
@@ -101,10 +103,11 @@ from an isolated, audit-heavy review pass before any UI depends on it.
 
 ### PR 6.1 — Application status and review database contract
 
-**Status:** In progress. Migration
+**Status:** Done — merged as PR #60
+(`a3e0a28ba8295cee501bf631cab591a0ef86d33f`). Migration
 `supabase/migrations/20260806140000_application_status_and_review_contract.sql`
 (12th) and `supabase/tests/database/28_application_status_and_review_contract_test.sql`
-(87 assertions) implemented and passing locally. Do not mark Done before merge.
+implemented and passing.
 
 **Objective:** Add the status vocabulary, audit-history table, and five
 narrow RPCs from `docs/38-application-status-and-review-proposal.md`. No UI.
@@ -149,6 +152,8 @@ generated types regenerate with no manual edits needed.
 ---
 
 ### PR 6.2 — Employer applicant review UI
+
+**Status:** In progress. Do not mark Done before merge.
 
 **Objective:** `/employer/applications` and `/employer/applications/[applicationId]`,
 built entirely on the PR 6.1 RPCs.
