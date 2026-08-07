@@ -16,13 +16,13 @@ employers can request export and deletion; removal can be confirmed.
 - core GDPR user actions work for the MVP surface
 - deletion does not leave private documents publicly reachable
 
-This build plan proposes the smallest reviewable decomposition that
-satisfies both criteria without weakening any existing safety property
-established in Slices 5–7 (RLS ownership boundaries, no-service-role
-ordinary runtime, no-existence-oracle discipline, operator-scope
-narrowness). Adjust the exact PR boundaries at PR 8.2 start if discovery
-evidence (`docs/45`) reveals a better split — this is a proposed shape,
-not a locked contract, mirroring how `docs/42` treated its own PR list.
+This build plan is the smallest reviewable decomposition that satisfies
+both criteria without weakening any existing safety property established
+in Slices 5–7 (RLS ownership boundaries, no-service-role ordinary
+runtime, no-existence-oracle discipline, operator-scope narrowness). The
+five-PR decomposition is accepted (D-076). If implementation evidence at
+PR 8.2 start reveals a better split, update this planning record and
+D-076 explicitly before proceeding — do not silently broaden a PR.
 
 ---
 

@@ -234,8 +234,13 @@ table: `docs/45` §3.1) — not two, and not treated as equivalent:**
 
 - **A. Hard delete** (`deleteUser(id)` / `deleteUser(id, false)`) —
   **rejected**: destroys the `auth.users` row the tombstone design (§4/§5)
-  depends on, and is blocked outright today by the `NO ACTION`/`RESTRICT`
-  FKs in §1 for any employer/candidate with dependent data.
+  depends on. For candidates, this is technically possible today under the
+  existing cascade graph but would destroy the D-078 tombstone and
+  preserved application/history records. For employers, it is
+  additionally blocked outright today by the `NO ACTION`/`RESTRICT` FKs
+  in §1 whenever dependent company, vacancy, review, or actor records
+  exist. In both roles, hard deletion is incompatible with the accepted
+  tombstone/preservation contract.
 - **B. Soft delete** (`deleteUser(id, true)`) — **preferred.** Supabase's
   own explicit deletion primitive; the `auth.users` row remains (avoiding
   the FK landmine entirely, not working around it); no custom
