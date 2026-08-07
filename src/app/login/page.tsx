@@ -5,6 +5,7 @@ import { LoginForm } from "@/components/auth/login-form";
 import styles from "@/components/auth/auth-form.module.scss";
 import { isEmployerIntentPath } from "@/lib/auth/paths";
 import { parseInternalNextPath } from "@/lib/auth/schemas";
+import { PublicFooter } from "@/components/public-shared/public-footer";
 import { resolvePostAuthDestination } from "@/lib/employer/capability-routing";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -64,6 +65,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           Create an account
         </Link>
       </p>
+      <PublicFooter />
     </main>
   );
 }

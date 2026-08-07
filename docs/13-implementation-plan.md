@@ -162,9 +162,14 @@ acceptance (docs only). Employer review/approval is already Done (Slice 5).
 The first Slice 7 implementation contract is narrower than the broad list
 above — see `docs/42-slice-7-build-plan.md` and D-071–D-075 for the locked
 boundary and the reasoning for each narrowing. This line preserves the
-original broad intent; it is not silently edited. Slice 7 product
-implementation has **not** started. **PR 7.2 is not authorized until PR 7.1
-merges.** Slice 8 has not started.
+original broad intent; it is not silently edited. **Implementation status:**
+PR 7.1 (planning) merged; PR 7.2 (moderation/audit database contract)
+merged; PR 7.3 (operator moderation UI + suspended-employer UX) merged; PR
+7.4 (pilot funnel + legal placeholders + local exit proof,
+`docs/44-slice-7-exit-proof.md`) is implementation-complete locally,
+awaiting review/merge. Slice 7's local implementation is complete; Slice 7
+itself is not marked Done pending PR 7.4's review/merge. Slice 8 has not
+started.
 
 **Exit criteria:**
 

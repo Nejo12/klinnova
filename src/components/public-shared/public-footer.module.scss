@@ -1,0 +1,19 @@
+.legalNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-default);
+}
+
+.legalLink {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-decoration: underline;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-ink-900);
+  }
+}

@@ -1,5 +1,6 @@
 import { CandidateShell } from "@/components/candidate-shell";
 import { EmployerShell } from "@/components/employer-shell";
+import { PublicFooter } from "@/components/public-shared/public-footer";
 import { ShellHeader } from "@/components/shell-header";
 
 import styles from "./page.module.scss";
@@ -17,6 +18,7 @@ export default function HomePage() {
           Candidate registration is available. Essential onboarding follows
           next.
         </p>
+        <PublicFooter />
       </footer>
     </>
   );

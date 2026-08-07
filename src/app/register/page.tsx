@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { RegisterForm } from "@/components/auth/register-form";
 import styles from "@/components/auth/auth-form.module.scss";
+import { PublicFooter } from "@/components/public-shared/public-footer";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const metadata = {
@@ -37,6 +38,7 @@ export default async function RegisterPage() {
           Sign in
         </Link>
       </p>
+      <PublicFooter />
     </main>
   );
 }
