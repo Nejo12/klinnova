@@ -1,15 +1,16 @@
 # Slice 7 Moderation and Audit — Proposed Contract
 
 > **Contract Accepted** (D-072/D-073/D-074, 2026-08-07) at the planning
-> level — see `docs/10-decisions.md`. No executable SQL and no migration
-> lands from this document; "proposed" below refers to the not-yet-written
-> schema/RPC shapes PR 7.2 still has to implement, not to decision status.
-> Full audit trail and rationale: `docs/41-slice-7-discovery.md`. PR
-> sequence: `docs/42-slice-7-build-plan.md`. Everything below is the input
-> to PR 7.2's actual migration — the migration author still writes the real
-> SQL, following the security/concurrency conventions cited throughout, and
-> may adjust exact column/function names during implementation as long as
-> the boundaries below are preserved.
+> level — see `docs/10-decisions.md`. **Implemented by PR 7.2**
+> (`20260807090000_admin_moderation_and_audit_contract.sql`, migration 13,
+> awaiting review/merge) exactly as specified below, preserving every
+> boundary and column/function name proposed here — no shape drift.
+> "Proposed" below is retained as the original planning language, not
+> updated to "implemented" throughout, since this document remains the
+> supporting rationale record, not the implementation's own status page
+> (`docs/42` §PR 7.2 carries the current status). Full audit trail and
+> rationale: `docs/41-slice-7-discovery.md`. PR sequence:
+> `docs/42-slice-7-build-plan.md`.
 
 ---
 
@@ -587,6 +588,22 @@ terms) — restoring one gate never overrides the other conditions.
 | `employer_profiles_update_own` (existing RLS policy) | unchanged (no `anon` access) | **narrowed** — adds a `not suspended` condition (§4.1); previously any own-row update, now any own-row update while not suspended | n/a |
 | `get_employer_moderation_status` / `get_vacancy_moderation_status` | revoked | EXECUTE (operator-gated internally) | n/a |
 | `is_current_employer_suspended` (or equivalent inline field) | revoked | EXECUTE (own-account-scoped) | n/a |
+| `list_employers_for_operator` / `list_employer_vacancies_for_operator` (implementation-time additions, beyond this document's original scope — see `docs/42` §PR 7.2) | revoked | EXECUTE (operator-gated internally, bounded `p_limit`/`p_offset`, hard-clamped to `[1,100]`) | n/a |
+
+**Corrected: the RLS-support suspension check must be self-derived, not
+arbitrary-id.** `employer_profiles_update_own`'s narrowed policy (below)
+needs a `SECURITY DEFINER` helper to read the zero-grant
+`employer_suspension` table, since RLS predicates evaluate under the
+querying role rather than an elevated context. An earlier implementation
+draft granted `authenticated` EXECUTE directly on the *arbitrary-id*
+`_is_employer_suspended(uuid)` to make this work — which would let any
+authenticated user probe an arbitrary employer's suspension state, not
+only their own. Corrected: `_is_employer_suspended(uuid)` carries zero
+grants of any kind; a new, zero-argument, self-derived
+`_is_current_employer_suspended()` (identity from `auth.uid()` only) is
+the sole helper granted `authenticated` EXECUTE, and is the only one the
+RLS policy or the public `is_current_employer_suspended()` row above may
+call. See `docs/42` §PR 7.2 for the full correction record.
 | `is_vacancy_effectively_public` / `visible_public_vacancy_ids` / `list_effective_public_vacancies` / `get_effective_public_vacancy` / `get_effective_public_vacancy_languages` / `resolve_current_candidate_vacancy_match` / `list_current_candidate_vacancy_matches` / `submit_candidate_application` (existing `SECURITY DEFINER` functions, §4.4) | unchanged (`anon`/none per existing grant) | unchanged grants — **function body** gains the two additional conditions from §5.3; this is not an RLS change, since none of these functions are gated by RLS in the first place | n/a |
 
 **Corrected: one existing RLS policy does require a change.** An earlier

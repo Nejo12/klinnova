@@ -92,6 +92,44 @@ founder-dashboard update.
 
 ### PR 7.2 — Admin moderation/audit database contract
 
+**Status:** Implementation complete locally, awaiting review/merge. One
+additive migration (13th,
+`20260807090000_admin_moderation_and_audit_contract.sql`) and one new
+pgTAP file (`29_admin_moderation_and_audit_contract_test.sql`, 222
+assertions) implement this section exactly as specified below, with three
+implementation-time corrections:
+
+1. `is_vacancy_effectively_public` is the *only* function that needed a
+   body change for visibility (§4.4's full delegation chain —
+   `list_effective_public_vacancies`, `get_effective_public_vacancy[_languages]`,
+   `visible_public_vacancy_ids`, `resolve_current_candidate_vacancy_match`,
+   `list_current_candidate_vacancy_matches`, `submit_candidate_application`
+   — all inherited both new conditions automatically, confirmed against the
+   merged migration, not just the plan).
+2. **RLS suspension check corrected from an arbitrary-id to a self-derived
+   helper.** An earlier draft of this migration granted `authenticated`
+   EXECUTE on `_is_employer_suspended(uuid)` (arbitrary caller-supplied
+   employer id) so the `employer_profiles_update_own` RLS policy could call
+   it. That is an authenticated suspension-status oracle — any authenticated
+   user could have probed whether an *arbitrary* employer is suspended, not
+   only their own. Corrected: `_is_employer_suspended(uuid)` now has zero
+   grants of any kind (fully internal, called only from within other
+   `SECURITY DEFINER` function bodies); a new `_is_current_employer_suspended()`
+   — zero arguments, identity from `auth.uid()` only — is the sole helper
+   granted `authenticated` EXECUTE, and is the only one the RLS policy or
+   the public `is_current_employer_suspended()` self-check RPC may call.
+3. **Operator list RPCs are now bounded, not unlimited.** `list_employers_for_operator()`
+   and `list_employer_vacancies_for_operator(uuid)` (§ below — beyond the
+   original `docs/43` planning scope, added during implementation per "the
+   DB contract must be complete enough for PR 7.3 UI without another
+   migration") now take `p_limit integer default 50, p_offset integer
+   default 0`, hard-clamped to `[1, 100]` for the limit and `>= 0` for the
+   offset, with deterministic `created_at desc, id asc` ordering — so
+   neither can be turned into an unrestricted table dump by a caller-
+   controlled limit.
+
+Not yet merged; PR 7.3 remains unauthorized until this PR merges.
+
 **Objective:** the additive migration + pgTAP proof for everything PR 7.3's
 UI needs — no UI in this PR, mirroring the Slice 6.1/6.2 split that already
 proved valuable twice this project.
