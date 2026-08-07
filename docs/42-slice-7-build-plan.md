@@ -1,11 +1,13 @@
 # Slice 7 Build Plan — Admin Moderation to Audit Event
 
-> **Status:** Planning in progress. No PR has started implementation.
-> Discovery: `docs/41-slice-7-discovery.md`. Moderation/audit proposal:
-> `docs/43-slice-7-moderation-and-audit-proposal.md`. Decisions D-071–D-075
-> below (see "Proposed decisions" at the end of this document) are
-> **Proposed**, not Accepted — `docs/10-decisions.md` is not modified by
-> this PR. D-070 remains the highest currently Accepted decision.
+> **Status:** Planning Accepted. PR 7.1 (this document + `docs/41`/`docs/43`
+> + `docs/10-decisions.md`) records the acceptance; no implementation PR has
+> started. Discovery: `docs/41-slice-7-discovery.md`. Moderation/audit
+> proposal: `docs/43-slice-7-moderation-and-audit-proposal.md`. Decisions
+> D-071–D-075 below (see "Accepted decisions" at the end of this document)
+> are **Accepted** (2026-08-07) in `docs/10-decisions.md`, the authoritative
+> record — the text here is retained as full supporting rationale/history,
+> not re-litigated. **PR 7.2 is authorized only after PR 7.1 merges.**
 
 **Outcome (`docs/13-implementation-plan.md`, unchanged):** Stint can be
 operated safely for a controlled Berlin pilot.
@@ -74,15 +76,17 @@ dashboard), and no justification for forcing pilot-readiness items
 
 ### PR 7.1 — Slice 7 planning and decisions (this unit)
 
-**Status:** In progress (this document).
+**Status:** Decisions Accepted (D-071–D-075, 2026-08-07, after two
+corrective review passes); this PR is ready for/under final merge.
 
 **Includes:** `docs/41-slice-7-discovery.md`, this build plan, `docs/43`
-proposal, proposed decisions (see below), founder-dashboard update.
+proposal, D-071–D-075 recorded Accepted in `docs/10-decisions.md`,
+founder-dashboard update.
 
 **Excludes:** everything database/runtime/UI.
 
 **Exit criteria:** decisions reviewed and Accepted (or revised) before PR
-7.2 starts.
+7.2 starts — **met**; PR 7.2 is authorized once this PR merges.
 
 ---
 
@@ -320,16 +324,18 @@ hosted mutation of any kind; Slice 8.
 
 ---
 
-## Proposed decisions
+## Accepted decisions
 
-The highest currently **Accepted** decision is **D-070** (`docs/10-decisions.md`).
-The five decisions below are **Proposed** — drafted for owner review, not
-yet Accepted, and `docs/10-decisions.md` is not modified by this PR. Full
-supporting evidence for each is in `docs/41-slice-7-discovery.md`.
+The five decisions below are **Accepted** (2026-08-07) — see
+`docs/10-decisions.md` D-071–D-075 for the authoritative record. The text
+here is the full supporting rationale and revision history for each,
+retained rather than trimmed after acceptance. Full supporting evidence is
+in `docs/41-slice-7-discovery.md`.
 
-### D-071 (Proposed) — Slice 7 boundary and admin authorization reuse
+### D-071 (Accepted) — Slice 7 boundary and admin authorization reuse
 
-**Status:** Proposed
+**Status:** Accepted
+**Accepted:** 2026-08-07
 **Must accept before:** PR 7.2
 
 **Context:** `docs/13-implementation-plan.md`'s Slice 7 entry lists a
@@ -370,9 +376,10 @@ above; funnel measurability is satisfied by existing database evidence
 
 ---
 
-### D-072 (Proposed) — Employer suspension semantics
+### D-072 (Accepted) — Employer suspension semantics
 
-**Status:** Proposed
+**Status:** Accepted
+**Accepted:** 2026-08-07
 **Must accept before:** PR 7.2
 
 **Context:** No suspension concept exists today. `verification_revoked` is
@@ -494,9 +501,10 @@ rewriting any stored `publication_state` value.
 
 ---
 
-### D-073 (Proposed) — Vacancy moderation semantics
+### D-073 (Accepted) — Vacancy moderation semantics
 
-**Status:** Proposed
+**Status:** Accepted
+**Accepted:** 2026-08-07
 **Must accept before:** PR 7.2
 
 **Context:** No operator-initiated, single-vacancy hold exists today. The
@@ -555,9 +563,10 @@ existing pgTAP assertion about them required to keep passing unchanged.
 
 ---
 
-### D-074 (Proposed) — Admin audit ledger architecture
+### D-074 (Accepted) — Admin audit ledger architecture
 
-**Status:** Proposed
+**Status:** Accepted
+**Accepted:** 2026-08-07
 **Must accept before:** PR 7.2
 
 **Context:** D-065 explicitly deferred the general `audit_events` platform
@@ -654,9 +663,10 @@ cannot express, while the CHECK constraint carries the `event_type`/
 
 ---
 
-### D-075 (Proposed) — Slice 7 pilot-readiness scope (reports, analytics, email, legal)
+### D-075 (Accepted) — Slice 7 pilot-readiness scope (reports, analytics, email, legal)
 
-**Status:** Proposed
+**Status:** Accepted
+**Accepted:** 2026-08-07
 **Must accept before:** PR 7.4 (does not block PR 7.2/7.3)
 
 **Context:** `docs/13-implementation-plan.md`'s Slice 7 entry also lists

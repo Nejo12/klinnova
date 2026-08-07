@@ -1,8 +1,11 @@
 # Slice 7 Discovery — Admin Moderation to Audit Event
 
 > Analysis artifact. No migrations, RLS, RPCs, generated types, or application
-> code land here. **Status:** Planning in progress. Slice 6 is locally complete
-> (`docs/39-slice-6-exit-proof.md`); hosted Slice 6 proof remains deferred.
+> code land here. **Status:** Planning Accepted (D-071–D-075, 2026-08-07).
+> Slice 6 is locally complete (`docs/39-slice-6-exit-proof.md`); hosted
+> Slice 6 proof remains deferred. Slice 7 *implementation* (PR 7.2 onward)
+> has not started — PR 7.2 is authorized only once PR 7.1 (this planning
+> package) merges.
 
 **Outcome to enable (`docs/13-implementation-plan.md`):** Stint can be
 operated safely for a controlled Berlin pilot.
@@ -13,8 +16,9 @@ operated safely for a controlled Berlin pilot.
 - Moderation/audit proposal: `docs/43-slice-7-moderation-and-audit-proposal.md`
 - Slice 5 discovery/build-plan/schema: `docs/34`–`docs/36`
 - Slice 6 closure: `docs/37`–`docs/40`
-- Decisions: D-001–D-070 in `docs/10-decisions.md` (all Accepted). **D-071
-  is the next available decision number.**
+- Decisions: D-001–D-075 in `docs/10-decisions.md` (all Accepted). D-071–D-075
+  cover Slice 7's first implementation contract, Accepted 2026-08-07 after
+  two corrective review passes recorded in D-072/D-074's Acceptance notes.
 
 ---
 

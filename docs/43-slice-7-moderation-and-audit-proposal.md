@@ -1,6 +1,9 @@
 # Slice 7 Moderation and Audit — Proposed Contract
 
-> Proposal only. No executable SQL. No migration lands from this document.
+> **Contract Accepted** (D-072/D-073/D-074, 2026-08-07) at the planning
+> level — see `docs/10-decisions.md`. No executable SQL and no migration
+> lands from this document; "proposed" below refers to the not-yet-written
+> schema/RPC shapes PR 7.2 still has to implement, not to decision status.
 > Full audit trail and rationale: `docs/41-slice-7-discovery.md`. PR
 > sequence: `docs/42-slice-7-build-plan.md`. Everything below is the input
 > to PR 7.2's actual migration — the migration author still writes the real
