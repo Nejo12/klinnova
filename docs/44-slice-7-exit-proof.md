@@ -11,6 +11,15 @@ PR 7.4 merges** — per the established Slice 3/4/5/6 pattern, hosted proof
 remains a separately authorized follow-up and is not a precondition for
 local closure (see "Hosted status" below).
 
+> **Post-merge closure note (2026-08-07):** PR 7.4 (#67) has merged. All
+> three Slice 7 exit criteria remain PASS against the merged
+> implementation (re-verified on merged `main`, commit `10420cff...`, as
+> part of Slice 8's PR 8.1 planning kickoff) — **Slice 7 is Done locally.**
+> Hosted proof still has not been run; that remains unchanged and is not
+> required by the accepted exit criteria. The status lines above are the
+> as-written record from the PR 7.4 authoring/proof run and are left
+> unedited as historical evidence.
+
 Related:
 
 - Decisions: D-071–D-075, `docs/10-decisions.md`
