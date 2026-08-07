@@ -95,6 +95,47 @@ describe("loadCandidateApplicationConfirmation", () => {
     );
   });
 
+  it("returns ready for a real employer vacancy snapshot (source: employer, demo_label: null) — regression for the demo_label bug", async () => {
+    const access = createAccess({
+      loadOwnedApplicationById: vi.fn().mockResolvedValue({
+        ok: true,
+        row: {
+          ...validRow,
+          vacancy_snapshot: {
+            ...validRow.vacancy_snapshot,
+            source: "employer",
+            demo_label: null,
+          },
+        },
+      }),
+    });
+    const result = await loadCandidateApplicationConfirmation(
+      APPLICATION_ID,
+      access,
+    );
+    expect(result.status).toBe("ready");
+    if (result.status === "ready") {
+      expect(result.confirmation.demoLabel).toBeNull();
+    }
+  });
+
+  it("returns ready with a live status label after an employer transition (regression: PR 6.2 status transitions)", async () => {
+    const access = createAccess({
+      loadOwnedApplicationById: vi.fn().mockResolvedValue({
+        ok: true,
+        row: { ...validRow, status: "reviewing" },
+      }),
+    });
+    const result = await loadCandidateApplicationConfirmation(
+      APPLICATION_ID,
+      access,
+    );
+    expect(result.status).toBe("ready");
+    if (result.status === "ready") {
+      expect(result.confirmation.statusLabel).toBe("In review");
+    }
+  });
+
   it("maps missing rows and malformed snapshots to unavailable", async () => {
     const missing = createAccess({
       loadOwnedApplicationById: vi.fn().mockResolvedValue({

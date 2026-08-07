@@ -4,6 +4,10 @@ import type {
   VacancySnapshotV1,
 } from "@/lib/applications/snapshot-schemas";
 import {
+  applicationStatusLabel,
+  type ApplicationStatus,
+} from "@/lib/applications/status";
+import {
   employmentTypeLabel,
   formatIsoCalendarDate,
   germanComfortLabel,
@@ -40,13 +44,13 @@ export type ConfirmationLanguageRequirement = {
 export type ApplicationConfirmation = {
   /** Route identity only — never render in candidate-facing copy. */
   applicationId: string;
-  statusLabel: typeof APPLICATION_STATUS_SUBMITTED_LABEL;
+  statusLabel: string;
   submittedAtIso: string;
   submittedAtLabel: string;
   vacancyId: string;
   vacancyTitle: string;
   employerDisplayName: string;
-  demoLabel: "Demo vacancy";
+  demoLabel: "Demo vacancy" | null;
   city: "Berlin";
   vacancyJobCategoryLabel: string;
   vacancyEmploymentTypesLabel: string;
@@ -110,6 +114,7 @@ function workAuthorisationLabel(declared: boolean): string {
 
 export function buildApplicationConfirmation(input: {
   applicationId: string;
+  status: ApplicationStatus;
   submittedAt: string;
   candidate: CandidateSnapshotV1;
   vacancy: VacancySnapshotV1;
@@ -143,7 +148,7 @@ export function buildApplicationConfirmation(input: {
 
   return {
     applicationId: input.applicationId,
-    statusLabel: APPLICATION_STATUS_SUBMITTED_LABEL,
+    statusLabel: applicationStatusLabel(input.status),
     submittedAtIso: input.submittedAt,
     submittedAtLabel,
     vacancyId: input.vacancy.vacancy_id,

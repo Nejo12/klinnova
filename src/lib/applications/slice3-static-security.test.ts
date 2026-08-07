@@ -96,7 +96,17 @@ describe("Slice 3 static security proof", () => {
     );
     expect(confirmationPage).toMatch(/loadCandidateApplicationConfirmation/);
     expect(jobDetailPage).toMatch(/loadCurrentCandidateVacancyDetail/);
-    expect(confirmationPage).not.toMatch(/employer/);
+    // PR 6.3 added the same dual-capability nav every other candidate route
+    // already has (`@/lib/employer/load-capabilities`, `hasEmployerProfile`)
+    // — narrowed from a bare /employer/ match (which also matches that
+    // legitimate import path) to the real guarantee: no employer
+    // applicant-review functionality (RPCs or routes) in this file.
+    expect(confirmationPage).not.toMatch(
+      /get_current_employer_application|list_current_employer_applications|transition_current_employer_application_status/,
+    );
+    expect(confirmationPage).not.toMatch(
+      /\/employer\/(applications|vacancies)/,
+    );
     expect(jobDetailPage).not.toMatch(/\/employer\//);
   });
 });

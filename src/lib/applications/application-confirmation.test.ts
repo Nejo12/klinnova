@@ -43,6 +43,7 @@ describe("buildApplicationConfirmation", () => {
   it("maps factual confirmation fields from snapshots only", () => {
     const confirmation = buildApplicationConfirmation({
       applicationId: APPLICATION_ID,
+      status: "submitted",
       submittedAt: "2026-08-03T14:30:00.000Z",
       candidate,
       vacancy,
@@ -69,5 +70,66 @@ describe("buildApplicationConfirmation", () => {
     expect(serialized).not.toMatch(/email|phone|cv|salary|reason/i);
     expect(serialized).not.toContain(APPLICATION_ID);
     expect(confirmation?.applicationId).toBe(APPLICATION_ID);
+  });
+
+  it("reflects the current status label, not a hardcoded Submitted (regression: PR 6.2 status transitions)", () => {
+    expect(
+      buildApplicationConfirmation({
+        applicationId: APPLICATION_ID,
+        status: "reviewing",
+        submittedAt: "2026-08-03T14:30:00.000Z",
+        candidate,
+        vacancy,
+      })?.statusLabel,
+    ).toBe("In review");
+
+    expect(
+      buildApplicationConfirmation({
+        applicationId: APPLICATION_ID,
+        status: "shortlisted",
+        submittedAt: "2026-08-03T14:30:00.000Z",
+        candidate,
+        vacancy,
+      })?.statusLabel,
+    ).toBe("Shortlisted");
+
+    expect(
+      buildApplicationConfirmation({
+        applicationId: APPLICATION_ID,
+        status: "accepted",
+        submittedAt: "2026-08-03T14:30:00.000Z",
+        candidate,
+        vacancy,
+      })?.statusLabel,
+    ).toBe("Accepted");
+
+    expect(
+      buildApplicationConfirmation({
+        applicationId: APPLICATION_ID,
+        status: "rejected",
+        submittedAt: "2026-08-03T14:30:00.000Z",
+        candidate,
+        vacancy,
+      })?.statusLabel,
+    ).toBe("Rejected");
+  });
+
+  it("maps a real employer vacancy snapshot (source: employer, demo_label: null) — regression for the demo_label bug", () => {
+    const realEmployerVacancy = {
+      ...vacancy,
+      source: "employer",
+      demo_label: null,
+    } satisfies VacancySnapshotV1;
+
+    const confirmation = buildApplicationConfirmation({
+      applicationId: APPLICATION_ID,
+      status: "submitted",
+      submittedAt: "2026-08-03T14:30:00.000Z",
+      candidate,
+      vacancy: realEmployerVacancy,
+    });
+
+    expect(confirmation).not.toBeNull();
+    expect(confirmation?.demoLabel).toBeNull();
   });
 });

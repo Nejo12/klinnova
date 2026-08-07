@@ -40,12 +40,18 @@ const confirmation: ApplicationConfirmation = {
   candidateShiftPreferencesLabel: "Morning",
 };
 
+const history = [
+  { to_status: "submitted" as const, occurred_at: "2026-08-03T14:35:00.000Z" },
+];
+
 describe("ApplicationConfirmationPage", () => {
   it("renders factual confirmation content without the application UUID", () => {
     render(
       <ApplicationConfirmationPage
         status="ready"
+        showEmployerNav={false}
         confirmation={confirmation}
+        history={history}
       />,
     );
 
@@ -75,8 +81,79 @@ describe("ApplicationConfirmationPage", () => {
     expect(screen.queryByText(/employer will|response time/i)).toBeNull();
   });
 
+  it("renders no demo badge for a real employer application (demoLabel: null)", () => {
+    render(
+      <ApplicationConfirmationPage
+        status="ready"
+        showEmployerNav={false}
+        confirmation={{ ...confirmation, demoLabel: null }}
+        history={history}
+      />,
+    );
+    expect(screen.queryByText("Demo vacancy")).toBeNull();
+  });
+
+  it("renders a non-submitted status label (e.g. after an employer transition)", () => {
+    render(
+      <ApplicationConfirmationPage
+        status="ready"
+        showEmployerNav={false}
+        confirmation={{ ...confirmation, statusLabel: "In review" }}
+        history={history}
+      />,
+    );
+    expect(screen.getAllByText("In review").length).toBeGreaterThan(0);
+  });
+
+  it("renders the status timeline in RPC order, with no from_status, reason, or actor identity", () => {
+    render(
+      <ApplicationConfirmationPage
+        status="ready"
+        showEmployerNav={false}
+        confirmation={{ ...confirmation, statusLabel: "Rejected" }}
+        history={[
+          {
+            to_status: "submitted",
+            occurred_at: "2026-08-03T14:30:00.000Z",
+          },
+          {
+            to_status: "reviewing",
+            occurred_at: "2026-08-04T09:00:00.000Z",
+          },
+          {
+            to_status: "rejected",
+            occurred_at: "2026-08-05T09:00:00.000Z",
+          },
+        ]}
+      />,
+    );
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Status timeline" }),
+    ).toBeInTheDocument();
+    const timelineHeading = screen.getByRole("heading", {
+      level: 2,
+      name: "Status timeline",
+    });
+    const timelineSection = timelineHeading.closest("section");
+    expect(timelineSection).not.toBeNull();
+    expect(timelineSection?.textContent).not.toMatch(/→/);
+    expect(screen.queryByText(/reason/i)).toBeNull();
+    expect(screen.queryByText(/actor/i)).toBeNull();
+    const statuses = Array.from(
+      timelineSection?.querySelectorAll("li") ?? [],
+    ).map((item) => item.textContent);
+    expect(statuses[0]).toMatch(/Submitted/);
+    expect(statuses[1]).toMatch(/In review/);
+    expect(statuses[2]).toMatch(/Rejected/);
+  });
+
   it("renders a generic unavailable state", () => {
-    render(<ApplicationConfirmationPage status="unavailable" />);
+    render(
+      <ApplicationConfirmationPage
+        status="unavailable"
+        showEmployerNav={false}
+      />,
+    );
     expect(
       screen.getByRole("heading", {
         level: 1,

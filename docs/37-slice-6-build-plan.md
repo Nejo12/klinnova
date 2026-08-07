@@ -3,9 +3,10 @@
 > **Status:** Decision **D-070 Accepted** 2026-08-06 — see `docs/10-decisions.md`.
 > **PR 6.1 (database contract) Done** — merged as PR #60
 > (`a3e0a28ba8295cee501bf631cab591a0ef86d33f`).
-> **PR 6.2 (employer applicant list/detail/status-transition UI) is in
-> progress.** PR 6.3 (candidate status UI) and PR 6.4 (exit proof/closure)
-> are not started.
+> **PR 6.2 (employer applicant list/detail/status-transition UI) Done** —
+> merged as PR #61 (`8237d92c90fee2d93e522a0bc3733f5b743c9847`).
+> **PR 6.3 (candidate application inventory/status-history UI) is in
+> progress.** PR 6.4 (exit proof/closure) is not started.
 
 **Goal:** Let a completed, vacancy-owning employer review applicants and move
 each application through a narrow, auditable status lifecycle
@@ -153,7 +154,7 @@ generated types regenerate with no manual edits needed.
 
 ### PR 6.2 — Employer applicant review UI
 
-**Status:** In progress. Do not mark Done before merge.
+**Status:** Done — merged as PR #61 (`8237d92c90fee2d93e522a0bc3733f5b743c9847`).
 
 **Objective:** `/employer/applications` and `/employer/applications/[applicationId]`,
 built entirely on the PR 6.1 RPCs.
@@ -186,6 +187,8 @@ employer sees nothing; full local Vitest/typecheck/lint/build green.
 
 ### PR 6.3 — Candidate status visibility
 
+**Status:** In progress. Do not mark Done before merge.
+
 **Objective:** Candidates see their current application status and a
 minimal history; a new `/candidate/applications` index closes the
 D-044-deferred gap.
@@ -193,11 +196,22 @@ D-044-deferred gap.
 **Includes:** `/candidate/applications` (own applications, RLS-scoped plain
 select, no new RPC needed — see proposal §13); confirmation route status
 label update (replace the hardcoded `"Submitted"` with the full 5-status
-map); optional status timeline component consuming
-`list_current_candidate_application_status_history`; updated
-`docs/12-terminology.md`-consistent rejected copy.
+map); status timeline component consuming
+`list_current_candidate_application_status_history`; a narrow, schema-only
+fix for a pre-existing bug in `vacancySnapshotV1Schema`
+(`src/lib/applications/snapshot-schemas.ts`) that required `source:
+"seed"` and `demo_label: "Demo vacancy"` as required literals — a real
+employer vacancy's stored snapshot has `source: "employer"` and
+`demo_label: null`, so every real employer application's confirmation/
+detail page rendered "Application not available"; also widened
+`applicationConfirmationRowSchema.status` from a hardcoded `"submitted"`
+literal to the full 5-status enum, since an employer-transitioned
+application's own `status` column value would otherwise fail the same
+schema. Both fixes are TypeScript/Zod-only — no migration, no database
+contract change.
 
-**Excludes:** Any notification (email/SMS/push) — explicit non-goal.
+**Excludes:** Any notification (email/SMS/push), candidate withdrawal,
+interview scheduling, messaging — explicit non-goals.
 
 **Database effects:** None (reuses PR 6.1's candidate RPC/existing RLS).
 
