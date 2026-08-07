@@ -3,11 +3,13 @@
 > Database contract for Slice 6 PR 6.1. **Status:** **D-070 Accepted**
 > 2026-08-06 — see `docs/10-decisions.md`. Implemented in migration
 > `20260806140000_application_status_and_review_contract.sql` (12th) and
-> proven by `supabase/tests/database/28_application_status_and_review_contract_test.sql`
-> (87 assertions, all passing locally). PR 6.1 itself is in progress; do not
-> mark Done before merge. Baseline schema before this migration: 11
-> migrations through `20260806000000_candidate_eligibility_contract.sql`.
-> Baseline decisions: D-001–D-070 in `docs/10-decisions.md` (all Accepted).
+> proven by `supabase/tests/database/28_application_status_and_review_contract_test.sql`.
+> **PR 6.1 Done** — merged as PR #60 (`a3e0a28ba8295cee501bf631cab591a0ef86d33f`).
+> PR 6.2 (employer applicant review UI, built entirely on this contract) is
+> in progress — see `docs/37-slice-6-build-plan.md`. Baseline schema before
+> this migration: 11 migrations through
+> `20260806000000_candidate_eligibility_contract.sql`. Baseline decisions:
+> D-001–D-070 in `docs/10-decisions.md` (all Accepted).
 
 **Companion document:** `docs/37-slice-6-build-plan.md` (PR decomposition,
 route/component architecture, test strategy, rollout plan).
