@@ -5,8 +5,12 @@
 > (`a3e0a28ba8295cee501bf631cab591a0ef86d33f`).
 > **PR 6.2 (employer applicant list/detail/status-transition UI) Done** —
 > merged as PR #61 (`8237d92c90fee2d93e522a0bc3733f5b743c9847`).
-> **PR 6.3 (candidate application inventory/status-history UI) is in
-> progress.** PR 6.4 (exit proof/closure) is not started.
+> **PR 6.3 (candidate application inventory/status-history UI) Done** —
+> merged as PR #62 (`aef3cf2e743e0d05d99ea6bb9dff61353c36b59f`).
+> **PR 6.4 (exit proof, hosted-proof runbook, closure) is in progress.**
+> Slice 6's local implementation is complete; Slice 6 itself is not marked
+> Done pending a separately authorized hosted proof — see
+> `docs/39-slice-6-exit-proof.md` and `docs/40-slice-6-hosted-proof-runbook.md`.
 
 **Goal:** Let a completed, vacancy-owning employer review applicants and move
 each application through a narrow, auditable status lifecycle
@@ -187,7 +191,7 @@ employer sees nothing; full local Vitest/typecheck/lint/build green.
 
 ### PR 6.3 — Candidate status visibility
 
-**Status:** In progress. Do not mark Done before merge.
+**Status:** Done — merged as PR #62 (`aef3cf2e743e0d05d99ea6bb9dff61353c36b59f`).
 
 **Objective:** Candidates see their current application status and a
 minimal history; a new `/candidate/applications` index closes the
@@ -230,31 +234,39 @@ all their applications from one index; full local suite green.
 
 ### PR 6.4 — Slice 6 exit proof and closure
 
-**Objective:** Full local orchestrated proof, hosted-proof runbook, decision
-and dashboard closure — mirrors the Slice 5 `5.6` pattern (D-067's
-Local→Preview→Production-with-explicit-authorization model).
+**Status:** In progress. Do not mark Done before merge.
 
-**Includes:** Full local proof orchestrator entry (parallel to
-`scripts/proof/migration-inventory.mts`/`slice4.mts`); evidence matrix;
-hosted runbook (disposable project, employer A/B isolation, candidate
-ownership, transition, history, revoked-verification, candidate visibility,
-Production untouched, Preview not connected to Production); documentation
-closure (README, dashboard, `docs/10-decisions.md` status rollups,
-`docs/13-implementation-plan.md` cross-reference note).
+**Objective:** Full local exit proof, a D-070-to-implementation audit,
+hosted-proof runbook, and documentation closure — mirrors the Slice 3/4
+Local→Preview/disposable→Production-with-explicit-authorization pattern.
+
+**Includes:** `docs/39-slice-6-exit-proof.md` (D-070 audit with per-requirement
+evidence citations; full local pass totals); `docs/40-slice-6-hosted-proof-runbook.md`
+(disposable project, employer/candidate cross-owner isolation, transition,
+history, revoked-verification, vacancy-lifecycle independence — not
+executed); README/dashboard/build-plan/proposal status updates. No dedicated
+`pnpm proof:slice6` orchestrator script was added — unlike Slice 4's
+`scripts/proof/slice4.mts`, PR 6.4 is documentation/proof-only, so the
+existing individual `pnpm` commands were run directly and their exact
+results recorded in `docs/39` rather than adding new automation.
 
 **Excludes:** Running hosted/Production proof itself; marking Slice 6 Done
 (requires owner-authorized hosted proof, per the established Slice 3/4/5
-pattern).
+pattern); any runtime/migration/generated-type/pgTAP change (the D-070 audit
+found no contradiction requiring one).
 
 **Database effects:** None.
 
 **Route effects:** None.
 
 **Tests:** Full local proof gate (pgTAP + Vitest + Playwright + build +
-migration inventory + type-drift check, all green).
+migration inventory + type-drift check), all green at the exact counts
+recorded in `docs/39-slice-6-exit-proof.md`. No new Vitest/pgTAP/Playwright
+cases were added — PR 6.4 is proof/documentation, not new coverage.
 
-**Exit criteria:** Local checklist green; hosted runbook ready; Slice 6
-Done only after owner-authorized hosted proof — not before.
+**Exit criteria:** Local checklist green (met — see `docs/39`); hosted
+runbook ready (met — see `docs/40`); Slice 6 Done only after
+owner-authorized hosted proof — not before.
 
 ---
 

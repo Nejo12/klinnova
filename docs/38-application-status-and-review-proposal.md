@@ -6,12 +6,16 @@
 > proven by `supabase/tests/database/28_application_status_and_review_contract_test.sql`.
 > **PR 6.1 Done** — merged as PR #60 (`a3e0a28ba8295cee501bf631cab591a0ef86d33f`).
 > **PR 6.2 Done** — merged as PR #61 (`8237d92c90fee2d93e522a0bc3733f5b743c9847`,
-> employer applicant review UI, built entirely on this contract). PR 6.3
-> (candidate application inventory/status-history UI, also built entirely on
-> this contract) is in progress — see `docs/37-slice-6-build-plan.md`.
-> Baseline schema before this migration: 11 migrations through
-> `20260806000000_candidate_eligibility_contract.sql`. Baseline decisions:
-> D-001–D-070 in `docs/10-decisions.md` (all Accepted).
+> employer applicant review UI, built entirely on this contract).
+> **PR 6.3 Done** — merged as PR #62 (`aef3cf2e743e0d05d99ea6bb9dff61353c36b59f`,
+> candidate application inventory/status-history UI, also built entirely on
+> this contract; also fixed a pre-existing, unrelated Zod schema bug in
+> `vacancySnapshotV1Schema` that predated this contract). **PR 6.4**
+> (exit proof/closure, in progress) audited the merged implementation
+> against D-070 and found no contradiction — see
+> `docs/39-slice-6-exit-proof.md`. Baseline schema before this migration: 11
+> migrations through `20260806000000_candidate_eligibility_contract.sql`.
+> Baseline decisions: D-001–D-070 in `docs/10-decisions.md` (all Accepted).
 
 **Companion document:** `docs/37-slice-6-build-plan.md` (PR decomposition,
 route/component architecture, test strategy, rollout plan).
