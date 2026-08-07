@@ -7,8 +7,10 @@ import styles from "@/components/employer-onboarding/employer-onboarding.module.
 import { OrganisationProfileForm } from "@/components/employer-onboarding/organisation-profile-form";
 import { PrivateProfileForm } from "@/components/employer-onboarding/private-profile-form";
 import { TypeSelectionForm } from "@/components/employer-onboarding/type-selection-form";
+import { EmployerRestrictedNotice } from "@/components/employer-shared/employer-restricted-notice";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadEmployerProfile } from "@/lib/employer/load-employer";
+import { loadCurrentEmployerSuspensionStatus } from "@/lib/employer/suspension-guard";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -35,6 +37,19 @@ export default async function EmployerOnboardingPage() {
   const capabilities = await loadAccountCapabilities(supabase);
   const profile = loaded.data;
 
+  // suspend_employer(uuid, text) requires only an existing employer_profiles
+  // row, not onboarding_completed_at — an incomplete employer can be
+  // suspended. A first-time caller (profile === null) has no row an
+  // employer_suspension row could reference, so the check is skipped for
+  // them entirely rather than issuing a self-check RPC call that can only
+  // ever return false.
+  const suspension =
+    profile !== null
+      ? await loadCurrentEmployerSuspensionStatus(supabase)
+      : null;
+  const suspended =
+    suspension !== null && suspension.ok && suspension.suspended;
+
   return (
     <main className={styles.page}>
       <div className={styles.header}>
@@ -52,23 +67,30 @@ export default async function EmployerOnboardingPage() {
       </div>
 
       <h1 className={styles.heading}>Employer onboarding</h1>
-      <p className={styles.lead}>
-        Set up your employer profile. Progress is saved on the server — refresh
-        anytime to resume.
-      </p>
 
-      <TypeSelectionForm
-        currentType={profile?.employerType ?? null}
-        typeLocked={profile?.typeLocked === true}
-      />
+      {suspended ? (
+        <EmployerRestrictedNotice />
+      ) : (
+        <>
+          <p className={styles.lead}>
+            Set up your employer profile. Progress is saved on the server —
+            refresh anytime to resume.
+          </p>
 
-      {profile?.employerType === "private" ? (
-        <PrivateProfileForm profile={profile} />
-      ) : null}
+          <TypeSelectionForm
+            currentType={profile?.employerType ?? null}
+            typeLocked={profile?.typeLocked === true}
+          />
 
-      {profile?.employerType === "organisation" ? (
-        <OrganisationProfileForm profile={profile} />
-      ) : null}
+          {profile?.employerType === "private" ? (
+            <PrivateProfileForm profile={profile} />
+          ) : null}
+
+          {profile?.employerType === "organisation" ? (
+            <OrganisationProfileForm profile={profile} />
+          ) : null}
+        </>
+      )}
     </main>
   );
 }

@@ -99,6 +99,10 @@ export const completeEmployerOnboardingResultSchema = z.discriminatedUnion(
   [
     z.object({ status: z.literal("unauthenticated") }),
     z.object({ status: z.literal("missing_profile") }),
+    // Added for the suspension check `complete_employer_onboarding` gained
+    // in PR 7.2 — a suspended employer's call returns this status before
+    // reaching the completion logic at all.
+    z.object({ status: z.literal("unavailable") }),
     z.object({
       status: z.literal("incomplete"),
       first_incomplete_reason: z.string(),

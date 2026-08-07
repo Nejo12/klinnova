@@ -10,10 +10,10 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 |-------|--------|
 | Active milestone | M4 — Trust and beta readiness |
 | Active slice | Slice 7 — Admin moderation to audit event (Trust ops) |
-| Slice status | Slice 6 complete locally (PR #59–#63 all merged; D-070 Accepted; local exit proof PASS — `docs/39-slice-6-exit-proof.md`). Hosted Slice 6 proof remains deferred, not executed (`docs/40-slice-6-hosted-proof-runbook.md` is a runbook only). Slice 7: planning **Accepted** — discovery/build-plan/proposal package `docs/41`–`docs/43` locked; decisions D-071–D-075 **Accepted** 2026-08-07; PR 7.1 (planning) merged (PR #64). PR 7.2 (admin moderation/audit database contract) is implementation-complete locally, awaiting review/merge — one additive migration (13th) + one new pgTAP file (178 assertions; 1092 total across 30 files). Slice 7 UI (PR 7.3) has **not** started. |
-| Next unit | PR 7.2 awaiting review/merge — `employer_suspension`/`vacancy_moderation`/`admin_audit_events`, suspend/unsuspend/moderate/restore RPCs, operator read RPCs, verification audit emission, suspension enforcement across every authoritative employer mutation path (including the `employer_profiles_update_own` RLS narrowing), Slice 6 applicant-review suspension denial, and the effective-public predicate's employer-suspension/vacancy-moderation conditions. No UI, no route work, no hosted operations. After PR 7.2 merges: **PR 7.3 — moderation internal UI** is the next unit (not started). |
+| Slice status | Slice 6 complete locally (PR #59–#63 all merged; D-070 Accepted; local exit proof PASS — `docs/39-slice-6-exit-proof.md`). Hosted Slice 6 proof remains deferred, not executed (`docs/40-slice-6-hosted-proof-runbook.md` is a runbook only). Slice 7: planning **Accepted** — discovery/build-plan/proposal package `docs/41`–`docs/43` locked; decisions D-071–D-075 **Accepted** 2026-08-07; PR 7.1 (planning) merged (PR #64). PR 7.2 (admin moderation/audit database contract, merged PR #65) added one additive migration (13th) + one new pgTAP file (222 assertions; 1136 total across 30 files). PR 7.3 (employer/vacancy moderation UI) is implementation-complete locally, awaiting review/merge — no new migration; migration count remains 13, pgTAP remains 1136/1136, generated types unchanged. |
+| Next unit | PR 7.3 awaiting review/merge — `/internal/employers` (operator list), `/internal/employers/[employerProfileId]` (detail: suspend/unsuspend, verification-revoke where verified, vacancy list, audit history), `/internal/employers/[employerProfileId]/vacancies/[vacancyId]` (moderate/restore, audit history), all built on the merged PR 7.2 operator RPCs and the existing `requireActiveOperator()` pattern; plus the required employer-facing suspended-state audit — a new self-scoped `loadCurrentEmployerSuspensionStatus()` loader, neutral restricted UX across `/employer/onboarding`, `/employer/applications`, `/employer/vacancies`, `/employer/verification`, and a race-safe `updateOwnEmployerProfile()` helper fixing a pre-existing misleading-success gap in the direct `employer_profiles` onboarding Server Actions (a review pass caught that `suspend_employer` requires no `onboarding_completed_at`, so `/employer/onboarding` needed the same restricted-state UX as the other surfaces, not just its Server Actions). After PR 7.3 merges: **PR 7.4** (not yet scoped) is the next unit. |
 | Next slice | Slice 8 — Account deletion to confirmed data removal (**not started**) |
-| Blockers | Preview remains intentionally unconfigured (no Preview-scoped Supabase configuration; re-isolate before any future hosted proof — known gap, unchanged by this unit). Production remains untouched by Slice 7 planning. Hosted Demo fixtures remain in Production until 2026-09-02. |
+| Blockers | Preview remains intentionally unconfigured (no Preview-scoped Supabase configuration; re-isolate before any future hosted proof — known gap, unchanged by this unit). Production remains untouched by Slice 7 work. Hosted Demo fixtures remain in Production until 2026-09-02. |
 
 ## Slice 4 delivery (complete)
 
@@ -38,7 +38,7 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | Publication / verification | Accepted contracts (D-055–D-067); PR 5.2 database foundation in progress |
 | Slice 5 | Active; PR 5.1 Done; PR 5.2 in progress |
 | Slice 6 | Complete locally; hosted proof deferred |
-| Slice 7 / Slice 8 | Slice 7 planning Accepted (D-071–D-075); PR 7.1 merged; PR 7.2 (database contract) awaiting review/merge; Slice 8 not started |
+| Slice 7 / Slice 8 | Slice 7 planning Accepted (D-071–D-075); PR 7.1 merged; PR 7.2 (database contract) merged; PR 7.3 (moderation UI) implementation-complete locally, awaiting review/merge; Slice 8 not started |
 
 ## Slice 5 delivery (active)
 
@@ -63,9 +63,9 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | Slice 5 implementation | In progress — database foundation done; employer verification UI done; publication UI not started |
 | Preview isolated environment | Not configured |
 | Production | Untouched for Slice 5 |
-| Publication / verification approval UI (full admin) | Slice 7 (not started) |
+| Publication / verification approval UI (full admin) | Slice 7 — PR 7.3 implementation-complete locally, awaiting review/merge |
 | Applicant review | Slice 6 — D-070 Accepted; PR 6.1–6.4 all merged (#60–#63); complete locally, hosted proof deferred |
-| Admin moderation / audit | Slice 7 — planning Accepted; `docs/41`–`docs/43` locked; D-071–D-075 Accepted 2026-08-07; PR 7.1 merged (#64); PR 7.2 (database contract) implementation-complete locally, awaiting review/merge; PR 7.3 (UI) not started |
+| Admin moderation / audit | Slice 7 — planning Accepted; `docs/41`–`docs/43` locked; D-071–D-075 Accepted 2026-08-07; PR 7.1 merged (#64); PR 7.2 (database contract) merged (#65); PR 7.3 (moderation UI) implementation-complete locally, awaiting review/merge |
 
 ## Slice 3 delivery (complete)
 
@@ -171,7 +171,7 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 | 5 Verification → public vacancy | Verified publish + lifecycle | Active — D-055–D-067 Accepted; PR 5.1 Done; PR 5.2 in progress |
 | 5 Publish | Verification → public vacancy | Not started |
 | 6 Review | Applicant review → status update | Complete locally (PR #59–#63 merged); D-070 Accepted; hosted proof deferred |
-| 7 Trust ops | Admin moderation → audit | Active — D-071–D-075 Accepted 2026-08-07; PR 7.1 merged (#64); PR 7.2 (database contract) implementation-complete locally, awaiting review/merge; PR 7.3 not started |
+| 7 Trust ops | Admin moderation → audit | Active — D-071–D-075 Accepted 2026-08-07; PR 7.1 merged (#64); PR 7.2 (database contract) merged (#65); PR 7.3 (moderation UI) implementation-complete locally, awaiting review/merge |
 | 8 Deletion | Export/delete → confirmed removal | Not started |
 
 ## Decision discipline

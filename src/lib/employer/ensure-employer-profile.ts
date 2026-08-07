@@ -2,7 +2,12 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import {
+  EMPLOYER_RESTRICTED_ACTION,
+  EMPLOYER_TYPE_LOCKED,
+} from "@/lib/employer/messages";
 import type { EmployerType } from "@/lib/employer/schemas";
+import { updateOwnEmployerProfile } from "@/lib/employer/update-own-profile";
 import type { Database } from "@/types/database";
 
 export type EnsureEmployerProfileResult =
@@ -15,7 +20,7 @@ export type EnsureEmployerProfileResult =
   | {
       ok: false;
       error: string;
-      reason: "unauthenticated" | "type_locked" | "failed";
+      reason: "unauthenticated" | "type_locked" | "restricted" | "failed";
     };
 
 type EmployerClient = SupabaseClient<Database>;
@@ -105,24 +110,22 @@ export async function ensureEmployerProfile(
     };
   }
 
-  const { error: updateError } = await supabase
-    .from("employer_profiles")
-    .update({
-      employer_type: employerType,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", user.id);
+  const updated = await updateOwnEmployerProfile(supabase, user.id, {
+    employer_type: employerType,
+    updated_at: new Date().toISOString(),
+  });
 
-  if (updateError) {
-    if (
-      updateError.code === "23514" ||
-      updateError.message.includes("employer_type_locked")
-    ) {
+  if (!updated.ok) {
+    if (updated.reason === "restricted") {
       return {
         ok: false,
-        error: "Your employer type can no longer be changed for this account.",
-        reason: "type_locked",
+        error: EMPLOYER_RESTRICTED_ACTION,
+        reason: "restricted",
       };
+    }
+
+    if (updated.error === EMPLOYER_TYPE_LOCKED) {
+      return { ok: false, error: updated.error, reason: "type_locked" };
     }
 
     return {
