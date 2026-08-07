@@ -9,6 +9,12 @@
   padding: var(--space-8) var(--layout-gutter-mobile);
 }
 
+.footer {
+  max-width: var(--layout-reading-max);
+  margin: 0 auto;
+  padding: 0 var(--layout-gutter-mobile) var(--space-8);
+}
+
 .header {
   display: flex;
   flex-wrap: wrap;

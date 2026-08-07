@@ -17,6 +17,12 @@
   gap: var(--space-4);
 }
 
+.footer {
+  max-width: var(--layout-reading-max);
+  margin: 0 auto;
+  padding: 0 var(--layout-gutter-mobile) var(--space-8);
+}
+
 .brand {
   margin: 0;
   font-size: var(--font-size-2xl);

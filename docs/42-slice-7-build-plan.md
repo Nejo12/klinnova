@@ -1,10 +1,12 @@
 # Slice 7 Build Plan — Admin Moderation to Audit Event
 
 > **Status:** Planning Accepted; PR 7.1 merged (#64); PR 7.2 (database
-> contract) merged (#65); PR 7.3 (employer/vacancy moderation UI) is
+> contract) merged (#65); PR 7.3 (employer/vacancy moderation UI) merged
+> (#66). PR 7.4 (pilot funnel + legal placeholders + local exit proof) is
 > implementation-complete locally, awaiting review/merge — no new migration,
-> migration count remains 13, pgTAP remains 1136/1136. PR 7.4 (analytics/
-> legal, if any) has not started. Discovery: `docs/41-slice-7-discovery.md`.
+> migration count remains 13, pgTAP remains 1136/1136. Local exit proof:
+> `docs/44-slice-7-exit-proof.md`. Slice 7 is not formally Done until PR 7.4
+> merges. Discovery: `docs/41-slice-7-discovery.md`.
 > Moderation/audit proposal: `docs/43-slice-7-moderation-and-audit-proposal.md`.
 > Decisions D-071–D-075 below (see "Accepted decisions" at the end of this
 > document) are **Accepted** (2026-08-07) in `docs/10-decisions.md`, the
@@ -217,9 +219,9 @@ regenerate cleanly; no regression in the existing 914 assertions.
 
 ### PR 7.3 — Employer/vacancy moderation UI
 
-**Status:** Implementation complete locally, awaiting review/merge. No new
-migration — built entirely on the merged PR 7.2 operator RPCs; migration
-count remains 13, pgTAP remains 1136/1136, generated types unchanged.
+**Status:** Merged (PR #66). No new migration — built entirely on the
+merged PR 7.2 operator RPCs; migration count remains 13, pgTAP remains
+1136/1136, generated types unchanged.
 
 **Objective:** the smallest operator-usable UI on top of PR 7.2's RPCs,
 extending `/internal/verification`'s established architecture rather than
@@ -268,6 +270,10 @@ full local suite green.
 
 ### PR 7.4 — Pilot-readiness surface (only the accepted minimum)
 
+**Status:** Implementation complete locally, awaiting review/merge. No new
+migration; migration count remains 13, pgTAP remains 1136/1136, generated
+types unchanged. Local exit proof: `docs/44-slice-7-exit-proof.md`.
+
 **Objective:** close out the *non*-moderation Slice 7 exit-criteria items
 that `docs/41` found genuinely necessary or low-risk, without expanding
 scope.
@@ -284,10 +290,16 @@ scope.
   onboarding completed → application submitted → reviewing → shortlisted
   → accepted/rejected → employer registered → employer verified → vacancy
   published) against existing tables/columns only, and prints a count per
-  stage. This is the literal deliverable that satisfies "pilot funnel
-  events are measurable" without a new third-party integration — deferring
-  PostHog is not the same as deferring measurability, and this script is
-  the concrete proof that the exit criterion is met by DB evidence alone.
+  stage. "Deterministic" is enforced at the database level, not merely by
+  the SQL being SELECT-only: the whole measurement runs inside one
+  Postgres `REPEATABLE READ READ ONLY` transaction, so every stage
+  describes the identical database snapshot and shares one
+  transaction-stable measurement instant (`transaction_timestamp()`)
+  rather than several independently observed states. This is the literal
+  deliverable that satisfies "pilot funnel events are measurable" without
+  a new third-party integration — deferring PostHog is not the same as
+  deferring measurability, and this script is the concrete proof that the
+  exit criterion is met by DB evidence alone.
   Committed as a script + a documented sample run in the eventual Slice 7
   exit-proof doc, exactly the same way `pnpm proof:migrations` already
   proves the migration-count criterion today.

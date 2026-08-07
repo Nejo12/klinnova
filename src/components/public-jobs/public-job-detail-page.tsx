@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ApplicationEntryNotice } from "@/components/public-jobs/application-entry-notice";
+import { PublicFooter } from "@/components/public-shared/public-footer";
 import type {
   PublicVacancy,
   PublicVacancyLanguage,
@@ -35,19 +36,24 @@ type PublicJobDetailPageProps =
 export function PublicJobDetailPage(props: PublicJobDetailPageProps) {
   if (props.status !== "ready") {
     return (
-      <main className={styles.page}>
-        <div className={styles.header}>
-          <Link className={styles.brand} href="/">
-            Stint
-          </Link>
-        </div>
-        <section aria-labelledby="public-job-detail-error-heading">
-          <h1 id="public-job-detail-error-heading">
-            {PUBLIC_JOBS_LOAD_FAILURE_HEADING}
-          </h1>
-          <p>{PUBLIC_JOBS_LOAD_FAILURE_BODY}</p>
-        </section>
-      </main>
+      <>
+        <main className={styles.page}>
+          <div className={styles.header}>
+            <Link className={styles.brand} href="/">
+              Stint
+            </Link>
+          </div>
+          <section aria-labelledby="public-job-detail-error-heading">
+            <h1 id="public-job-detail-error-heading">
+              {PUBLIC_JOBS_LOAD_FAILURE_HEADING}
+            </h1>
+            <p>{PUBLIC_JOBS_LOAD_FAILURE_BODY}</p>
+          </section>
+        </main>
+        <footer className={styles.footer}>
+          <PublicFooter />
+        </footer>
+      </>
     );
   }
 
@@ -60,153 +66,158 @@ export function PublicJobDetailPage(props: PublicJobDetailPageProps) {
   const closingDate = formatListingDate(vacancy.expiresAt);
 
   return (
-    <main className={styles.page}>
-      <div className={styles.header}>
-        <Link className={styles.brand} href="/">
-          Stint
+    <>
+      <main className={styles.page}>
+        <div className={styles.header}>
+          <Link className={styles.brand} href="/">
+            Stint
+          </Link>
+        </div>
+
+        <Link className={styles.backLink} href="/jobs">
+          Back to jobs
         </Link>
-      </div>
 
-      <Link className={styles.backLink} href="/jobs">
-        Back to jobs
-      </Link>
-
-      <div className={styles.titleRow}>
-        <h1 className={styles.heading}>{vacancy.title}</h1>
-        {vacancy.source === "seed" ? (
-          <p className={styles.demoLabel}>{DEMO_VACANCY_LABEL}</p>
-        ) : null}
-      </div>
-
-      <p className={styles.company}>
-        {vacancy.employerDisplayName ?? "Berlin employer"}
-        {vacancy.companyName !== null ? ` · ${vacancy.companyName}` : ""}
-      </p>
-
-      <section
-        className={styles.section}
-        aria-labelledby="public-job-details-heading"
-      >
-        <h2 className={styles.sectionHeading} id="public-job-details-heading">
-          Job details
-        </h2>
-        <dl className={styles.meta}>
-          <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Category</dt>
-            <dd className={styles.metaValue}>
-              {jobCategoryLabel(vacancy.jobCategory)}
-            </dd>
-          </div>
-          {vacancy.publicLocality !== null ? (
-            <div className={styles.metaRow}>
-              <dt className={styles.metaLabel}>Location</dt>
-              <dd className={styles.metaValue}>
-                {vacancy.publicLocality}, Berlin
-              </dd>
-            </div>
+        <div className={styles.titleRow}>
+          <h1 className={styles.heading}>{vacancy.title}</h1>
+          {vacancy.source === "seed" ? (
+            <p className={styles.demoLabel}>{DEMO_VACANCY_LABEL}</p>
           ) : null}
-          {vacancy.workplaceType !== null ? (
-            <div className={styles.metaRow}>
-              <dt className={styles.metaLabel}>Workplace</dt>
-              <dd className={styles.metaValue}>
-                {workplaceTypeLabel(vacancy.workplaceType)}
-              </dd>
-            </div>
-          ) : null}
-          {vacancy.workFrequency !== null ? (
-            <div className={styles.metaRow}>
-              <dt className={styles.metaLabel}>Frequency</dt>
-              <dd className={styles.metaValue}>
-                {workFrequencyLabel(vacancy.workFrequency)}
-              </dd>
-            </div>
-          ) : null}
-          {vacancy.cvRequired !== null ? (
-            <div className={styles.metaRow}>
-              <dt className={styles.metaLabel}>CV</dt>
-              <dd className={styles.metaValue}>
-                {vacancy.cvRequired ? "CV required" : "CV not required"}
-              </dd>
-            </div>
-          ) : null}
-          {vacancy.interviewEnglishOk !== null ? (
-            <div className={styles.metaRow}>
-              <dt className={styles.metaLabel}>Interview</dt>
-              <dd className={styles.metaValue}>
-                {vacancy.interviewEnglishOk
-                  ? "Interview can be in English"
-                  : "Interview in German"}
-              </dd>
-            </div>
-          ) : null}
-          {closingDate !== null ? (
-            <div className={styles.metaRow}>
-              <dt className={styles.metaLabel}>Closes</dt>
-              <dd className={styles.metaValue}>{closingDate}</dd>
-            </div>
-          ) : null}
-        </dl>
-      </section>
+        </div>
 
-      {languages.length > 0 ? (
-        <section
-          className={styles.section}
-          aria-labelledby="public-job-languages-heading"
-        >
-          <h2
-            className={styles.sectionHeading}
-            id="public-job-languages-heading"
-          >
-            Additional languages
-          </h2>
-          <ul className={styles.languageList}>
-            {languages.map((language) => (
-              <li key={language.languageCode} className={styles.languageItem}>
-                {languageLabel(language.languageCode)} —{" "}
-                {languageProficiencyLabel(language.minProficiency)}
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {paragraphs.length > 0 ? (
-        <section
-          className={styles.section}
-          aria-labelledby="public-job-description-heading"
-        >
-          <h2
-            className={styles.sectionHeading}
-            id="public-job-description-heading"
-          >
-            About this job
-          </h2>
-          {paragraphs.map((paragraph, index) => (
-            <p key={index} className={styles.descriptionParagraph}>
-              {paragraph}
-            </p>
-          ))}
-        </section>
-      ) : null}
-
-      {externalHref !== null ? (
-        <p>
-          <a
-            className={styles.externalLink}
-            href={externalHref}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Employer website
-            <span className={styles.srOnly}> (opens in a new tab)</span>
-          </a>
+        <p className={styles.company}>
+          {vacancy.employerDisplayName ?? "Berlin employer"}
+          {vacancy.companyName !== null ? ` · ${vacancy.companyName}` : ""}
         </p>
-      ) : null}
 
-      <ApplicationEntryNotice
-        vacancyId={vacancy.vacancyId}
-        authenticated={authenticated}
-      />
-    </main>
+        <section
+          className={styles.section}
+          aria-labelledby="public-job-details-heading"
+        >
+          <h2 className={styles.sectionHeading} id="public-job-details-heading">
+            Job details
+          </h2>
+          <dl className={styles.meta}>
+            <div className={styles.metaRow}>
+              <dt className={styles.metaLabel}>Category</dt>
+              <dd className={styles.metaValue}>
+                {jobCategoryLabel(vacancy.jobCategory)}
+              </dd>
+            </div>
+            {vacancy.publicLocality !== null ? (
+              <div className={styles.metaRow}>
+                <dt className={styles.metaLabel}>Location</dt>
+                <dd className={styles.metaValue}>
+                  {vacancy.publicLocality}, Berlin
+                </dd>
+              </div>
+            ) : null}
+            {vacancy.workplaceType !== null ? (
+              <div className={styles.metaRow}>
+                <dt className={styles.metaLabel}>Workplace</dt>
+                <dd className={styles.metaValue}>
+                  {workplaceTypeLabel(vacancy.workplaceType)}
+                </dd>
+              </div>
+            ) : null}
+            {vacancy.workFrequency !== null ? (
+              <div className={styles.metaRow}>
+                <dt className={styles.metaLabel}>Frequency</dt>
+                <dd className={styles.metaValue}>
+                  {workFrequencyLabel(vacancy.workFrequency)}
+                </dd>
+              </div>
+            ) : null}
+            {vacancy.cvRequired !== null ? (
+              <div className={styles.metaRow}>
+                <dt className={styles.metaLabel}>CV</dt>
+                <dd className={styles.metaValue}>
+                  {vacancy.cvRequired ? "CV required" : "CV not required"}
+                </dd>
+              </div>
+            ) : null}
+            {vacancy.interviewEnglishOk !== null ? (
+              <div className={styles.metaRow}>
+                <dt className={styles.metaLabel}>Interview</dt>
+                <dd className={styles.metaValue}>
+                  {vacancy.interviewEnglishOk
+                    ? "Interview can be in English"
+                    : "Interview in German"}
+                </dd>
+              </div>
+            ) : null}
+            {closingDate !== null ? (
+              <div className={styles.metaRow}>
+                <dt className={styles.metaLabel}>Closes</dt>
+                <dd className={styles.metaValue}>{closingDate}</dd>
+              </div>
+            ) : null}
+          </dl>
+        </section>
+
+        {languages.length > 0 ? (
+          <section
+            className={styles.section}
+            aria-labelledby="public-job-languages-heading"
+          >
+            <h2
+              className={styles.sectionHeading}
+              id="public-job-languages-heading"
+            >
+              Additional languages
+            </h2>
+            <ul className={styles.languageList}>
+              {languages.map((language) => (
+                <li key={language.languageCode} className={styles.languageItem}>
+                  {languageLabel(language.languageCode)} —{" "}
+                  {languageProficiencyLabel(language.minProficiency)}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {paragraphs.length > 0 ? (
+          <section
+            className={styles.section}
+            aria-labelledby="public-job-description-heading"
+          >
+            <h2
+              className={styles.sectionHeading}
+              id="public-job-description-heading"
+            >
+              About this job
+            </h2>
+            {paragraphs.map((paragraph, index) => (
+              <p key={index} className={styles.descriptionParagraph}>
+                {paragraph}
+              </p>
+            ))}
+          </section>
+        ) : null}
+
+        {externalHref !== null ? (
+          <p>
+            <a
+              className={styles.externalLink}
+              href={externalHref}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Employer website
+              <span className={styles.srOnly}> (opens in a new tab)</span>
+            </a>
+          </p>
+        ) : null}
+
+        <ApplicationEntryNotice
+          vacancyId={vacancy.vacancyId}
+          authenticated={authenticated}
+        />
+      </main>
+      <footer className={styles.footer}>
+        <PublicFooter />
+      </footer>
+    </>
   );
 }
