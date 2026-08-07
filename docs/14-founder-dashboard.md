@@ -9,11 +9,11 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | Field | Value |
 |-------|--------|
 | Active milestone | M4 — Trust and beta readiness |
-| Active slice | Slice 7 — Admin moderation to audit event (Trust ops) |
-| Slice status | Slice 6 complete locally (PR #59–#63 all merged; D-070 Accepted; local exit proof PASS — `docs/39-slice-6-exit-proof.md`). Hosted Slice 6 proof remains deferred, not executed (`docs/40-slice-6-hosted-proof-runbook.md` is a runbook only). Slice 7: planning **Accepted** — discovery/build-plan/proposal package `docs/41`–`docs/43` locked; decisions D-071–D-075 **Accepted** 2026-08-07; PR 7.1 merged (#64); PR 7.2 (database contract) merged (#65); PR 7.3 (moderation UI + suspended-employer UX) merged (#66). PR 7.4 (pilot funnel + legal placeholders + local exit proof) is implementation-complete locally, awaiting review/merge — no new migration; migration count remains 13, pgTAP remains 1136/1136, generated types unchanged. Local exit proof: **PASS** — `docs/44-slice-7-exit-proof.md`, all three accepted Slice 7 exit criteria evidenced. |
-| Next unit | PR 7.4 awaiting review/merge — `scripts/proof/pilot-funnel.mts` (`pnpm proof:pilot-funnel`, D-075's deterministic read-only funnel proof, 16 metrics/5 queries, no PII); `/privacy`, `/terms`, `/impressum` structural legal placeholders with a shared draft-warning notice, linked from a new `PublicFooter`; `docs/44-slice-7-exit-proof.md` mapping all three accepted Slice 7 exit criteria to evidence. After PR 7.4 merges: Slice 7 is Done and **Slice 8** (not yet scoped beyond `docs/13`) is the next slice. |
-| Next slice | Slice 8 — Account deletion to confirmed data removal (**not started**) |
-| Blockers | Preview remains intentionally unconfigured (no Preview-scoped Supabase configuration; re-isolate before any future hosted proof — known gap, unchanged by this unit). Production remains untouched by Slice 7 work. Hosted Demo fixtures remain in Production until 2026-09-02. |
+| Active slice | Slice 8 — Account deletion to confirmed data removal (planning Accepted, PR 8.1 pending merge) |
+| Slice status | Slice 6 complete locally (PR #59–#63 all merged; D-070 Accepted; local exit proof PASS — `docs/39-slice-6-exit-proof.md`). Hosted Slice 6 proof remains deferred, not executed (`docs/40-slice-6-hosted-proof-runbook.md` is a runbook only). **Slice 7 is Done locally**: planning **Accepted** — discovery/build-plan/proposal package `docs/41`–`docs/43` locked; decisions D-071–D-075 **Accepted** 2026-08-07; PR 7.1 merged (#64); PR 7.2 (database contract) merged (#65); PR 7.3 (moderation UI + suspended-employer UX) merged (#66); PR 7.4 (pilot funnel + legal placeholders + local exit proof) merged (#67) — no migration added by 7.3/7.4; migration count remains 13, pgTAP remains 1136/1136, generated types unchanged. Local exit proof: **PASS** — `docs/44-slice-7-exit-proof.md`, all three accepted Slice 7 exit criteria evidenced (suspend/remove; audited; pilot funnel measurable). Hosted Slice 7 proof has not been run. Slice 8: planning **Accepted** — discovery/build-plan/data-removal-proposal package `docs/45`–`docs/47` locked; decisions D-076–D-084 **Accepted** 2026-08-07 after a corrective review pass; PR 8.1 opened, pending merge; no Slice 8 implementation has started. |
+| Next unit | PR 8.2 (first authorized implementation unit, once PR 8.1 merges) — Slice 8 database deletion/tombstone/request/access-gate contract, per the Accepted D-078/D-079/D-080/D-081/D-082 field matrices and gate composition scope. |
+| Next slice | none — Slice 8 is the active slice; M4 remains active until Slice 8 completes |
+| Blockers | Preview remains intentionally unconfigured (no Preview-scoped Supabase configuration; re-isolate before any future hosted proof — known gap, unchanged by this unit). Production remains untouched by Slice 7/8 work. Hosted Demo fixtures remain in Production until 2026-09-02. |
 
 ## Slice 4 delivery (complete)
 
@@ -38,7 +38,7 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | Publication / verification | Accepted contracts (D-055–D-067); PR 5.2 database foundation in progress |
 | Slice 5 | Active; PR 5.1 Done; PR 5.2 in progress |
 | Slice 6 | Complete locally; hosted proof deferred |
-| Slice 7 / Slice 8 | Slice 7 planning Accepted (D-071–D-075); PR 7.1 merged; PR 7.2 (database contract) merged; PR 7.3 (moderation UI) merged; PR 7.4 (pilot funnel + legal placeholders + exit proof) implementation-complete locally, awaiting review/merge; Slice 8 not started |
+| Slice 7 / Slice 8 | Slice 7 Done locally (D-071–D-075 Accepted; PR 7.1 #64, PR 7.2 #65, PR 7.3 #66, PR 7.4 #67 all merged; local exit proof PASS); Slice 8 planning Accepted (D-076–D-084 Accepted 2026-08-07; PR 8.1 opened, pending merge); no Slice 8 implementation started |
 
 ## Slice 5 delivery (active)
 
@@ -63,9 +63,9 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | Slice 5 implementation | In progress — database foundation done; employer verification UI done; publication UI not started |
 | Preview isolated environment | Not configured |
 | Production | Untouched for Slice 5 |
-| Publication / verification approval UI (full admin) | Slice 7 — PR 7.3 implementation-complete locally, awaiting review/merge |
+| Publication / verification approval UI (full admin) | Slice 7 — Done (PR 7.3 merged #66) |
 | Applicant review | Slice 6 — D-070 Accepted; PR 6.1–6.4 all merged (#60–#63); complete locally, hosted proof deferred |
-| Admin moderation / audit | Slice 7 — planning Accepted; `docs/41`–`docs/43` locked; D-071–D-075 Accepted 2026-08-07; PR 7.1 merged (#64); PR 7.2 (database contract) merged (#65); PR 7.3 (moderation UI) merged (#66); PR 7.4 (pilot funnel + legal placeholders + exit proof) implementation-complete locally, awaiting review/merge |
+| Admin moderation / audit | Slice 7 — Done locally; `docs/41`–`docs/43` locked; D-071–D-075 Accepted 2026-08-07; PR 7.1 merged (#64); PR 7.2 (database contract) merged (#65); PR 7.3 (moderation UI) merged (#66); PR 7.4 (pilot funnel + legal placeholders + exit proof) merged (#67); local exit proof PASS (`docs/44-slice-7-exit-proof.md`) |
 
 ## Slice 3 delivery (complete)
 
@@ -171,8 +171,8 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 | 5 Verification → public vacancy | Verified publish + lifecycle | Active — D-055–D-067 Accepted; PR 5.1 Done; PR 5.2 in progress |
 | 5 Publish | Verification → public vacancy | Not started |
 | 6 Review | Applicant review → status update | Complete locally (PR #59–#63 merged); D-070 Accepted; hosted proof deferred |
-| 7 Trust ops | Admin moderation → audit | Active — D-071–D-075 Accepted 2026-08-07; PR 7.1 merged (#64); PR 7.2 (database contract) merged (#65); PR 7.3 (moderation UI) merged (#66); PR 7.4 (pilot funnel + legal placeholders + exit proof) implementation-complete locally, awaiting review/merge |
-| 8 Deletion | Export/delete → confirmed removal | Not started |
+| 7 Trust ops | Admin moderation → audit | Done locally — D-071–D-075 Accepted 2026-08-07; PR 7.1 merged (#64); PR 7.2 (database contract) merged (#65); PR 7.3 (moderation UI) merged (#66); PR 7.4 (pilot funnel + legal placeholders + exit proof) merged (#67); local exit proof PASS |
+| 8 Deletion | Export/delete → confirmed removal | Planning active (PR 8.1); no implementation started |
 
 ## Decision discipline
 

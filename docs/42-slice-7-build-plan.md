@@ -2,11 +2,11 @@
 
 > **Status:** Planning Accepted; PR 7.1 merged (#64); PR 7.2 (database
 > contract) merged (#65); PR 7.3 (employer/vacancy moderation UI) merged
-> (#66). PR 7.4 (pilot funnel + legal placeholders + local exit proof) is
-> implementation-complete locally, awaiting review/merge — no new migration,
-> migration count remains 13, pgTAP remains 1136/1136. Local exit proof:
-> `docs/44-slice-7-exit-proof.md`. Slice 7 is not formally Done until PR 7.4
-> merges. Discovery: `docs/41-slice-7-discovery.md`.
+> (#66); PR 7.4 (pilot funnel + legal placeholders + local exit proof)
+> merged (#67) — no new migration across 7.3/7.4, migration count remains
+> 13, pgTAP remains 1136/1136. Local exit proof: **PASS** —
+> `docs/44-slice-7-exit-proof.md`. **Slice 7 is Done locally**; hosted
+> proof has not been run. Discovery: `docs/41-slice-7-discovery.md`.
 > Moderation/audit proposal: `docs/43-slice-7-moderation-and-audit-proposal.md`.
 > Decisions D-071–D-075 below (see "Accepted decisions" at the end of this
 > document) are **Accepted** (2026-08-07) in `docs/10-decisions.md`, the
@@ -270,9 +270,9 @@ full local suite green.
 
 ### PR 7.4 — Pilot-readiness surface (only the accepted minimum)
 
-**Status:** Implementation complete locally, awaiting review/merge. No new
-migration; migration count remains 13, pgTAP remains 1136/1136, generated
-types unchanged. Local exit proof: `docs/44-slice-7-exit-proof.md`.
+**Status:** Merged (PR #67). No new migration; migration count remains
+13, pgTAP remains 1136/1136, generated types unchanged. Local exit proof:
+**PASS** — `docs/44-slice-7-exit-proof.md`.
 
 **Objective:** close out the *non*-moderation Slice 7 exit-criteria items
 that `docs/41` found genuinely necessary or low-risk, without expanding

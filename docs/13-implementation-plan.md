@@ -163,13 +163,15 @@ The first Slice 7 implementation contract is narrower than the broad list
 above — see `docs/42-slice-7-build-plan.md` and D-071–D-075 for the locked
 boundary and the reasoning for each narrowing. This line preserves the
 original broad intent; it is not silently edited. **Implementation status:**
-PR 7.1 (planning) merged; PR 7.2 (moderation/audit database contract)
-merged; PR 7.3 (operator moderation UI + suspended-employer UX) merged; PR
-7.4 (pilot funnel + legal placeholders + local exit proof,
-`docs/44-slice-7-exit-proof.md`) is implementation-complete locally,
-awaiting review/merge. Slice 7's local implementation is complete; Slice 7
-itself is not marked Done pending PR 7.4's review/merge. Slice 8 has not
-started.
+PR 7.1 (planning) merged (#64); PR 7.2 (moderation/audit database
+contract) merged (#65); PR 7.3 (operator moderation UI +
+suspended-employer UX) merged (#66); PR 7.4 (pilot funnel + legal
+placeholders + local exit proof, `docs/44-slice-7-exit-proof.md`) merged
+(#67). **Slice 7 is Done locally** — all three exit criteria below pass
+against the merged implementation; hosted proof has not been run. Slice 8
+(account deletion to confirmed data removal) planning is **Accepted**:
+decisions D-076–D-084 Accepted 2026-08-07; PR 8.1 (planning) opened,
+pending merge; no Slice 8 implementation has started.
 
 **Exit criteria:**
 
@@ -182,6 +184,14 @@ started.
 **Outcome:** candidates and employers can request export and deletion; removal can be confirmed.
 
 **Includes:** account export; deletion request workflow; confirmation of data-removal path for MVP needs.
+
+**Planning status:** PR 8.1 (discovery, data-ownership inventory, export/
+deletion contract proposal, build plan) opened, pending merge — see
+`docs/45-slice-8-discovery.md`, `docs/46-slice-8-build-plan.md`,
+`docs/47-slice-8-data-removal-proposal.md`. Decisions D-076–D-084 are
+**Accepted** (2026-08-07) in `docs/10-decisions.md`. No Slice 8
+implementation (migration, RPC, UI) has started; PR 8.2 is the first
+authorized implementation unit once PR 8.1 merges.
 
 **Exit criteria:**
 

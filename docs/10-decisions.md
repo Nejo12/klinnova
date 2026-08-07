@@ -1289,3 +1289,160 @@ Actor and timestamp are always DB-derived (`auth.uid()`, `clock_timestamp()`); r
 **Acceptance note:** Accepted 2026-08-07 by repository owner for PR 7.1 decision lock; must be re-confirmed (not reopened) before PR 7.4, per its "Must accept before" gate.
 
 **Acceptance note:** Accepted 2026-08-06 by repository owner for PR 6.1 implementation.
+
+## D-076 — Slice 8 PR decomposition
+
+**Status:** Accepted
+**Accepted:** 2026-08-07
+**Must accept before:** PR 8.2 (does not block PR 8.1, which is this planning unit itself)
+
+**Context:** `docs/45-slice-8-discovery.md` and `docs/47-slice-8-data-removal-proposal.md` establish the full export/deletion contract. Following the Slice 5/6/7 precedent (planning PR, then database-contract PR, then UI/API PRs, then closure), Slice 8 needs its own small, individually-reviewable PR sequence rather than one large mixed PR.
+
+**Decision:** Five candidate PRs, adjustable at PR 8.2 start against the accepted decisions rather than fixed here: **PR 8.1** (this unit) — discovery, proposed decisions, build plan, no code. **PR 8.2** — deletion/export database contract: `account_deleted_at` tombstone state on `candidate_profiles`/`employer_profiles`; the `deletion_requests` table (concurrency-constrained per D-081); request/cancel/claim/process transition RPCs; the candidate and employer anonymization `SECURITY DEFINER` RPCs (D-078/D-079); canonical deleted-account helper functions (`_is_current_candidate_deleted()`/`_is_current_employer_deleted()`, mirroring the PR 7.2 suspension-helper pattern) composed into every RLS policy/RPC enumerated in `docs/45` §3.3; any narrow read RPCs export needs. One additive migration, pgTAP proof, no UI — a materially larger schema surface than "one table + two RPCs," reflecting the D-080/D-081 corrections below. **PR 8.3** — account export UI/API on top of PR 8.2's read RPCs (or directly on existing RLS reads where sufficient), following the immediate-JSON-download design in `docs/47` §2. **PR 8.4** — deletion request + processing UI: request/cancel UI, the isolated Auth-scrub processing path (the one place `service_role`-equivalent privilege is used), confirmation screens, independent local verification of the exact `deleteUser(id, true)` behavior. **PR 8.5** — local exit proof + Slice 8 closure doc, mirroring `docs/44`'s pattern. No PR after 8.1 may start until the decisions gating it (below) are Accepted.
+
+**Alternatives:** One large PR covering schema + UI (rejected — every prior slice in this project used small reviewable PRs; Slice 8 touches the most cross-user-sensitive graph in the whole schema, the opposite case for bundling); skip database-contract-only PR and build schema alongside UI (rejected — PR 7.2/7.3's split let pgTAP carry the full authorization/integrity burden before any UI existed, which this project has consistently found valuable).
+
+**Consequences:** Matches established project rhythm; each PR has a narrow, auditable diff; implementation cannot start until export/deletion semantics are actually Accepted, preventing a repeat of any premature-implementation risk.
+
+**Acceptance note:** Accepted 2026-08-07 by repository owner as part of the Slice 8 PR 8.1 decision lock, following a corrective review pass that closed the export/deletion behavioral contracts in D-077–D-082 (see each decision's own acceptance note). PR 8.2 is now the first authorized implementation unit.
+
+## D-077 — Export format and scope
+
+**Status:** Accepted
+**Accepted:** 2026-08-07
+**Must accept before:** PR 8.3
+
+**Context:** `docs/45` §4/§5 and `docs/47` §2 propose exact candidate and employer export payloads, with the employer boundary explicitly excluding any candidate snapshot content.
+
+**Decision:** Adopt the candidate and employer export boundaries exactly as proposed in `docs/47` §2: versioned JSON envelope (`"version": 1`), server-generated, immediate download, bounded by `auth.uid()` with no caller-supplied target parameter. **Auth account metadata scope is decided, not left open: `email` and `created_at` only, for both roles** — `last_sign_in_at` is excluded (no concrete user-value requirement identified for it), and password/session/token material is never included regardless. Candidate export body: own `candidate_profiles` fields, `candidate_languages`, own applications (own `candidate_snapshot` + narrow public-safe `vacancy_snapshot` projection), candidate-safe status-history projection (`to_status`/`occurred_at` only), onboarding/completion timestamps. Employer export body: own `employer_profiles` fields, own `companies` row (organisation only), owned vacancies plus their structured `vacancy_language_requirements`, and **narrow application process metadata only** (id/status/submitted_at/count) — **never** `candidate_snapshot` content, candidate name/email/profile fields, candidate Auth identity, `application_status_history.actor_user_id`, operator IDs, or operator moderation/verification reasons; no password hashes or session/token material in either export. No background job, no object storage, no email delivery.
+
+**Alternatives:** Include full `candidate_snapshot` content in employer export (rejected — `docs/45` §5 treats this as a materially different privacy posture from per-application viewing, with no current product precedent); email-delivered export archive (rejected — reopens D-075's transactional-email deferral without a new justification); persisted export job with polling (rejected — current data volume does not require it, per `docs/47` §2's architecture-principle citation).
+
+**Consequences:** Export implementation (PR 8.3) is a synchronous read-and-serialize operation, no new background infrastructure; the employer/candidate snapshot-field audit required by `docs/45` §13 must happen at PR 8.3 implementation time against the current `candidateSnapshotV1Schema`/`vacancySnapshotV1Schema` shape.
+
+**Acceptance note:** Accepted 2026-08-07 by repository owner, after the Auth account-metadata scope (`email`/`created_at` only) was closed from a flagged proposal into a firm decision, and the employer export boundary was tightened to explicitly exclude candidate Auth identity, operator IDs, and operator moderation/verification reasons alongside the previously-listed exclusions.
+
+## D-078 — Candidate deletion semantics
+
+**Status:** Accepted
+**Accepted:** 2026-08-07
+**Must accept before:** PR 8.2
+
+**Context:** `docs/45` §6 traces the candidate deletion graph and evaluates six strategies; a naive hard delete via the existing `ON DELETE CASCADE` chain would silently destroy the employer's own applicant-review record.
+
+**Decision:** Adopt Strategy C from `docs/45` §6, with an exact row-level field matrix — no field left ambiguous. `candidate_profiles`: **preserved as a structural tombstone row** (preserved `applications` rows depend on this FK anchor); `account_deleted_at` is set; `display_name`/`german_comfort`/`work_authorisation_declared`/`work_authorisation_declared_at`/`city`/`travel_radius_minutes`/`available_from`/`job_categories`/`employment_types`/`shift_preferences` are cleared/replaced with fixed placeholders; `onboarding_completed_at`/`created_at` are preserved as lifecycle facts. `candidate_languages`: **all rows DELETED**, not anonymized in place. `applications` per row: `id`/`vacancy_id`/`status`/timestamps/`vacancy_snapshot` preserved unchanged; `candidate_snapshot` replaced with one fixed, versioned tombstone shape — conceptually `{"version": 1, "deleted": true}`, matching the existing `applications.snapshot_version = 1` constraint (extended only if the current `candidateSnapshotV1Schema` requires additional structural fields, confirmed at PR 8.2 — the *contract* of "fixed, versioned, non-identifying placeholder" does not change based on that detail). `application_status_history`: preserved unchanged, including `actor_user_id`; access by the deleted candidate is blocked by the D-080 database gate, not by modifying the row. Auth side processed per D-080 (never a literal `auth.users` DELETE). No shared `profiles` table is introduced; `account_deleted_at` lives on `candidate_profiles` directly.
+
+**Alternatives:** Hard delete + cascade (Strategy A, rejected — destroys employer business record); nullable-FK/tombstone candidate row (Strategy D, rejected for MVP — a larger schema change than the anonymize-in-place approach requires, deferred as a future option if Strategy C proves insufficient); legal-retention hold (Strategy E, explicitly not decided here — flagged for legal review, not assumed absent); operator-mediated manual review (Strategy F, rejected — disproportionate for a self-service GDPR action, inconsistent with D-072/D-073's narrow operator scope).
+
+**Consequences:** `applications`/`application_status_history` rows are never deleted for a candidate-initiated request; PR 8.2's migration adds the anonymizing RPC and its fixed-placeholder contract, not a schema change to the FK graph itself; the local proof script (D-084) must assert the employer-visible application row is provably unchanged after a candidate deletion.
+
+**Acceptance note:** Accepted 2026-08-07 by repository owner, after `candidate_profiles` was named explicitly as a preserved structural tombstone row, `candidate_languages` was closed to an exact DELETE-all-rows contract, and `candidate_snapshot`'s replacement was given an exact conceptual versioned tombstone shape (`{"version": 1, "deleted": true}`).
+
+## D-079 — Employer deletion semantics
+
+**Status:** Accepted
+**Accepted:** 2026-08-07
+**Must accept before:** PR 8.2
+
+**Context:** `docs/45` §7 traces the employer deletion graph, confirming today's `NO ACTION`/`RESTRICT` FK defaults already prevent a naive hard delete from silently cascading into candidate application history — the risk is an implementer "fixing" the resulting FK errors by weakening those defaults, not the current schema itself.
+
+**Decision:** Adopt Strategies B+C from `docs/45` §7, with an exact field matrix and a resolved slug rule — no open question left inside this decision. `employer_profiles`: **preserved as a structural tombstone row** (`vacancies.employer_profile_id`/`companies.owner_employer_id` are `NO ACTION`); `account_deleted_at` is set; `display_name`/`berlin_locality`/`phone`/`website`/`organisation_legal_name` are cleared/replaced with fixed placeholders; `verification_state`/`verification_reviewed_by`/`verification_reviewed_at` are preserved as operator-facing historical fact. `companies` (organisation employers only): `name` replaced with a fixed placeholder; **`slug` replaced with a deterministic, non-PII tombstone value, `deleted-company-<uuid>`, derived only from the company's own immutable `id` — never from name or email.** **The pre-deletion slug is not automatically freed for reuse by a different employer** and remains permanently retired unless a separate, explicit future product decision introduces a slug-release mechanism — no such mechanism exists or is proposed here. Every vacancy the employer owns is withdrawn first (reusing the existing `withdraw_employer_vacancy` RPC pattern, self-scoped to the requester) so it immediately stops being effective-public via the existing canonical predicate. `vacancies`, `vacancy_language_requirements`, `applications`, and `application_status_history` are **never written to, deleted, or cascaded** by this process. Auth side per D-080. No shared `profiles` table is introduced.
+
+**Alternatives:** Hard delete employer + vacancies + applications (Strategy A, rejected — would require weakening `applications.vacancy_id` from `RESTRICT` to `CASCADE`, directly destroying candidate-owned history the candidate never asked to remove); operator-reviewed deletion request (Strategy E, rejected — same disproportionality objection as D-078).
+
+**Consequences:** No FK default is weakened by Slice 8; candidate application history is preserved by construction (the proposal never touches those tables), not by careful cascade tuning; PR 8.2's migration adds the anonymizing RPC and reuses the existing withdrawal RPC, no change to `vacancies`/`applications`/`companies` FK definitions. Directly answers the kickoff's question H: employer deletion cannot destroy candidate application history — confirmed by construction, not assumption.
+
+**Acceptance note:** Accepted 2026-08-07 by repository owner, after `employer_profiles` was named explicitly as a preserved structural tombstone row and the company-slug-reuse question was closed: tombstone slugs are deterministic (`deleted-company-<uuid>`, derived only from the immutable `id`), and the pre-deletion slug is explicitly not auto-reusable absent a separate future decision.
+
+## D-080 — Auth-user deletion privilege mechanism
+
+**Status:** Accepted
+**Accepted:** 2026-08-07
+**Must accept before:** PR 8.2 (schema readiness) and PR 8.4 (the actual Auth-scrub processing path)
+
+**Context:** `docs/45` §3.1 compares **three distinct Supabase Auth Admin API mechanisms** for the Auth-side step — **A.** hard `deleteUser(userId)` / `deleteUser(userId, false)`, **B.** soft `deleteUser(userId, true)`, **C.** manual `updateUserById` scrub + `ban_duration` — and treats them as materially different, not interchangeable. A literal hard `auth.users` DELETE for any employer/candidate with dependent data fails today (or would destroy the D-078/D-079 tombstone rows), due to the FK graph. Separately, `docs/45` §3.2 identifies the **stale-JWT problem**: none of A/B/C invalidate an already-issued, unexpired access token, so the Auth mechanism alone cannot be relied on for real-time authorization enforcement.
+
+**Decision, part 1 — Auth mechanism: adopt B, `auth.admin.deleteUser(userId, true)`.** Comparison basis (full table `docs/45` §3.1): **A** is rejected — destroys the `auth.users` row the D-078/D-079 tombstone design depends on, and is blocked outright by the FK graph for any account with dependent data. **B** is preferred — Supabase's own explicit soft-deletion primitive; the `auth.users` row remains (sidestepping the FK landmine entirely, not working around it); requires no custom synthetic-email lifecycle; non-reversible, matching deletion's intent; requires `service_role`. **C** is rejected as the primary mechanism — semantically a temporary-restriction primitive (reversible via `ban_duration` expiry), not a genuine deletion signal, and does not by itself avoid the need for a custom scrub. Mechanism B is invoked via one self-scoped `SECURITY DEFINER` RPC (public-schema anonymization from D-078/D-079, `auth.uid()`-scoped, no caller-supplied target) plus one narrowly isolated, server-only processing path (never client-bundled) that calls `deleteUser(userId, true)` — the only point in the whole design touching `service_role`/Auth Admin credentials, built in PR 8.4. **Mechanism B is the accepted choice; the method is not called anywhere in PR 8.1, and PR 8.4 must independently verify the exact local Supabase behavior of `deleteUser(userId, true)` (FK/session/reversibility behavior against this project's actual local stack) as an implementation-verification step before this decision's proof is treated as complete — this is a verification requirement, not an open behavioral question about which mechanism is chosen.**
+
+**Decision, part 2 — the stale-JWT problem requires an independent database gate, not just the Auth mechanism.** "Cannot sign in again" is **not sufficient** authorization enforcement, because a previously issued access token remains cryptographically valid until its own expiry regardless of which of A/B/C runs. Adopt the `docs/45` §3.3 proposal: nullable `account_deleted_at timestamptz` on `candidate_profiles` and `employer_profiles` directly (**no shared `profiles` table introduced solely for this**), composed into every candidate/employer RLS policy and `SECURITY DEFINER` RPC via canonical self-scoped helper functions (`_is_current_candidate_deleted()`/`_is_current_employer_deleted()`, mirroring the existing `_is_current_employer_suspended()`/`is_current_employer_suspended()` pattern from PR 7.2 exactly — zero-argument, `auth.uid()`-derived, no caller-supplied target). The full required composition scope (candidate profile/languages/onboarding/matching/applications/status-history; employer profile/company/onboarding/vacancy-lifecycle/verification/applicant-review) is enumerated in `docs/45` §3.3 and is a required, non-optional part of PR 8.2 — not deferred, not left open.
+
+**Alternatives:** Mechanism C as primary (rejected — reversible-by-design, semantically wrong for permanent deletion, see above); Mechanism A with weakened FK defaults (`CASCADE`/`SET NULL`) to make hard delete "work" (rejected — exactly the failure mode `docs/45` §3/§7 warns against); relying on Auth deletion alone without a database gate (rejected — does not solve the stale-JWT problem, and would leave a completed "deletion" that a live unexpired token can still exploit); a shared `profiles` table to host `account_deleted_at` for both roles (rejected — `candidate_profiles`/`employer_profiles` are already the canonical per-role identity tables in this schema; introducing a new shared table purely for one boolean-like column adds a migration and a join for no behavioral benefit); operator-mediated worker (rejected — disproportionate, same reasoning as D-078/D-079).
+
+**Consequences:** `service_role`-equivalent privilege is introduced to this codebase for the first time since the project's "no service-role runtime client" principle was established, but confined to one narrow, explicitly-triggered, server-only processing path — never the ordinary authenticated runtime. PR 8.4 must include a static-security test proving this confinement, mirroring the PR 7.3/7.4 convention, **and** must independently verify `deleteUser(userId, true)`'s exact local behavior before relying on it. The `auth.users` row is never deleted by this design — "deletion" in user-facing language means "your data is removed and your account can no longer access anything, including with a token issued before deletion," not "the account row itself no longer exists." PR 8.2 must add `account_deleted_at` to both profile tables and the canonical helper functions/RLS-RPC composition as first-class, required schema work — this is materially more schema surface than a bare anonymization RPC pair.
+
+**Acceptance note:** Accepted 2026-08-07 by repository owner, after this decision was corrected from a two-mechanism comparison into the required three-way A/B/C comparison (preferring soft-delete mechanism B) and the stale-JWT problem/database gate was added as a first-class, separately-verified part of this decision rather than left implicit.
+
+## D-081 — Deletion-request state machine and confirmation semantics
+
+**Status:** Accepted
+**Accepted:** 2026-08-07
+**Must accept before:** PR 8.2 (state machine schema) and PR 8.4 (UI/confirmation)
+
+**Context:** `docs/45` §10 compares four request models and answers the kickoff's specific operational questions (reversibility, cooling-off, password re-entry, session handling, confirmation without email, partial failure, retry, idempotency).
+
+**Decision:** Adopt option 2 from `docs/45` §10: `pending` → `processing` → `completed`/`failed`, with the following contract closed exactly, not left as implementation detail:
+
+- **Concurrency:** at most one **active** (`pending`/`processing`) request per user, enforced at the schema level. A duplicate request while `pending` returns the existing request. The processor claims `pending` → `processing` under a row lock/deterministic single-writer transition.
+- **Cancellation:** allowed only while `pending`. Once claimed into `processing`, cancellation is impossible — there is no mid-processing cancel state.
+- **Cooling-off period — decided: NONE for MVP.** `pending` is a process state, not a promised waiting window. If a deliberate cooling-off window is wanted later, that is its own separate, explicitly-authorized future decision with its own exact duration — not implied here.
+- **Target identity:** never caller-supplied, on either the request-creation path (`auth.uid()` only) or the privileged processing path (derived exclusively from the claimed request row).
+- **Processing phases (exact, six steps — full detail `docs/45` §10.2):** 1) claim under row lock; 2) run domain anonymization transaction (D-078/D-079); 3) record domain-scrub evidence (`domain_scrubbed_at` or equivalent durable marker); 4) invoke Auth soft delete (D-080 mechanism B); 5) verify the Auth result; 6) record Auth-deletion evidence (`auth_deleted_at`) and transition to `completed` — only once both markers exist.
+- **Failure handling:** if step 4 fails, the request remains safely retryable (steps 2/3 are idempotent). If step 4 succeeds but step 6's persistence fails, the now-deleted user cannot authenticate to retry anything — a narrow, manually-invoked, privileged **reconciliation operation** (not a scheduled background worker) re-confirms the Auth deletion independently via the Auth Admin API and completes the request, without requiring the user to authenticate. This reconciliation mechanism is required scope for PR 8.2/8.4, not an unspecified future addition.
+- **Error surfacing:** raw Auth/database errors are never persisted to user-visible fields; `failed` carries a fixed, generic reason code only.
+- **Session/confirmation semantics:** no password re-entry (no recent-auth mechanism exists today; not built in Slice 8). The user sees a final processing/success confirmation screen **before** their local session ends (not deferred to a later sign-in attempt); session/refresh tokens are then revoked as supported. After deletion, any future login attempt receives the ordinary generic Auth failure state — no special "account deleted" message, and no identifier is retained solely to enable one. In-app confirmation only, no transactional email, consistent with D-075.
+
+**Alternatives:** Immediate one-click deletion (option 1, rejected — no natural place to persist/report partial-failure state, and the underlying multi-step privileged process needs a durable state regardless); reauthentication-gated immediate deletion (option 3, rejected — the required recent-auth mechanism does not exist in this codebase today; building it is new authentication-surface scope, not a Slice 8 data-removal concern); operator-mediated request (option 4, rejected — same reasoning as D-078/D-079); a mandatory cooling-off period (considered, rejected for MVP — adds complexity with no identified user-safety requirement beyond the existing cancel-while-pending guarantee); retaining the original email as a tombstone identifier purely to show a "this account was deleted" login message (rejected — unnecessary PII retention for a cosmetic purpose; the ordinary generic Auth failure state is sufficient).
+
+**Consequences:** PR 8.2's migration includes a `deletion_requests` table with an explicit status column, the active-request uniqueness constraint, and the two evidence-marker columns; PR 8.4 builds the request/cancel/confirm UI, the processing trigger, and the manual reconciliation operation. No cooling-off duration is deferred — none is used for MVP, full stop.
+
+**Acceptance note:** Accepted 2026-08-07 by repository owner, after this decision was corrected to close the concurrency contract exactly (at-most-one-active-request, row-locked claim, cancel-only-while-pending, no mandatory cooling-off for MVP), specify the six-phase processing order with durable evidence, define the manual reconciliation mechanism for the Auth-succeeded/evidence-write-failed case, and remove the earlier "account deleted" post-delete sign-in message in favor of the ordinary generic Auth failure state.
+
+## D-082 — Audit-event retention and redaction under account deletion
+
+**Status:** Accepted
+**Accepted:** 2026-08-07
+**Must accept before:** PR 8.2
+
+**Context:** `docs/45` §8 confirms `admin_audit_events.target_id` has no FK and survives any anonymization/deletion trivially at the SQL level — the open question is privacy of the free-text `reason` field, not schema mechanics. D-074's own migration comment explicitly flagged this as a Slice 8 responsibility.
+
+**Decision:** Retain `admin_audit_events` rows unconditionally after any employer/vacancy anonymization under D-079 — `id`/`target_id`/`target_kind`/`event_type`/`actor_user_id`/`created_at` are never modified or removed. **`reason` free text is redacted for rows whose target is the deleted employer or one of its vacancies** — replaced with a fixed marker, `"[redacted after account deletion]"`, at the moment deletion processing anonymizes that employer. This is a **closed technical MVP contract, not a flagged-open legal question**: free-text moderation reasons can contain identifying/user-provided information (e.g. a business name an operator quoted) that the audit system's own author did not control, while the event's fact/taxonomy/time remain fully auditable without retaining arbitrary free text indefinitely — the taxonomy alone already answers "what kind of action was taken against this account, and when," which is the audit trail's load-bearing property.
+
+**This is an explicit, narrow Slice 8 exception/supersession to D-074's immutable-reason contract — stated as such, not left to imply both contracts hold simultaneously.** D-074 remains the general rule for every audit row whose target has not been deleted; this decision carves out one specific, narrowly-scoped exception that applies only when the row's own subject has exercised a GDPR-motivated account deletion, and only replaces `reason` with the fixed marker — no other field, no other trigger.
+
+**Alternatives:** Delete/null entire audit rows targeting a deleted account (rejected — silently destroys the tamper-evident taxonomy record D-074 was built to guarantee, which is broader than the privacy risk `reason` text alone poses); retain `reason` unredacted for MVP (considered as the alternative technical contract; rejected because it would permanently retain user-provided identifying text with no product justification once the account itself has been anonymized — if this project ever prefers retention instead, that must be stated as the actual contract with its privacy consequence accepted, not left as an open question, which is exactly what this decision closes); automatically redact `reason` text via content-aware pattern-matching instead of a fixed marker (rejected — no reliable pattern exists to detect an arbitrary business name or identifying phrase without false positives/negatives; a fixed marker is simple, deterministic, and does not require pretending to know what was in the original text).
+
+**Consequences:** No change to `admin_audit_events`'s schema or grants (redaction is a data-write during deletion processing, not a schema change); PR 8.2's anonymization RPC for employers must also perform this `reason` replacement as part of the same transaction (§8/D-079); PR 8.5's closure doc records this as a settled MVP contract, not an open legal question; the local proof script (D-084) must assert `reason` matches the fixed marker for affected rows post-deletion.
+
+**Acceptance note:** Accepted 2026-08-07 by repository owner, after this decision was corrected from a self-contradictory "retain unredacted but unresolved" position into a single closed technical MVP contract (redact to a fixed marker), explicitly framed as a narrow, named exception to D-074 rather than a silent conflict with it.
+
+## D-083 — Private-document/storage interpretation
+
+**Status:** Accepted
+**Accepted:** 2026-08-07
+**Must accept before:** PR 8.5 (closure — this decision documents a proof, not a build)
+
+**Context:** `docs/45` §9 confirms, by direct inspection of `supabase/config.toml` and the codebase, zero configured Storage buckets and zero user-uploaded private documents anywhere in the current product. `NOT_NOW.md` independently confirms this was a deliberate Slice 5 deferral specifically to avoid pulling retention/GDPR work forward.
+
+**Decision:** The Slice 8 exit criterion *"deletion does not leave private documents publicly reachable"* is satisfied by proof of absence: no private-document object exists in the current MVP surface, and neither D-078 nor D-079 introduces any new public-reachability path. No Storage work is added in Slice 8. Future CV/document upload (if ever built) must trigger its own retention/deletion review at that time — this decision does not pre-approve any future Storage design.
+
+**Alternatives:** Add Storage scaffolding now "to be safe" (rejected — `docs/45` §9 and the kickoff's own instruction both reject adding Storage solely to prove a currently-vacuous exit criterion); defer this exit criterion entirely (rejected — proof of absence is itself sufficient evidence and should be documented, not silently skipped).
+
+**Consequences:** PR 8.5's closure doc records this as evidence (a grep/config audit, not a test suite) for exit-criterion satisfaction; no code or migration is produced by this decision.
+
+**Acceptance note:** Accepted 2026-08-07 by repository owner as part of the Slice 8 PR 8.1 decision lock; unchanged in substance from the original proposal.
+
+## D-084 — Local proof boundary and hosted-proof timing
+
+**Status:** Accepted
+**Accepted:** 2026-08-07
+**Must accept before:** PR 8.5
+
+**Context:** `docs/45` §14 proposes a local deletion/export proof script mirroring `scripts/proof/pilot-funnel.mts`'s pattern, but notes this proof necessarily performs real writes against disposable local fixtures, unlike the read-only funnel proof — a materially different risk class if ever pointed at a hosted environment.
+
+**Decision:** Slice 8 closure (PR 8.5) requires a local-only deterministic proof (`scripts/proof/account-deletion.mts` or an agreed equivalent name) asserting the full candidate/employer deletion and export contracts from D-077–D-079, reusing the existing `local-environment-guard.ts`/localhost-only discipline. **The proof must include, for both candidate and employer fixtures, an explicit stale-JWT test (per D-080's stale-JWT finding): obtain a valid JWT before deletion; process deletion to completion; attempt protected reads/mutations using that same, still-unexpired, pre-delete JWT; prove they are denied by the `account_deleted_at` gate** — proving "cannot sign in again" alone is not treated as sufficient. **Hosted deletion/export proof is not authorized by this decision and is not scheduled for Slice 8** — it would require its own separate, explicit, owner-authorized follow-up, exactly as Slice 3/4's hosted-proof pattern already established for lower-risk operations, and more conservatively than any of them given the destructive nature of what is being proven.
+
+**Alternatives:** Require hosted proof before Slice 8 can be marked Done (rejected — no accepted Slice 8 exit criterion requires it, and it introduces disproportionate risk for a planning-stage decision to pre-authorize); skip local proof entirely and rely on pgTAP alone (rejected — pgTAP proves schema/RLS/RPC correctness in isolation; a local script proves the end-to-end contract the way `pnpm proof:pilot-funnel` already does for Slice 7, and D-075 established that pattern as the project's preferred evidentiary style).
+
+**Consequences:** PR 8.5 is local-only, following the exact established pattern of every prior slice's closure PR; Slice 8 can be marked Done locally without hosted execution, mirroring Slice 7's own closure; a hosted proof, if ever pursued, remains a distinct, separately-authorized unit of work outside Slice 8's scope as currently decided.
+
+**Acceptance note:** Accepted 2026-08-07 by repository owner, after this decision was corrected to explicitly fold in the stale-JWT proof requirement (pre-delete JWT reuse denied post-deletion, for both candidate and employer) as required local-proof scope rather than leaving it implicit.
