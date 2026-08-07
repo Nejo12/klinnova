@@ -1171,4 +1171,121 @@ The new `ineligible` result is purely additive to `submit_candidate_application`
 
 **Consequences:** `submit_candidate_application`'s signature and JSON result contract are unchanged; a successful submission now also writes its initial `application_status_history` event atomically in the same transaction. `applications.status` is widened from the single Slice 3 value to the five-value state machine above (additive migration, 12th). A new `application_status_history` table is append-only and RPC-mediated only — zero direct `authenticated` grant. Four new narrow `SECURITY DEFINER` RPCs (`list_current_employer_applications`, `get_current_employer_application`, `transition_current_employer_application_status`, `list_current_candidate_application_status_history`) are the only read/write surface for employer- and candidate-side application status; no RLS policy is added to `applications` itself. A future slice that wants interview scheduling, notifications, candidate withdrawal, or richer audit infrastructure needs its own new decision, not a silent extension of this one.
 
+## D-071 — Slice 7 boundary and admin authorization reuse
+
+**Status:** Accepted
+**Accepted:** 2026-08-07
+**Must accept before:** PR 7.2
+
+**Context:** `docs/13-implementation-plan.md`'s Slice 7 entry lists a broader set of capabilities (admin authorization, employer review/approval, vacancy moderation, reports, suspension, stale-vacancy handling, audit events, transactional email completeness, privacy/terms/Impressum placeholders, basic funnel analytics) than this plan's first implementation contract covers. Employer verification review/approval is already Done (Slice 5). Per `AGENTS.md`'s conflict-reporting rule, this narrowing is recorded here rather than silently resolved, following the identical precedent of D-039/D-046/D-055/D-070 narrowing their own slices' earlier `docs/13` descriptions.
+
+**Decision:** Slice 7's first implementation contract is: employer suspension, vacancy moderation, and one general operator-audit ledger, built entirely on the existing `verification_operators`/`_is_active_verification_operator`/`requireActiveOperator` authorization foundation from D-056 — no second admin/operator identity model, no operator self-management (grant/revoke) RPC. Operator provisioning remains owner-controlled/direct-database administration, as today. Reports, analytics, transactional email, and legal placeholders receive the minimum treatment identified in `docs/41` (mostly deferred, or a small separate final PR), not full features. Candidate suspension and a new stale-vacancy subsystem are explicit non-goals.
+
+**Alternatives:** Build the full `docs/13` list in one slice (rejected — no product evidence most of it is needed for a controlled pilot's safety exit criteria, and it would force a generic admin dashboard disproportionate to a founder-operated pilot); add a second, general-purpose "admin" role distinct from "verification operator" (rejected — the existing mechanism already generalizes cleanly with no naming or authorization conflict).
+
+**Consequences:** Slice 7 exit criteria ("administrators can suspend unsafe actors and remove vacancies; sensitive admin actions are audited; pilot funnel events are measurable") are met by the narrower contract above; funnel measurability is satisfied by existing database evidence (D-075) rather than a new analytics integration; PR 7.2 is not authorized until this PR merges.
+
+**Acceptance note:** Accepted 2026-08-07 by repository owner for PR 7.1 decision lock, after two corrective review passes recorded in D-072/D-074.
+
+## D-072 — Employer suspension semantics
+
+**Status:** Accepted
+**Accepted:** 2026-08-07
+**Must accept before:** PR 7.2
+
+**Context:** No suspension concept exists today. `verification_revoked` is not equivalent to suspension (`docs/41` §3) — it only fires from `verified`, is reversible by employer resubmission alone, and is a trust-gate reset rather than a punitive hold. An audit of every authoritative employer mutation and sensitive read path (`docs/41` §3.1, `docs/43` §4.1) found the employer mutation surface is not RPC-only: direct-table `UPDATE` paths on `employer_profiles` are authorized by RLS alone. An earlier draft of this decision incorrectly cited D-070's "review survives verification revocation" precedent to exempt Slice 6 employer applicant-review access from suspension — that citation was a reasoning error, since D-070 describes *revocation*, not a punitive *suspension* imposed on an actor already judged unsafe — and withdrawn. A second review pass additionally found that "suspension does not rewrite `vacancies.publication_state`" had been incorrectly treated as equivalent to "suspension leaves public/candidate visibility unaffected" — also withdrawn.
+
+**Decision:** A new, independent employer-suspension state (`employer_suspension` table): two states only (suspended / not suspended), operator-only, required bounded reason, DB-derived actor/timestamp. While an employer is suspended:
+
+- Supabase Auth login/session is **not** disabled;
+- historical data remains stored, untouched;
+- the employer's own UI may render a neutral suspended state;
+- **every authoritative employer mutation path is blocked** — every `SECURITY DEFINER` employer/vacancy/verification/onboarding-mutating RPC, **and** every existing authenticated own-profile `UPDATE` path on `employer_profiles`, closed by narrowing the `employer_profiles_update_own` RLS policy itself (not achievable by RPC-body checks alone, since those paths never call an RPC);
+- **application status transitions are blocked** — `transition_current_employer_application_status` returns its existing `employer_unavailable` result while suspended;
+- **employer applicant list/detail access is blocked** — `list_current_employer_applications` returns zero rows and `get_current_employer_application` returns `{"status":"unavailable"}`, both reusing existing deny-branch results, while suspended;
+- **no candidate snapshot is returned** to a suspended employer through any Slice 6 employer-review RPC, for as long as the suspension is active;
+- candidate-owned application/history views (Slice 6 candidate side) are **unaffected** — a candidate can still see their own application and its status timeline regardless of the employer's suspension state;
+- operator moderation/audit surfaces continue to work regardless of any employer's suspension state;
+- **unsuspension restores ordinary employer access** according to the employer's *current live* verification/vacancy/application states at the moment of unsuspension — it does not resurrect or replay any state that changed, or would have changed, during the suspension window;
+- **suspension itself does not mutate `verification_state`**;
+- **suspension itself does not mutate any `applications.status` value**;
+- **suspension itself does not rewrite any `vacancies.publication_state` value** — a currently-published vacancy stays `published` in the database; suspension never touches stored lifecycle state;
+- **all of the suspended employer's vacancies nonetheless become non-effective-public while the suspension is active** — achieved without rewriting `publication_state`: the canonical `is_vacancy_effectively_public` predicate gains an independent `employer_not_suspended` condition, composed the same way vacancy moderation (D-073) already narrows the same predicate: `effective_public = existing_conditions AND employer_not_suspended AND vacancy_not_moderated`. Every public/candidate read and write path that delegates to that one predicate (public list/detail, candidate match list/detail, application submission) is covered automatically, with no candidate-facing "employer suspended" reason exposed — a suspended employer's vacancy is simply the existing `'unavailable'` discriminant, the same one already used for paused/expired/withdrawn/unverified-employer vacancies;
+- **unsuspension does not republish anything and does not restore any captured state** — it only removes the suspension gate; each vacancy becomes visible again solely if its current live publication/verification/expiry/moderation state independently qualifies it.
+
+Suspension is independent of `verification_state`; suspending does not itself change verification, and revoking verification does not itself suspend. This is a **stronger** hold than verification revocation — an explicit operator safety action against an actor already judged unsafe, not a trust-gate reset.
+
+**Alternatives:** Reuse `verification_state = 'revoked'` for suspension (rejected — conflates two different concepts with different reversal rules); block Auth login (rejected for MVP — would require deeper Auth-hook work not evidenced as necessary; RLS/RPC-layer enforcement is sufficient for the stated exit criterion); exempt Slice 6 applicant-review access from suspension by analogy to D-070's revocation precedent (rejected — this was the original, now-corrected error; a suspended employer's continued candidate-snapshot access is a real privacy exposure); enforce suspension only via RPC-body checks (rejected — would leave direct-table `employer_profiles` update paths completely unblocked); leave public/candidate visibility unaffected by suspension, blocking only mutations and reads (rejected — this was the original, now-corrected error; an operator-judged-unsafe employer's vacancies remaining publicly discoverable and applicable-to defeats the purpose of the safety hold).
+
+**Consequences:** One new small table with a real FK to `employer_profiles`; every employer-mutating RPC and all three Slice 6 employer RPCs gain one additional internal check; **one existing RLS policy (`employer_profiles_update_own`) is narrowed** — a real, if small, RLS change, stated explicitly rather than claimed as "no RLS changes"; the canonical `is_vacancy_effectively_public` predicate also gains one additional condition — a `SECURITY DEFINER` function-body change, not a further RLS change — which every public/candidate read and write path inherits automatically by delegation, with no per-path duplication and no new candidate-facing "suspended" oracle.
+
+**Acceptance note:** Accepted 2026-08-07 by repository owner for PR 7.1 decision lock, after two corrective review passes: the first added the direct-table/RLS mutation-path coverage and Slice 6 applicant-review denial; the second added the effective-public employer-suspension visibility gate.
+
+## D-073 — Vacancy moderation semantics
+
+**Status:** Accepted
+**Accepted:** 2026-08-07
+**Must accept before:** PR 7.2
+
+**Context:** No operator-initiated, single-vacancy hold exists today. The closest existing mechanism (revoking the owning employer's verification) has blast radius across every published vacancy that employer owns, not one specific unsafe listing, and none of the six existing `publication_state` values cleanly represents an operator hold without overloading employer-controlled semantics (`docs/41` §4).
+
+**Decision:** A new, independent vacancy-moderation state (`vacancy_moderation` table), composing with rather than replacing `publication_state`. The canonical `is_vacancy_effectively_public` predicate gains one additive narrowing condition: a vacancy is never effectively public while moderated, regardless of its `publication_state`. Restoration re-reads the vacancy's *current* live `publication_state` rather than assuming a prior one, so a since-withdrawn vacancy is not resurrected by restoration alone. Operator-authored moderation events are written to the new general audit ledger (D-074), never to `vacancy_lifecycle_events` (whose owner-readable RLS would leak the operator's identity to the employer being moderated).
+
+Employer suspension (D-072) and vacancy moderation (D-073) are kept as two separate, deliberately not collapsed, concepts: suspension is an **actor-level** safety gate narrowing visibility for every vacancy a suspended employer owns; moderation is a **vacancy-level** safety gate narrowing visibility for one specific vacancy regardless of who owns it. Both compose into the same canonical predicate without either subsuming the other:
+
+```
+effective_public =
+  existing_publication_conditions
+  AND employer_not_suspended   -- D-072
+  AND vacancy_not_moderated    -- D-073
+```
+
+Both conditions can independently be true or false for the same vacancy (a moderated vacancy owned by a suspended employer is hidden by both; restoring only one leaves it hidden by the other).
+
+**Alternatives:** Overload `withdrawn` or `paused` for moderation (rejected — both remain employer-reversible via existing RPCs, which would let an employer silently undo an operator's moderation hold); write moderation events into `vacancy_lifecycle_events` (rejected — that table's RLS already exposes `actor_user_id` to the owning employer).
+
+**Consequences:** One new small table; one additive (narrowing-only) change to the single canonical `is_vacancy_effectively_public` predicate, inherited by delegation across every public/candidate read and write function that depends on it, with every existing pgTAP assertion about them required to keep passing unchanged.
+
+**Acceptance note:** Accepted 2026-08-07 by repository owner for PR 7.1 decision lock.
+
+## D-074 — Admin audit ledger architecture
+
+**Status:** Accepted
+**Accepted:** 2026-08-07
+**Must accept before:** PR 7.2
+
+**Context:** D-065 explicitly deferred the general `audit_events` platform to Slice 7 rather than building it in Slice 5. No such table exists today. Two narrower audit patterns already exist and diverge: `vacancy_lifecycle_events` (owner-readable RLS, closed event-type enum) and `application_status_history` (zero-grant, RPC-mediated, actor never client-exposed).
+
+**Decision:** One general, append-only `admin_audit_events` ledger, following `application_status_history`'s zero-`authenticated`-grant, RPC-mediated pattern — not `vacancy_lifecycle_events`'s owner-readable pattern. Fields: `id`, `event_type`, `target_kind`, `target_id`, `actor_user_id`, `occurred_at`, `reason`, bounded `metadata`. `event_type` is the closed action/event discriminator (`employer_suspended | employer_unsuspended | vacancy_moderated | vacancy_restored | verification_approved | verification_rejected | verification_revoked`); `target_kind` is an independently bounded enum (`employer | vacancy`) — **not** the same field as `event_type`, and not derived from it by string matching. Covers employer suspend/unsuspend, vacancy moderate/restore, and re-emits verification approve/reject/revoke as first-class events from the three already-shipped Slice 5 RPCs, whose parameters/result contracts/existing pgTAP assertions remain unchanged.
+
+`event_type`/`target_kind` pairing is declaratively **CHECK-constrained** — both columns live in the same row (unlike `target_id`'s cross-table problem below), so their legal pairing is an ordinary same-row CHECK, the same class already used for `application_status_history`'s `reason`/`to_status` pairing: `target_kind = 'employer'` only for `event_type in ('employer_suspended', 'employer_unsuspended', 'verification_approved', 'verification_rejected', 'verification_revoked')`; `target_kind = 'vacancy'` only for `event_type in ('vacancy_moderated', 'vacancy_restored')`.
+
+`target_id` existence has **no polymorphic FK and no cross-table CHECK** — PostgreSQL CHECK constraints cannot perform cross-table existence queries. Referential integrity for `target_id` is procedural instead: every audit-producing RPC resolves and locks its target *before* writing the event; `target_kind` is hard-coded per RPC, never caller-supplied (and additionally constrained by the same-row CHECK above); `target_id` is the id of the row the RPC just locked, never a separately re-typed parameter; **there is no generic client-callable "append an audit event" RPC** — every event is a side effect of a specific, already-authorized domain RPC. The implementation PR's pgTAP suite must prove this behaviorally: an invalid `event_type`/`target_kind` pairing is rejected by the table CHECK directly; a valid pairing succeeds only through an approved domain RPC; a nonexistent target cannot create an event through any approved RPC; `target_kind` cannot be caller-supplied independently by any domain RPC; actor/timestamp remain DB-derived; no direct `authenticated` INSERT/UPDATE/DELETE succeeds against the table.
+
+Actor and timestamp are always DB-derived (`auth.uid()`, `clock_timestamp()`); reason is required for punitive event types, optional/absent for restorative ones; no event's `reason` is exposed to the moderated employer or any candidate by default. State transition and its audit event are written atomically, sharing one captured timestamp — the Slice 6 shared-timestamp pattern, re-proven for this table.
+
+**Retention is deliberately not `ON DELETE CASCADE` from the target.** `target_id` remains historical evidence even if the employer/vacancy row it refers to is later deleted — this decision does not decide Slice 8's final GDPR retention/deletion policy, but locks the constraint Slice 8 must respect: Slice 8 must explicitly reconcile administrative-audit retention with account-deletion requirements, and the implementing PR must not accidentally erase the ledger merely because a domain row is deleted. This is distinct from the two *current-state* tables (`employer_suspension`, `vacancy_moderation`), which legitimately use real FKs with `on delete cascade`, since they represent live state tied to a still-existing row, not durable cross-domain audit history.
+
+**Alternatives:** Extend domain-specific histories only (rejected — `vacancy_lifecycle_events`'s existing RLS is unsuitable for operator actions without either weakening it per-row or building a second table anyway); land the full general ledger in Slice 5 instead (rejected already, by D-065, prior to this decision); a literal polymorphic foreign key or cross-table CHECK on `target_id` (rejected — not implementable in PostgreSQL; procedural integrity via the RPC boundary is the corrected design).
+
+**Consequences:** One new table with no FK to any domain table (by design — see retention above), but with a same-row `event_type`/`target_kind` CHECK constraint; three existing Slice 5 RPCs gain one additional insert each inside their existing transactions, with no change to their external contracts; the implementing PR's pgTAP suite carries the full `target_id`-existence integrity burden that a declarative constraint cannot express, while the CHECK constraint carries the `event_type`/`target_kind` pairing burden declaratively.
+
+**Acceptance note:** Accepted 2026-08-07 by repository owner for PR 7.1 decision lock, after two corrective review passes: the first withdrew an unimplementable cross-table CHECK claim for `target_id` and moved to procedural integrity; the second added the declarative same-row `event_type`/`target_kind` CHECK.
+
+## D-075 — Slice 7 pilot-readiness scope (reports, analytics, email, legal)
+
+**Status:** Accepted
+**Accepted:** 2026-08-07
+**Must accept before:** PR 7.4 (does not block PR 7.2/7.3)
+
+**Context:** `docs/13-implementation-plan.md`'s Slice 7 entry also lists reports, stale-vacancy handling, transactional-email completeness, basic funnel analytics, and (via `docs/04-mvp.md`'s Administration MVP) implies legal/privacy readiness. `docs/41` audited each and found the current state is zero integration for analytics/email/legal, and no report-intake schema, while stale-vacancy handling is already fully solved by existing Slice 5 expiry/renewal.
+
+**Decision:** Reports: operator-initiated moderation only (D-072/D-073's suspend/moderate RPCs), no user-submitted report-intake UI in Slice 7. Stale-vacancy handling: no new subsystem — existing expiry/renewal already satisfies it. **Analytics: no third-party integration in Slice 7 — but the "pilot funnel events are measurable" exit criterion is not deferred along with it.** It is proven instead by a concrete, committed deliverable: a deterministic, read-only funnel-proof script (proposed `scripts/proof/pilot-funnel.mts` or a final agreed equivalent name), running one query per accepted funnel stage against existing tables/columns only, plus a documented sample run recorded in the Slice 7 exit-proof doc. Deferring PostHog is explicitly not the same decision as deferring measurability — this decision exists specifically so that distinction is never silently collapsed. Transactional email: none added in Slice 7 for candidates or employers (unchanged from D-070's own notification non-goal); no operator-facing email either, since it is not required to meet the stated exit criteria. Legal/privacy: route placeholders + footer links with explicit "draft — legal review required" text only, in a small final PR (7.4), containing no real legal content and no claim of legal review.
+
+**Alternatives:** Build a full user-submitted report/ticketing workflow now (rejected — no pilot evidence of need, disproportionate for a founder-operated, controlled Berlin pilot); integrate PostHog or similar now (rejected — existing DB evidence already satisfies "measurable" for pilot scale; introduces an unreviewed privacy/consent surface); treat "no PostHog" as "no funnel measurement" and drop the exit criterion entirely (rejected — the exit criterion is binding regardless of which mechanism proves it); add status-change emails now (rejected — D-070 already excluded notifications as a Slice 6 non-goal, and the core journeys already work without email).
+
+**Consequences:** The implementing PR is small and low-risk (static routes + one read-only proof script); the "pilot funnel events are measurable" exit criterion is met with a named, verifiable deliverable rather than an implicit claim; a future slice may still add live product analytics or transactional email as its own, separately-decided feature.
+
+**Acceptance note:** Accepted 2026-08-07 by repository owner for PR 7.1 decision lock; must be re-confirmed (not reopened) before PR 7.4, per its "Must accept before" gate.
+
 **Acceptance note:** Accepted 2026-08-06 by repository owner for PR 6.1 implementation.

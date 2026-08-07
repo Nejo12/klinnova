@@ -8,12 +8,12 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 
 | Field | Value |
 |-------|--------|
-| Active milestone | M3 — Employer flow |
-| Active slice | Slice 6 — Applicant review to status update |
-| Slice status | Slice 5 Done (PR 5.1–5.5d all merged; D-055–D-069 Accepted). Slice 6: D-070 Accepted; **PR 6.1 Done** (merged PR #60, `a3e0a28ba8295cee501bf631cab591a0ef86d33f`); **PR 6.2 Done** (merged PR #61, `8237d92c90fee2d93e522a0bc3733f5b743c9847`); **PR 6.3 Done** (merged PR #62, `aef3cf2e743e0d05d99ea6bb9dff61353c36b59f`) — migration count 12. **PR 6.4 (exit proof, hosted-proof runbook, closure) in progress before merge (this unit)** — Slice 6 local implementation complete; local exit proof PASS (`docs/39-slice-6-exit-proof.md`); D-070 audited against merged main with no contradiction found. |
-| Next unit | PR 6.4 (in progress, this unit) — full local exit proof (format/lint/typecheck/build/Vitest/pgTAP/migration/type-drift/E2E, all green at accepted counts), a D-070-to-implementation audit finding no contradiction, `docs/39-slice-6-exit-proof.md`, and a disposable hosted-proof runbook (`docs/40-slice-6-hosted-proof-runbook.md`) that is **not executed** in this PR — no migration, no runtime code change, no candidate withdrawal, no notifications, no interview scheduling. Hosted disposable proof remains a controlled, separately authorized follow-up if still required before Slice 6 can be marked Done. After PR 6.4 merges: await explicit direction for the next unit — do not assume Slice 7 begins automatically. |
-| Next slice | Slice 7 — general admin/audit platform (**not started**) |
-| Blockers | Preview has no Preview-scoped Supabase configuration (re-isolate before any Slice 6 hosted proof — known gap, unchanged by PR 6.4). Hosted Demo fixtures remain in Production until 2026-09-02. |
+| Active milestone | M4 — Trust and beta readiness |
+| Active slice | Slice 7 — Admin moderation to audit event (Trust ops) |
+| Slice status | Slice 6 complete locally (PR #59–#63 all merged; D-070 Accepted; local exit proof PASS — `docs/39-slice-6-exit-proof.md`). Hosted Slice 6 proof remains deferred, not executed (`docs/40-slice-6-hosted-proof-runbook.md` is a runbook only). Slice 7: planning **Accepted** — discovery/build-plan/proposal package `docs/41`–`docs/43` locked; decisions D-071–D-075 **Accepted** 2026-08-07 after two corrective review passes. PR 7.1 (this planning unit) is ready for/under final merge. Slice 7 *implementation* has **not** started. |
+| Next unit | PR 7.1 ready for/under final merge (Slice 7 discovery `docs/41`, build plan `docs/42`, moderation/audit proposal `docs/43`, D-071–D-075 recorded Accepted in `docs/10-decisions.md`). Docs only — no migration, no runtime code, no RPCs, no UI, no hosted operations. After PR 7.1 merges: **PR 7.2 — admin moderation/audit database contract** is the next implementation unit (not started). |
+| Next slice | Slice 8 — Account deletion to confirmed data removal (**not started**) |
+| Blockers | Preview remains intentionally unconfigured (no Preview-scoped Supabase configuration; re-isolate before any future hosted proof — known gap, unchanged by this unit). Production remains untouched by Slice 7 planning. Hosted Demo fixtures remain in Production until 2026-09-02. |
 
 ## Slice 4 delivery (complete)
 
@@ -37,7 +37,8 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | Production authorization | Not used / not granted for Slice 4 hosted proof |
 | Publication / verification | Accepted contracts (D-055–D-067); PR 5.2 database foundation in progress |
 | Slice 5 | Active; PR 5.1 Done; PR 5.2 in progress |
-| Slice 6 / Slice 7 / Slice 8 | Not started |
+| Slice 6 | Complete locally; hosted proof deferred |
+| Slice 7 / Slice 8 | Slice 7 planning Accepted (D-071–D-075, PR 7.1 ready for/under final merge); Slice 8 not started |
 
 ## Slice 5 delivery (active)
 
@@ -63,7 +64,8 @@ Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implem
 | Preview isolated environment | Not configured |
 | Production | Untouched for Slice 5 |
 | Publication / verification approval UI (full admin) | Slice 7 (not started) |
-| Applicant review | Slice 6 — D-070 Accepted; PR 6.1 database contract Done (PR #60); PR 6.2 employer applicant review UI Done (PR #61); PR 6.3 candidate application status UI Done (PR #62); PR 6.4 exit proof/closure in progress (this unit) — local implementation complete, hosted proof deferred |
+| Applicant review | Slice 6 — D-070 Accepted; PR 6.1–6.4 all merged (#60–#63); complete locally, hosted proof deferred |
+| Admin moderation / audit | Slice 7 — planning Accepted; `docs/41`–`docs/43` locked; D-071–D-075 Accepted 2026-08-07; PR 7.1 ready for/under final merge; implementation (PR 7.2) not started |
 
 ## Slice 3 delivery (complete)
 
@@ -168,8 +170,8 @@ Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
 | 4 Employer draft | Register → draft vacancy | Done — PR 4.1–4.5 merged (#41–#45); local + Preview/disposable hosted proof complete; publication not started |
 | 5 Verification → public vacancy | Verified publish + lifecycle | Active — D-055–D-067 Accepted; PR 5.1 Done; PR 5.2 in progress |
 | 5 Publish | Verification → public vacancy | Not started |
-| 6 Review | Applicant review → status update | Active — D-070 Accepted; PR 6.1 Done; PR 6.2 Done; PR 6.3 Done; PR 6.4 exit proof/closure in progress; local implementation complete, hosted proof deferred |
-| 7 Trust ops | Admin moderation → audit | Not started |
+| 6 Review | Applicant review → status update | Complete locally (PR #59–#63 merged); D-070 Accepted; hosted proof deferred |
+| 7 Trust ops | Admin moderation → audit | Active — planning Accepted; `docs/41`–`docs/43` locked; D-071–D-075 Accepted 2026-08-07; PR 7.1 ready for/under final merge; PR 7.2 not started |
 | 8 Deletion | Export/delete → confirmed removal | Not started |
 
 ## Decision discipline

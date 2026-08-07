@@ -156,6 +156,16 @@ re-isolation (`docs/33`, D-067). Slice 6 / 7 / 8 have not started.
 
 **Includes:** admin authorization; employer review/approval; vacancy moderation; reports; suspension; stale-vacancy handling; audit events; transactional email completeness; privacy/terms/Impressum placeholders; basic funnel analytics.
 
+**Planning status:** Discovery/build-plan/proposal package `docs/41`–`docs/43`
+locked; decisions D-071–D-075 **Accepted** 2026-08-07. PR 7.1 records
+acceptance (docs only). Employer review/approval is already Done (Slice 5).
+The first Slice 7 implementation contract is narrower than the broad list
+above — see `docs/42-slice-7-build-plan.md` and D-071–D-075 for the locked
+boundary and the reasoning for each narrowing. This line preserves the
+original broad intent; it is not silently edited. Slice 7 product
+implementation has **not** started. **PR 7.2 is not authorized until PR 7.1
+merges.** Slice 8 has not started.
+
 **Exit criteria:**
 
 - administrators can suspend unsafe actors and remove vacancies
