@@ -37,11 +37,29 @@ function form(data: Record<string, string>): FormData {
   return formData;
 }
 
-function mockUpdateChain(error: { code?: string; message?: string } | null) {
-  const eqType = vi.fn().mockResolvedValue({ error });
-  const eqId = vi.fn(() => ({ eq: eqType }));
-  const update = vi.fn(() => ({ eq: eqId }));
-  return { update, eqId, eqType };
+/**
+ * Mirrors the real Supabase query-builder chain shape
+ * `.update(...).eq(...).eq(...)?.select("id").maybeSingle()` —
+ * `.eq()` is chainable any number of times, `.select()` terminates into
+ * `.maybeSingle()`, which is what actually resolves. `data` defaults to a
+ * non-null row (a real row was affected) unless the test asks for a
+ * zero-row result explicitly.
+ */
+function mockUpdateChain(
+  error: { code?: string; message?: string } | null,
+  data: { id: string } | null = { id: "user-1" },
+) {
+  const maybeSingle = vi
+    .fn()
+    .mockResolvedValue({ data: error === null ? data : null, error });
+  const select = vi.fn(() => ({ maybeSingle }));
+  const chain: { eq: ReturnType<typeof vi.fn>; select: typeof select } = {
+    eq: vi.fn(),
+    select,
+  };
+  chain.eq.mockReturnValue(chain);
+  const update = vi.fn(() => chain);
+  return { update, eq: chain.eq, select, maybeSingle };
 }
 
 describe("employer onboarding actions", () => {
@@ -51,6 +69,10 @@ describe("employer onboarding actions", () => {
     rpc.mockReset();
     ensureEmployerProfile.mockReset();
     redirect.mockClear();
+    // is_current_employer_suspended() defaults to "not suspended" for
+    // every test unless overridden — this is the pre-check every direct
+    // employer_profiles UPDATE now performs first.
+    rpc.mockResolvedValue({ data: false, error: null });
   });
 
   it("rejects unauthenticated type selection", async () => {
@@ -142,18 +164,77 @@ describe("employer onboarding actions", () => {
     );
   });
 
+  it("does not attempt the UPDATE and returns a restricted state when already suspended", async () => {
+    getUser.mockResolvedValue({
+      data: { user: { id: "user-1" } },
+      error: null,
+    });
+    rpc.mockResolvedValue({ data: true, error: null });
+    const chain = mockUpdateChain(null);
+    from.mockReturnValue(chain);
+
+    const state = await savePrivateEmployerAction(
+      { error: null, message: null },
+      form({
+        displayName: "Ada",
+        berlinLocality: "Mitte",
+        phone: "",
+        website: "",
+        lawfulHiringDeclared: "yes",
+      }),
+    );
+
+    expect(state.message).toBeNull();
+    expect(state.error).toMatch(/restricted/i);
+    expect(chain.update).not.toHaveBeenCalled();
+  });
+
+  it("returns a restricted state, not a false success, when the UPDATE affects zero rows", async () => {
+    getUser.mockResolvedValue({
+      data: { user: { id: "user-1" } },
+      error: null,
+    });
+    // Pre-check passes (not suspended), but the UPDATE itself returns zero
+    // rows and a re-check now reports suspended — the exact race this
+    // fixes.
+    rpc
+      .mockResolvedValueOnce({ data: false, error: null })
+      .mockResolvedValueOnce({ data: true, error: null });
+    const chain = mockUpdateChain(null, null);
+    from.mockReturnValue(chain);
+
+    const state = await savePrivateEmployerAction(
+      { error: null, message: null },
+      form({
+        displayName: "Ada",
+        berlinLocality: "Mitte",
+        phone: "",
+        website: "",
+        lawfulHiringDeclared: "yes",
+      }),
+    );
+
+    expect(state.message).toBeNull();
+    expect(state.error).toMatch(/restricted/i);
+  });
+
   it("bootstraps organisation via RPC without owner inputs", async () => {
     getUser.mockResolvedValue({
       data: { user: { id: "user-1" } },
       error: null,
     });
-    rpc.mockResolvedValue({
-      data: {
-        status: "ok",
-        employer_id: "11111111-1111-4111-8111-111111111111",
-        company_id: "22222222-2222-4222-8222-222222222222",
-      },
-      error: null,
+    rpc.mockImplementation((name: string) => {
+      if (name === "bootstrap_organisation_employer") {
+        return Promise.resolve({
+          data: {
+            status: "ok",
+            employer_id: "11111111-1111-4111-8111-111111111111",
+            company_id: "22222222-2222-4222-8222-222222222222",
+          },
+          error: null,
+        });
+      }
+      return Promise.resolve({ data: false, error: null });
     });
 
     const state = await saveOrganisationEmployerAction(
@@ -175,7 +256,10 @@ describe("employer onboarding actions", () => {
         p_company_slug: "ada-care-test",
       }),
     );
-    const args = rpc.mock.calls[0]?.[1] as Record<string, unknown>;
+    const call = rpc.mock.calls.find(
+      ([name]) => name === "bootstrap_organisation_employer",
+    );
+    const args = call?.[1] as Record<string, unknown>;
     expect(args).not.toHaveProperty("owner_employer_id");
     expect(args).not.toHaveProperty("source");
   });
@@ -185,9 +269,14 @@ describe("employer onboarding actions", () => {
       data: { user: { id: "user-1" } },
       error: null,
     });
-    rpc.mockResolvedValue({
-      data: { status: "conflict_unique" },
-      error: null,
+    rpc.mockImplementation((name: string) => {
+      if (name === "bootstrap_organisation_employer") {
+        return Promise.resolve({
+          data: { status: "conflict_unique" },
+          error: null,
+        });
+      }
+      return Promise.resolve({ data: false, error: null });
     });
 
     const state = await saveOrganisationEmployerAction(
@@ -222,9 +311,14 @@ describe("employer onboarding actions", () => {
       }
       return {};
     });
-    rpc.mockResolvedValue({
-      data: { status: "completed", already_complete: false },
-      error: null,
+    rpc.mockImplementation((name: string) => {
+      if (name === "complete_employer_onboarding") {
+        return Promise.resolve({
+          data: { status: "completed", already_complete: false },
+          error: null,
+        });
+      }
+      return Promise.resolve({ data: false, error: null });
     });
 
     await expect(
@@ -239,5 +333,47 @@ describe("employer onboarding actions", () => {
     ).rejects.toThrow("REDIRECT:/employer");
 
     expect(rpc).toHaveBeenCalledWith("complete_employer_onboarding");
+  });
+
+  it("maps an unavailable completion result to a restricted state", async () => {
+    getUser.mockResolvedValue({
+      data: { user: { id: "user-1" } },
+      error: null,
+    });
+
+    const maybeSingle = vi.fn().mockResolvedValue({
+      data: { employer_type: "private" },
+      error: null,
+    });
+    const eq = vi.fn(() => ({ maybeSingle }));
+    const select = vi.fn(() => ({ eq }));
+    const chain = mockUpdateChain(null);
+    from.mockImplementation((table: string) => {
+      if (table === "employer_profiles") {
+        return { select, update: chain.update };
+      }
+      return {};
+    });
+    rpc.mockImplementation((name: string) => {
+      if (name === "complete_employer_onboarding") {
+        return Promise.resolve({
+          data: { status: "unavailable" },
+          error: null,
+        });
+      }
+      return Promise.resolve({ data: false, error: null });
+    });
+
+    const state = await completeEmployerOnboardingAction(
+      { error: null, message: null },
+      form({
+        displayName: "Ada",
+        berlinLocality: "Mitte",
+        lawfulHiringDeclared: "yes",
+      }),
+    );
+
+    expect(state.error).toMatch(/restricted/i);
+    expect(redirect).not.toHaveBeenCalled();
   });
 });

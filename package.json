@@ -25,6 +25,7 @@
     "test:e2e:candidate-integration": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/matches-journey.spec.ts e2e/job-detail-journey.spec.ts",
     "test:e2e:employer-applications": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/employer-applicant-review-journey.spec.ts",
     "test:e2e:candidate-applications": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/candidate-application-status-journey.spec.ts",
+    "test:e2e:admin-moderation": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/admin-moderation.spec.ts",
     "proof:migrations": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/proof/migration-inventory.mts",
     "proof:slice4": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/proof/slice4.mts",
     "fixtures:hosted:apply": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/fixtures/hosted-demo.mts apply",

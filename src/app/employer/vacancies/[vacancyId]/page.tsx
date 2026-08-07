@@ -5,6 +5,7 @@ import styles from "@/components/employer-vacancies/employer-vacancies.module.sc
 import { VacancyDetail } from "@/components/employer-vacancies/vacancy-detail";
 import { VacancyUnavailable } from "@/components/employer-vacancies/vacancy-unavailable";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
+import { loadCurrentEmployerSuspensionStatus } from "@/lib/employer/suspension-guard";
 import { loadEmployerVacancy } from "@/lib/employer/vacancies/load-employer-vacancy";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -45,6 +46,8 @@ export default async function EmployerVacancyDetailPage({
   }
 
   const capabilities = await loadAccountCapabilities(supabase);
+  const suspension = await loadCurrentEmployerSuspensionStatus(supabase);
+  const suspended = suspension.ok && suspension.suspended;
 
   return (
     <main className={styles.page}>
@@ -54,7 +57,7 @@ export default async function EmployerVacancyDetailPage({
         currentPath="vacancies"
       />
       <h1 className={styles.heading}>{loaded.vacancy.title}</h1>
-      <VacancyDetail vacancy={loaded.vacancy} />
+      <VacancyDetail vacancy={loaded.vacancy} suspended={suspended} />
     </main>
   );
 }

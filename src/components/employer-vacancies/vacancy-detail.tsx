@@ -5,6 +5,7 @@ import styles from "@/components/employer-vacancies/employer-vacancies.module.sc
 import { ReadinessChecklist } from "@/components/employer-vacancies/readiness-checklist";
 import { VacancyLifecycleActions } from "@/components/employer-vacancies/vacancy-lifecycle-actions";
 import { VacancyLifecycleStatus } from "@/components/employer-vacancies/vacancy-lifecycle-status";
+import { EmployerRestrictedNotice } from "@/components/employer-shared/employer-restricted-notice";
 import {
   SALARY_PERIOD_OPTIONS,
   WORK_FREQUENCY_OPTIONS,
@@ -12,6 +13,7 @@ import {
 } from "@/lib/employer/vacancies/allow-lists";
 import type { EmployerVacancyDetail } from "@/lib/employer/vacancies/load-employer-vacancy";
 import { centsToEurString } from "@/lib/employer/vacancies/salary";
+import { EMPLOYER_RESTRICTED_ACTION } from "@/lib/employer/messages";
 import {
   jobCategoryLabel,
   languageLabel,
@@ -25,6 +27,7 @@ import type {
 
 type VacancyDetailProps = {
   vacancy: EmployerVacancyDetail;
+  suspended?: boolean;
 };
 
 function labelFromOptions(
@@ -37,19 +40,27 @@ function labelFromOptions(
   return options.find((option) => option.code === code)?.label ?? code;
 }
 
-export function VacancyDetail({ vacancy }: VacancyDetailProps) {
+export function VacancyDetail({
+  vacancy,
+  suspended = false,
+}: VacancyDetailProps) {
   const salarySummary =
     vacancy.salaryAmountCents !== null && vacancy.salaryPeriod !== null
       ? `€${centsToEurString(vacancy.salaryAmountCents)} ${labelFromOptions(vacancy.salaryPeriod, SALARY_PERIOD_OPTIONS)}${vacancy.salaryIsGross === true ? " gross" : ""}`
       : "Not set";
 
   const editable =
-    vacancy.publicationState === "draft" ||
-    vacancy.publicationState === "paused";
+    !suspended &&
+    (vacancy.publicationState === "draft" ||
+      vacancy.publicationState === "paused");
 
   return (
     <>
       <VacancyLifecycleStatus vacancy={vacancy} />
+
+      {suspended ? (
+        <EmployerRestrictedNotice message={EMPLOYER_RESTRICTED_ACTION} />
+      ) : null}
 
       <p className={styles.actions}>
         {editable ? (
@@ -163,13 +174,15 @@ export function VacancyDetail({ vacancy }: VacancyDetailProps) {
         />
       ) : null}
 
-      <VacancyLifecycleActions
-        vacancyId={vacancy.id}
-        publicationState={vacancy.publicationState}
-        isEffectivelyExpired={vacancy.isEffectivelyExpired}
-      />
+      {suspended ? null : (
+        <VacancyLifecycleActions
+          vacancyId={vacancy.id}
+          publicationState={vacancy.publicationState}
+          isEffectivelyExpired={vacancy.isEffectivelyExpired}
+        />
+      )}
 
-      {vacancy.publicationState === "draft" ? (
+      {!suspended && vacancy.publicationState === "draft" ? (
         <DeleteDraftForm vacancyId={vacancy.id} title={vacancy.title} />
       ) : null}
     </>

@@ -1,13 +1,15 @@
 # Slice 7 Build Plan — Admin Moderation to Audit Event
 
-> **Status:** Planning Accepted. PR 7.1 (this document + `docs/41`/`docs/43`
-> + `docs/10-decisions.md`) records the acceptance; no implementation PR has
-> started. Discovery: `docs/41-slice-7-discovery.md`. Moderation/audit
-> proposal: `docs/43-slice-7-moderation-and-audit-proposal.md`. Decisions
-> D-071–D-075 below (see "Accepted decisions" at the end of this document)
-> are **Accepted** (2026-08-07) in `docs/10-decisions.md`, the authoritative
-> record — the text here is retained as full supporting rationale/history,
-> not re-litigated. **PR 7.2 is authorized only after PR 7.1 merges.**
+> **Status:** Planning Accepted; PR 7.1 merged (#64); PR 7.2 (database
+> contract) merged (#65); PR 7.3 (employer/vacancy moderation UI) is
+> implementation-complete locally, awaiting review/merge — no new migration,
+> migration count remains 13, pgTAP remains 1136/1136. PR 7.4 (analytics/
+> legal, if any) has not started. Discovery: `docs/41-slice-7-discovery.md`.
+> Moderation/audit proposal: `docs/43-slice-7-moderation-and-audit-proposal.md`.
+> Decisions D-071–D-075 below (see "Accepted decisions" at the end of this
+> document) are **Accepted** (2026-08-07) in `docs/10-decisions.md`, the
+> authoritative record — the text here is retained as full supporting
+> rationale/history, not re-litigated.
 
 **Outcome (`docs/13-implementation-plan.md`, unchanged):** Stint can be
 operated safely for a controlled Berlin pilot.
@@ -92,7 +94,7 @@ founder-dashboard update.
 
 ### PR 7.2 — Admin moderation/audit database contract
 
-**Status:** Implementation complete locally, awaiting review/merge. One
+**Status:** Merged (PR #65). One
 additive migration (13th,
 `20260807090000_admin_moderation_and_audit_contract.sql`) and one new
 pgTAP file (`29_admin_moderation_and_audit_contract_test.sql`, 222
@@ -214,6 +216,10 @@ regenerate cleanly; no regression in the existing 914 assertions.
 ---
 
 ### PR 7.3 — Employer/vacancy moderation UI
+
+**Status:** Implementation complete locally, awaiting review/merge. No new
+migration — built entirely on the merged PR 7.2 operator RPCs; migration
+count remains 13, pgTAP remains 1136/1136, generated types unchanged.
 
 **Objective:** the smallest operator-usable UI on top of PR 7.2's RPCs,
 extending `/internal/verification`'s established architecture rather than

@@ -1,9 +1,11 @@
 import { redirect } from "next/navigation";
 
+import { EmployerRestrictedNotice } from "@/components/employer-shared/employer-restricted-notice";
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import { VacancyList } from "@/components/employer-vacancies/vacancy-list";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
+import { loadCurrentEmployerSuspensionStatus } from "@/lib/employer/suspension-guard";
 import { loadEmployerDrafts } from "@/lib/employer/vacancies/load-employer-drafts";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -28,6 +30,8 @@ export default async function EmployerVacanciesPage() {
   }
 
   const capabilities = await loadAccountCapabilities(supabase);
+  const suspension = await loadCurrentEmployerSuspensionStatus(supabase);
+  const suspended = suspension.ok && suspension.suspended;
 
   return (
     <main className={styles.page}>
@@ -37,6 +41,7 @@ export default async function EmployerVacanciesPage() {
         currentPath="vacancies"
       />
       <h1 className={styles.heading}>Vacancy drafts</h1>
+      {suspended ? <EmployerRestrictedNotice /> : null}
       <VacancyList drafts={loaded.drafts} />
     </main>
   );

@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { EmployerRestrictedNotice } from "@/components/employer-shared/employer-restricted-notice";
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
 import { VerificationRequestForm } from "@/components/employer-verification/verification-request-form";
 import styles from "@/components/employer-verification/employer-verification.module.scss";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadEmployerProfile } from "@/lib/employer/load-employer";
+import { EMPLOYER_RESTRICTED_VERIFICATION } from "@/lib/employer/messages";
+import { loadCurrentEmployerSuspensionStatus } from "@/lib/employer/suspension-guard";
 import {
   VERIFICATION_PENDING_LEAD,
   VERIFICATION_REJECTED_LEAD,
@@ -66,6 +69,10 @@ export default async function EmployerVerificationPage() {
   const requestedAt = formatTimestamp(view.requestedAt);
   const reviewedAt = formatTimestamp(view.reviewedAt);
 
+  const suspension = await loadCurrentEmployerSuspensionStatus(supabase);
+  const suspended = suspension.ok && suspension.suspended;
+  const canRequest = view.canRequest && !suspended;
+
   return (
     <main className={styles.page}>
       <EmployerVacancyPageHeader
@@ -75,6 +82,10 @@ export default async function EmployerVerificationPage() {
       />
 
       <h1 className={styles.heading}>Verification</h1>
+
+      {suspended ? (
+        <EmployerRestrictedNotice message={EMPLOYER_RESTRICTED_VERIFICATION} />
+      ) : null}
 
       {view.status === "unverified" ? (
         <section className={styles.panel} aria-labelledby="verification-status">
@@ -95,7 +106,7 @@ export default async function EmployerVerificationPage() {
             </Link>
           </p>
 
-          {view.canRequest ? (
+          {canRequest ? (
             <VerificationRequestForm
               submitLabel="Request verification"
               pendingLabel="Requesting…"
@@ -175,7 +186,7 @@ export default async function EmployerVerificationPage() {
             </Link>
           </p>
 
-          {view.canRequest ? (
+          {canRequest ? (
             <VerificationRequestForm
               submitLabel="Resubmit verification"
               pendingLabel="Resubmitting…"

@@ -10,6 +10,7 @@ import { ensureEmployerProfile } from "@/lib/employer/ensure-employer-profile";
 import {
   EMPLOYER_COMPLETION_INCOMPLETE,
   EMPLOYER_GENERIC_FAILURE,
+  EMPLOYER_RESTRICTED_ACTION,
   EMPLOYER_UNAUTHENTICATED,
 } from "@/lib/employer/messages";
 import {
@@ -19,6 +20,7 @@ import {
   privateEmployerProfileSchema,
   selectEmployerTypeSchema,
 } from "@/lib/employer/schemas";
+import { updateOwnEmployerProfile } from "@/lib/employer/update-own-profile";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export type EmployerOnboardingActionState = {
@@ -126,9 +128,10 @@ export async function savePrivateEmployerAction(
     return auth.state;
   }
 
-  const { error } = await auth.supabase
-    .from("employer_profiles")
-    .update({
+  const updated = await updateOwnEmployerProfile(
+    auth.supabase,
+    auth.userId,
+    {
       display_name: parsed.data.displayName,
       berlin_locality: parsed.data.berlinLocality,
       phone: parsed.data.phone,
@@ -136,12 +139,12 @@ export async function savePrivateEmployerAction(
       organisation_legal_name: null,
       lawful_hiring_declared: parsed.data.lawfulHiringDeclared,
       updated_at: new Date().toISOString(),
-    })
-    .eq("id", auth.userId)
-    .eq("employer_type", "private");
+    },
+    { employerType: "private" },
+  );
 
-  if (error) {
-    return { error: mapEmployerWriteError(error), message: null };
+  if (!updated.ok) {
+    return { error: updated.error, message: null };
   }
 
   return {
@@ -254,9 +257,10 @@ export async function completeEmployerOnboardingAction(
       };
     }
 
-    const { error } = await auth.supabase
-      .from("employer_profiles")
-      .update({
+    const updated = await updateOwnEmployerProfile(
+      auth.supabase,
+      auth.userId,
+      {
         display_name: parsed.data.displayName,
         berlin_locality: parsed.data.berlinLocality,
         phone: parsed.data.phone,
@@ -264,12 +268,12 @@ export async function completeEmployerOnboardingAction(
         organisation_legal_name: null,
         lawful_hiring_declared: true,
         updated_at: new Date().toISOString(),
-      })
-      .eq("id", auth.userId)
-      .eq("employer_type", "private");
+      },
+      { employerType: "private" },
+    );
 
-    if (error) {
-      return { error: mapEmployerWriteError(error), message: null };
+    if (!updated.ok) {
+      return { error: updated.error, message: null };
     }
   } else {
     const parsed = organisationEmployerProfileSchema.safeParse({
@@ -330,6 +334,8 @@ export async function completeEmployerOnboardingAction(
         error: "Choose an employer type to start onboarding.",
         message: null,
       };
+    case "unavailable":
+      return { error: EMPLOYER_RESTRICTED_ACTION, message: null };
     case "incomplete":
       return { error: EMPLOYER_COMPLETION_INCOMPLETE, message: null };
     case "completed":
@@ -344,15 +350,12 @@ async function setLawfulHiringDeclared(
   userId: string,
   value: boolean,
 ): Promise<string | null> {
-  const { error } = await supabase
-    .from("employer_profiles")
-    .update({
-      lawful_hiring_declared: value,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", userId);
+  const updated = await updateOwnEmployerProfile(supabase, userId, {
+    lawful_hiring_declared: value,
+    updated_at: new Date().toISOString(),
+  });
 
-  return error === null ? null : mapEmployerWriteError(error);
+  return updated.ok ? null : updated.error;
 }
 
 async function runOrganisationBootstrap(

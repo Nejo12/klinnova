@@ -2,12 +2,15 @@ import { redirect } from "next/navigation";
 
 import { ApplicationList } from "@/components/employer-applications/application-list";
 import { ApplicationListFilters } from "@/components/employer-applications/application-list-filters";
+import { EmployerRestrictedNotice } from "@/components/employer-shared/employer-restricted-notice";
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import { APPLICATION_LIST_LEAD } from "@/lib/employer/applications/messages";
 import { loadEmployerApplications } from "@/lib/employer/applications/load-employer-applications";
 import { parseApplicationListFilters } from "@/lib/employer/applications/parse-list-filters";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
+import { EMPLOYER_RESTRICTED_APPLICATIONS } from "@/lib/employer/messages";
+import { loadCurrentEmployerSuspensionStatus } from "@/lib/employer/suspension-guard";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -30,6 +33,27 @@ export default async function EmployerApplicationsPage({
   const filter = parseApplicationListFilters(resolvedSearchParams);
 
   const supabase = await createServerSupabaseClient();
+
+  // Checked before the applications RPC: while suspended, the RPC itself
+  // already returns zero rows (D-072), which would otherwise render
+  // indistinguishably from "no applications yet." This makes the actual
+  // reason explicit without exposing any application/candidate data.
+  const suspension = await loadCurrentEmployerSuspensionStatus(supabase);
+  if (suspension.ok && suspension.suspended) {
+    const capabilities = await loadAccountCapabilities(supabase);
+    return (
+      <main className={styles.page}>
+        <EmployerVacancyPageHeader
+          showCandidate={capabilities?.hasCandidateProfile === true}
+          showEmployer={capabilities?.hasEmployerProfile === true}
+          currentPath="applications"
+        />
+        <h1 className={styles.heading}>Applications</h1>
+        <EmployerRestrictedNotice message={EMPLOYER_RESTRICTED_APPLICATIONS} />
+      </main>
+    );
+  }
+
   const loaded = await loadEmployerApplications(supabase, filter);
 
   if (!loaded.ok) {
