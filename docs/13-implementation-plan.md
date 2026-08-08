@@ -173,9 +173,9 @@ against the merged implementation; hosted proof has not been run. Slice 8
 decisions D-076–D-089 Accepted; PR 8.1 (planning) merged. PR 8.2
 (deletion/tombstone/request/access-gate database contract) is **merged** —
 no Auth Admin API call, no service-role application code, no UI. PR 8.3 is
-split into PR 8.3a (D-089 narrow employer-export read RPC, implementation-
-complete locally, awaiting review) and PR 8.3b (export API/UI, not
-started). PR 8.4/8.5 have not started.
+split into PR 8.3a (D-089 narrow employer-export read RPC) **merged**, and
+PR 8.3b (role-scoped export API/UI) implementation-complete locally,
+awaiting review. PR 8.4/8.5 have not started.
 
 **Exit criteria:**
 
@@ -212,9 +212,10 @@ the deleted-employer exclusion in `is_vacancy_effectively_public`; D-087's
 deleted-candidate transition freeze. No Auth Admin API call, no
 service-role application code, no UI. PR 8.3 is split into **PR 8.3a**
 (D-089's narrow `list_current_employer_export_applications()` read
-contract — one additive migration, 15th; implementation-complete locally,
-awaiting review) and **PR 8.3b** (D-088-compliant role-scoped export
-API/UI, not started). PR 8.4 (deletion request UI + privileged Auth
+contract — one additive migration, 15th) **merged**, and **PR 8.3b**
+(D-088-compliant role-scoped export API/UI — `GET /candidate/account/export`
+and `GET /employer/account/export`, no new migration) implementation-complete
+locally, awaiting review. PR 8.4 (deletion request UI + privileged Auth
 processing) and PR 8.5 (local exit proof + closure) have not started.
 
 **Exit criteria:**

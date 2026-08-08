@@ -217,4 +217,34 @@ describe("CandidateMatchesPage", () => {
     expect(within(card).queryAllByRole("link")).toHaveLength(2);
     expect(within(card).queryByText(applicationId)).toBeNull();
   });
+
+  it("shows a fixed candidate data-download link with no role/target query parameter", () => {
+    render(
+      <CandidateMatchesPage
+        status="success"
+        vacancies={[]}
+        applicationsByVacancyId={new Map()}
+      />,
+    );
+
+    const downloadLink = screen.getByRole("link", {
+      name: "Download candidate data",
+    });
+    expect(downloadLink).toHaveAttribute("href", "/candidate/account/export");
+    expect(downloadLink.getAttribute("href")).not.toMatch(/\?/);
+  });
+
+  it("never claims GDPR compliance or legal completeness for the download link", () => {
+    render(
+      <CandidateMatchesPage
+        status="success"
+        vacancies={[]}
+        applicationsByVacancyId={new Map()}
+      />,
+    );
+
+    expect(document.body.textContent ?? "").not.toMatch(
+      /gdpr|legally required|fully compliant|right to portability/i,
+    );
+  });
 });

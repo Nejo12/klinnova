@@ -15,7 +15,8 @@ process metadata only") would actually be read given the current RLS/RPC
 surface — closed by D-088 (role-scoped exports) and D-089 (a dedicated
 narrow employer-export read RPC) respectively, both Accepted 2026-08-08;
 see `docs/10-decisions.md`. PR 8.3 is accordingly split into PR 8.3a (the
-D-089 read contract) and PR 8.3b (the export API/UI this §2 describes).
+D-089 read contract, merged) and PR 8.3b (the export API/UI this §2
+describes — implementation-complete locally, awaiting review).
 
 ## 1. Current-state graph (summary; full inventory in `docs/45` §2)
 

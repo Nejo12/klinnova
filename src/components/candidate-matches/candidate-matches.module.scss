@@ -38,6 +38,21 @@
   outline-offset: var(--focus-ring-offset);
 }
 
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  color: var(--color-text-link);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.navLink:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
 .heading {
   margin: 0;
   font-size: var(--font-size-3xl);

@@ -19,9 +19,12 @@
 > (narrow employer export application-process read contract) and PR 8.3b
 > (role-scoped candidate/employer export API + download UI)** — an
 > explicit D-076 decomposition update, not a silent scope broadening. **PR
-> 8.3a is implementation-complete locally, awaiting review** — one
-> additive migration (15th), adding only `list_current_employer_export_applications()`.
-> PR 8.3b/8.4/8.5 have not started.
+> 8.3a is merged** — one additive migration (15th), adding only
+> `list_current_employer_export_applications()`. **PR 8.3b is
+> implementation-complete locally, awaiting review** — `GET
+> /candidate/account/export` and `GET /employer/account/export` Route
+> Handlers, each independently authorized and returning only its own role's
+> data (D-088); no new migration. PR 8.4/8.5 have not started.
 
 **Outcome (`docs/13-implementation-plan.md`, unchanged):** candidates and
 employers can request export and deletion; removal can be confirmed.
@@ -197,6 +200,8 @@ export builder (PR 8.3b).
 
 ### PR 8.3b — Role-scoped account export API + download UI
 
+**Status: implementation-complete locally, awaiting review.**
+
 **Gated by:** D-077 (export format and scope), D-088 (exports are
 role-scoped), D-089 (employer export's application data source).
 
@@ -204,6 +209,17 @@ role-scoped), D-089 (employer export's application data source).
 exactly as bounded in `docs/47` §2 and D-088's role-scoped-download
 contract, built on PR 8.2's existing RLS/RPCs plus PR 8.3a's narrow
 employer application-process RPC.
+
+**Implemented:** `src/lib/account-export/` (schemas, the D-085 whole-account
+deleted gate via `_is_current_stint_account_deleted()`, the candidate and
+employer builders, a pure HTTP-response mapper, filename/messages helpers);
+`GET /candidate/account/export` and `GET /employer/account/export` Route
+Handlers (`Content-Type: application/json; charset=utf-8`, `Content-Disposition:
+attachment; filename="stint-<role>-export-YYYY-MM-DD.json"`, `Cache-Control:
+no-store`, `force-dynamic`); a "Download candidate data"/"Download employer
+data" link on the candidate matches page header and the employer home page
+respectively (plain `<a>`, not `next/link` — a real file download, not a
+client-side transition). No new migration.
 
 **Includes:** one export route per role, each returning its own versioned
 JSON envelope (`docs/47` §2); the employer export's applications section

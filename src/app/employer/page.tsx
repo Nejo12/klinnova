@@ -3,6 +3,10 @@ import { redirect } from "next/navigation";
 
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import {
+  EMPLOYER_EXPORT_BUTTON_LABEL,
+  EMPLOYER_EXPORT_LEAD,
+} from "@/lib/account-export/messages";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadEmployerProfile } from "@/lib/employer/load-employer";
 import {
@@ -77,6 +81,18 @@ export default async function EmployerHomePage() {
       </p>
 
       <p className={styles.note}>{EMPLOYER_VERIFICATION_NOTICE}</p>
+
+      <h2 className={styles.heading}>Account data</h2>
+      <p className={styles.note}>{EMPLOYER_EXPORT_LEAD}</p>
+      <p className={styles.actions}>
+        {/* Plain anchor, not next/link: this is a real file download from a
+            Route Handler, not a client-side page transition. The server's
+            Content-Disposition header is the authoritative download
+            mechanism, not this element. */}
+        <a className={styles.linkButton} href="/employer/account/export">
+          {EMPLOYER_EXPORT_BUTTON_LABEL}
+        </a>
+      </p>
     </main>
   );
 }

@@ -69,6 +69,21 @@
   outline-offset: var(--focus-ring-offset);
 }
 
+.secondaryLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  color: var(--color-text-link);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.secondaryLink:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
 @media (min-width: $breakpoint-md) {
   .page {
     padding: var(--space-12) var(--layout-gutter-tablet);

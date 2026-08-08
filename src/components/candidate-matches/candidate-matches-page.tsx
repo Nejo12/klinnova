@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { CANDIDATE_EXPORT_BUTTON_LABEL } from "@/lib/account-export/messages";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { CapabilityNav } from "@/components/employer-onboarding/capability-nav";
 import { MatchCount } from "@/components/candidate-matches/match-count";
@@ -37,6 +38,13 @@ export function CandidateMatchesPage(props: CandidateMatchesPageProps) {
             showEmployer={showEmployerNav}
             current="candidate"
           />
+          {/* Plain anchor, not next/link: this is a real file download from
+              a Route Handler, not a client-side page transition. The
+              server's Content-Disposition header is the authoritative
+              download mechanism, not this element. */}
+          <a className={styles.navLink} href="/candidate/account/export">
+            {CANDIDATE_EXPORT_BUTTON_LABEL}
+          </a>
           <LogoutButton />
         </div>
       </div>
