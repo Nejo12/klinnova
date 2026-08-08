@@ -127,6 +127,21 @@ Use deterministic, explainable matching based on:
 
 The result should explain the match rather than expose an unexplained score.
 
+## Initial M5 Berlin private-beta boundary
+
+The lists above preserve the broader MVP/product direction. They are **not** a requirement that every listed capability must exist before the initial M5 Berlin private beta begins.
+
+Founder-approved M5 boundary (D-M5-1 and D-M5-6; `docs/49-m5-beta-transition-and-measurement.md`):
+
+- the merged M4 implementation is the minimum product boundary for Cohort A;
+- capabilities deliberately narrowed/deferred during Slices 0–8 do not block the initial private beta unless observed beta evidence shows they are required;
+- optional CV upload and save/unsave jobs remain deferred product capabilities and do not block Cohort A;
+- broader matching intent such as travel-time sophistication and experience-based matching remains product direction, but accepted narrower matching contracts remain authoritative for the current beta until evidence justifies reopening them;
+- interview/hire outcome measurement is a beta-measurement requirement and is investigated separately from application workflow status in M5.0;
+- normal beta changes are evidence-driven rather than backlog-driven.
+
+A deferred capability is not deleted from the longer-term product direction merely because it is outside the initial beta gate.
+
 ## Explicitly out of scope
 
 - payroll or worker payments
@@ -160,3 +175,5 @@ A release candidate must support this complete vertical journey:
 7. Employer updates the application status.
 8. Candidate sees the progress.
 9. Stint records interview or hire outcome.
+
+For M5, item 9 uses the founder-approved metric semantics in `docs/49` and the separate-outcome direction in `docs/50`; existing application status `accepted` must not be counted automatically as a confirmed hire.
