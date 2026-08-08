@@ -1021,6 +1021,15 @@ export type Database = {
           vacancy_title: string
         }[]
       }
+      list_current_employer_export_applications: {
+        Args: never
+        Returns: {
+          application_id: string
+          status: string
+          submitted_at: string
+          vacancy_id: string
+        }[]
+      }
       list_effective_public_vacancies: {
         Args: never
         Returns: {
