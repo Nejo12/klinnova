@@ -51,11 +51,11 @@ Overall M5 targets:
 
 Staged cohorts:
 
-| Cohort | Employers | Legitimate vacancies | Candidates | Outcome gate |
-|---|---:|---:|---:|---|
-| A — Proof | 3–5 | 10–20 | 20–30 | first completed interview |
-| B — Validation | 8–10 | 30–50 | 60–100 | repeated interviews + first confirmed hire |
-| C — Full M5 | 20 | 100 | 200 | 10 completed interviews + 3 confirmed hires |
+| Cohort         | Employers | Legitimate vacancies | Candidates | Outcome gate                                |
+| -------------- | --------: | -------------------: | ---------: | ------------------------------------------- |
+| A — Proof      |       3–5 |                10–20 |      20–30 | first completed interview                   |
+| B — Validation |      8–10 |                30–50 |     60–100 | repeated interviews + first confirmed hire  |
+| C — Full M5    |        20 |                  100 |        200 | 10 completed interviews + 3 confirmed hires |
 
 Founder-approved beta boundary:
 
