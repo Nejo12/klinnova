@@ -3,6 +3,7 @@
 export type DeleteAccountActionState = {
   status:
     | "idle"
+    | "confirmation_required"
     | "unauthenticated"
     | "unavailable"
     | "processing"

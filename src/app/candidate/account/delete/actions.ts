@@ -4,6 +4,7 @@ import type {
   CancelDeletionActionState,
   DeleteAccountActionState,
 } from "@/components/account-deletion/delete-account-action-state";
+import { hasValidAccountDeletionConfirmation } from "@/lib/account-deletion/confirmation";
 import {
   cancelPendingAccountDeletion,
   confirmAccountDeletion,
@@ -12,8 +13,16 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export async function confirmCandidateAccountDeletionAction(
   _prev: DeleteAccountActionState,
-  _formData: FormData,
+  formData: FormData,
 ): Promise<DeleteAccountActionState> {
+  // Server-authoritative destructive-confirmation boundary. The client
+  // checkbox/disabled-button UX is not itself a security boundary — this
+  // check runs before any Supabase client is created and before
+  // request_account_deletion()/the privileged processor are ever reached.
+  if (!hasValidAccountDeletionConfirmation(formData)) {
+    return { status: "confirmation_required" };
+  }
+
   const supabase = await createServerSupabaseClient();
   const outcome = await confirmAccountDeletion(supabase);
 

@@ -37,11 +37,20 @@ test.describe("account deletion journey", () => {
     });
     await expect(confirmButton).toBeDisabled();
 
-    await page
-      .getByRole("checkbox", {
-        name: "I understand that this deletes my whole Stint account.",
-      })
-      .check();
+    const confirmCheckbox = page.getByRole("checkbox", {
+      name: "I understand that this deletes my whole Stint account.",
+    });
+    // Server-authoritative confirmation contract (not just client UX):
+    // the checkbox must submit the exact field name/value both destructive
+    // Server Actions require before any deletion RPC or privileged
+    // processing can run.
+    await expect(confirmCheckbox).toHaveAttribute(
+      "name",
+      "confirmAccountDeletion",
+    );
+    await expect(confirmCheckbox).toHaveAttribute("value", "yes");
+
+    await confirmCheckbox.check();
     await expect(confirmButton).toBeEnabled();
 
     await confirmButton.click();

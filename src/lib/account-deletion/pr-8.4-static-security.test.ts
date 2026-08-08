@@ -154,4 +154,42 @@ describe("PR 8.4 account-deletion privileged-boundary static security proof", ()
       expect(source, file).not.toMatch(/formData\.get\(\s*["']user/i);
     }
   });
+
+  it("both destructive confirm actions validate the server-authoritative confirmation before ever calling confirmAccountDeletion(...)", () => {
+    const files = [
+      "src/app/candidate/account/delete/actions.ts",
+      "src/app/employer/account/delete/actions.ts",
+    ];
+    for (const file of files) {
+      const source = readSource(file);
+      expect(source, file).toMatch(
+        /import\s*\{\s*hasValidAccountDeletionConfirmation\s*\}\s*from\s*["']@\/lib\/account-deletion\/confirmation["']/,
+      );
+
+      const confirmationCheckIndex = source.indexOf(
+        "hasValidAccountDeletionConfirmation(",
+      );
+      const confirmCallIndex = source.indexOf("confirmAccountDeletion(");
+      expect(confirmationCheckIndex, file).toBeGreaterThan(-1);
+      expect(confirmCallIndex, file).toBeGreaterThan(-1);
+      expect(
+        confirmationCheckIndex,
+        `${file}: the confirmation check must appear before the confirmAccountDeletion(...) call`,
+      ).toBeLessThan(confirmCallIndex);
+    }
+  });
+
+  it("no destructive action bypasses the confirmation boundary via a second confirmAccountDeletion call site", () => {
+    for (const file of allSourceFiles()) {
+      if (
+        file === "src/app/candidate/account/delete/actions.ts" ||
+        file === "src/app/employer/account/delete/actions.ts" ||
+        file === "src/lib/account-deletion/self-service.ts"
+      ) {
+        continue;
+      }
+      const source = readSource(file);
+      expect(source, file).not.toMatch(/confirmAccountDeletion\(/);
+    }
+  });
 });

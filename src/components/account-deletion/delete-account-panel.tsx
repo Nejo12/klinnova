@@ -10,6 +10,10 @@ import {
   type DeleteAccountActionState,
 } from "@/components/account-deletion/delete-account-action-state";
 import {
+  ACCOUNT_DELETION_CONFIRMATION_FIELD,
+  ACCOUNT_DELETION_CONFIRMATION_VALUE,
+} from "@/lib/account-deletion/confirmation";
+import {
   CANCEL_DELETION_CANCELLED_MESSAGE,
   CANCEL_DELETION_NOT_CANCELLABLE_MESSAGE,
   CANCEL_DELETION_UNAUTHENTICATED_MESSAGE,
@@ -20,6 +24,7 @@ import {
   DELETE_ACCOUNT_CANCEL_LEAD,
   DELETE_ACCOUNT_COMPLETED_MESSAGE,
   DELETE_ACCOUNT_CONFIRM_LABEL,
+  DELETE_ACCOUNT_CONFIRMATION_REQUIRED_MESSAGE,
   DELETE_ACCOUNT_CONTINUE_LABEL,
   DELETE_ACCOUNT_DUAL_CAPABILITY_NOTE,
   DELETE_ACCOUNT_FAILURE_MESSAGE,
@@ -47,6 +52,8 @@ type DeleteAccountPanelProps = {
 
 function confirmMessage(status: DeleteAccountActionState["status"]) {
   switch (status) {
+    case "confirmation_required":
+      return DELETE_ACCOUNT_CONFIRMATION_REQUIRED_MESSAGE;
     case "unauthenticated":
       return DELETE_ACCOUNT_UNAUTHENTICATED_MESSAGE;
     case "unavailable":
@@ -164,6 +171,8 @@ export function DeleteAccountPanel({
         <label className={styles.option}>
           <input
             type="checkbox"
+            name={ACCOUNT_DELETION_CONFIRMATION_FIELD}
+            value={ACCOUNT_DELETION_CONFIRMATION_VALUE}
             checked={acknowledged}
             onChange={(event) => setAcknowledged(event.target.checked)}
             disabled={confirmPending}

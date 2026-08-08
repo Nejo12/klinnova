@@ -21,6 +21,8 @@ export const DELETE_ACCOUNT_CANCEL_LEAD =
 export const DELETE_ACCOUNT_CANCEL_BUTTON_LABEL =
   "Cancel any pending deletion request";
 
+export const DELETE_ACCOUNT_CONFIRMATION_REQUIRED_MESSAGE =
+  "Please confirm that you understand the account deletion.";
 export const DELETE_ACCOUNT_UNAUTHENTICATED_MESSAGE =
   "You must be signed in to delete your account.";
 export const DELETE_ACCOUNT_UNAVAILABLE_MESSAGE =

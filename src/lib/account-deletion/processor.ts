@@ -21,11 +21,14 @@ export type ProcessDeletionResult =
 type PrivilegedClient = ReturnType<typeof createPrivilegedDeletionClient>;
 
 /**
- * Best-effort failure recording. If this itself fails, the request may be
- * left in `processing` with no evidence — an accepted MVP limitation of a
- * synchronous, non-transactional multi-step external-API workflow with no
- * background worker (D-081); nothing short of a process crash mid-flight
- * reaches this branch, since every step above is already wrapped.
+ * Best-effort failure recording. If this itself fails or is interrupted,
+ * the request may be left in `processing` with no evidence — nothing
+ * short of a process crash mid-flight reaches this branch, since every
+ * step above is already wrapped. This is no longer an unrecoverable
+ * state: D-090's `processing_lease_started_at` makes the request eligible
+ * for explicit privileged reconciliation (`reconcileAccountDeletionRequest`
+ * → `_reclaim_stale_deletion_request`) once its lease exceeds the
+ * database's fixed staleness threshold.
  */
 async function recordFailure(
   client: PrivilegedClient,
