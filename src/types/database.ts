@@ -799,12 +799,17 @@ export type Database = {
       _is_current_candidate_deleted: { Args: never; Returns: boolean }
       _is_current_employer_deleted: { Args: never; Returns: boolean }
       _is_current_employer_suspended: { Args: never; Returns: boolean }
+      _is_current_stint_account_deleted: { Args: never; Returns: boolean }
       _is_employer_deleted: {
         Args: { p_employer_profile_id: string }
         Returns: boolean
       }
       _is_employer_suspended: {
         Args: { p_employer_profile_id: string }
+        Returns: boolean
+      }
+      _is_stint_account_deleted: {
+        Args: { p_user_id: string }
         Returns: boolean
       }
       _is_vacancy_moderated: {

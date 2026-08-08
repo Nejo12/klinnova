@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(199);
+select plan(238);
 
 -- ---------------------------------------------------------------------------
 -- Fixtures
@@ -29,7 +29,8 @@ insert into auth.users (
 ('00000000-0000-0000-0000-000000000000','a3000000-0000-4000-8000-000000000041','authenticated','authenticated','c30-candidate-e@example.test',crypt('password',gen_salt('bf')),now(),'{"provider":"email","providers":["email"]}','{}',now(),now(),'','','',''),
 ('00000000-0000-0000-0000-000000000000','a3000000-0000-4000-8000-000000000042','authenticated','authenticated','c30-employer-d@example.test',crypt('password',gen_salt('bf')),now(),'{"provider":"email","providers":["email"]}','{}',now(),now(),'','','',''),
 ('00000000-0000-0000-0000-000000000000','a3000000-0000-4000-8000-000000000099','authenticated','authenticated','c30-throwaway@example.test',crypt('password',gen_salt('bf')),now(),'{"provider":"email","providers":["email"]}','{}',now(),now(),'','','',''),
-('00000000-0000-0000-0000-000000000000','a3000000-0000-4000-8000-000000000051','authenticated','authenticated','c30-candidate-f@example.test',crypt('password',gen_salt('bf')),now(),'{"provider":"email","providers":["email"]}','{}',now(),now(),'','','','');
+('00000000-0000-0000-0000-000000000000','a3000000-0000-4000-8000-000000000051','authenticated','authenticated','c30-candidate-f@example.test',crypt('password',gen_salt('bf')),now(),'{"provider":"email","providers":["email"]}','{}',now(),now(),'','','',''),
+('00000000-0000-0000-0000-000000000000','a3000000-0000-4000-8000-000000000052','authenticated','authenticated','c30-active-g@example.test',crypt('password',gen_salt('bf')),now(),'{"provider":"email","providers":["email"]}','{}',now(),now(),'','','','');
 
 insert into public.verification_operators (user_id, created_by)
 values ('a3000000-0000-4000-8000-000000000001','a3000000-0000-4000-8000-000000000001');
@@ -332,6 +333,12 @@ insert into public.applications (
   now() - interval '1 days'
 );
 
+-- Active G: a dedicated review-fix fixture — an auth identity with no
+-- candidate_profiles or employer_profiles row of either kind and never
+-- anonymized in this file. Proves the D-085 whole-account
+-- resurrection-boundary check (Section F.1) is not a false positive: an
+-- ordinary active account can still create a missing capability normally.
+
 -- ---------------------------------------------------------------------------
 -- Section A — schema
 -- ---------------------------------------------------------------------------
@@ -618,14 +625,14 @@ reset role;
 
 select public._claim_deletion_request((select id from deletion_test_ids where label='candidate-e-request'));
 select is(
-  public._record_deletion_failure((select id from deletion_test_ids where label='candidate-e-request'), 'auth_admin_call_failed') ->> 'status',
+  public._record_deletion_failure((select id from deletion_test_ids where label='candidate-e-request'), 'auth_delete_failed') ->> 'status',
   'failed',
   'a processing request can be marked failed with a bounded failure code'
 );
 select is(
   (select failure_code from public.deletion_requests where id = (select id from deletion_test_ids where label='candidate-e-request')),
-  'auth_admin_call_failed',
-  'the exact bounded failure code is persisted'
+  'auth_delete_failed',
+  'the exact bounded allow-listed failure code is persisted'
 );
 select is(
   public._record_deletion_failure((select id from deletion_test_ids where label='candidate-e-request'), 'x') ->> 'status',
@@ -647,6 +654,72 @@ select is(
   public._claim_deletion_request('00000000-0000-0000-0000-000000000000') ->> 'status',
   'not_found',
   'claiming a nonexistent request id is a deterministic not_found, not an error'
+);
+
+-- ---------------------------------------------------------------------------
+-- failure_code allow-list bounding (PR 8.2 review fix, D-081). A fresh,
+-- disposable deletion_requests row for the throwaway identity, never
+-- completed, used solely to prove _record_deletion_failure normalizes
+-- against the fixed allow-list rather than persisting caller-supplied text
+-- — both defensively inside the function and via the CHECK constraint.
+-- ---------------------------------------------------------------------------
+
+with inserted as (
+  insert into public.deletion_requests (user_id, status)
+  values ('a3000000-0000-4000-8000-000000000099', 'pending')
+  returning id
+)
+insert into deletion_test_ids (label, id)
+select 'throwaway-failure-code-request', id from inserted;
+
+select public._claim_deletion_request((select id from deletion_test_ids where label='throwaway-failure-code-request'));
+
+select is(
+  public._record_deletion_failure((select id from deletion_test_ids where label='throwaway-failure-code-request'), 'AuthApiError: user foo@example.com not found in tenant abc-123') ->> 'status',
+  'failed',
+  'a raw-looking error string still transitions the request to failed — status transition is unconditional, only the stored code is bounded'
+);
+select is(
+  (select failure_code from public.deletion_requests where id = (select id from deletion_test_ids where label='throwaway-failure-code-request')),
+  'unknown',
+  'a raw, non-allow-listed error string (containing an email address) is never persisted — it normalizes to the fixed generic code "unknown"'
+);
+
+select public._claim_deletion_request((select id from deletion_test_ids where label='throwaway-failure-code-request'));
+
+select is(
+  public._record_deletion_failure((select id from deletion_test_ids where label='throwaway-failure-code-request'), repeat('x', 5000)) ->> 'status',
+  'failed',
+  'an oversized failure-code input still transitions the request to failed'
+);
+select is(
+  (select failure_code from public.deletion_requests where id = (select id from deletion_test_ids where label='throwaway-failure-code-request')),
+  'unknown',
+  'an oversized (5000-char) failure-code input is never persisted raw — it normalizes to "unknown"'
+);
+select is(
+  (select char_length(failure_code) from public.deletion_requests where id = (select id from deletion_test_ids where label='throwaway-failure-code-request')),
+  7,
+  'the persisted failure_code length matches "unknown" exactly (7 chars) — no truncated fragment of the oversized input survived'
+);
+
+select public._claim_deletion_request((select id from deletion_test_ids where label='throwaway-failure-code-request'));
+
+select is(
+  public._record_deletion_failure((select id from deletion_test_ids where label='throwaway-failure-code-request'), 'domain_scrub_failed') ->> 'status',
+  'failed',
+  'an allow-listed failure code transitions the request to failed'
+);
+select is(
+  (select failure_code from public.deletion_requests where id = (select id from deletion_test_ids where label='throwaway-failure-code-request')),
+  'domain_scrub_failed',
+  'the allow-listed failure code persists exactly, unmodified'
+);
+
+select throws_ok(
+  $$ update public.deletion_requests set failure_code = 'raw_exception_text_that_is_not_allow_listed' where id = (select id from deletion_test_ids where label='throwaway-failure-code-request') $$,
+  '23514', null,
+  'the failure_code CHECK constraint itself rejects a non-allow-listed value at the SQL level — defense in depth beyond the function normalization'
 );
 
 -- Complete candidate E's and employer D's deletion through the real
@@ -674,6 +747,20 @@ select public._record_deletion_auth_evidence((select id from deletion_test_ids w
 -- anonymization contract itself from the request-state-machine concern
 -- already proven in Section C.
 -- ---------------------------------------------------------------------------
+
+-- Snapshot the full application row before anonymization, to prove
+-- byte/value-exact preservation of every field except candidate_snapshot
+-- (PR 8.2 review fix: application.updated_at was previously touched as an
+-- unnecessary side effect of the candidate_snapshot replacement).
+create temporary table d078_pre_anonymize_application_snapshot as
+select id, candidate_id, vacancy_id, status, submitted_at, created_at, updated_at, vacancy_snapshot, snapshot_version, candidate_snapshot
+from public.applications
+where id = 'a3000000-0000-4000-8000-0000000000a1';
+
+create temporary table d078_pre_anonymize_history_snapshot as
+select id, application_id, from_status, to_status, actor_user_id, actor_role, reason, occurred_at
+from public.application_status_history
+where application_id = 'a3000000-0000-4000-8000-0000000000a1';
 
 select public._anonymize_candidate_domain('a3000000-0000-4000-8000-000000000002', now());
 
@@ -789,6 +876,59 @@ select is(
   null::jsonb,
   'candidate A candidate_snapshot carries no display_name key at all — the truthful "Deleted candidate" label is synthesized only at the read layer (list/detail RPCs), never stored as a fabricated snapshot field'
 );
+
+-- PR 8.2 review fix: full byte/value-exact preservation proof against the
+-- pre-anonymization snapshot. Only candidate_snapshot may differ.
+select is(
+  (select id from public.applications where id = 'a3000000-0000-4000-8000-0000000000a1'),
+  (select id from d078_pre_anonymize_application_snapshot),
+  'candidate A application id is byte/value-exact unchanged'
+);
+select is(
+  (select candidate_id from public.applications where id = 'a3000000-0000-4000-8000-0000000000a1'),
+  (select candidate_id from d078_pre_anonymize_application_snapshot),
+  'candidate A application candidate_id is byte/value-exact unchanged'
+);
+select is(
+  (select vacancy_id from public.applications where id = 'a3000000-0000-4000-8000-0000000000a1'),
+  (select vacancy_id from d078_pre_anonymize_application_snapshot),
+  'candidate A application vacancy_id is byte/value-exact unchanged (redundant with the earlier literal check, against the captured snapshot)'
+);
+select is(
+  (select status from public.applications where id = 'a3000000-0000-4000-8000-0000000000a1'),
+  (select status from d078_pre_anonymize_application_snapshot),
+  'candidate A application status is byte/value-exact unchanged (redundant with the earlier literal check, against the captured snapshot)'
+);
+select is(
+  (select submitted_at from public.applications where id = 'a3000000-0000-4000-8000-0000000000a1'),
+  (select submitted_at from d078_pre_anonymize_application_snapshot),
+  'candidate A application submitted_at is byte/value-exact unchanged'
+);
+select is(
+  (select created_at from public.applications where id = 'a3000000-0000-4000-8000-0000000000a1'),
+  (select created_at from d078_pre_anonymize_application_snapshot),
+  'candidate A application created_at is byte/value-exact unchanged'
+);
+select is(
+  (select updated_at from public.applications where id = 'a3000000-0000-4000-8000-0000000000a1'),
+  (select updated_at from d078_pre_anonymize_application_snapshot),
+  'candidate A application updated_at is byte/value-exact unchanged — the candidate_snapshot replacement no longer touches it'
+);
+select is(
+  (select vacancy_snapshot from public.applications where id = 'a3000000-0000-4000-8000-0000000000a1'),
+  (select vacancy_snapshot from d078_pre_anonymize_application_snapshot),
+  'candidate A application vacancy_snapshot is byte/value-exact unchanged (redundant with the earlier literal check, against the captured snapshot)'
+);
+select is(
+  (select snapshot_version from public.applications where id = 'a3000000-0000-4000-8000-0000000000a1'),
+  (select snapshot_version from d078_pre_anonymize_application_snapshot),
+  'candidate A application snapshot_version is byte/value-exact unchanged'
+);
+select isnt(
+  (select candidate_snapshot from public.applications where id = 'a3000000-0000-4000-8000-0000000000a1'),
+  (select candidate_snapshot from d078_pre_anonymize_application_snapshot),
+  'candidate A application candidate_snapshot is the only field that changed'
+);
 select is(
   (select count(*)::integer from public.applications a, jsonb_object_keys(a.candidate_snapshot) where a.id = 'a3000000-0000-4000-8000-0000000000a1'),
   1,
@@ -803,6 +943,24 @@ select is(
   (select to_status from public.application_status_history where application_id = 'a3000000-0000-4000-8000-0000000000a1' and from_status = 'submitted'),
   'reviewing',
   'candidate A application_status_history content is unchanged'
+);
+select is(
+  (
+    select count(*)::integer
+    from public.application_status_history h
+    join d078_pre_anonymize_history_snapshot s
+      on h.id = s.id
+      and h.application_id is not distinct from s.application_id
+      and h.from_status is not distinct from s.from_status
+      and h.to_status is not distinct from s.to_status
+      and h.actor_user_id is not distinct from s.actor_user_id
+      and h.actor_role is not distinct from s.actor_role
+      and h.reason is not distinct from s.reason
+      and h.occurred_at is not distinct from s.occurred_at
+    where h.application_id = 'a3000000-0000-4000-8000-0000000000a1'
+  ),
+  2,
+  'candidate A application_status_history is byte/value-exact unchanged across every column, both rows, against the pre-anonymization snapshot'
 );
 
 select is(
@@ -1305,6 +1463,108 @@ select isnt(
 );
 
 -- ---------------------------------------------------------------------------
+-- Section F.1 — D-085 cross-capability stale-JWT resurrection boundary
+-- (discovered in PR 8.2 review). A role-local deleted check alone
+-- (_is_current_candidate_deleted/_is_current_employer_deleted) is a no-op
+-- for a capability that was never created — there is no row for it to
+-- find — so a still-valid pre-delete JWT could otherwise create the
+-- missing capability after the existing one was scrubbed.
+-- _is_stint_account_deleted/_is_current_stint_account_deleted close this
+-- gap. Candidate A (candidate-only, deleted in Section D) and Employer B
+-- (employer-only, deleted immediately above) are reused as the
+-- deleted-side fixtures; the fresh, never-deleted Active G proves the
+-- ordinary creation path is unaffected.
+-- ---------------------------------------------------------------------------
+
+-- A. candidate-only deleted account cannot create the employer capability.
+select is(
+  (select count(*)::integer from public.employer_profiles where id = 'a3000000-0000-4000-8000-000000000002'),
+  0,
+  'candidate A (candidate-only, deleted) has no employer_profiles row'
+);
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub','a3000000-0000-4000-8000-000000000002',true);
+select set_config('request.jwt.claims','{"sub":"a3000000-0000-4000-8000-000000000002","role":"authenticated"}',true);
+
+select throws_ok(
+  $$ insert into public.employer_profiles (id, employer_type, display_name, berlin_locality, lawful_hiring_declared) values ('a3000000-0000-4000-8000-000000000002','private','Resurrected Employer','Mitte',true) $$,
+  '42501', null,
+  'a candidate-only deleted account cannot INSERT an employer_profiles row with a still-valid pre-delete JWT'
+);
+
+select is(
+  public.bootstrap_organisation_employer('Resurrected Org','Resurrected Org GmbH','Mitte','Resurrected Co','resurrected-co') ->> 'status',
+  'unavailable',
+  'a candidate-only deleted account cannot bootstrap_organisation_employer with a still-valid pre-delete JWT'
+);
+
+reset role;
+
+select is(
+  (select count(*)::integer from public.employer_profiles where id = 'a3000000-0000-4000-8000-000000000002'),
+  0,
+  'no employer_profiles row was created for candidate A by either resurrection attempt above'
+);
+select is(
+  (select count(*)::integer from public.companies where owner_employer_id = 'a3000000-0000-4000-8000-000000000002'),
+  0,
+  'no company row was created for candidate A by the bootstrap resurrection attempt above'
+);
+
+-- B. employer-only deleted account cannot create the candidate capability.
+select is(
+  (select count(*)::integer from public.candidate_profiles where id = 'a3000000-0000-4000-8000-000000000012'),
+  0,
+  'employer B (employer-only, deleted) has no candidate_profiles row'
+);
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub','a3000000-0000-4000-8000-000000000012',true);
+select set_config('request.jwt.claims','{"sub":"a3000000-0000-4000-8000-000000000012","role":"authenticated"}',true);
+
+select throws_ok(
+  $$ insert into public.candidate_profiles (id, display_name, job_categories, employment_types, shift_preferences) values ('a3000000-0000-4000-8000-000000000012','Resurrected Candidate',array['cleaning'],array['part_time'],array['daytime']) $$,
+  '42501', null,
+  'an employer-only deleted account cannot INSERT a candidate_profiles row with a still-valid pre-delete JWT'
+);
+
+reset role;
+
+select is(
+  (select count(*)::integer from public.candidate_profiles where id = 'a3000000-0000-4000-8000-000000000012'),
+  0,
+  'no candidate_profiles row was created for employer B by the resurrection attempt above'
+);
+
+-- C. an active (never-deleted) account can still create a missing
+-- capability normally — the new whole-account check is not a false
+-- positive for an account that was never deleted at all.
+select is(
+  (select count(*)::integer from public.employer_profiles where id = 'a3000000-0000-4000-8000-000000000052'),
+  0,
+  'Active G (fresh, never deleted) has no employer_profiles row yet'
+);
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub','a3000000-0000-4000-8000-000000000052',true);
+select set_config('request.jwt.claims','{"sub":"a3000000-0000-4000-8000-000000000052","role":"authenticated"}',true);
+
+select is(
+  public.bootstrap_organisation_employer('New Org','New Org GmbH','Mitte','New Co','new-co-active-g') ->> 'status',
+  'ok',
+  'an active (never-deleted) account can still bootstrap_organisation_employer normally — the D-085 whole-account check is not a false positive'
+);
+
+reset role;
+
+select is(
+  (select count(*)::integer from public.employer_profiles where id = 'a3000000-0000-4000-8000-000000000052'),
+  1,
+  'Active G now has an employer_profiles row, created by the successful bootstrap above'
+);
+
+-- ---------------------------------------------------------------------------
 -- Section G — stale-JWT-style database gate (D-080 §3.2/§3.3): an
 -- authenticated session (auth.uid() resolving successfully — exactly what a
 -- still-cryptographically-valid pre-delete JWT would produce) must be
@@ -1474,6 +1734,62 @@ select is(
 select set_config('request.jwt.claim.sub','',true);
 set local role anon;
 select throws_ok($$ select public._is_candidate_deleted('a3000000-0000-4000-8000-000000000041') $$, '42501', null, 'anon cannot call the arbitrary-id candidate helper directly') ;
+reset role;
+
+-- ---------------------------------------------------------------------------
+-- Section I.1 — full deletion-function privilege matrix (PR 8.2 review fix).
+-- Explicit, deterministic ACLs are proven for every category rather than
+-- relying on Supabase's project-level default schema privileges: ordinary
+-- authenticated gets self-service request/cancel only; anon gets nothing;
+-- service_role gets exactly the four request-bound processor functions and
+-- nothing else — not the arbitrary-target anonymization/withdrawal helpers,
+-- which remain reachable only via internal owner-implicit calls from within
+-- those four functions' own bodies.
+-- ---------------------------------------------------------------------------
+
+select is(
+  (select count(*)::integer from pg_proc where pronamespace='public'::regnamespace and proname in ('_is_stint_account_deleted','_is_current_stint_account_deleted') and prosecdef),
+  2,
+  'both new whole-account deleted helpers are SECURITY DEFINER'
+);
+
+select is_empty(
+  $$ select privilege_type from information_schema.routine_privileges where routine_schema='public' and routine_name in ('_is_candidate_deleted','_is_employer_deleted','_is_stint_account_deleted','_withdraw_vacancy_for_deletion','_anonymize_candidate_domain','_anonymize_employer_domain') and grantee in ('anon','authenticated','service_role') $$,
+  'no arbitrary-target/private deletion helper is anon/authenticated/service_role-executable — reachable only via internal owner-implicit calls, never as a direct RPC'
+);
+
+select ok(
+  has_function_privilege('authenticated','public._is_current_stint_account_deleted()','execute'),
+  'authenticated can execute the self-scoped whole-account deleted-check (RLS support)'
+);
+select is_empty(
+  $$ select privilege_type from information_schema.routine_privileges where routine_schema='public' and routine_name = '_is_current_stint_account_deleted' and grantee = 'anon' $$,
+  'anon cannot execute the self-scoped whole-account deleted-check'
+);
+
+select is(
+  (select count(*)::integer from information_schema.routine_privileges where routine_schema='public' and routine_name in ('_claim_deletion_request','_process_deletion_domain_scrub','_record_deletion_auth_evidence','_record_deletion_failure') and grantee='service_role' and privilege_type='EXECUTE'),
+  4,
+  'service_role has an explicit EXECUTE grant on exactly the four request-bound processor functions'
+);
+select is_empty(
+  $$ select privilege_type from information_schema.routine_privileges where routine_schema='public' and routine_name in ('_claim_deletion_request','_process_deletion_domain_scrub','_record_deletion_auth_evidence','_record_deletion_failure') and grantee in ('anon','authenticated') $$,
+  'no request-bound processor function is anon/authenticated-executable'
+);
+
+select is(
+  (select count(*)::integer from information_schema.routine_privileges where routine_schema='public' and routine_name in ('request_account_deletion','cancel_account_deletion_request') and grantee='authenticated' and privilege_type='EXECUTE'),
+  2,
+  'authenticated has an explicit EXECUTE grant on both self-service deletion RPCs'
+);
+select is_empty(
+  $$ select privilege_type from information_schema.routine_privileges where routine_schema='public' and routine_name in ('request_account_deletion','cancel_account_deletion_request') and grantee in ('anon','service_role') $$,
+  'neither self-service deletion RPC is anon/service_role-executable — self-service only, never the processor role'
+);
+
+select set_config('request.jwt.claim.sub','',true);
+set local role anon;
+select throws_ok($$ select public._is_stint_account_deleted('a3000000-0000-4000-8000-000000000041') $$, '42501', null, 'anon cannot call the arbitrary-id whole-account helper directly') ;
 reset role;
 
 select * from finish();

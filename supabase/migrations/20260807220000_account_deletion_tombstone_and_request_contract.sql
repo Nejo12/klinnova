@@ -63,7 +63,7 @@ $$;
 comment on function public._is_candidate_deleted(uuid) is
   'Fully internal arbitrary-id deleted-account lookup. Never authenticated/anon-executable — an authenticated user must not be able to probe an arbitrary candidate''s deletion state. Called only from within other SECURITY DEFINER function bodies.';
 
-revoke all on function public._is_candidate_deleted(uuid) from public, anon, authenticated;
+revoke all on function public._is_candidate_deleted(uuid) from public, anon, authenticated, service_role;
 
 create or replace function public._is_current_candidate_deleted()
 returns boolean
@@ -115,7 +115,7 @@ $$;
 comment on function public._is_employer_deleted(uuid) is
   'Fully internal arbitrary-id deleted-account lookup. Never authenticated/anon-executable — mirrors _is_employer_suspended''s no-existence-oracle discipline. Called only from within other SECURITY DEFINER function bodies.';
 
-revoke all on function public._is_employer_deleted(uuid) from public, anon, authenticated;
+revoke all on function public._is_employer_deleted(uuid) from public, anon, authenticated, service_role;
 
 create or replace function public._is_current_employer_deleted()
 returns boolean
@@ -148,6 +148,52 @@ comment on function public.is_current_employer_deleted() is
 
 revoke all on function public.is_current_employer_deleted() from public, anon;
 grant execute on function public.is_current_employer_deleted() to authenticated;
+
+-- =============================================================================
+-- 2b. Canonical whole-account deleted helper (D-085 cross-capability gap,
+--     discovered in PR 8.2 review)
+-- =============================================================================
+-- _is_candidate_deleted/_is_employer_deleted are role-local: for a
+-- candidate-only deleted account, _is_employer_deleted(uid) returns false
+-- because no employer_profiles row exists yet (there is nothing to check),
+-- and symmetrically for an employer-only deleted account. That gap would
+-- let a still-valid pre-delete JWT create the capability the account never
+-- had, after the existing capability was already scrubbed — a whole-account
+-- resurrection, violating D-085. This helper is true whenever EITHER
+-- tombstone is set for the identity, independent of which row(s) exist.
+
+create or replace function public._is_stint_account_deleted(p_user_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path to pg_catalog, public
+as $$
+  select
+    public._is_candidate_deleted(p_user_id)
+    or public._is_employer_deleted(p_user_id);
+$$;
+
+comment on function public._is_stint_account_deleted(uuid) is
+  'D-085 whole-account deletion helper: true when EITHER candidate_profiles.account_deleted_at or employer_profiles.account_deleted_at is set for this auth identity. Closes the cross-capability stale-JWT resurrection gap that a role-local check alone cannot see (a capability that does not yet exist has no row for _is_candidate_deleted/_is_employer_deleted to find). Fully internal arbitrary-id lookup, mirroring _is_candidate_deleted/_is_employer_deleted''s no-existence-oracle discipline exactly. Never authenticated/anon/service_role-executable — called only from within other SECURITY DEFINER function bodies via owner-implicit execute (_is_candidate_deleted/_is_employer_deleted grant it none either).';
+
+revoke all on function public._is_stint_account_deleted(uuid) from public, anon, authenticated, service_role;
+
+create or replace function public._is_current_stint_account_deleted()
+returns boolean
+language sql
+stable
+security definer
+set search_path to pg_catalog, public
+as $$
+  select public._is_stint_account_deleted(auth.uid());
+$$;
+
+comment on function public._is_current_stint_account_deleted() is
+  'RLS-support helper: zero arguments, identity from auth.uid() only. Granted authenticated EXECUTE because the candidate_profiles_insert_own/employer_profiles_insert_own RLS predicates call it directly, so a whole-account-deleted identity cannot create the capability it never had before deletion. Cannot be used to probe another identity''s deletion state.';
+
+revoke all on function public._is_current_stint_account_deleted() from public, anon;
+grant execute on function public._is_current_stint_account_deleted() to authenticated;
 
 -- =============================================================================
 -- 3. Trigger guard: preserve onboarding_completed_at during account-deletion
@@ -396,6 +442,11 @@ create policy candidate_profiles_insert_own
   with check (
     (select auth.uid()) = id
     and not public._is_current_candidate_deleted()
+    -- D-085 cross-capability gap: _is_current_candidate_deleted() alone
+    -- is a no-op here (no candidate_profiles row exists yet to check), so
+    -- an employer-only deleted account could otherwise create a candidate
+    -- profile with a still-valid pre-delete JWT. Whole-account check closes it.
+    and not public._is_current_stint_account_deleted()
   );
 
 drop policy candidate_profiles_update_own on public.candidate_profiles;
@@ -478,6 +529,11 @@ create policy employer_profiles_insert_own
   with check (
     (select auth.uid()) = id
     and not public._is_current_employer_deleted()
+    -- D-085 cross-capability gap: _is_current_employer_deleted() alone is
+    -- a no-op here (no employer_profiles row exists yet to check), so a
+    -- candidate-only deleted account could otherwise create an employer
+    -- profile with a still-valid pre-delete JWT. Whole-account check closes it.
+    and not public._is_current_stint_account_deleted()
   );
 
 drop policy employer_profiles_update_own on public.employer_profiles;
@@ -1235,10 +1291,18 @@ begin
       where id = uid;
     end if;
   else
-    -- No existing profile: structurally cannot be suspended or deleted
-    -- (D-072/D-080 — an employer_suspension row, and account_deleted_at,
-    -- can only reference an already-existing employer_profile_id), so
-    -- this branch is deliberately unguarded.
+    -- No existing employer_profiles row: role-locally this branch cannot
+    -- be suspended (D-072 requires an existing employer_profile_id) or
+    -- employer-deleted (D-080 requires an existing row too) — but D-085's
+    -- whole-account contract still applies: a candidate-only deleted
+    -- account must not be able to use a still-valid pre-delete JWT to
+    -- create the employer capability it never had. _is_stint_account_deleted
+    -- checks both candidate_profiles and employer_profiles account_deleted_at
+    -- for this identity, not just the (absent) employer_profiles row.
+    if public._is_stint_account_deleted(uid) then
+      return jsonb_build_object('status', 'unavailable');
+    end if;
+
     insert into public.employer_profiles (
       id,
       employer_type,
@@ -2389,7 +2453,16 @@ create table public.deletion_requests (
   constraint deletion_requests_failed_at_chk
     check ((status = 'failed') = (failed_at is not null)),
   constraint deletion_requests_failure_code_chk
-    check (failure_code is null or char_length(btrim(failure_code)) > 0)
+    check (
+      failure_code is null
+      or failure_code in (
+        'domain_scrub_failed',
+        'auth_delete_failed',
+        'auth_verification_failed',
+        'auth_evidence_failed',
+        'unknown'
+      )
+    )
 );
 
 comment on table public.deletion_requests is
@@ -2484,7 +2557,7 @@ $$;
 comment on function public.request_account_deletion() is
   'D-081/D-085 self-service deletion request. Target is always auth.uid() — never a caller-supplied user ID or role. Idempotent: a duplicate call while pending/processing returns the existing request rather than erroring or creating a second row (enforced declaratively by deletion_requests_active_user_uidx, defensively by the unique_violation handler above).';
 
-revoke all on function public.request_account_deletion() from public, anon;
+revoke all on function public.request_account_deletion() from public, anon, service_role;
 grant execute on function public.request_account_deletion() to authenticated;
 
 create or replace function public.cancel_account_deletion_request()
@@ -2517,7 +2590,7 @@ $$;
 comment on function public.cancel_account_deletion_request() is
   'D-081 pending-only cancellation. Deletes the pending request row outright (D-081''s preferred representation — keeps the status enum closed at pending/processing/completed/failed, immediately frees the active-request uniqueness constraint). Only the caller''s own row, only while status=pending; a processing/completed/failed request cannot be cancelled by any authenticated path.';
 
-revoke all on function public.cancel_account_deletion_request() from public, anon;
+revoke all on function public.cancel_account_deletion_request() from public, anon, service_role;
 grant execute on function public.cancel_account_deletion_request() to authenticated;
 
 -- =============================================================================
@@ -2554,7 +2627,7 @@ $$;
 comment on function public._withdraw_vacancy_for_deletion(uuid, uuid, timestamptz) is
   'Internal-only vacancy withdrawal for account-deletion processing. Reproduces _transition_employer_vacancy''s withdraw branch exactly, but takes an explicit target employer id instead of deriving auth.uid() — the processor context has no caller session. Lifecycle-event actor is the deleted employer''s own id (their own account action being finalized), never service_role/an operator/another user.';
 
-revoke all on function public._withdraw_vacancy_for_deletion(uuid, uuid, timestamptz) from public, anon, authenticated;
+revoke all on function public._withdraw_vacancy_for_deletion(uuid, uuid, timestamptz) from public, anon, authenticated, service_role;
 
 create or replace function public._anonymize_candidate_domain(p_candidate_id uuid, p_ts timestamptz)
 returns void
@@ -2583,18 +2656,22 @@ begin
 
   delete from public.candidate_languages where candidate_id = p_candidate_id;
 
+  -- D-078: candidate_snapshot is replaced, but every other application
+  -- field — including updated_at — is preserved byte/value-exact. The
+  -- application row itself was not modified by the candidate's own action;
+  -- only its candidate-authored snapshot is superseded by the tombstone
+  -- marker. No trigger exists on public.applications to override this.
   update public.applications
   set
-    candidate_snapshot = jsonb_build_object('deleted', true),
-    updated_at = p_ts
+    candidate_snapshot = jsonb_build_object('deleted', true)
   where candidate_id = p_candidate_id;
 end;
 $$;
 
 comment on function public._anonymize_candidate_domain(uuid, timestamptz) is
-  'D-078 candidate anonymization. candidate_profiles preserved as tombstone (account_deleted_at set, identifying fields cleared/placeholder, onboarding_completed_at/created_at left untouched by this function and protected from the essentials trigger''s auto-clear via stint.allow_account_deletion_scrub). candidate_languages rows deleted outright. Every applications.candidate_snapshot replaced with the exact minimal tombstone {"deleted": true} — no fabricated candidate attributes (job_category/german_comfort/employment_types/shift_preferences/languages/available_from/work_authorisation_declared/display_name are never written into this JSON). applications.snapshot_version remains 1 (unchanged) — the deleted marker does not need its own JSON version key. candidateSnapshotV1Schema and the employer list/detail schemas were corrected (not the SQL) to accept this shape as a distinct, explicit deleted variant via a discriminated union — the employer applicant list/detail views detect it via this exact "deleted" key and render a truthful "Deleted candidate" label, never a fabricated live attribute. applications/application_status_history rows and vacancy_snapshot are never touched by this function.';
+  'D-078 candidate anonymization. candidate_profiles preserved as tombstone (account_deleted_at set, identifying fields cleared/placeholder, onboarding_completed_at/created_at left untouched by this function and protected from the essentials trigger''s auto-clear via stint.allow_account_deletion_scrub). candidate_languages rows deleted outright. Every applications.candidate_snapshot replaced with the exact minimal tombstone {"deleted": true} — no fabricated candidate attributes (job_category/german_comfort/employment_types/shift_preferences/languages/available_from/work_authorisation_declared/display_name are never written into this JSON). applications.updated_at is deliberately NOT touched by this update — every other application field (id/candidate_id/vacancy_id/status/submitted_at/created_at/updated_at/vacancy_snapshot/snapshot_version) remains byte/value-exact, since the application itself was not modified, only its candidate-authored snapshot was superseded. applications.snapshot_version remains 1 (unchanged) — the deleted marker does not need its own JSON version key. candidateSnapshotV1Schema and the employer list/detail schemas were corrected (not the SQL) to accept this shape as a distinct, explicit deleted variant via a discriminated union — the employer applicant list/detail views detect it via this exact "deleted" key and render a truthful "Deleted candidate" label, never a fabricated live attribute. application_status_history rows are never touched by this function.';
 
-revoke all on function public._anonymize_candidate_domain(uuid, timestamptz) from public, anon, authenticated;
+revoke all on function public._anonymize_candidate_domain(uuid, timestamptz) from public, anon, authenticated, service_role;
 
 create or replace function public._anonymize_employer_domain(p_employer_id uuid, p_ts timestamptz)
 returns void
@@ -2659,16 +2736,23 @@ $$;
 comment on function public._anonymize_employer_domain(uuid, timestamptz) is
   'D-079/D-082/D-086 employer anonymization. Order: (1) withdraw every owned published/paused vacancy via _withdraw_vacancy_for_deletion, so vacancy ids remain queryable by employer_profile_id unchanged throughout; (2) D-082 redact admin_audit_events.reason for rows targeting this employer or its vacancies, preserving id/event_type/target_kind/target_id/actor_user_id/occurred_at; (3) D-086 delete (not redact, not preserve) the current-state employer_suspension row and vacancy_moderation rows for owned vacancies — no unsuspend_employer/restore_vacancy call, no employer_unsuspended/vacancy_restored audit event; (4) employer_profiles preserved as tombstone; (5) owned organisation company preserved as tombstone with a deterministic deleted-company-<uuid> slug derived only from the company''s own immutable id. vacancies, vacancy_language_requirements, applications, and application_status_history are never written to, deleted, or cascaded by this function.';
 
-revoke all on function public._anonymize_employer_domain(uuid, timestamptz) from public, anon, authenticated;
+revoke all on function public._anonymize_employer_domain(uuid, timestamptz) from public, anon, authenticated, service_role;
 
 -- =============================================================================
 -- 10. Processor-only claim/scrub/evidence/failure primitives (D-081, D-085)
 -- =============================================================================
--- None of these four functions are granted to authenticated/anon — only
--- service_role's default schema privilege (unchanged by this migration,
--- matching admin_audit_events/employer_suspension/vacancy_moderation's own
--- service_role-default-access pattern) can execute them. PR 8.4's isolated
--- server-only processing module is the only intended caller.
+-- Each of these four functions has an explicit, deterministic ACL — revoked
+-- from public/anon/authenticated/service_role by default, then granted back
+-- to service_role only — rather than relying on Supabase's project-level
+-- default schema privileges (discovered during PR 8.2 review as
+-- insufficiently explicit for the one surface a future service-role
+-- processing module will actually call over PostgREST). This is exactly the
+-- external processor API: PR 8.4's isolated server-only processing module is
+-- the only intended caller, and it must not be able to reach the
+-- arbitrary-target anonymization/withdrawal helpers below directly — those
+-- remain revoked from service_role too (§9) and are reachable only via these
+-- four request-bound entry points, which resolve their own target from the
+-- persisted request row, never from a caller-supplied id.
 
 create or replace function public._claim_deletion_request(p_request_id uuid)
 returns jsonb
@@ -2706,7 +2790,8 @@ $$;
 comment on function public._claim_deletion_request(uuid) is
   'D-081 row-locked/deterministic single-writer claim. The UPDATE ... WHERE status IN (''pending'',''failed'') itself is the concurrency guarantee: two concurrent claim attempts on the same row cannot both match under Postgres MVCC (the second sees the first''s already-updated status and matches zero rows). Claims from ''failed'' too, so a retry after a failed Auth step re-enters processing without a separate retry function. A completed/already-processing row is a deterministic no-op, never an error.';
 
-revoke all on function public._claim_deletion_request(uuid) from public, anon, authenticated;
+revoke all on function public._claim_deletion_request(uuid) from public, anon, authenticated, service_role;
+grant execute on function public._claim_deletion_request(uuid) to service_role;
 
 create or replace function public._process_deletion_domain_scrub(p_request_id uuid)
 returns jsonb
@@ -2760,7 +2845,8 @@ $$;
 comment on function public._process_deletion_domain_scrub(uuid) is
   'D-081 phase 2/3. Accepts only a deletion_request_id, never candidate_id/employer_id/user_id/role — resolves request.user_id internally (D-085). Must be called only after _claim_deletion_request has transitioned the row to processing. Runs D-078 and/or D-079+D-082+D-086 anonymization for whichever profile(s) exist on the target identity inside this one function invocation''s transaction, then records domain_scrubbed_at — the durable evidence PR 8.4''s Auth-scrub step (phase 4) checks for before proceeding.';
 
-revoke all on function public._process_deletion_domain_scrub(uuid) from public, anon, authenticated;
+revoke all on function public._process_deletion_domain_scrub(uuid) from public, anon, authenticated, service_role;
+grant execute on function public._process_deletion_domain_scrub(uuid) to service_role;
 
 create or replace function public._record_deletion_auth_evidence(p_request_id uuid)
 returns jsonb
@@ -2798,7 +2884,8 @@ $$;
 comment on function public._record_deletion_auth_evidence(uuid) is
   'D-081 phase 5/6, and the reconciliation primitive for the Auth-succeeded-but-evidence-write-failed case in one function: idempotent (coalesce on auth_deleted_at, early-return once already completed), callable from ''processing'' or ''failed'' status as long as domain_scrubbed_at is already set, and requires no authentication from the deleted user — PR 8.4''s manual reconciliation path calls this same function again after independently re-confirming the Auth deletion via the Auth Admin API, rather than needing a second dedicated reconciliation function.';
 
-revoke all on function public._record_deletion_auth_evidence(uuid) from public, anon, authenticated;
+revoke all on function public._record_deletion_auth_evidence(uuid) from public, anon, authenticated, service_role;
+grant execute on function public._record_deletion_auth_evidence(uuid) to service_role;
 
 create or replace function public._record_deletion_failure(p_request_id uuid, p_failure_code text)
 returns jsonb
@@ -2809,11 +2896,27 @@ as $$
 declare
   ts timestamptz := clock_timestamp();
   updated_id uuid;
+  -- Fixed, declarative allow-list — must match
+  -- deletion_requests_failure_code_chk exactly. A caller-supplied value
+  -- outside this list (including a raw Auth Admin API or Postgres error
+  -- message) is never persisted as-is; it silently normalizes to
+  -- 'unknown' instead. A max-length constraint alone would still let a
+  -- raw exception string through, so membership is checked, not length.
+  normalized_code text := case
+    when btrim(coalesce(p_failure_code, '')) in (
+      'domain_scrub_failed',
+      'auth_delete_failed',
+      'auth_verification_failed',
+      'auth_evidence_failed',
+      'unknown'
+    ) then btrim(p_failure_code)
+    else 'unknown'
+  end;
 begin
   update public.deletion_requests
   set status = 'failed',
       failed_at = ts,
-      failure_code = coalesce(nullif(btrim(p_failure_code), ''), 'unknown'),
+      failure_code = normalized_code,
       updated_at = ts
   where id = p_request_id
     and status = 'processing'
@@ -2828,6 +2931,7 @@ end;
 $$;
 
 comment on function public._record_deletion_failure(uuid, text) is
-  'D-081 failure recording. Only transitions from processing — a fixed, generic, bounded failure_code is stored, never a raw Auth Admin API or Postgres error message (no internal-error-leakage). Claimable again via _claim_deletion_request (which accepts pending or failed).';
+  'D-081 failure recording. Only transitions from processing — failure_code is normalized against a fixed, declarative allow-list (domain_scrub_failed/auth_delete_failed/auth_verification_failed/auth_evidence_failed/unknown, matching deletion_requests_failure_code_chk exactly) before being stored; any other input, including a raw Auth Admin API or Postgres error message, is never persisted and silently becomes ''unknown'' instead (no internal-error-leakage). Claimable again via _claim_deletion_request (which accepts pending or failed).';
 
-revoke all on function public._record_deletion_failure(uuid, text) from public, anon, authenticated;
+revoke all on function public._record_deletion_failure(uuid, text) from public, anon, authenticated, service_role;
+grant execute on function public._record_deletion_failure(uuid, text) to service_role;
