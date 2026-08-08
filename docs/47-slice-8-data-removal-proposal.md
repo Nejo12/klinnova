@@ -17,13 +17,22 @@ narrow employer-export read RPC) respectively, both Accepted 2026-08-08;
 see `docs/10-decisions.md`. PR 8.3 is accordingly split into PR 8.3a (the
 D-089 read contract, merged) and PR 8.3b (the export API/UI this §2
 describes, merged). PR 8.4 (the deletion request UI and privileged Auth
-soft-delete processing this document's §3/§10 describe) is
-implementation-complete locally, awaiting review. PR 8.4 implementation
-discovery found this §10 processing sequence had no recovery path for a
-request stranded at `processing` by a crash between a successful claim and
-any subsequent step — closed by D-090 (deletion processing lease and
-stranded-request recovery), Accepted 2026-08-08, with one additive
-migration (16th). Migration count is 16.
+soft-delete processing this document's §3/§10 describe) is merged (#72).
+PR 8.4 implementation discovery found this §10 processing sequence had no
+recovery path for a request stranded at `processing` by a crash between a
+successful claim and any subsequent step — closed by D-090 (deletion
+processing lease and stranded-request recovery), Accepted 2026-08-08, with
+one additive migration (16th). Migration count is 16. Slice 8's
+implementation PRs (8.1–8.4) are all merged; Slice 8's local
+implementation is complete. PR 8.5 (local exit proof + Slice 8/M4
+closure) is implementation-complete locally, awaiting review/merge — see
+`docs/48-slice-8-exit-proof.md`. Independent review of PR 8.5 found one
+proof gap (processing-state cancellation denial lacked an authoritative
+pgTAP assertion), closed by a test-only correction — 4 new pgTAP
+assertions in the existing `30_account_deletion_tombstone_and_request_contract_test.sql`
+file, no migration, no schema change, no RPC behavior change. Slice 8
+itself is not marked Done, and M4 is not marked Complete, pending PR
+8.5's review/merge.
 
 ## 1. Current-state graph (summary; full inventory in `docs/45` §2)
 
