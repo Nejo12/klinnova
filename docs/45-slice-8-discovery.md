@@ -249,6 +249,58 @@ avoids the FK-cascade/tombstone incompatibility in §3.1, and closes the
 stale-JWT gap with a mechanism this repository already fully controls and
 has already proven out once (PR 7.2's suspension gate).
 
+### 3.4 Whole-account deletion for dual-capability identities (D-085)
+
+**Discovered during PR 8.2 implementation, resolved by D-085, not reopened
+here.** D-047 permits one `auth.users` identity to hold both
+`candidate_profiles` and `employer_profiles` simultaneously (a shipped,
+reachable "dual-capability account" state, with live routing support at
+`/account/choose`). Because mechanism B (§3.1) soft-deletes the *shared*
+`auth.users` row rather than an individual capability, §6 (candidate
+deletion) and §7 (employer deletion) cannot be treated as independent,
+mutually exclusive scenarios when both profiles exist on one identity —
+a role-scoped deletion would leave the untouched capability's data intact
+in the database while the shared Auth identity underneath it can no
+longer sign in, an orphaned, misleading state.
+
+**D-085 resolves this as whole-account deletion**, not a re-decision of
+§6/§7's per-role contracts: a deletion request always targets `auth.uid()`
+— the Stint account — never a caller-selected role. The privileged
+processor derives which profile(s) exist at processing time and, for a
+dual-capability account, runs **both** §6's candidate anonymization and
+§7's employer anonymization (including the D-086 moderation cleanup and
+D-082 audit redaction folded into the employer side) inside **one atomic
+domain transaction**, then sets `account_deleted_at` on every existing
+profile row before the Auth soft-delete step. `deletion_requests` is
+`user_id`-scoped, not role-scoped — see §10.1's amendment below. Full
+decision text and rationale: `docs/10-decisions.md` D-085.
+
+### 3.5 Deleted-candidate application transition boundary (D-087)
+
+**Discovered during PR 8.2 implementation, resolved by D-087, not reopened
+here.** The §3.3 table above gates the applicant list/detail/status
+transition surface against the *employer's own* deletion — it does not
+address what happens when the *candidate* who owns a given preserved
+application (§6/D-078) is deleted while the employer remains active. A
+preserved application is a legitimate historical recruitment record, but
+the candidate is no longer an active Stint participant once
+`candidate_profiles.account_deleted_at` is set — the ordinary D-070
+transition machine must not keep treating that application as an ongoing
+workflow.
+
+**D-087 resolves this:** the employer may still read the preserved
+application (list/detail, unchanged from §D.1's truthful `candidate_deleted`
+projection), but `transition_current_employer_application_status(...)`
+returns its existing `unavailable` result — no new result variant — once
+the application's candidate has `account_deleted_at IS NOT NULL`, checked
+before any row lock/mutation. `get_current_employer_application(...)`'s
+deleted-candidate branch returns `allowed_transitions: []` so the detail
+RPC never advertises a transition the transition RPC will reject. The
+authoritative signal is `candidate_profiles.account_deleted_at`, never
+`candidate_snapshot`'s presentation-only `deleted` marker. D-070 remains
+authoritative and unaffected for any application whose candidate account is
+active. Full decision text and rationale: `docs/10-decisions.md` D-087.
+
 ## 4. Candidate export boundary (proposal, not yet accepted)
 
 **Included (proposed):**
@@ -396,6 +448,11 @@ document proposes for `docs/47` and the gating decision (§16, D-077).
 
 ## 6. Candidate deletion semantics (proposal, not yet accepted)
 
+*Applies whenever a candidate profile exists on the target identity —
+including as one half of a dual-capability domain scrub under D-085/§3.4;
+that decision does not alter this section's per-role contract, only when
+it runs and alongside what.*
+
 Graph traced in §2/§3: `candidate_profiles` → `candidate_languages`
 (cascade), → `applications` (cascade), → `application_status_history`
 (cascade). A literal `auth.users` delete for a candidate is **technically
@@ -509,6 +566,11 @@ identifying field in `candidate_profiles`, all `candidate_languages` rows,
 and every `candidate_snapshot`.
 
 ## 7. Employer deletion semantics (proposal, not yet accepted) — the most consequential graph
+
+*Applies whenever an employer profile exists on the target identity —
+including as one half of a dual-capability domain scrub under D-085/§3.4.
+The D-086 current-state moderation cleanup (§8) is folded into this
+section's transaction when it runs.*
 
 Full trace, confirmed against §2/§3:
 
@@ -671,6 +733,27 @@ without retaining arbitrary free text indefinitely — the taxonomy alone
 action was taken against this account, and when," which is the audit
 trail's load-bearing property.
 
+**Current-state moderation tables — resolved by D-086, discovered during
+PR 8.2 implementation.** The redaction contract above governs
+`admin_audit_events` only. It left open what happens to
+`employer_suspension.suspended_reason`/`vacancy_moderation.moderated_reason`
+— `NOT NULL` free-text current-state columns that D-074's own text notes
+normally `ON DELETE CASCADE` from the employer/vacancy row, a cascade
+that never fires under Slice 8's tombstone-preservation design. **D-086
+resolves this as removal, not redaction**: during employer account
+anonymization, the current `employer_suspension` row for that employer
+and every current `vacancy_moderation` row for a vacancy it owns are
+deleted outright (not preserved, not redacted in place) — these are
+*current operational state*, not history, and the historical fact
+already survives, redacted, in `admin_audit_events` per the contract
+above. Deletion processing does not call `unsuspend_employer`/
+`restore_vacancy` for this cleanup — those RPCs carry different business
+semantics and would generate misleading `employer_unsuspended`/
+`vacancy_restored` audit events; the cleanup happens directly inside the
+authoritative deletion/anonymization transaction, with no ordinary
+`authenticated`/`anon` DELETE grant on either table. Full decision text:
+`docs/10-decisions.md` D-086.
+
 ## 9. Private-document/storage surface — current factual state
 
 Confirmed by direct inspection, not assumed:
@@ -741,7 +824,14 @@ intermediate state to recover from if a later step fails.
   `pending` or `processing`. This is enforced at the schema level (a
   partial unique index or equivalent constraint on `(user_id)` filtered to
   active statuses — exact SQL is a PR 8.2 implementation detail, but the
-  *constraint itself* is decided here).
+  *constraint itself* is decided here). **Per D-085, this is scoped to
+  `user_id` — the whole Stint account — not to a role.** A dual-capability
+  user cannot hold a candidate deletion request and an employer deletion
+  request in parallel; there is exactly one request per account, and it
+  covers whichever capability/capabilities exist at processing time. If a
+  capability descriptor is stored on the request row at all, it is
+  DB-derived (`candidate` | `employer` | `dual`) and diagnostic only —
+  never caller-supplied, and never used to narrow processing to one role.
 - **Duplicate request while `pending`:** a second request call from the
   same user returns the existing `pending` request rather than creating a
   new row or erroring — the operation is naturally idempotent from the

@@ -1,12 +1,15 @@
 # Slice 8 Build Plan — Account Deletion to Confirmed Data Removal
 
-> **Status:** Planning active; decisions Accepted. PR 8.1 (this document +
-> `docs/45`/`docs/47` + `docs/10-decisions.md` D-076–D-084) is complete —
-> no implementation PR has started. Discovery: `docs/45-slice-8-discovery.md`.
-> Data-removal proposal: `docs/47-slice-8-data-removal-proposal.md`.
-> Decisions D-076–D-084 below are **Accepted** (2026-08-07) in
-> `docs/10-decisions.md`. **PR 8.2 is the first authorized implementation
-> unit; this PR (8.1) does not itself begin it.**
+> **Status:** Implementation active. PR 8.1 (this document + `docs/45`/
+> `docs/47` + `docs/10-decisions.md` D-076–D-084) merged. Decisions
+> D-076–D-086 are **Accepted** (2026-08-07) in `docs/10-decisions.md` —
+> D-085 (whole-account deletion across capabilities) and D-086
+> (current-state moderation removal) were discovered and Accepted during
+> PR 8.2's own implementation. **PR 8.2 (deletion/tombstone/request/
+> access-gate database contract) is implementation-complete locally,
+> awaiting review** — one additive migration (14th), pgTAP 1306/1306 (1136
+> prior + 170 new), no Auth Admin API call, no service-role application
+> code, no UI. PR 8.3/8.4/8.5 have not started.
 
 **Outcome (`docs/13-implementation-plan.md`, unchanged):** candidates and
 employers can request export and deletion; removal can be confirmed.
@@ -49,11 +52,24 @@ started.
 
 ### PR 8.2 — Deletion/export database contract
 
+**Status: implementation-complete locally, awaiting review.** One
+additive migration (14th, `20260807220000_account_deletion_tombstone_and_request_contract.sql`);
+pgTAP 1306/1306 (1136 prior + 170 new, `supabase/tests/database/30_account_deletion_tombstone_and_request_contract_test.sql`);
+generated types regenerated, no drift. Not merged.
+
 **Gated by:** D-078 (candidate deletion semantics), D-079 (employer
 deletion semantics), D-080 (Auth deletion mechanism — schema-readiness
 half, and the `account_deleted_at` database gate), D-081 (deletion-request
 state machine — schema half, including the concurrency contract and
-processing-phase evidence), D-082 (audit-event retention/redaction).
+processing-phase evidence), D-082 (audit-event retention/redaction),
+D-085 (whole-account deletion across capabilities — discovered and
+Accepted during this PR's own implementation), D-086 (current-state
+moderation removal — discovered and Accepted during this PR's own
+implementation), D-087 (deleted-candidate application transition boundary —
+discovered and Accepted during this PR's own implementation: a preserved
+application remains a frozen historical record once its candidate is
+deleted, not an ongoing recruitment workflow; D-070 remains authoritative
+while the candidate account is active).
 
 **Objective:** the additive migration + pgTAP proof for everything PR 8.3/
 8.4's UI needs, following the exact PR 7.2 precedent (schema/RPCs/pgTAP
@@ -76,24 +92,32 @@ table + two RPCs" per the D-080/D-081 corrections):**
   profile/company/onboarding/vacancy-lifecycle/verification/applicant-
   review) — a double-digit number of individual policies/RPCs, not a
   handful
-- a `deletion_requests` table: owner-scoped, `pending`/`processing`/
-  `completed`/`failed` status, an active-request uniqueness constraint
-  (at most one `pending`/`processing` row per user), two evidence-marker
-  columns (`domain_scrubbed_at`/`auth_deleted_at` or equivalent), no
-  caller-supplied target user
+- D-087: `transition_current_employer_application_status` additionally
+  denies (existing `unavailable` result) once the *application's own
+  candidate* — not the employer — has `account_deleted_at` set;
+  `get_current_employer_application` returns `allowed_transitions: []` for
+  that same case. This is a distinct check from the employer-deletion gate
+  above — the employer may be fully active while a specific applicant's
+  account is deleted
+- a `deletion_requests` table: owner-scoped by `user_id` (the whole Stint
+  account, not a role, per D-085), `pending`/`processing`/`completed`/
+  `failed` status, an active-request uniqueness constraint (at most one
+  `pending`/`processing` row per `user_id`), two evidence-marker columns
+  (`domain_scrubbed_at`/`auth_deleted_at` or equivalent), no caller-supplied
+  target user and no caller-supplied role/scope column
 - request/cancel/claim/process transition RPCs (or an equivalent RPC
   surface) implementing D-081's exact concurrency contract (row-locked
   claim, cancel-only-while-pending, no cooling-off) and the six-phase
   processing order
-- a self-scoped `SECURITY DEFINER` candidate-anonymization RPC
-  implementing D-078's exact field matrix (tombstone `candidate_profiles`
-  row, `candidate_languages` row deletion, versioned `candidate_snapshot`
-  tombstone shape)
-- a self-scoped `SECURITY DEFINER` employer-anonymization RPC
-  implementing D-079's exact field matrix (tombstone `employer_profiles`
-  row, deterministic `deleted-company-<uuid>` company slug, vacancy
-  withdrawal via the existing `withdraw_employer_vacancy` pattern, and the
-  D-082 audit-`reason` redaction as part of the same transaction)
+- one processor-bound, `deletion_request_id`-scoped domain-anonymization
+  operation (not two independently-invocable ones) implementing D-085:
+  resolves `request.user_id`, determines which profile(s) exist, and runs
+  D-078's candidate field matrix and/or D-079's employer field matrix
+  (tombstone rows, `candidate_languages` deletion, versioned
+  `candidate_snapshot` tombstone, deterministic `deleted-company-<uuid>`
+  slug, vacancy withdrawal, D-082 audit-`reason` redaction, D-086
+  current-state `employer_suspension`/`vacancy_moderation` removal) in one
+  atomic transaction when both profiles exist
 - a narrow, manually-invoked privileged reconciliation operation (D-081)
   for the Auth-succeeded-but-evidence-write-failed case — not a scheduled
   background worker

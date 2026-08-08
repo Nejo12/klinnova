@@ -7,7 +7,10 @@ import {
   buildApplicationConfirmation,
   type ApplicationConfirmation,
 } from "@/lib/applications/application-confirmation";
-import { parseApplicationSnapshots } from "@/lib/applications/snapshot-schemas";
+import {
+  isCandidateSnapshotDeleted,
+  parseApplicationSnapshots,
+} from "@/lib/applications/snapshot-schemas";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
@@ -99,6 +102,14 @@ export async function loadCandidateApplicationConfirmation(
 
   const parsed = parseApplicationSnapshots(applicationResult.row);
   if (!parsed.ok) {
+    return { status: "unavailable" };
+  }
+
+  // A deleted candidate's own confirmation page is unreachable in practice
+  // (the D-080 database gate blocks their own reads before this loader is
+  // ever called), but the snapshot type is a union — narrow explicitly
+  // rather than assuming.
+  if (isCandidateSnapshotDeleted(parsed.candidate)) {
     return { status: "unavailable" };
   }
 

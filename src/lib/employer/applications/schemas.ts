@@ -26,18 +26,46 @@ const languageSnapshotSchema = z.object({
 // Returns shape exactly (src/types/database.ts); no widening.
 // ---------------------------------------------------------------------------
 
-export const employerApplicationListRowSchema = z.object({
-  application_id: z.string().uuid(),
-  vacancy_id: z.string().uuid(),
-  vacancy_title: z.string().min(1),
-  candidate_display_name: z.string().min(1),
-  job_category: z.enum(JOB_CATEGORY_CODES),
-  german_comfort: z.enum(GERMAN_COMFORT_CODES),
-  available_from: isoCalendarDateSchema.nullable(),
-  current_status: applicationStatusSchema,
-  submitted_at: z.string().min(1),
-  updated_at: z.string().min(1),
-});
+/**
+ * D-078/D-082-consistent contract: a preserved application against a
+ * deleted candidate must never surface fabricated candidate attributes.
+ * `candidate_deleted` is the explicit, DB-derived discriminant (read from
+ * `applications.candidate_snapshot->>'deleted'` server-side, never
+ * inferred from `candidate_display_name` text). The deleted branch omits
+ * `job_category`/`german_comfort`/`available_from` entirely rather than
+ * requiring a real (or fake) enum value.
+ */
+export const employerApplicationListRowSchema = z.discriminatedUnion(
+  "candidate_deleted",
+  [
+    z.object({
+      candidate_deleted: z.literal(false),
+      application_id: z.string().uuid(),
+      vacancy_id: z.string().uuid(),
+      vacancy_title: z.string().min(1),
+      candidate_display_name: z.string().min(1),
+      job_category: z.enum(JOB_CATEGORY_CODES),
+      german_comfort: z.enum(GERMAN_COMFORT_CODES),
+      available_from: isoCalendarDateSchema.nullable(),
+      current_status: applicationStatusSchema,
+      submitted_at: z.string().min(1),
+      updated_at: z.string().min(1),
+    }),
+    z.object({
+      candidate_deleted: z.literal(true),
+      application_id: z.string().uuid(),
+      vacancy_id: z.string().uuid(),
+      vacancy_title: z.string().min(1),
+      candidate_display_name: z.literal("Deleted candidate"),
+      job_category: z.null(),
+      german_comfort: z.null(),
+      available_from: z.null(),
+      current_status: applicationStatusSchema,
+      submitted_at: z.string().min(1),
+      updated_at: z.string().min(1),
+    }),
+  ],
+);
 
 export const employerApplicationListSchema = z.array(
   employerApplicationListRowSchema,
@@ -77,26 +105,68 @@ const statusHistoryEntrySchema = z.object({
   occurred_at: z.string().min(1),
 });
 
-export const employerApplicationDetailSchema = z.discriminatedUnion("status", [
-  z.object({
-    status: z.literal("ready"),
-    application_id: z.string().uuid(),
-    vacancy_id: z.string().uuid(),
-    vacancy_title: z.string().min(1),
-    submitted_at: z.string().min(1),
-    current_status: applicationStatusSchema,
-    candidate_display_name: z.string().min(1),
-    matched_job_category: z.enum(JOB_CATEGORY_CODES),
-    german_comfort: z.enum(GERMAN_COMFORT_CODES),
-    languages: z.array(languageSnapshotSchema),
-    work_authorisation_declared: z.boolean(),
-    available_from: isoCalendarDateSchema.nullable(),
-    employment_types: z.array(z.enum(EMPLOYMENT_TYPE_CODES)),
-    shift_preferences: z.array(z.enum(SHIFT_PREFERENCE_CODES)),
-    allowed_transitions: allowedTransitionsSchema,
-    status_history: z.array(statusHistoryEntrySchema),
-  }),
-  z.object({ status: z.literal("unavailable") }),
+/**
+ * D-078/D-082-consistent contract, nested one level deeper than the list
+ * row: outer discriminant is `status` (unchanged — `ready`/`unavailable`,
+ * matching the RPC's existing no-existence-oracle result vocabulary); the
+ * `ready` branch is itself a discriminated union on `candidate_deleted`.
+ * A deleted candidate's application is still `status: "ready"` — the
+ * preserved application/status/history remains a legitimate business
+ * record (D-078) — it is never collapsed into `unavailable` merely
+ * because the candidate deleted their account.
+ */
+const employerApplicationDetailReadyLiveSchema = z.object({
+  status: z.literal("ready"),
+  candidate_deleted: z.literal(false),
+  application_id: z.string().uuid(),
+  vacancy_id: z.string().uuid(),
+  vacancy_title: z.string().min(1),
+  submitted_at: z.string().min(1),
+  current_status: applicationStatusSchema,
+  candidate_display_name: z.string().min(1),
+  matched_job_category: z.enum(JOB_CATEGORY_CODES),
+  german_comfort: z.enum(GERMAN_COMFORT_CODES),
+  languages: z.array(languageSnapshotSchema),
+  work_authorisation_declared: z.boolean(),
+  available_from: isoCalendarDateSchema.nullable(),
+  employment_types: z.array(z.enum(EMPLOYMENT_TYPE_CODES)),
+  shift_preferences: z.array(z.enum(SHIFT_PREFERENCE_CODES)),
+  allowed_transitions: allowedTransitionsSchema,
+  status_history: z.array(statusHistoryEntrySchema),
+});
+
+const employerApplicationDetailReadyDeletedSchema = z.object({
+  status: z.literal("ready"),
+  candidate_deleted: z.literal(true),
+  application_id: z.string().uuid(),
+  vacancy_id: z.string().uuid(),
+  vacancy_title: z.string().min(1),
+  submitted_at: z.string().min(1),
+  current_status: applicationStatusSchema,
+  candidate_display_name: z.literal("Deleted candidate"),
+  // D-087: a deleted candidate's application is frozen — the database
+  // itself always returns [] here, and this schema encodes that contract
+  // rather than accepting whatever array-of-known-statuses the live
+  // branch would.
+  allowed_transitions: z.tuple([]),
+  status_history: z.array(statusHistoryEntrySchema),
+});
+
+const employerApplicationDetailReadySchema = z.discriminatedUnion(
+  "candidate_deleted",
+  [
+    employerApplicationDetailReadyLiveSchema,
+    employerApplicationDetailReadyDeletedSchema,
+  ],
+);
+
+const employerApplicationDetailUnavailableSchema = z.object({
+  status: z.literal("unavailable"),
+});
+
+export const employerApplicationDetailSchema = z.union([
+  employerApplicationDetailReadySchema,
+  employerApplicationDetailUnavailableSchema,
 ]);
 
 export type EmployerApplicationDetail = z.infer<

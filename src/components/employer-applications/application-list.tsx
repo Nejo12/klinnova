@@ -10,10 +10,6 @@ import {
   germanRequirementLabel,
   jobCategoryLabel,
 } from "@/lib/matching/labels";
-import type {
-  GermanComfortCode,
-  JobCategoryCode,
-} from "@/lib/onboarding/allow-lists";
 
 type ApplicationListProps = {
   applications: EmployerApplicationListRow[];
@@ -41,22 +37,23 @@ export function ApplicationList({ applications }: ApplicationListProps) {
           </h2>
           <ul className={styles.meta}>
             <li>Vacancy: {application.vacancy_title}</li>
-            <li>
-              Matched category:{" "}
-              {jobCategoryLabel(application.job_category as JobCategoryCode)}
-            </li>
-            <li>
-              German comfort:{" "}
-              {germanRequirementLabel(
-                application.german_comfort as GermanComfortCode,
-              )}
-            </li>
-            <li>
-              Available from:{" "}
-              {application.available_from === null
-                ? "Not set"
-                : formatIsoCalendarDate(application.available_from)}
-            </li>
+            {application.candidate_deleted ? null : (
+              <>
+                <li>
+                  Matched category: {jobCategoryLabel(application.job_category)}
+                </li>
+                <li>
+                  German comfort:{" "}
+                  {germanRequirementLabel(application.german_comfort)}
+                </li>
+                <li>
+                  Available from:{" "}
+                  {application.available_from === null
+                    ? "Not set"
+                    : formatIsoCalendarDate(application.available_from)}
+                </li>
+              </>
+            )}
             <li>
               Status: {applicationStatusLabel(application.current_status)}
             </li>

@@ -30,17 +30,56 @@ const vacancyLanguageRequirementSnapshotSchema = z.object({
   min_proficiency: z.enum(LANGUAGE_PROFICIENCY_CODES),
 });
 
-/** Accepted candidate_snapshot shape for snapshot_version = 1. */
-export const candidateSnapshotV1Schema = z.object({
-  display_name: z.string().min(1),
-  job_category: z.enum(JOB_CATEGORY_CODES),
-  german_comfort: z.enum(GERMAN_COMFORT_CODES),
-  languages: z.array(candidateLanguageSnapshotSchema),
-  work_authorisation_declared: z.boolean(),
-  available_from: isoCalendarDateSchema.nullable(),
-  employment_types: z.array(z.enum(EMPLOYMENT_TYPE_CODES)).min(1),
-  shift_preferences: z.array(z.enum(SHIFT_PREFERENCE_CODES)).min(1),
-});
+/**
+ * Accepted candidate_snapshot shape for snapshot_version = 1 — a candidate
+ * who has not deleted their account. All fields are the candidate's own
+ * user-provided data as it existed at submission time.
+ */
+export const candidateLiveSnapshotV1Schema = z
+  .object({
+    display_name: z.string().min(1),
+    job_category: z.enum(JOB_CATEGORY_CODES),
+    german_comfort: z.enum(GERMAN_COMFORT_CODES),
+    languages: z.array(candidateLanguageSnapshotSchema),
+    work_authorisation_declared: z.boolean(),
+    available_from: isoCalendarDateSchema.nullable(),
+    employment_types: z.array(z.enum(EMPLOYMENT_TYPE_CODES)).min(1),
+    shift_preferences: z.array(z.enum(SHIFT_PREFERENCE_CODES)).min(1),
+  })
+  .strict();
+
+/**
+ * D-078 deleted-candidate tombstone shape. Deliberately minimal — no
+ * candidate attribute (job_category, german_comfort, languages,
+ * employment_types, shift_preferences, available_from,
+ * work_authorisation_declared, display_name) is fabricated or preserved.
+ * `applications.snapshot_version` stays 1; this shape does not need its
+ * own version key.
+ */
+export const candidateDeletedSnapshotV1Schema = z
+  .object({
+    deleted: z.literal(true),
+  })
+  .strict();
+
+/**
+ * Accepted candidate_snapshot shape for snapshot_version = 1 — either a
+ * live candidate's own data, or the deleted-candidate tombstone. Both
+ * branches are `.strict()`, so an object combining `deleted: true` with
+ * live-looking fields (or vice versa) matches neither branch and fails to
+ * parse — it is never silently accepted as a live snapshot.
+ */
+export const candidateSnapshotV1Schema = z.union([
+  candidateDeletedSnapshotV1Schema,
+  candidateLiveSnapshotV1Schema,
+]);
+
+/** True when a parsed candidate snapshot is the deleted-account tombstone. */
+export function isCandidateSnapshotDeleted(
+  candidate: CandidateSnapshotV1,
+): candidate is CandidateDeletedSnapshotV1 {
+  return "deleted" in candidate && candidate.deleted === true;
+}
 
 /**
  * Accepted vacancy_snapshot shape for snapshot_version = 1.
@@ -103,6 +142,12 @@ export type ApplicationInventoryRow = z.infer<
   typeof applicationInventoryRowSchema
 >;
 
+export type CandidateLiveSnapshotV1 = z.infer<
+  typeof candidateLiveSnapshotV1Schema
+>;
+export type CandidateDeletedSnapshotV1 = z.infer<
+  typeof candidateDeletedSnapshotV1Schema
+>;
 export type CandidateSnapshotV1 = z.infer<typeof candidateSnapshotV1Schema>;
 export type VacancySnapshotV1 = z.infer<typeof vacancySnapshotV1Schema>;
 export type ApplicationConfirmationRow = z.infer<

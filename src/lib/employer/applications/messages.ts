@@ -24,3 +24,5 @@ export const APPLICATION_INVALID_TRANSITION =
 
 export const APPLICATION_TERMINAL_STATE =
   "This application's status is final. No further status changes are available.";
+
+export const CANDIDATE_DATA_REMOVED = "Candidate data has been removed.";

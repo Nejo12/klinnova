@@ -13,11 +13,19 @@ vi.mock(
 import { ApplicationDetail } from "@/components/employer-applications/application-detail";
 import type { EmployerApplicationDetailReady } from "@/lib/employer/applications/load-employer-application";
 
-function buildApplication(
-  overrides: Partial<EmployerApplicationDetailReady> = {},
-): EmployerApplicationDetailReady {
+type LiveDetail = Extract<
+  EmployerApplicationDetailReady,
+  { candidate_deleted: false }
+>;
+type DeletedDetail = Extract<
+  EmployerApplicationDetailReady,
+  { candidate_deleted: true }
+>;
+
+function buildApplication(overrides: Partial<LiveDetail> = {}): LiveDetail {
   return {
     status: "ready",
+    candidate_deleted: false,
     application_id: "11111111-1111-4111-8111-111111111111",
     vacancy_id: "22222222-2222-4222-8222-222222222222",
     vacancy_title: "Morning kitchen support",
@@ -32,6 +40,31 @@ function buildApplication(
     employment_types: ["full_time"],
     shift_preferences: ["morning"],
     allowed_transitions: ["reviewing", "shortlisted", "accepted", "rejected"],
+    status_history: [
+      {
+        from_status: null,
+        to_status: "submitted",
+        reason: null,
+        occurred_at: "2026-08-01T00:00:00Z",
+      },
+    ],
+    ...overrides,
+  };
+}
+
+function buildDeletedApplication(
+  overrides: Partial<DeletedDetail> = {},
+): DeletedDetail {
+  return {
+    status: "ready",
+    candidate_deleted: true,
+    application_id: "11111111-1111-4111-8111-111111111111",
+    vacancy_id: "22222222-2222-4222-8222-222222222222",
+    vacancy_title: "Morning kitchen support",
+    submitted_at: "2026-08-01T00:00:00Z",
+    current_status: "submitted",
+    candidate_display_name: "Deleted candidate",
+    allowed_transitions: [],
     status_history: [
       {
         from_status: null,
@@ -91,5 +124,32 @@ describe("ApplicationDetail", () => {
     );
     expect(screen.getByText(/status is final/i)).toBeInTheDocument();
     expect(screen.queryByRole("combobox")).toBeNull();
+  });
+
+  it("shows a neutral deleted-candidate state with no fabricated attributes", () => {
+    render(<ApplicationDetail application={buildDeletedApplication()} />);
+    expect(screen.getByText("Deleted candidate")).toBeInTheDocument();
+    expect(
+      screen.getByText("Candidate data has been removed."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Matched category")).toBeNull();
+    expect(screen.queryByText("German comfort")).toBeNull();
+    expect(screen.queryByText("Languages")).toBeNull();
+    expect(screen.queryByText("Work authorisation")).toBeNull();
+    expect(screen.queryByText("Employment types")).toBeNull();
+    expect(screen.queryByText("Shift preferences")).toBeNull();
+  });
+
+  it("still renders the vacancy section and status history for a deleted candidate's preserved application", () => {
+    render(<ApplicationDetail application={buildDeletedApplication()} />);
+    expect(screen.getByText("Morning kitchen support")).toBeInTheDocument();
+    expect(screen.getAllByText("Submitted").length).toBeGreaterThan(0);
+  });
+
+  it("renders no transition controls for a deleted candidate's application (D-087)", () => {
+    render(<ApplicationDetail application={buildDeletedApplication()} />);
+    expect(screen.getByText(/status is final/i)).toBeInTheDocument();
+    expect(screen.queryByRole("combobox")).toBeNull();
+    expect(screen.queryByRole("button", { name: /update status/i })).toBeNull();
   });
 });
