@@ -171,6 +171,7 @@ export type Database = {
       }
       candidate_profiles: {
         Row: {
+          account_deleted_at: string | null
           available_from: string | null
           city: string | null
           created_at: string
@@ -187,6 +188,7 @@ export type Database = {
           work_authorisation_declared_at: string | null
         }
         Insert: {
+          account_deleted_at?: string | null
           available_from?: string | null
           city?: string | null
           created_at?: string
@@ -203,6 +205,7 @@ export type Database = {
           work_authorisation_declared_at?: string | null
         }
         Update: {
+          account_deleted_at?: string | null
           available_from?: string | null
           city?: string | null
           created_at?: string
@@ -258,8 +261,51 @@ export type Database = {
           },
         ]
       }
+      deletion_requests: {
+        Row: {
+          auth_deleted_at: string | null
+          completed_at: string | null
+          domain_scrubbed_at: string | null
+          failed_at: string | null
+          failure_code: string | null
+          id: string
+          processing_started_at: string | null
+          requested_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auth_deleted_at?: string | null
+          completed_at?: string | null
+          domain_scrubbed_at?: string | null
+          failed_at?: string | null
+          failure_code?: string | null
+          id?: string
+          processing_started_at?: string | null
+          requested_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auth_deleted_at?: string | null
+          completed_at?: string | null
+          domain_scrubbed_at?: string | null
+          failed_at?: string | null
+          failure_code?: string | null
+          id?: string
+          processing_started_at?: string | null
+          requested_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       employer_profiles: {
         Row: {
+          account_deleted_at: string | null
           berlin_locality: string | null
           created_at: string
           display_name: string | null
@@ -281,6 +327,7 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          account_deleted_at?: string | null
           berlin_locality?: string | null
           created_at?: string
           display_name?: string | null
@@ -302,6 +349,7 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          account_deleted_at?: string | null
           berlin_locality?: string | null
           created_at?: string
           display_name?: string | null
@@ -607,6 +655,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _anonymize_candidate_domain: {
+        Args: { p_candidate_id: string; p_ts: string }
+        Returns: undefined
+      }
+      _anonymize_employer_domain: {
+        Args: { p_employer_id: string; p_ts: string }
+        Returns: undefined
+      }
       _append_admin_audit_event: {
         Args: {
           p_actor_user_id: string
@@ -636,6 +692,7 @@ export type Database = {
         Args: { p_uid: string }
         Returns: string
       }
+      _claim_deletion_request: { Args: { p_request_id: string }; Returns: Json }
       _clear_completion_for_two_candidates: {
         Args: { p_a: string; p_b: string }
         Returns: undefined
@@ -735,9 +792,24 @@ export type Database = {
         Args: { p_uid: string }
         Returns: boolean
       }
+      _is_candidate_deleted: {
+        Args: { p_candidate_id: string }
+        Returns: boolean
+      }
+      _is_current_candidate_deleted: { Args: never; Returns: boolean }
+      _is_current_employer_deleted: { Args: never; Returns: boolean }
       _is_current_employer_suspended: { Args: never; Returns: boolean }
+      _is_current_stint_account_deleted: { Args: never; Returns: boolean }
+      _is_employer_deleted: {
+        Args: { p_employer_profile_id: string }
+        Returns: boolean
+      }
       _is_employer_suspended: {
         Args: { p_employer_profile_id: string }
+        Returns: boolean
+      }
+      _is_stint_account_deleted: {
+        Args: { p_user_id: string }
         Returns: boolean
       }
       _is_vacancy_moderated: {
@@ -745,6 +817,10 @@ export type Database = {
         Returns: boolean
       }
       _language_proficiency_rank: { Args: { p_level: string }; Returns: number }
+      _process_deletion_domain_scrub: {
+        Args: { p_request_id: string }
+        Returns: Json
+      }
       _profile_first_incomplete_group: {
         Args: {
           p_available_from: string
@@ -759,6 +835,14 @@ export type Database = {
         }
         Returns: string
       }
+      _record_deletion_auth_evidence: {
+        Args: { p_request_id: string }
+        Returns: Json
+      }
+      _record_deletion_failure: {
+        Args: { p_failure_code: string; p_request_id: string }
+        Returns: Json
+      }
       _slugify_vacancy_title: { Args: { p_title: string }; Returns: string }
       _transition_employer_vacancy: {
         Args: { p_action: string; p_expires_at?: string; p_vacancy_id: string }
@@ -767,6 +851,14 @@ export type Database = {
       _unique_employer_vacancy_slug: {
         Args: { p_title: string }
         Returns: string
+      }
+      _withdraw_vacancy_for_deletion: {
+        Args: {
+          p_employer_profile_id: string
+          p_ts: string
+          p_vacancy_id: string
+        }
+        Returns: undefined
       }
       approve_employer_verification: {
         Args: { p_employer_profile_id: string }
@@ -784,6 +876,7 @@ export type Database = {
         }
         Returns: Json
       }
+      cancel_account_deletion_request: { Args: never; Returns: Json }
       complete_candidate_onboarding: { Args: never; Returns: Json }
       complete_employer_onboarding: { Args: never; Returns: Json }
       create_employer_vacancy_draft: {
@@ -874,6 +967,8 @@ export type Database = {
         Args: { p_vacancy_id: string }
         Returns: Json
       }
+      is_current_candidate_deleted: { Args: never; Returns: boolean }
+      is_current_employer_deleted: { Args: never; Returns: boolean }
       is_current_employer_suspended: { Args: never; Returns: boolean }
       is_current_user_verification_operator: { Args: never; Returns: boolean }
       is_vacancy_effectively_public: {
@@ -915,6 +1010,7 @@ export type Database = {
         Returns: {
           application_id: string
           available_from: string
+          candidate_deleted: boolean
           candidate_display_name: string
           current_status: string
           german_comfort: string
@@ -1015,6 +1111,7 @@ export type Database = {
         Args: { p_languages?: Json; p_vacancy_id: string }
         Returns: Json
       }
+      request_account_deletion: { Args: never; Returns: Json }
       request_employer_verification: { Args: never; Returns: Json }
       resolve_current_candidate_vacancy_match: {
         Args: { p_vacancy_id: string }

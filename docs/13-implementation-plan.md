@@ -170,8 +170,10 @@ placeholders + local exit proof, `docs/44-slice-7-exit-proof.md`) merged
 (#67). **Slice 7 is Done locally** — all three exit criteria below pass
 against the merged implementation; hosted proof has not been run. Slice 8
 (account deletion to confirmed data removal) planning is **Accepted**:
-decisions D-076–D-084 Accepted 2026-08-07; PR 8.1 (planning) opened,
-pending merge; no Slice 8 implementation has started.
+decisions D-076–D-086 Accepted 2026-08-07; PR 8.1 (planning) merged. PR 8.2
+(deletion/tombstone/request/access-gate database contract) is
+implementation-complete locally, awaiting review — no Auth Admin API call,
+no service-role application code, no UI. PR 8.3/8.4/8.5 have not started.
 
 **Exit criteria:**
 
@@ -186,12 +188,25 @@ pending merge; no Slice 8 implementation has started.
 **Includes:** account export; deletion request workflow; confirmation of data-removal path for MVP needs.
 
 **Planning status:** PR 8.1 (discovery, data-ownership inventory, export/
-deletion contract proposal, build plan) opened, pending merge — see
+deletion contract proposal, build plan) merged — see
 `docs/45-slice-8-discovery.md`, `docs/46-slice-8-build-plan.md`,
-`docs/47-slice-8-data-removal-proposal.md`. Decisions D-076–D-084 are
-**Accepted** (2026-08-07) in `docs/10-decisions.md`. No Slice 8
-implementation (migration, RPC, UI) has started; PR 8.2 is the first
-authorized implementation unit once PR 8.1 merges.
+`docs/47-slice-8-data-removal-proposal.md`. Decisions D-076–D-086 are
+**Accepted** (2026-08-07) in `docs/10-decisions.md` (D-085/D-086 discovered
+and Accepted during PR 8.2 implementation).
+
+**Implementation status:** PR 8.2 (deletion/tombstone/request/access-gate
+database contract) is implementation-complete locally, awaiting review —
+one additive migration (14th): `account_deleted_at` on both profile
+tables; canonical deleted-account helpers; the deleted-account gate
+composed into every candidate/employer RLS policy and self-service RPC;
+the `deletion_requests` state machine with self-service request/cancel
+RPCs and processor-only claim/domain-scrub/evidence/failure primitives;
+D-078/D-079 anonymization (D-085 dual-capability-aware, D-082 audit
+redaction and D-086 moderation removal folded into the employer side);
+the deleted-employer exclusion in `is_vacancy_effectively_public`. No Auth
+Admin API call, no service-role application code, no UI. PR 8.3 (export),
+PR 8.4 (deletion request UI + privileged Auth processing), and PR 8.5
+(local exit proof + closure) have not started.
 
 **Exit criteria:**
 

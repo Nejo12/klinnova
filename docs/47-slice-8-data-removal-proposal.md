@@ -92,20 +92,26 @@ privileged processing path (which derives its target exclusively from the
 claimed request row).
 
 **Concurrency contract (exact):** at most one **active** (`pending` or
-`processing`) request per user, enforced at the schema level. A duplicate
-request while `pending` returns the existing request rather than creating
-a second row. The processor claims `pending` → `processing` under a row
-lock / deterministic single-writer transition, so two concurrent claim
-attempts cannot both succeed. Cancellation is allowed **only** while
-`pending`; once processing has claimed the request, cancellation is
-impossible (anonymization is destructive by design and cannot be safely
-unwound). **No mandatory cooling-off period for MVP** — `pending` is a
-process state, not a promised waiting window; the only reversibility
-guarantee is "cancel before the processor claims the request."
+`processing`) request per user, enforced at the schema level. **Per
+D-085, "per user" means per `auth.uid()`/Stint account, not per role** —
+a dual-capability account (D-047) has exactly one deletion request
+covering whichever capability/capabilities it holds, never a parallel
+candidate request and employer request. A duplicate request while
+`pending` returns the existing request rather than creating a second row.
+The processor claims `pending` → `processing` under a row lock /
+deterministic single-writer transition, so two concurrent claim attempts
+cannot both succeed. Cancellation is allowed **only** while `pending`;
+once processing has claimed the request, cancellation is impossible
+(anonymization is destructive by design and cannot be safely unwound).
+**No mandatory cooling-off period for MVP** — `pending` is a process
+state, not a promised waiting window; the only reversibility guarantee is
+"cancel before the processor claims the request."
 
 **Processing phases and evidence (exact — full detail in `docs/45` §10.2):**
 1) claim request under row lock; 2) run the domain anonymization
-transaction (§4/§5); 3) record domain-scrub evidence (a durable marker,
+transaction (§4/§5 — for a dual-capability account, **both** run inside
+this one atomic transaction per D-085, never as two separately committed
+transactions); 3) record domain-scrub evidence (a durable marker,
 conceptually `domain_scrubbed_at`); 4) invoke Auth soft delete (§7); 5)
 verify the Auth result; 6) record Auth-deletion evidence
 (`auth_deleted_at`) and transition to `completed` — only once both
@@ -137,6 +143,10 @@ expiry.
 
 ## 4. Candidate removal graph
 
+*Runs whenever a candidate profile exists on the target account — for a
+dual-capability account (D-047), inside the same atomic transaction as
+§5, per D-085.*
+
 **`candidate_profiles`:** preserved as a **structural tombstone row**
 (preserved applications depend on this FK anchor) — `account_deleted_at`
 is set; `display_name`/`german_comfort`/`work_authorisation_declared`/
@@ -152,10 +162,22 @@ place) — this table carries no FK any preserved row depends on.
 **`applications` (per row the candidate submitted):** `id`/`vacancy_id`/
 `status`/timestamps and `vacancy_snapshot` are **preserved unchanged**;
 `candidate_snapshot` is **replaced** with one fixed, versioned tombstone
-shape, conceptually `{"version": 1, "deleted": true}` (matching the
-current `applications.snapshot_version = 1` constraint; extended only if
-the current `candidateSnapshotV1Schema` requires additional structural
-fields, confirmed at PR 8.2).
+shape. **Confirmed at PR 8.2**: the `{"version": 1, "deleted": true}`
+conceptual minimum required extension — `candidateSnapshotV1Schema` and
+the employer-side applicant list/detail schemas require non-nullable
+`display_name`/`job_category`/`german_comfort`/`employment_types`/
+`shift_preferences` — so the implemented tombstone is `{"version": 1,
+"deleted": true, "display_name": "Deleted candidate", "job_category":
+"cleaning", "german_comfort": "none", "languages": [],
+"work_authorisation_declared": false, "available_from": null,
+"employment_types": ["full_time"], "shift_preferences": ["flexible"]}`,
+using one fixed, non-identifying constant per required field (identical
+for every deleted candidate, so no information about the real value is
+disclosed) — this keeps the employer's existing, unmodified applicant
+list/detail views rendering "Deleted candidate" instead of failing to
+parse, satisfying the "employer can still see an applicant (deleted)
+applied and reached status X" preservation goal without any runtime
+TypeScript change.
 
 **`application_status_history`:** preserved unchanged, including
 `actor_user_id` (the employer's own identity) — access by the deleted
@@ -171,7 +193,23 @@ the employer's own applicant-list/review record continues to show "an
 applicant (account deleted) applied and reached status X," never a
 silently-vanished row.
 
+**Preserved does not mean ongoing (D-087):** a preserved application is a
+frozen historical record, not an ongoing recruitment workflow — candidate
+deletion freezes that candidate's application at its current state. Once
+the owning candidate has `account_deleted_at` set, the employer may keep
+reading the preserved application, its status, and its history, but
+`transition_current_employer_application_status` denies any further
+status transition (existing `unavailable` result) and
+`get_current_employer_application` reports `allowed_transitions: []`.
+D-070's ordinary transition state machine remains authoritative only
+while the owning candidate's account is active; full decision text:
+`docs/10-decisions.md` D-087.
+
 ## 5. Employer removal graph — the graph most likely to be scrutinized
+
+*Runs whenever an employer profile exists on the target account — for a
+dual-capability account (D-047), inside the same atomic transaction as
+§4, per D-085. Includes the D-086 current-state moderation cleanup (§6).*
 
 **`employer_profiles`:** preserved as a **structural tombstone row**
 (`vacancies.employer_profile_id`/`companies.owner_employer_id` are `NO
@@ -226,6 +264,23 @@ user-provided information is replaced, and only with the fixed marker —
 no other mutation of `admin_audit_events` is introduced, and the
 supersession applies only to rows whose target has actually been
 deleted.
+
+**Current-state moderation tables — resolved by D-086, not covered by
+the redaction contract above.** `employer_suspension.suspended_reason`
+and `vacancy_moderation.moderated_reason` are `NOT NULL` free-text
+current-state columns, distinct from the durable `admin_audit_events`
+ledger. Because `employer_profiles`/`vacancies` are tombstoned rather
+than deleted, their existing `ON DELETE CASCADE` to these two tables
+never fires. **D-086 decides removal, not redaction**: as part of the
+same employer anonymization transaction, the current `employer_suspension`
+row for the deleted employer and every current `vacancy_moderation` row
+for a vacancy it owns are deleted outright — not preserved, not redacted
+in place. `unsuspend_employer`/`restore_vacancy` are not called for this
+cleanup (their business semantics don't apply and would generate
+misleading `employer_unsuspended`/`vacancy_restored` audit events); no
+ordinary `authenticated`/`anon` grant exists for this DELETE. The
+historical fact remains solely in `admin_audit_events`, redacted per the
+contract above.
 
 ## 7. Auth deletion mechanism
 

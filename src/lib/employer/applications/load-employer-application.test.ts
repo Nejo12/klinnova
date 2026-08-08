@@ -36,6 +36,7 @@ const applicationId = "11111111-1111-4111-8111-111111111111";
 
 const readyPayload = {
   status: "ready",
+  candidate_deleted: false,
   application_id: applicationId,
   vacancy_id: "22222222-2222-4222-8222-222222222222",
   vacancy_title: "Morning kitchen support",
@@ -181,5 +182,67 @@ describe("loadEmployerApplication", () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error).not.toMatch(/permission denied/i);
+  });
+
+  it("stays ready (never unavailable) for a deleted candidate's preserved application, with no fabricated attributes", async () => {
+    rpc.mockResolvedValue({
+      data: {
+        status: "ready",
+        candidate_deleted: true,
+        application_id: applicationId,
+        vacancy_id: "22222222-2222-4222-8222-222222222222",
+        vacancy_title: "Morning kitchen support",
+        submitted_at: "2026-08-01T00:00:00Z",
+        current_status: "submitted",
+        candidate_display_name: "Deleted candidate",
+        allowed_transitions: [],
+        status_history: [
+          {
+            from_status: null,
+            to_status: "submitted",
+            reason: null,
+            occurred_at: "2026-08-01T00:00:00Z",
+          },
+        ],
+      },
+      error: null,
+    });
+
+    const result = await loadEmployerApplication(
+      makeClient() as never,
+      applicationId,
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.application.candidate_deleted).toBe(true);
+    expect(result.application.candidate_display_name).toBe("Deleted candidate");
+    expect("matched_job_category" in result.application).toBe(false);
+    expect(result.application.allowed_transitions).toEqual([]);
+  });
+
+  it("rejects a deleted-candidate payload with a non-empty allowed_transitions (D-087)", async () => {
+    rpc.mockResolvedValue({
+      data: {
+        status: "ready",
+        candidate_deleted: true,
+        application_id: applicationId,
+        vacancy_id: "22222222-2222-4222-8222-222222222222",
+        vacancy_title: "Morning kitchen support",
+        submitted_at: "2026-08-01T00:00:00Z",
+        current_status: "submitted",
+        candidate_display_name: "Deleted candidate",
+        allowed_transitions: ["reviewing"],
+        status_history: [],
+      },
+      error: null,
+    });
+
+    const result = await loadEmployerApplication(
+      makeClient() as never,
+      applicationId,
+    );
+
+    expect(result.ok).toBe(false);
   });
 });

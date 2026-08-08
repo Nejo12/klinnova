@@ -5,6 +5,7 @@ import { ApplicationTransitionForm } from "@/components/employer-applications/ap
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import { formatApplicationTimestamp } from "@/lib/employer/applications/format-timestamp";
 import type { EmployerApplicationDetailReady } from "@/lib/employer/applications/load-employer-application";
+import { CANDIDATE_DATA_REMOVED } from "@/lib/employer/applications/messages";
 import { applicationStatusLabel } from "@/lib/employer/applications/status";
 import {
   employmentTypeLabel,
@@ -15,14 +16,6 @@ import {
   languageProficiencyLabel,
   shiftLabel,
 } from "@/lib/matching/labels";
-import type {
-  EmploymentTypeCode,
-  GermanComfortCode,
-  JobCategoryCode,
-  LanguageCode,
-  LanguageProficiencyCode,
-  ShiftPreferenceCode,
-} from "@/lib/onboarding/allow-lists";
 
 type ApplicationDetailProps = {
   application: EmployerApplicationDetailReady;
@@ -41,79 +34,83 @@ export function ApplicationDetail({ application }: ApplicationDetailProps) {
         <h2 id="applicant-heading" className={styles.sectionHeading}>
           Applicant
         </h2>
-        <dl className={styles.detailList}>
-          <div>
-            <dt>Name</dt>
-            <dd>{application.candidate_display_name}</dd>
-          </div>
-          <div>
-            <dt>Matched category</dt>
-            <dd>
-              {jobCategoryLabel(
-                application.matched_job_category as JobCategoryCode,
-              )}
-            </dd>
-          </div>
-          <div>
-            <dt>German comfort</dt>
-            <dd>
-              {germanRequirementLabel(
-                application.german_comfort as GermanComfortCode,
-              )}
-            </dd>
-          </div>
-          <div>
-            <dt>Languages</dt>
-            <dd>
-              {application.languages.length === 0
-                ? "None declared"
-                : application.languages
-                    .map(
-                      (language) =>
-                        `${languageLabel(language.language_code as LanguageCode)} (${languageProficiencyLabel(language.proficiency as LanguageProficiencyCode)})`,
-                    )
-                    .join(", ")}
-            </dd>
-          </div>
-          <div>
-            <dt>Work authorisation</dt>
-            <dd>
-              {application.work_authorisation_declared
-                ? "Declared"
-                : "Not declared"}
-            </dd>
-          </div>
-          <div>
-            <dt>Available from</dt>
-            <dd>
-              {application.available_from === null
-                ? "Not set"
-                : formatIsoCalendarDate(application.available_from)}
-            </dd>
-          </div>
-          <div>
-            <dt>Employment types</dt>
-            <dd>
-              {application.employment_types.length === 0
-                ? "None declared"
-                : application.employment_types
-                    .map((code) =>
-                      employmentTypeLabel(code as EmploymentTypeCode),
-                    )
-                    .join(", ")}
-            </dd>
-          </div>
-          <div>
-            <dt>Shift preferences</dt>
-            <dd>
-              {application.shift_preferences.length === 0
-                ? "None declared"
-                : application.shift_preferences
-                    .map((code) => shiftLabel(code as ShiftPreferenceCode))
-                    .join(", ")}
-            </dd>
-          </div>
-        </dl>
+        {application.candidate_deleted ? (
+          <>
+            <dl className={styles.detailList}>
+              <div>
+                <dt>Name</dt>
+                <dd>{application.candidate_display_name}</dd>
+              </div>
+            </dl>
+            <p className={styles.support} role="status">
+              {CANDIDATE_DATA_REMOVED}
+            </p>
+          </>
+        ) : (
+          <dl className={styles.detailList}>
+            <div>
+              <dt>Name</dt>
+              <dd>{application.candidate_display_name}</dd>
+            </div>
+            <div>
+              <dt>Matched category</dt>
+              <dd>{jobCategoryLabel(application.matched_job_category)}</dd>
+            </div>
+            <div>
+              <dt>German comfort</dt>
+              <dd>{germanRequirementLabel(application.german_comfort)}</dd>
+            </div>
+            <div>
+              <dt>Languages</dt>
+              <dd>
+                {application.languages.length === 0
+                  ? "None declared"
+                  : application.languages
+                      .map(
+                        (language) =>
+                          `${languageLabel(language.language_code)} (${languageProficiencyLabel(language.proficiency)})`,
+                      )
+                      .join(", ")}
+              </dd>
+            </div>
+            <div>
+              <dt>Work authorisation</dt>
+              <dd>
+                {application.work_authorisation_declared
+                  ? "Declared"
+                  : "Not declared"}
+              </dd>
+            </div>
+            <div>
+              <dt>Available from</dt>
+              <dd>
+                {application.available_from === null
+                  ? "Not set"
+                  : formatIsoCalendarDate(application.available_from)}
+              </dd>
+            </div>
+            <div>
+              <dt>Employment types</dt>
+              <dd>
+                {application.employment_types.length === 0
+                  ? "None declared"
+                  : application.employment_types
+                      .map((code) => employmentTypeLabel(code))
+                      .join(", ")}
+              </dd>
+            </div>
+            <div>
+              <dt>Shift preferences</dt>
+              <dd>
+                {application.shift_preferences.length === 0
+                  ? "None declared"
+                  : application.shift_preferences
+                      .map((code) => shiftLabel(code))
+                      .join(", ")}
+              </dd>
+            </div>
+          </dl>
+        )}
       </section>
 
       <section className={styles.section} aria-labelledby="vacancy-heading">

@@ -1,6 +1,6 @@
 import { NO_ADDITIONAL_LANGUAGE_REQUIREMENTS } from "@/lib/applications/messages";
 import type {
-  CandidateSnapshotV1,
+  CandidateLiveSnapshotV1,
   VacancySnapshotV1,
 } from "@/lib/applications/snapshot-schemas";
 import {
@@ -112,11 +112,18 @@ function workAuthorisationLabel(declared: boolean): string {
   return declared ? "Yes" : "Not sure";
 }
 
+/**
+ * `candidate` must already be narrowed to the live variant by the caller —
+ * a deleted candidate's own confirmation page is unreachable (the D-080
+ * database gate blocks a deleted candidate's own reads before this
+ * function is ever called), so there is no legitimate deleted-snapshot
+ * case for this candidate-facing receipt to render.
+ */
 export function buildApplicationConfirmation(input: {
   applicationId: string;
   status: ApplicationStatus;
   submittedAt: string;
-  candidate: CandidateSnapshotV1;
+  candidate: CandidateLiveSnapshotV1;
   vacancy: VacancySnapshotV1;
 }): ApplicationConfirmation | null {
   const submittedAtLabel = formatSubmittedAtUtc(input.submittedAt);

@@ -5,10 +5,18 @@ import { ApplicationList } from "@/components/employer-applications/application-
 import type { EmployerApplicationListRow } from "@/lib/employer/applications/schemas";
 import { APPLICATION_EMPTY_LIST } from "@/lib/employer/applications/messages";
 
-function buildRow(
-  overrides: Partial<EmployerApplicationListRow> = {},
-): EmployerApplicationListRow {
+type LiveRow = Extract<
+  EmployerApplicationListRow,
+  { candidate_deleted: false }
+>;
+type DeletedRow = Extract<
+  EmployerApplicationListRow,
+  { candidate_deleted: true }
+>;
+
+function buildRow(overrides: Partial<LiveRow> = {}): LiveRow {
   return {
+    candidate_deleted: false,
     application_id: "11111111-1111-4111-8111-111111111111",
     vacancy_id: "22222222-2222-4222-8222-222222222222",
     vacancy_title: "Morning kitchen support",
@@ -16,6 +24,23 @@ function buildRow(
     job_category: "hospitality",
     german_comfort: "basic",
     available_from: "2026-09-01",
+    current_status: "submitted",
+    submitted_at: "2026-08-01T00:00:00Z",
+    updated_at: "2026-08-01T00:00:00Z",
+    ...overrides,
+  };
+}
+
+function buildDeletedRow(overrides: Partial<DeletedRow> = {}): DeletedRow {
+  return {
+    candidate_deleted: true,
+    application_id: "44444444-4444-4444-8444-444444444444",
+    vacancy_id: "22222222-2222-4222-8222-222222222222",
+    vacancy_title: "Morning kitchen support",
+    candidate_display_name: "Deleted candidate",
+    job_category: null,
+    german_comfort: null,
+    available_from: null,
     current_status: "submitted",
     submitted_at: "2026-08-01T00:00:00Z",
     updated_at: "2026-08-01T00:00:00Z",
@@ -54,5 +79,15 @@ describe("ApplicationList", () => {
   it("never renders a candidate id, auth id, or actor identity", () => {
     render(<ApplicationList applications={[buildRow()]} />);
     expect(screen.queryByText(/actor/i)).toBeNull();
+  });
+
+  it("renders a deleted candidate as 'Deleted candidate' with no fabricated attributes", () => {
+    render(<ApplicationList applications={[buildDeletedRow()]} />);
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Deleted candidate" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Matched category/i)).toBeNull();
+    expect(screen.queryByText(/German comfort/i)).toBeNull();
+    expect(screen.queryByText(/Available from/i)).toBeNull();
   });
 });
