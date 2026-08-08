@@ -269,6 +269,7 @@ export type Database = {
           failed_at: string | null
           failure_code: string | null
           id: string
+          processing_lease_started_at: string | null
           processing_started_at: string | null
           requested_at: string
           status: string
@@ -282,6 +283,7 @@ export type Database = {
           failed_at?: string | null
           failure_code?: string | null
           id?: string
+          processing_lease_started_at?: string | null
           processing_started_at?: string | null
           requested_at?: string
           status?: string
@@ -295,6 +297,7 @@ export type Database = {
           failed_at?: string | null
           failure_code?: string | null
           id?: string
+          processing_lease_started_at?: string | null
           processing_started_at?: string | null
           requested_at?: string
           status?: string
@@ -834,6 +837,10 @@ export type Database = {
           p_work_authorisation_declared: boolean
         }
         Returns: string
+      }
+      _reclaim_stale_deletion_request: {
+        Args: { p_request_id: string }
+        Returns: Json
       }
       _record_deletion_auth_evidence: {
         Args: { p_request_id: string }

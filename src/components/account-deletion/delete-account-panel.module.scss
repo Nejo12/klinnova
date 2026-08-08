@@ -1,0 +1,158 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: var(--space-8) var(--layout-gutter-mobile);
+  min-height: 70vh;
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-xl);
+  color: var(--color-text-primary);
+}
+
+.lead {
+  margin: 0;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  color: var(--color-text-secondary);
+}
+
+.note {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  color: var(--color-text-secondary);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-height: var(--touch-target-min);
+}
+
+.option input {
+  margin-top: 0.25rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--color-action-primary);
+}
+
+.optionLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.button {
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-5);
+  border: none;
+  border-radius: var(--radius-md);
+  background-color: var(--color-status-danger);
+  color: var(--color-action-primary-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.buttonSecondary {
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-5);
+  border: var(--border-width-default) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background-color: transparent;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.buttonSecondary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.linkButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  background-color: transparent;
+  color: var(--color-text-link);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.error {
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--color-status-danger-bg);
+  color: var(--color-status-danger);
+  font-size: var(--font-size-sm);
+}
+
+.status {
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-subtle);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.success {
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--color-status-success-bg);
+  color: var(--color-status-success);
+  font-size: var(--font-size-sm);
+}
+
+.button:focus-visible,
+.buttonSecondary:focus-visible,
+.linkButton:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.error:focus-visible,
+.error:focus,
+.status:focus-visible,
+.status:focus,
+.success:focus-visible,
+.success:focus {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}

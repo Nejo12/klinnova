@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { CANDIDATE_EXPORT_BUTTON_LABEL } from "@/lib/account-export/messages";
+import { DELETE_ACCOUNT_HEADING } from "@/lib/account-deletion/messages";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { CapabilityNav } from "@/components/employer-onboarding/capability-nav";
 import { MatchCount } from "@/components/candidate-matches/match-count";
@@ -45,6 +46,9 @@ export function CandidateMatchesPage(props: CandidateMatchesPageProps) {
           <a className={styles.navLink} href="/candidate/account/export">
             {CANDIDATE_EXPORT_BUTTON_LABEL}
           </a>
+          <Link className={styles.navLink} href="/candidate/account/delete">
+            {DELETE_ACCOUNT_HEADING}
+          </Link>
           <LogoutButton />
         </div>
       </div>
