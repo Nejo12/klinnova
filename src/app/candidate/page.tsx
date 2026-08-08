@@ -2,6 +2,10 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { resolveCandidateHomeView } from "@/app/candidate/resolve-candidate-home";
+import {
+  CANDIDATE_EXPORT_BUTTON_LABEL,
+  CANDIDATE_EXPORT_LEAD,
+} from "@/lib/account-export/messages";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { loadCandidateOnboarding } from "@/lib/onboarding/load-candidate";
 import { onboardingGroupHref } from "@/lib/onboarding/navigation";
@@ -63,6 +67,18 @@ export default async function CandidatePage() {
             ? "Review and confirm essentials"
             : "Continue onboarding"}
         </Link>
+      </p>
+
+      <h2 className={styles.heading}>Account data</h2>
+      <p className={styles.note}>{CANDIDATE_EXPORT_LEAD}</p>
+      <p>
+        {/* Plain anchor, not next/link: this is a real file download from a
+            Route Handler, not a client-side page transition. The server's
+            Content-Disposition header is the authoritative download
+            mechanism, not this element. */}
+        <a className={styles.secondaryLink} href="/candidate/account/export">
+          {CANDIDATE_EXPORT_BUTTON_LABEL}
+        </a>
       </p>
     </main>
   );
