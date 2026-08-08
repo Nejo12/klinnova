@@ -1,6 +1,6 @@
 # M5 Berlin Private Beta Operating Plan
 
-**Status:** Proposed — founder review
+**Status:** Founder-approved operating direction; awaiting final founder review of PR #74 before merge
 
 **Date:** 2026-08-09
 
@@ -12,50 +12,57 @@ Related:
 
 ## 1. Objective
 
-Run a controlled Berlin private beta that determines whether Stint can produce legitimate applications, completed interviews, and confirmed hires without expanding into a broad marketplace or ATS.
+Run a controlled Berlin private beta that determines whether Stint can produce legitimate applications, completed-interview conversions, and confirmed hires without expanding into a broad marketplace or ATS.
 
 M5 is operational and product-led. Engineering work is evidence-driven.
 
 ## 2. Staged cohorts
 
-| Cohort | Employers | Legitimate vacancies | Candidates | Required outcome before expansion |
+| Cohort | Participating employers | Legitimate vacancies | Candidates | Required outcome before expansion |
 |---|---:|---:|---:|---|
-| A — Proof | 3–5 | 10–20 | 20–30 | first completed interview |
-| B — Validation | 8–10 | 30–50 | 60–100 | repeated completed interviews + first confirmed hire |
-| C — Full target | 20 | 100 | 200 | 10 completed interviews + 3 confirmed hires |
+| A — Proof | 3–5 | 10–20 | 20–30 | first completed-interview conversion |
+| B — Validation | 8–10 | 30–50 | 60–100 | repeated completed-interview conversions + first confirmed hire |
+| C — Full target | 20 | 100 | 200 | 10 completed-interview conversions + 3 confirmed hires |
 
-Do not expand cohorts solely because target registration numbers are reached. Trust/safety, vacancy legitimacy, candidate usability, and outcome quality remain gates.
+Do not expand cohorts solely because registration numbers are reached. Trust/safety, vacancy legitimacy, candidate usability, and outcome quality remain gates.
+
+Top-level metric definitions are authoritative in `docs/49`.
 
 ## 3. Geographic boundary
 
-Berlin remains the only active market under D-004 and the current anti-goals.
+Berlin remains the only active market under D-004 and current anti-goals.
 
 For M5:
 
-- employer vacancies must represent work in Berlin;
-- candidate beta recruitment focuses on people seeking work in Berlin;
+- employer vacancies represent work in Berlin;
+- candidate recruitment focuses on people seeking Berlin work;
 - no Brandenburg/nationwide expansion is introduced merely to increase supply;
-- travel-time sophistication remains deferred unless observed candidate evidence shows the current Berlin-level eligibility boundary creates a material problem.
+- travel-time sophistication remains deferred unless observed evidence shows the current Berlin-level boundary causes a material blocker.
 
-## 4. Cohort A employer segment — proposed founder decision
+## 4. Cohort A employer segment — approved
 
-### Recommended wedge: cleaning-first
+### Cleaning-first wedge
 
-Cohort A should prioritize employers that can generate legitimate cleaning vacancies with relatively low hiring-process complexity:
+Cohort A should prioritize simple legitimate cleaning demand:
 
 1. small/medium cleaning businesses;
 2. property managers / managed-property operators with recurring cleaning needs;
 3. selected shops/retail premises with legitimate cleaning requirements;
 4. a small number of private household employers where verification and privacy handling remain straightforward.
 
+A narrow exception permits **1–2 adjacent low-language-barrier employers** only when:
+
+- founder access is strong; and
+- the hiring model remains simple and compatible with the current Stint workflow.
+
+Do not deliberately run a broad multi-sector Cohort A.
+
 Rationale:
 
-- cleaning is already an explicit initial private-employer use case;
-- vacancy requirements are comparatively structured;
-- limited-German candidates can plausibly match roles without Stint needing a CV/document workflow;
-- recurring employer demand can generate more than one legitimate vacancy per employer, making the 100-vacancy M5 target more realistic.
-
-Do not broaden Cohort A simultaneously across cleaning, hospitality, logistics, warehousing, food production, moving, and retail unless founder evidence/recruitment access makes that necessary.
+- cleaning is already an explicit initial use case;
+- requirements are comparatively structured;
+- limited-German candidates can plausibly match without a CV/document workflow;
+- recurring demand can produce multiple legitimate vacancies per employer.
 
 ## 5. Candidate segment
 
@@ -67,7 +74,7 @@ Primary Cohort A candidate profile:
 - interested in the active employer/vacancy segment;
 - willing to complete the lightweight Stint profile rather than requiring a CV-first workflow.
 
-Candidate recruitment should prioritize channels where trust and direct feedback are possible rather than maximizing anonymous registrations.
+Candidate recruitment should prioritize channels where trust and direct feedback are possible rather than anonymous volume.
 
 Potential channels:
 
@@ -86,12 +93,13 @@ Candidate profiles must never be scraped or imported from public groups.
 Recommended order:
 
 1. founder/direct network and warm introductions;
-2. direct outreach to relevant Berlin employers;
+2. direct outreach to relevant Berlin cleaning employers;
 3. property-management / cleaning-business introductions;
 4. local business associations/community organizations;
-5. inbound/referral from participating employers.
+5. inbound/referral from participating employers;
+6. at most 1–2 founder-accessible adjacent low-language-barrier employers under the approved exception.
 
-Do not use unrestricted job scraping as the M5 supply strategy. Employer-submitted or manually curated/verified vacancies remain preferred.
+Do not use unrestricted job scraping as the M5 supply strategy.
 
 ## 7. Founder-assisted onboarding
 
@@ -102,34 +110,37 @@ The founder may:
 - walk an employer through onboarding/verification;
 - help structure a legitimate vacancy without fabricating facts;
 - observe a candidate completing onboarding;
-- explain Stint workflow;
+- explain the Stint workflow;
 - collect usability feedback;
-- help a user recover from an ordinary product issue using supported flows.
+- help a user recover from an ordinary issue using supported flows.
 
 The founder must not:
 
 - bypass verification/publication rules through direct DB changes;
 - impersonate users to manufacture activity;
-- write candidate application content on their behalf without consent;
 - fabricate vacancies or outcomes;
-- count founder-created test/demo data toward M5 metrics.
+- count test/demo data toward M5 metrics.
 
 Manual assistance is evidence gathering, not evidence falsification.
 
-## 8. Weekly operating cadence
+## 8. Weekly operating cadence — approved
 
-Recommended cadence: one structured M5 review each week.
+Run one structured M5 review per week.
 
 ### Review inputs
 
-- participating employers / target;
-- verified/effective-public vacancies / target;
-- completed candidate onboarding / target;
+- cumulative participating employers / target;
+- current active/safe employers;
+- cumulative verified vacancies / target;
+- current effective-public vacancy supply;
+- completed-onboarding cohort candidates / target;
+- raw registrations as diagnostic only;
 - submitted applications;
 - reviewed/shortlisted applications;
-- completed interviews;
+- completed-interview conversions;
+- total completed interview rounds as diagnostic history;
 - confirmed hires;
-- employer recruitment pipeline for the next cohort;
+- employer recruitment pipeline;
 - candidate recruitment pipeline;
 - trust/safety incidents;
 - technical incidents;
@@ -138,20 +149,22 @@ Recommended cadence: one structured M5 review each week.
 
 ### Review output
 
-Every observed problem is placed in one of four buckets:
+Every observed problem goes into exactly one operating bucket:
 
 1. **Operate manually** — founder can handle safely at current scale;
-2. **Fix now** — real blocker/security/privacy/accessibility defect;
-3. **Watch** — one-off or low-confidence friction; collect more evidence;
-4. **Defer** — useful but not required for beta thesis.
+2. **Fix now** — material blocker, beta-measurement requirement, or security/privacy/accessibility issue;
+3. **Watch** — plausible issue with insufficient evidence;
+4. **Defer** — does not materially affect the beta thesis.
 
-Normal beta engineering work then follows:
+Normal beta engineering loop:
 
-> Observe → confirm → smallest fix → test → deploy → observe.
+> Observe problem → confirm it matters → smallest fix → test → deploy → observe again.
+
+Use heavier discovery/decision planning only for changes affecting schema/database, authorization/RLS, privacy, security, matching authority, employment/legal boundaries, or major architecture.
 
 ## 9. Feedback collection
 
-Keep feedback lightweight and event-linked.
+Keep feedback lightweight and tied to actual events.
 
 ### Candidate prompts
 
@@ -193,17 +206,17 @@ Avoid long generic satisfaction surveys during Cohort A.
 
 ## 10. Blocker intake
 
-A blocker should be promoted to engineering only when at least one condition holds:
+Promote a blocker to engineering when at least one condition holds:
 
-- user cannot complete a core journey;
+- a user cannot complete a core journey;
 - data displayed/recorded is wrong or misleading;
 - authorization/privacy/security is incorrect;
 - accessibility prevents practical use;
 - multiple real users encounter the same friction;
-- founder manual workaround is becoming unsafe or repeatedly expensive;
+- founder workaround becomes unsafe or repeatedly expensive;
 - beta measurement cannot be trusted without the change.
 
-For ordinary feature requests, record the evidence and defer until the weekly review.
+Otherwise record the evidence and classify it in the weekly review.
 
 ## 11. Moderation and safety procedure
 
@@ -223,26 +236,25 @@ Treat these as immediate review items:
 
 ### Response sequence
 
-1. capture the report/facts outside public product surfaces using the beta support channel;
+1. capture report/facts using the beta support channel;
 2. assess immediate candidate risk;
-3. if necessary, moderate the vacancy and/or suspend the employer using existing operator controls;
+3. if necessary, moderate the vacancy and/or suspend the employer using existing controls;
 4. preserve the existing audit trail;
 5. contact affected users where appropriate;
 6. document whether the incident exposes a product/systemic gap;
-7. only then decide whether engineering work is required.
+7. decide whether engineering work is required.
 
-Do not build a user-facing report intake system merely because moderation currently uses founder-assisted intake. Promote it only if manual intake becomes a demonstrated blocker.
+Do not build a user-facing report intake system merely because founder-assisted intake is manual.
 
 ## 12. Account/privacy support
 
 For export/deletion support:
 
-- prefer the user's own existing account export/deletion controls;
-- never ask users to send passwords or session tokens;
+- prefer the user's existing account export/deletion controls;
+- never ask users for passwords or session tokens;
 - never paste service-role credentials into support channels;
-- if deletion fails, capture the request context without exposing internal secrets and use the documented privileged reconciliation process only through authorized internal maintenance procedures;
-- do not perform ad-hoc direct production table mutation as a support shortcut;
-- treat any stale-JWT/authorization anomaly as a security incident, not a normal support issue.
+- if deletion fails, use documented privileged reconciliation procedures rather than ad-hoc table mutation;
+- treat stale-JWT/authorization anomalies as security incidents.
 
 ## 13. Technical incident response
 
@@ -255,7 +267,7 @@ Examples:
 - incorrect deletion/export privacy boundary;
 - compromised secret;
 - destructive data corruption;
-- production authentication failure affecting many users.
+- widespread production authentication failure.
 
 Response:
 
@@ -276,39 +288,42 @@ Examples:
 
 Response: smallest tested correction with expedited beta-fix PR.
 
-### Severity C — usability / cosmetic
+### Severity C — usability/cosmetic
 
 Record and review weekly unless accessibility or trust is materially affected.
 
 ## 14. Beta-readiness infrastructure
 
-### Isolated Preview environment — required before systematic external testing
+### Isolated Preview environment
+
+Required before systematic external testing of iterative builds.
 
 Plan:
 
 - separate Preview Supabase project/environment;
 - Preview-scoped browser-safe URL/key;
-- no Production database reuse;
+- no Production DB reuse;
 - disposable/non-real fixtures;
 - documented reset/teardown procedure;
 - hosted destructive proof remains separately authorized.
 
-Preview restoration should not block founder recruitment conversations or operating-plan preparation, but it should precede systematic external testing of iterative builds.
+This PR does not configure Preview.
 
-### Minimal Sentry — approved direction, implementation not authorized here
+### Minimal Sentry — approved readiness requirement
 
-Before Cohort A external traffic, propose a minimal setup with:
+Before intentional Cohort A external traffic, configure Sentry subject to the approved boundary:
 
+- EU region where available on the selected plan;
 - error monitoring only;
 - no session replay;
-- no PostHog/product analytics;
-- no request-body/user-content capture by default;
-- scrub email/identifiers where not necessary for diagnosis;
-- avoid storing application/vacancy snapshot payloads in error context;
-- short, explicit retention configuration where the selected Sentry plan supports it;
-- environment tags separating Preview and Production.
+- no request-body capture;
+- no application/vacancy payload capture;
+- scrub unnecessary email/user identifiers;
+- separate Preview and Production environments;
+- retention target 30 days or less where supported;
+- no PostHog in Cohort A.
 
-Founder approval is still required for the exact Sentry region/retention/PII settings before implementation.
+This PR does not configure Sentry.
 
 ### Production demo fixtures
 
@@ -319,45 +334,106 @@ Operational requirement:
 - remove them by that date; or
 - explicitly re-authorize a new retention period with reason.
 
-They never count toward M5 employer/vacancy/candidate/outcome metrics.
+They never count toward M5 metrics.
 
-### External-facing legal pages
+### External-facing legal readiness — approved gate
 
-Current Privacy/Terms/Impressum surfaces are structural placeholders with legal-review-required language.
+The founder owns beta-readiness completion.
 
-Before Cohort A external beta traffic is treated as intentional product use, assign an owner for legal/business-identity review and define the minimum readiness gate for:
+Intentional Cohort A external traffic is gated on qualified German legal review/finalization of:
 
-- Privacy information;
-- Terms;
 - Impressum/business identity;
-- contact/support channel;
-- any Sentry disclosure required by the chosen monitoring configuration.
+- Privacy notice reflecting actual processing;
+- Terms suitable for the beta;
+- support/contact channel;
+- Sentry disclosure if required.
 
-This operating plan does not claim GDPR compliance or substitute for legal advice.
+This is a readiness gate, **not** a claim of full GDPR compliance.
 
-## 15. Cohort advancement gates
+## 15. M5 measurement operating rules
+
+### Participating employer
+
+Count one unique employer when:
+
+- onboarding is complete;
+- employer is verified; and
+- at least one employer-submitted vacancy became effective-public during M5.
+
+Once counted, retain historical participation even if later paused, withdrawn, suspended, or verification changes.
+
+Track current active/safe employer supply separately.
+
+### Verified vacancy
+
+Count one unique employer-submitted vacancy when it became effective-public at least once during M5 while employer verification was valid.
+
+Do not count seed/demo vacancies or drafts that never became public.
+
+Count once historically and track current effective-public supply separately.
+
+### Candidate
+
+Count one unique candidate when essential onboarding is complete.
+
+Pre-existing completed candidates count only when explicitly enrolled into an M5 cohort.
+
+Raw registrations are diagnostic only.
+
+### Completed interview
+
+Store each legitimate distinct completed interview round as an `interview_completed` event if/when the outcome contract is implemented.
+
+For the top-level target, count **distinct applications with at least one active, non-voided interview-completed event**.
+
+Multiple interview rounds on one application do not inflate the top-line target.
+
+### Confirmed hire
+
+Count an application once when it has an active, non-voided employer-recorded `hired` event.
+
+`applications.status = accepted` never counts automatically.
+
+## 16. Outcome correction and candidate/deletion behavior
+
+Approved operating intent for future implementation:
+
+- append-only outcome history;
+- void/replacement corrections;
+- no hard edit/delete of outcome history;
+- candidate may read own active outcome type + occurred timestamp only;
+- after candidate deletion, block new outcome events;
+- preserve existing non-identifying historical outcome facts;
+- allow `occurred_at` backdating up to 30 days;
+- prohibit future dating except negligible fixed clock-skew tolerance;
+- DB-generate immutable `recorded_at`.
+
+No schema/runtime work is implemented by this PR.
+
+## 17. Cohort advancement gates
 
 ### A → B
 
-Recommended minimum:
+Minimum:
 
-- at least one completed interview under the approved metric definition;
+- at least one completed-interview conversion under the approved metric;
 - no unresolved Severity A incident;
 - no repeated blocker preventing candidate application or employer review;
 - vacancy legitimacy/moderation process workable manually;
-- outcome measurement contract implemented and trusted if the interview is to count in-product.
+- outcome measurement implementation trusted if the interview is counted in-product;
+- legal/Sentry/Preview readiness remains appropriate for the next traffic level.
 
 ### B → C
 
-Recommended minimum:
+Minimum:
 
-- repeated completed interviews;
+- repeated completed-interview conversions;
 - first confirmed hire;
-- acquisition channels show repeatability rather than one-off founder network only;
+- acquisition channels show repeatability beyond a single founder relationship;
 - support burden remains manageable or has evidence-backed fixes;
-- monitoring/Preview/legal readiness is stable enough for the larger cohort.
+- monitoring/Preview/legal readiness is stable for larger cohort traffic.
 
-## 16. Explicit non-goals during Cohort A
+## 18. Explicit non-goals during Cohort A
 
 Do not introduce without evidence:
 
@@ -376,13 +452,19 @@ Do not introduce without evidence:
 - sophisticated analytics dashboards;
 - PostHog/session replay.
 
-## 17. Remaining founder approvals
+## 19. Approval state
 
-Before M5.0 closes, founder review should resolve:
+The founder has approved:
 
-1. Cohort A cleaning-first employer wedge vs a broader multi-sector cohort;
-2. exact participation/vacancy/candidate count semantics in `docs/49`;
-3. interview multiplicity and outcome-contract details in `docs/50`;
-4. exact Sentry region/retention/PII configuration;
-5. legal-page review owner/readiness gate;
-6. whether the recommended weekly review cadence is adopted as written.
+- cleaning-first Cohort A with 1–2 narrow adjacent-employer exceptions;
+- all top-level M5 counting semantics;
+- interview conversion counting capped at one per application;
+- candidate-safe outcome visibility;
+- append-only correction;
+- deleted-candidate outcome freeze;
+- 30-day timestamp backdating;
+- minimal Sentry boundary;
+- founder-owned qualified German legal-review gate;
+- weekly `Operate manually / Fix now / Watch / Defer` cadence.
+
+No additional M5.0 operating-plan decision remains open before final review of PR #74.
