@@ -330,7 +330,7 @@ describe("buildEmployerAccountExport", () => {
   // PART H — mandatory candidate-PII serialized-absence proof
   // ---------------------------------------------------------------------
 
-  it("never serializes candidate PII anywhere in the employer export, even if a malicious/unexpected extra field were present", async () => {
+  it("fails closed when the export RPC returns an unexpected candidate-identifying field", async () => {
     const client = makeClient({
       employerProfile: { data: employerProfileRow, error: null },
       vacancies: { data: [vacancyRow], error: null },
@@ -342,9 +342,30 @@ describe("buildEmployerAccountExport", () => {
             status: "reviewing",
             submitted_at: "2026-08-01T00:00:00Z",
             // Simulates a hypothetical future RPC regression that leaks
-            // extra fields — the strict schema must strip/reject this.
+            // extra fields — the strict schema must reject this.
             candidate_display_name: "candidate-secret-name-8-3b",
             candidate_id: "66666666-6666-4666-8666-666666666666",
+          },
+        ],
+        error: null,
+      },
+    });
+
+    const result = await buildEmployerAccountExport(client as never);
+    expect(result.kind).toBe("failure");
+  });
+
+  it("never serializes candidate PII anywhere in a successful employer export", async () => {
+    const client = makeClient({
+      employerProfile: { data: employerProfileRow, error: null },
+      vacancies: { data: [vacancyRow], error: null },
+      exportApplications: {
+        data: [
+          {
+            application_id: "55555555-5555-4555-8555-555555555555",
+            vacancy_id: vacancyRow.id,
+            status: "reviewing",
+            submitted_at: "2026-08-01T00:00:00Z",
           },
         ],
         error: null,

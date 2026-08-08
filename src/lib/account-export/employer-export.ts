@@ -9,6 +9,7 @@ import { resolveCurrentExportAccount } from "./current-account";
 import {
   ACCOUNT_EXPORT_VERSION,
   employerAccountExportV1Schema,
+  exportEmployerApplicationProcessRowSchema,
   type EmployerAccountExportV1,
 } from "./schemas";
 
@@ -81,13 +82,6 @@ const vacancyRowSchema = z.object({
   withdrawn_at: z.string().nullable(),
   expired_at: z.string().nullable(),
   created_at: z.string().min(1),
-});
-
-const exportApplicationProcessRowSchema = z.object({
-  application_id: z.string().uuid(),
-  vacancy_id: z.string().uuid(),
-  status: z.string(),
-  submitted_at: z.string().min(1),
 });
 
 /**
@@ -198,7 +192,7 @@ export async function buildEmployerAccountExport(
     return { kind: "failure" };
   }
   const parsedApplications = z
-    .array(exportApplicationProcessRowSchema)
+    .array(exportEmployerApplicationProcessRowSchema)
     .safeParse(applicationRows);
   if (!parsedApplications.success) {
     return { kind: "failure" };
