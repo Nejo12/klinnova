@@ -1,40 +1,33 @@
 # M5 Beta Transition and Measurement
 
-**Status:** M5.0 discovery / founder review
+## Status
 
-**Date:** 2026-08-09
+**M5.0 — Approved founder decisions recorded; awaiting final founder review of PR #74 before merge.**
 
-**Authoritative base:** `main` at `7a92e31fc25b3fe7d33d10fe7ffa5c5dd5a47789` (PR #73 merge commit)
+M4 is complete. Slice 8 is complete. M5 — Berlin private beta — is the active milestone.
 
-Related sources:
+This document defines the initial M5 beta boundary and authoritative top-level counting semantics. It does not authorize product/schema/runtime implementation by itself.
 
-- MVP scope: `docs/04-mvp.md`
-- Roadmap: `docs/09-roadmap.md`
-- Decisions: `docs/10-decisions.md`
-- Anti-goals: `docs/11-anti-goals.md`
-- Implementation plan: `docs/13-implementation-plan.md`
-- Founder dashboard: `docs/14-founder-dashboard.md`
-- Slice 8/M4 closure proof: `docs/48-slice-8-exit-proof.md`
-- M5 outcome-contract proposal: `docs/50-m5-outcome-contract-proposal.md`
-- M5 operating plan: `docs/51-m5-operating-plan.md`
+## M5 objective
 
-## 1. Transition state
+Operate Stint as a controlled Berlin private beta and validate whether the current product can create real employment outcomes without broad feature expansion.
 
-PR 8.1 through PR 8.5 are merged. Slice 8 is complete. M4 — Trust and beta readiness — is complete. The active milestone is now **M5 — Berlin private beta**.
-
-M5 is an operating/validation phase, not a new broad implementation milestone. The product boundary for Cohort A is the merged M4 application unless real beta evidence demonstrates that a change is required.
-
-The overall M5 targets remain:
+Overall M5 targets:
 
 - 20 participating employers
 - 100 verified vacancies
 - 200 candidates
-- 10 completed interviews
+- 10 completed-interview conversions
 - 3 confirmed hires
 
-## 2. Founder-approved M5 decisions
+Feature expansion is frozen unless a change:
 
-The following decisions were explicitly approved by the founder on 2026-08-09. They use an M5-specific decision namespace because they govern beta operation and measurement rather than reopening the implementation decisions D-001–D-090.
+- is required to measure the beta;
+- removes an observed blocker for a real user;
+- fixes a bug, accessibility, security, or privacy problem; or
+- is necessary for safe beta operation.
+
+## Accepted founder decisions
 
 ### D-M5-1 — Beta scope freeze
 
@@ -42,215 +35,296 @@ The following decisions were explicitly approved by the founder on 2026-08-09. T
 
 The merged M4 implementation is the minimum product boundary for the initial M5 Berlin private beta. Capabilities deliberately deferred during implementation do not block beta unless observed beta evidence shows they are required.
 
-A new capability may enter the active beta backlog only when it:
-
-1. is required to measure the beta;
-2. removes an observed blocker for a real beta user;
-3. fixes a bug, accessibility, security, or privacy problem; or
-4. is necessary for safe beta operation.
-
-Normal beta fixes use the lightweight loop:
-
-> Observe problem → confirm it matters → smallest fix → test → deploy → observe again.
-
-Heavier discovery/decision work remains required for schema/database, authorization/RLS, privacy, security, matching authority, employment/legal boundaries, or major architecture changes.
+The initial beta does not require speculative expansion into chat, native applications, reviews/ratings, AI matching, embeddings/vector search, payments/payroll, subscriptions, full ATS functionality, video interviews, multi-city expansion, broad scraping, CV upload, saved jobs, or sophisticated analytics dashboards.
 
 ### D-M5-2 — Completed interview metric
 
 **Status:** Approved
 
-An interview counts toward M5 only when an application-related interview is recorded by the employer as having **actually taken place**. An invitation, proposal, or scheduled interview alone does not count.
+An interview is an outcome fact, not an application workflow status.
+
+An `interview_completed` event may be stored for each distinct employer-recorded completed interview round on an application.
+
+For the **top-level M5 target**, one application contributes at most one completed-interview conversion:
+
+- an application contributes `1` once it has at least one active, non-voided `interview_completed` event;
+- additional completed interview rounds remain historical events but do not increment the top-line target.
+
+An invitation, proposal, or scheduled interview alone does not count.
+
+This prevents multi-round interview processes from inflating the M5 target of 10 completed interviews.
 
 ### D-M5-3 — Confirmed hire metric
 
 **Status:** Approved
 
-A confirmed hire counts when the employer records that the candidate was hired for the vacancy. Existing application status `accepted` must **not** automatically count as a confirmed hire.
+A confirmed hire counts when the employer records that the candidate was hired for the vacancy.
+
+Existing application status `accepted` must not automatically count as a confirmed hire.
 
 Candidate confirmation may be considered later but is not required for the initial private beta.
 
 ### D-M5-4 — Outcome model direction
 
+**Status:** Approved direction
+
+Interview/hire outcomes are conceptually separate from the existing application workflow status.
+
+M5.0 may investigate and propose the smallest trustworthy outcome contract, including authorization, history/audit behavior, candidate visibility, deletion behavior, and funnel integration.
+
+No schema/runtime implementation is authorized by this decision alone.
+
+### D-M5-5 — Monitoring boundary
+
+**Status:** Approved direction
+
+Before intentional Cohort A external beta traffic, plan a minimal, privacy-conscious Sentry setup:
+
+- EU region where available on the selected plan;
+- error monitoring only;
+- no session replay;
+- no request-body or application/vacancy payload capture;
+- scrub unnecessary email/user identifiers;
+- separate Preview and Production environments;
+- retention target of 30 days or less where supported;
+- no PostHog in Cohort A.
+
+M5.0 does not configure Sentry.
+
+### D-M5-6 — CV/save-job freeze
+
 **Status:** Approved
 
-Interview/hire outcomes are conceptually separate from application workflow status. M5.0 may investigate and propose the smallest trustworthy outcome contract, but it does not authorize a schema or runtime implementation.
+Optional CV upload and save/unsave jobs remain longer-term product capabilities but do not block the initial Berlin private beta.
 
-### D-M5-5 — Error monitoring direction
-
-**Status:** Approved
-
-Plan minimal, privacy-conscious Sentry error monitoring before Cohort A external beta traffic. Do not introduce PostHog, session replay, or a broader observability platform as part of this decision.
-
-### D-M5-6 — CV/save-job beta freeze
-
-**Status:** Approved
-
-Optional CV upload and save/unsave jobs do not block the initial Berlin private beta. They remain deferred product capabilities and may be reconsidered only with beta evidence.
-
-This resolves the apparent ambiguity in `docs/04-mvp.md`: those capabilities remain longer-term MVP/product intent, but they are not part of the **initial M5 beta entry gate**.
+Reconsider them only with beta evidence that they remove a real blocker.
 
 ### D-M5-7 — Staged beta cohorts
 
 **Status:** Approved
 
-Operate M5 through three staged cohorts rather than attempting the full target immediately.
+#### Cohort A — Proof
 
-| Cohort | Employers | Legitimate vacancies | Candidates | Outcome target |
-|---|---:|---:|---:|---|
-| A — Proof | 3–5 | 10–20 | 20–30 | first completed interview |
-| B — Validation | 8–10 | 30–50 | 60–100 | repeated interviews + first confirmed hire |
-| C — Full M5 | 20 | 100 | 200 | 10 completed interviews + 3 confirmed hires |
+- 3–5 participating employers
+- 10–20 legitimate vacancies
+- 20–30 candidates
+- target: first completed-interview conversion
 
-Cohort expansion is evidence-gated. Cohort B should not begin merely because a calendar date arrives; Cohort A should first demonstrate that the core journey can produce a completed interview without a critical unresolved trust, usability, privacy, or operational blocker.
+#### Cohort B — Validation
 
-## 3. Initial M5 feature freeze
+- 8–10 participating employers
+- 30–50 vacancies
+- 60–100 candidates
+- target: repeated completed-interview conversions and first confirmed hire
 
-The following are explicitly **not Cohort A work without beta evidence**:
+#### Cohort C — Full M5 target
 
-- real-time chat or messaging
-- native applications
-- public reviews/ratings
-- AI matching surfaces
-- embeddings/vector search
-- payroll/payments
-- employer subscriptions/billing
-- full ATS functionality
-- video interviews
-- multi-city expansion
-- broad/unrestricted scraping
-- optional CV upload
-- save/unsave jobs
-- sophisticated analytics dashboards
-- PostHog/session replay
+- 20 participating employers
+- 100 verified vacancies
+- 200 candidates
+- 10 completed-interview conversions
+- 3 confirmed hires
 
-These are deferred, not necessarily rejected forever. Promotion requires beta evidence and the repository's normal scope/decision discipline.
+### D-M5-8 — Participating employer counting
 
-## 4. Proposed M5 counting semantics — founder review required
+**Status:** Approved
 
-The founder has approved the interview and hire definitions above. Three remaining top-line metrics still need exact counting semantics so the M5 dashboard cannot drift into vanity metrics.
+Count one unique employer when all of the following became true during M5:
 
-### P-M5-1 — Participating employer
+- employer onboarding is complete;
+- employer is verified; and
+- at least one employer-submitted vacancy became effective-public during M5.
 
-**Proposed definition:** count one unique employer profile when all of the following have occurred during M5:
+Participation is a historical M5 fact. Once counted, the employer remains counted even if they later pause/withdraw their vacancy, are suspended, or lose verification.
 
-1. employer onboarding is complete;
-2. employer verification state is `verified` at the time of participation; and
-3. the employer owns at least one employer-submitted vacancy that has reached effective-public visibility during M5.
+Track **current active/safe employer supply separately** from the cumulative participating-employer metric.
 
-Count a qualifying employer once for the M5 program even if they later pause/withdraw a vacancy or verification is later revoked. Safety/moderation state remains visible separately and must not be hidden by the historical participation count.
+Seed/demo employers do not count.
 
-**Reason:** registration alone is not marketplace participation; this definition measures employers that supplied at least one legitimate public opportunity.
+### D-M5-9 — Verified vacancy counting
 
-### P-M5-2 — Verified vacancy
+**Status:** Approved
 
-There is no separate `vacancy_verification_state` in the merged model; verification belongs to the employer and public visibility is governed by the effective-public predicate.
-
-**Proposed definition:** count one unique employer-submitted vacancy when it has been effective-public at least once during M5 while its employer was verified. A vacancy counts once, not once per publish/resume/renew cycle.
+Count one unique employer-submitted vacancy when it became effective-public at least once during M5 while its employer was verified.
 
 Do not count:
 
 - seed/demo vacancies;
-- drafts that never became effective-public;
-- vacancies hidden by an unverified employer at first publication attempt;
-- moderated/unsafe rows that never legitimately reached effective-public visibility.
+- drafts that never legitimately became public;
+- duplicate public periods for the same vacancy.
 
-If a previously-counted vacancy is later moderated or withdrawn, retain the historical unique-vacancy count but report current active/effective-public supply separately.
+The metric is historical/cumulative: each qualifying vacancy counts once even if later paused, withdrawn, filled, expired, moderated, or otherwise no longer public.
 
-### P-M5-3 — Candidate
+Track **current effective-public supply separately**.
 
-**Proposed definition:** count one unique candidate identity when essential onboarding reaches the authoritative completed state during M5, or when a pre-existing completed candidate explicitly participates in an M5 cohort and is included in the cohort roster.
+### D-M5-10 — Candidate counting
 
-Raw registrations do not count as M5 candidates.
+**Status:** Approved
 
-**Reason:** the product only becomes useful for matching after essential onboarding. Counting uncompleted registrations would inflate the beta metric without representing a usable candidate participant.
+Count one unique candidate when authoritative essential onboarding is complete.
 
-### Completed interview
+A candidate who completed onboarding before M5 counts only if explicitly enrolled into an M5 cohort.
 
-Approved D-M5-2 governs this metric. Proposed counting detail still requiring founder review:
+Raw registrations do not count.
 
-- count each non-voided employer-recorded `interview_completed` outcome event;
-- an application may therefore contribute more than one completed interview if multiple distinct interview rounds actually occurred.
+The cohort roster therefore determines whether a pre-existing completed profile enters M5 measurement; onboarding completion determines eligibility to count.
 
-Alternative: count at most one completed-interview conversion per application. See Remaining founder decisions below.
+### D-M5-11 — Cohort A employer wedge
 
-### Confirmed hire
+**Status:** Approved
 
-Approved D-M5-3 governs this metric.
+Cohort A is cleaning-first.
 
-Proposed counting detail:
+The primary employer segment should be simple cleaning demand where language barriers are low and the current product fits the hiring workflow.
 
-- at most one active confirmed-hire outcome per application;
-- count the application once when the owning employer records `hired`;
-- application status `accepted` remains analytically separate and cannot increment this metric by itself.
+A narrow exception allows **1–2 adjacent low-language-barrier employers** when:
 
-## 5. M5 funnel
+- founder access is strong; and
+- the hiring model remains simple and compatible with the current Stint workflow.
 
-The beta funnel should distinguish stock metrics from conversion/outcome metrics.
+Do not deliberately run a broad multi-sector Cohort A.
 
-### Supply / participation
+### D-M5-12 — Candidate visibility of outcomes
 
-- participating employers
-- verified employers currently active
-- verified vacancies ever effective-public during M5
-- vacancies currently effective-public
+**Status:** Approved
 
-### Candidate funnel
+Candidates may read their own **active** outcome events in candidate-safe form containing only:
 
-- candidate registrations (diagnostic only)
-- completed candidate onboarding (**M5 candidate count**)
-- candidates with at least one current match
-- candidates with at least one submitted application
+- outcome type;
+- occurred date/time.
 
-### Recruitment funnel
+Do not expose candidate-facing:
 
-- applications submitted
-- applications reviewed (`reviewing` or later)
-- applications shortlisted
-- completed interview events
-- confirmed hire events
+- actor IDs;
+- void/correction metadata;
+- operator details;
+- internal audit implementation;
+- internal notes.
 
-The existing `proof:pilot-funnel` remains useful as deterministic local proof, but production M5 measurement must not silently redefine a metric simply because the existing script does not yet expose it. Outcome metrics are added only after an approved outcome contract exists.
+### D-M5-13 — Outcome correction model
 
-## 6. M5 entry gates
+**Status:** Approved
 
-### Cohort A may begin operational preparation now
+Outcome history is append-only.
 
-Founder/employer/candidate recruitment preparation, outreach planning, manual onboarding preparation, and beta-process setup do not require new product implementation.
+Corrections use void/replacement semantics.
 
-### Before systematic external Cohort A traffic
+Do not hard-edit or hard-delete an existing outcome event to rewrite history.
 
-The beta-readiness plan must address:
+### D-M5-14 — Deleted-candidate outcome behavior
 
-- isolated Preview environment for systematic external testing;
-- minimal privacy-conscious Sentry configuration;
-- external-facing legal-page review/readiness;
-- documented technical and moderation incident response;
-- Production demo-fixture cleanup/re-authorization by 2026-09-02.
+**Status:** Approved
 
-### Outcome measurement implementation
+After `candidate_profiles.account_deleted_at` is non-null for the application owner:
 
-A separate implementation PR may be authorized only after founder review of `docs/50-m5-outcome-contract-proposal.md` and the remaining measurement decisions in this document.
+- no new outcome event may be recorded for that application;
+- existing non-identifying historical outcome facts may remain with the preserved application/history under the current deletion model.
 
-## 7. Remaining founder decisions
+This mirrors the existing principle that a deleted candidate's application is historical/read-only rather than an active recruitment workflow.
 
-The M5.0 discovery leaves these decisions open intentionally:
+### D-M5-15 — Outcome timestamp policy
 
-1. **Employer count:** approve/revise P-M5-1's requirement that a participating employer must have had at least one effective-public vacancy.
-2. **Vacancy count:** approve/revise P-M5-2's “effective-public at least once” historical unique-vacancy definition.
-3. **Candidate count:** approve/revise P-M5-3's completed-onboarding definition, including treatment of pre-existing candidates.
-4. **Interview multiplicity:** should two completed interview rounds for one application count as two M5 completed interviews, or should the metric cap at one interview conversion per application?
-5. **Cohort A employer wedge:** approve the proposed cleaning-first segment in `docs/51-m5-operating-plan.md` or deliberately broaden Cohort A.
-6. **Sentry retention/region/config:** approve the minimal configuration proposed in `docs/51` before any integration PR.
-7. **Legal readiness owner:** determine who reviews/finalizes Privacy/Terms/Impressum before external beta traffic and what constitutes the launch gate.
+**Status:** Approved
 
-## 8. M5.0 exit
+Employer-recorded `occurred_at`:
 
-M5.0 is complete when:
+- may be backdated by at most 30 days;
+- must not be future-dated except for negligible server/client clock-skew tolerance.
 
-- repository status reflects Slice 8 complete / M4 complete / M5 active;
-- the approved M5 beta boundary and staged cohorts are recorded;
-- M5 metric definitions are approved;
-- the separate outcome-contract direction is approved or revised;
-- the operating plan is approved;
-- beta-readiness responsibilities are assigned;
-- no product/schema implementation has been silently introduced by this discovery unit.
+`recorded_at` is database-generated and immutable.
+
+Any future implementation must define the exact negligible clock-skew tolerance as a fixed system-owned constant rather than a caller-selectable value.
+
+### D-M5-16 — Sentry Cohort A readiness
+
+**Status:** Approved
+
+Minimal Sentry error monitoring is approved as a beta-readiness item under the D-M5-5 boundary.
+
+Required configuration intent:
+
+- EU region where available on the selected plan;
+- error monitoring only;
+- no session replay;
+- no request-body capture;
+- no application/vacancy payload capture;
+- scrub unnecessary email/user identifiers;
+- Preview and Production separated;
+- retention target 30 days or less where supported;
+- no PostHog in Cohort A.
+
+This PR does not implement or configure Sentry.
+
+### D-M5-17 — Legal readiness gate
+
+**Status:** Approved
+
+The founder owns beta-readiness completion.
+
+Intentional Cohort A external traffic is gated on qualified German legal review/finalization of:
+
+- Impressum/business identity;
+- Privacy notice reflecting actual processing;
+- Terms suitable for the beta;
+- support/contact channel;
+- Sentry disclosure if required by the final monitoring configuration.
+
+Passing this gate is **not** a claim of full GDPR compliance or complete statutory fulfillment.
+
+### D-M5-18 — Weekly operating cadence
+
+**Status:** Approved
+
+Run one structured M5 review per week.
+
+Every observed issue is classified as one of:
+
+- **Operate manually** — founder support solves it without product work;
+- **Fix now** — material blocker, safety/privacy/security/accessibility issue, or beta-measurement requirement;
+- **Watch** — plausible issue with insufficient evidence;
+- **Defer** — does not materially affect current beta validation.
+
+The default M5 engineering loop is:
+
+> Observe problem → confirm it matters → smallest fix → test → deploy → observe again.
+
+Heavier planning remains reserved for changes affecting schema/database, authorization/RLS, privacy, security, matching authority, employment/legal boundaries, or major architecture.
+
+## M5 measurement semantics summary
+
+| Metric | Top-level counting rule |
+|---|---|
+| Participating employers | Unique employer whose onboarding completed, verification was verified, and at least one own employer-submitted vacancy became effective-public during M5; historical once counted |
+| Verified vacancies | Unique employer-submitted vacancy that became effective-public at least once during M5 while employer verified; historical once counted |
+| Candidates | Unique completed-onboarding candidate in the M5 cohort; pre-existing completed candidates require explicit cohort enrollment |
+| Completed interviews | Unique applications with at least one active, non-voided `interview_completed` event |
+| Confirmed hires | Unique applications with at least one active, non-voided `hired` event |
+
+Current active/safe employers and current effective-public vacancies are operational supply metrics and must not replace the cumulative beta target metrics.
+
+## Beta feature boundary
+
+The broader product direction remains documented in `docs/04-mvp.md`, `docs/09-roadmap.md`, and `NOT_NOW.md`.
+
+Starting M5 does not mean those capabilities were permanently rejected. It means they do not block Cohort A unless beta evidence changes the decision.
+
+## Implementation authorization boundary
+
+This M5.0 unit authorizes **documentation/discovery only**.
+
+It does not authorize:
+
+- outcome schema/migrations/RPCs/UI;
+- Sentry configuration;
+- Preview environment setup;
+- Production mutation;
+- legal-text publication;
+- broader product expansion.
+
+Any product/schema implementation must be selected explicitly after this PR's final founder review/merge.
+
+## Remaining founder decisions
+
+All previously listed M5.0 founder-review decisions are resolved by D-M5-8 through D-M5-18.
+
+The next founder decision should occur only when selecting the first post-M5.0 work unit after PR #74 merges.
