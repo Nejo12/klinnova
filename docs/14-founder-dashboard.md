@@ -1,179 +1,170 @@
 # Founder Dashboard
 
-Operating view for solo delivery. Update this file when the active slice changes or a milestone checkpoint is reached.
+Operating view for the active phase. Keep this file concise and current.
 
-Product scope stays in `docs/04-mvp.md`. Delivery order stays in `docs/13-implementation-plan.md`. Ideas that are not current work go in `NOT_NOW.md`.
+Product scope: `docs/04-mvp.md`.
+Delivery/phase plan: `docs/13-implementation-plan.md`.
+M5 boundary/metrics: `docs/49-m5-beta-transition-and-measurement.md`.
+M5 outcome proposal: `docs/50-m5-outcome-contract-proposal.md`.
+M5 operating plan: `docs/51-m5-operating-plan.md`.
+Deferred ideas: `NOT_NOW.md`.
+Historical slice detail remains in the individual discovery/build-plan/closure documents.
 
 ## Current focus
 
-| Field | Value |
-|-------|--------|
-| Active milestone | M4 — Trust and beta readiness |
-| Active slice | Slice 8 — Account deletion to confirmed data removal (PR 8.1–8.4 all merged; PR 8.5 local exit proof + closure implementation-complete locally, awaiting review) |
-| Slice status | Slice 6 complete locally (PR #59–#63 all merged; D-070 Accepted; local exit proof PASS — `docs/39-slice-6-exit-proof.md`). Hosted Slice 6 proof remains deferred, not executed (`docs/40-slice-6-hosted-proof-runbook.md` is a runbook only). **Slice 7 is Done locally**: planning **Accepted** — discovery/build-plan/proposal package `docs/41`–`docs/43` locked; decisions D-071–D-075 **Accepted** 2026-08-07; PR 7.1 merged (#64); PR 7.2 (database contract) merged (#65); PR 7.3 (moderation UI + suspended-employer UX) merged (#66); PR 7.4 (pilot funnel + legal placeholders + local exit proof) merged (#67) — no migration added by 7.3/7.4; migration count remains 13, pgTAP remains 1136/1136, generated types unchanged. Local exit proof: **PASS** — `docs/44-slice-7-exit-proof.md`, all three accepted Slice 7 exit criteria evidenced (suspend/remove; audited; pilot funnel measurable). Hosted Slice 7 proof has not been run. Slice 8: planning **Accepted** — discovery/build-plan/data-removal-proposal package `docs/45`–`docs/47` locked; decisions D-076–D-084 **Accepted** 2026-08-07, D-085/D-086/D-087 **Accepted** 2026-08-07 (discovered during PR 8.2 implementation), D-088/D-089 **Accepted** 2026-08-08 (discovered during PR 8.3 implementation start — D-077 left dual-capability export scope and the employer export's application-data source unresolved), D-090 **Accepted** 2026-08-08 (discovered during PR 8.4 implementation — a crash between a successful processing claim and any subsequent step could permanently strand a request, which D-081 did not cover); PR 8.1 merged. PR 8.2 (database deletion/tombstone/request/access-gate contract) is **merged**: 14 migrations, no Auth Admin API call, no service-role application code, no UI. PR 8.3 split into PR 8.3a (D-089's narrow `list_current_employer_export_applications()` read contract — one additive migration, 15th) **merged**, and PR 8.3b (D-088-compliant role-scoped export API/UI — `GET /candidate/account/export`/`GET /employer/account/export`, no new migration) **merged**. PR 8.4 (deletion request UI + isolated privileged Auth soft-delete processing — the one place `service_role`/Auth Admin credentials are used, confined to `src/lib/account-deletion/processor.ts`/`privileged-supabase.ts`) is **merged**: `/candidate/account/delete` and `/employer/account/delete` destructive-confirmation request/cancel UI on the existing PR 8.2 self-service RPCs, with server-authoritative FormData confirmation validation (never client-state alone) on both destructive actions; `processAccountDeletionRequest(requestId)`/`reconcileAccountDeletionRequest(requestId)` drive D-081's six-phase claim/domain-scrub/Auth-soft-delete/verify/evidence sequence, request-id-only, target derived from the claimed/reclaimed row; D-090 adds one additive migration (16th, `20260808220000_deletion_processing_lease_and_recovery.sql`) — a `processing_lease_started_at` lease column distinct from the historical `processing_started_at`, and a request-id-only `_reclaim_stale_deletion_request()` RPC (fixed 5-minute DB-owned staleness threshold, reachable only from `reconcileAccountDeletionRequest`) — closing the stranded-`processing` recovery gap; a local Auth Admin integration proof (gated to `127.0.0.1`/`localhost`, `STINT_DB_INTEGRATION=1`) exercises one disposable dual-capability identity through the real `deleteUser(id, true)`/`getUserById` API, proving domain tombstoning, company/vacancy/moderation/audit-redaction outcomes, stale pre-delete-JWT denial (read and mutate), fresh-login failure, and an untouched control account, plus a second disposable identity through the stranded-processing recovery path end to end; a focused Playwright journey proves the UI-level destructive-confirmation gating and post-deletion generic login failure end to end. Migration count is 16; pgTAP is 1437/1437 across 33 files at PR 8.4's own merge. Slice 8's implementation PRs (8.1–8.4) are all merged; Slice 8's local implementation is complete. PR 8.5 (local exit proof + Slice 8/M4 closure, `docs/48-slice-8-exit-proof.md`) is implementation-complete locally, awaiting review/merge — re-proves the full merged Slice 8 implementation from clean main and adds no migration, generated-type change, or application runtime change; independent review found one proof gap (processing-state cancellation denial lacked an authoritative pgTAP assertion), closed by a test-only correction of 4 pgTAP assertions to the existing `30_account_deletion_tombstone_and_request_contract_test.sql` file — no RPC behavior change. pgTAP is now 1441/1441 across 33 files. Slice 8 itself is not marked Done, and M4 is not marked Complete, pending PR 8.5's review/merge. |
-| Next unit | Review/merge PR 8.5 (local exit proof + Slice 8/M4 closure) — the first authorized unit after PR 8.4's merge. |
-| Next slice | none — Slice 8 is the active slice; M4 remains active until Slice 8/PR 8.5 completes |
-| Blockers | Preview remains intentionally unconfigured (no Preview-scoped Supabase configuration; re-isolate before any future hosted proof — known gap, unchanged by this unit). Production remains untouched by Slice 7/8 work. Hosted Demo fixtures remain in Production until 2026-09-02. |
+| Field | Current state |
+|---|---|
+| Active milestone | **M5 — Berlin private beta** |
+| Previous milestone | **M4 — Complete** (Slices 7–8 closed; PR #73 merged) |
+| Product boundary | Merged M4 implementation under D-M5-1 feature freeze |
+| Active work unit | M5.0 — beta transition + measurement contract + operating plan (docs/discovery only) |
+| PR | #74 — awaiting final founder review before merge |
+| Product/schema implementation | **Not authorized by M5.0** |
+| Preview | Intentionally unconfigured; isolated Preview restoration is beta-readiness work before systematic external testing |
+| Production | Existing production remains live; no M5.0 product/schema mutation |
+| Hosted destructive proof | Not authorized / not run |
+| Demo fixture deadline | Remove or explicitly re-authorize retained Production Demo fixtures by **2026-09-02** |
+| Monitoring | Minimal privacy-conscious Sentry approved before intentional Cohort A external traffic; not configured in M5.0 |
+| Legal readiness | Founder-owned qualified German legal review/finalization gate before intentional Cohort A external traffic |
 
-## Slice 4 delivery (complete)
+## M5 targets and approved definitions
 
-| Artifact | Status |
-|----------|--------|
-| `docs/28-slice-4-discovery.md` | Locked — contracts Accepted 2026-08-03 |
-| `docs/29-slice-4-build-plan.md` | Locked — PR 4.1–4.5 sequence complete |
-| `docs/30-slice-4-schema-and-journey-proposal.md` | Locked — schema/routes/RLS Accepted |
-| `docs/31-slice-4-exit-proof.md` | Done — local evidence via `pnpm proof:slice4` |
-| `docs/32-slice-4-hosted-proof-runbook.md` | Done — Preview/disposable run executed 2026-08-04 |
-| `docs/33-slice-4-closure.md` | Done — Slice 4 closed after hosted Preview/disposable proof |
-| D-034 | Accepted — private vs organisation employers (product boundary) |
-| D-046–D-054 | Accepted 2026-08-03; Slice 4 draft-path acceptance complete |
-| PR 4.1 — employer identity/profile schema and RLS | Done (merged; PR #41) |
-| PR 4.2 — employer registration and onboarding UI | Done (merged; PR #42) |
-| PR 4.3 — draft vacancy schema, languages, RLS, RPCs | Done (merged; PR #43) |
-| PR 4.4 — employer draft vacancy UI | Done (merged; PR #44) |
-| PR 4.5 — local exit proof + hosted readiness | Done (merged; PR #45) |
-| Local Slice 4 exit proof | Pass via `pnpm proof:slice4` |
-| Hosted Slice 4 proof | Done — Preview + disposable `wbucxaquktraobrvknts` (deleted after proof) |
-| Production authorization | Not used / not granted for Slice 4 hosted proof |
-| Publication / verification | Accepted contracts (D-055–D-067); PR 5.2 database foundation in progress |
-| Slice 5 | Active; PR 5.1 Done; PR 5.2 in progress |
-| Slice 6 | Complete locally; hosted proof deferred |
-| Slice 7 / Slice 8 | Slice 7 Done locally (D-071–D-075 Accepted; PR 7.1 #64, PR 7.2 #65, PR 7.3 #66, PR 7.4 #67 all merged; local exit proof PASS); Slice 8 planning Accepted (D-076–D-090 Accepted; PR 8.1 merged); PR 8.2 database contract merged (#69); PR 8.3a (D-089 narrow employer-export read contract) merged (#70); PR 8.3b (role-scoped export API/UI) merged (#71); PR 8.4 (deletion request UI + privileged Auth processing, plus D-090's stranded-processing recovery migration, 16th) merged (#72); PR 8.5 (local exit proof + Slice 8/M4 closure) implementation-complete locally, awaiting review/merge — Slice 8 not marked Done, M4 not marked Complete, pending PR 8.5's review/merge |
+| Metric | Full M5 target | Approved top-level counting rule |
+|---|---:|---|
+| Participating employers | 20 | Unique employer with completed onboarding + verified state + at least one employer-submitted vacancy effective-public during M5; historical once counted |
+| Verified vacancies | 100 | Unique employer-submitted vacancy effective-public at least once during M5 while employer verified; historical once counted |
+| Candidates | 200 | Unique authoritative completed-onboarding candidate in cohort; pre-existing completed candidate requires explicit M5 cohort enrollment |
+| Completed interviews | 10 | Distinct applications with >=1 active non-voided `interview_completed` event; additional rounds do not increment top-line target |
+| Confirmed hires | 3 | Distinct applications with an active employer-recorded `hired` event; `accepted` status alone never counts |
 
-## Slice 5 delivery (active)
+Track current active/safe employers and current effective-public vacancies separately from the historical cumulative target metrics.
 
-| Artifact | Status |
-|----------|--------|
-| `docs/34-slice-5-discovery.md` | Done — planning locked; D-055–D-067 Accepted |
-| `docs/35-slice-5-build-plan.md` | Done — PR 5.1–5.7 sequence; 5.2 gated on 5.1 merge |
-| `docs/36-slice-5-schema-and-publication-proposal.md` | Done — PR 5.2 schema contract locked |
-| D-055–D-067 | **Accepted** 2026-08-05 |
-| PR 5.1 — decision acceptance and schema contract | Done |
-| PR 5.2 — schema / RLS / RPCs / pgTAP | Done (merged; PR #49) |
-| PR 5.3 — employer verification request/status UI | Done (merged; PR #50). Employer-facing `/employer/verification` request/status UI |
-| PR 5.3a — operator verification read contract | Done (merged; PR #51). Migration + 47 pgTAP assertions (full local suite 672 assertions / 26 files) + generated types |
-| PR 5.3b — operator verification queue/review UI | Done (merged). `/internal/verification` queue + `/internal/verification/[employerProfileId]` review detail; approve/reject Server Actions on the PR 5.3a read RPCs and existing approve/reject RPCs. No revocation UI, no publication UI, no public jobs routes, no general admin dashboard. |
-| PR 5.4 — vacancy publication lifecycle controls | Done (merged). Employer-facing publish/pause/resume/fill/withdraw/materialize-expiry/renew at `/employer/vacancies/[vacancyId]`, on the existing PR 5.2 lifecycle RPCs (no migration). No public `/jobs` routes, no candidate matching integration, no applicant review. |
-| PR 5.5 — public/candidate vacancy discovery | Blocked — audited before writing UI and found no field-level read path for public/candidate discovery: `anon` has zero table grant on `vacancies`/`vacancy_language_requirements` (locked in by pgTAP `23_effective_public_and_application_test.sql`'s own `throws_ok` assertion), and no `authenticated` policy covers another employer's effective-public rows. Split into PR 5.5a (database contract) and PR 5.5b (UI). |
-| PR 5.5a — effective-public vacancy read contract | Done (merged). Narrow `SECURITY DEFINER` RPCs only — `list_effective_public_vacancies()`, `get_effective_public_vacancy(uuid)`, `get_effective_public_vacancy_languages(uuid)` — granted to `anon, authenticated`. No anon table grant, no broadened RLS, no UI. |
-| PR 5.5b — public vacancy discovery (public-discovery-only) | Done (merged; PR #56). `/jobs` + `/jobs/[vacancyId]` built entirely on the PR 5.5a RPCs; public navigation; public metadata; safe rendering; no migration. Candidate matching, `/candidate/matches`, `/candidate/jobs/[vacancyId]`, and the application Server Action were untouched. |
-| PR 5.5c — canonical candidate-matching/application-eligibility database contract | Done (merged; PR #57). One additive migration (11th): internal `_evaluate_candidate_vacancy_eligibility` evaluator (ported rule-for-rule from the TypeScript matcher, audited before implementation); authenticated-only `resolve_current_candidate_vacancy_match(uuid)` and `list_current_candidate_vacancy_matches()`; `submit_candidate_application` now enforces full eligibility transactionally, returning `ineligible` (with missing-requirement codes) instead of only checking category (D-068). |
-| PR 5.5d — candidate discovery UI + application integration | Done (merged; PR #58). `/candidate/matches` and `/candidate/jobs/[vacancyId]` now use the PR 5.5c RPCs exclusively (D-069); `ineligible` result/typed state/feedback UI added; pre-submit TypeScript matcher check removed from the Server Action; "Application preview" section dropped (D-043 narrowed); `/candidate/matches`'s existing redirect guards (unauthenticated/missing-profile/incomplete) are preserved via a new narrow completion guard, not collapsed. No migration. |
-| Vacancy lifecycle evidence | Narrow append-only `vacancy_lifecycle_events` selected per D-065 |
-| Slice 5 implementation | In progress — database foundation done; employer verification UI done; publication UI not started |
-| Preview isolated environment | Not configured |
-| Production | Untouched for Slice 5 |
-| Publication / verification approval UI (full admin) | Slice 7 — Done (PR 7.3 merged #66) |
-| Applicant review | Slice 6 — D-070 Accepted; PR 6.1–6.4 all merged (#60–#63); complete locally, hosted proof deferred |
-| Admin moderation / audit | Slice 7 — Done locally; `docs/41`–`docs/43` locked; D-071–D-075 Accepted 2026-08-07; PR 7.1 merged (#64); PR 7.2 (database contract) merged (#65); PR 7.3 (moderation UI) merged (#66); PR 7.4 (pilot funnel + legal placeholders + exit proof) merged (#67); local exit proof PASS (`docs/44-slice-7-exit-proof.md`) |
+## Staged cohorts
 
-## Slice 3 delivery (complete)
+| Cohort | Employers | Legitimate vacancies | Candidates | Outcome gate |
+|---|---:|---:|---:|---|
+| A — Proof | 3–5 | 10–20 | 20–30 | first completed-interview conversion |
+| B — Validation | 8–10 | 30–50 | 60–100 | repeated completed-interview conversions + first confirmed hire |
+| C — Full M5 | 20 | 100 | 200 | 10 completed-interview conversions + 3 confirmed hires |
 
-| Artifact | Status |
-|----------|--------|
-| `docs/22-slice-3-discovery.md` | Locked — contracts Accepted 2026-08-03 |
-| `docs/23-slice-3-build-plan.md` | Locked — PR 3.1–3.5 sequence complete |
-| `docs/24-slice-3-schema-and-journey-proposal.md` | Locked — schema/journey contracts Accepted |
-| `docs/25-slice-3-exit-proof.md` | Done — local automated proof (PR #37) |
-| `docs/26-slice-3-hosted-proof-runbook.md` | Done — Production fallback executed 2026-08-03 |
-| `docs/27-slice-3-closure.md` | Done — Slice 3 closed after hosted Production proof |
-| D-035–D-045 | Accepted 2026-08-03; Slice 3 acceptance conditions complete |
-| PR 3.1 — application schema, constraints, RLS, RPC | Done (merged; PR #33) |
-| PR 3.2 — job-detail loader and candidate detail route | Done (merged; PR #34) |
-| PR 3.3 — application preview and atomic submission | Done (merged; PR #35) |
-| PR 3.4 — confirmation, Applied state | Done (merged; PR #36) |
-| PR 3.5 — local exit proof + hosted-proof readiness | Done (merged; PR #37) |
-| Owner-run hosted Production proof | Done — `https://stint.company`; project `kvrzmzoszitdicjvrprt`; Demo fixtures retained until 2026-09-02 |
+## Cohort A wedge
 
-## Slice 2 delivery (complete)
+Cleaning-first is approved.
 
-| Artifact | Status |
-|----------|--------|
-| `docs/18`–`docs/20` / D-026–D-033 | Locked / Accepted |
-| PR 2.1 — Vacancy schema, RLS, local/CI fixtures | Done (merged; PR #26) |
-| PR 2.2 — Pure matcher + server loader | Done (merged; PR #27) |
-| PR 2.3 — `/candidate/matches` UI | Done (merged; PR #28) |
-| PR 2.4 — Critical journey + hosted fixture procedure | Done (merged; PR #29) |
-| Owner-run hosted Production proof | Done — `https://stint.company`; project `kvrzmzoszitdicjvrprt`; Demo fixtures retained until 2026-09-02 |
-| `docs/21-slice-2-closure.md` | Done — Slice 2 closed after hosted Production proof |
+Allow only **1–2 adjacent low-language-barrier employers** when founder access is strong and the hiring model remains simple. Do not deliberately run a broad multi-sector Cohort A.
 
-## Slice 1 closure (complete)
+## M5 scope freeze
 
-| Checkpoint | Status |
-|------------|--------|
-| PR 1.1 — Candidate schema and RLS | Complete (merged) |
-| PR 1.2 — Auth foundation | Complete (merged; PR #21) |
-| PR 1.3 — Essential onboarding | Complete (merged; PR #22) |
-| PR 1.4 — Completion gate and exit proof | Complete (merged; PR #23) |
-| Hosted migration `20260801160000_complete_candidate_onboarding.sql` | Applied; no pending remote migrations |
-| Local CI (Quality + Schema/RLS/Auth/onboarding/completion) | Confirmed green on PR #23 |
-| Hosted production smoke (register → persist → complete → invalidate → resume → re-complete) | Confirmed by repository owner |
-| No Slice 2 matching / jobs / applications / employer UI | Confirmed |
-| D-018–D-025 | Accepted |
+Do not introduce without beta evidence:
 
-## Slice 0 closure (complete)
+- chat/messaging;
+- native apps;
+- reviews/ratings;
+- AI matching surfaces;
+- embeddings/vector search;
+- payroll/payments;
+- subscriptions/billing;
+- full ATS functionality;
+- video interviewing;
+- multi-city expansion;
+- unrestricted scraping;
+- CV upload;
+- save/unsave jobs;
+- sophisticated analytics dashboards;
+- PostHog/session replay.
 
-| Checkpoint | Status |
-|------------|--------|
-| PR 0.1 — App shell and toolchain | Complete (merged) |
-| PR 0.2 — Design tokens and responsive shell | Complete (merged) |
-| PR 0.3 — Environment validation and Supabase scaffolding | Complete (merged) |
-| PR 0.4 — Tests, CI, and deployment | Complete (merged; PR #17) |
-| CI green (lint, typecheck, unit tests, build, e2e) | Confirmed |
-| Vercel Preview and Production | Confirmed working by repository owner |
-| Registration / onboarding product behaviour | Complete (Slice 1) |
+A change may enter active work only when it is required to measure the beta, removes an observed blocker, fixes a bug/accessibility/security/privacy problem, or is necessary for safe beta operation.
 
-## Solo cadence
+## M5.0 deliverables
 
-1. Keep **one** active slice.
-2. Work until that slice’s exit criteria are met, or park a blocker note here.
-3. Open PRs that leave `main` deployable.
-4. After merge, update this dashboard before starting the next slice.
-5. Put tempting extras in `NOT_NOW.md` instead of expanding the slice.
+- [x] Slice 8 marked complete
+- [x] M4 marked complete
+- [x] M5 marked active
+- [x] Beta scope freeze recorded
+- [x] Staged Cohorts A/B/C recorded
+- [x] Participating-employer definition approved
+- [x] Verified-vacancy definition approved
+- [x] Candidate definition approved
+- [x] Completed-interview top-line counting approved
+- [x] Confirmed-hire definition approved
+- [x] Separate outcome-model direction approved
+- [x] Candidate-safe outcome visibility approved
+- [x] Append-only void/replacement correction approved
+- [x] Deleted-candidate outcome freeze approved
+- [x] 30-day outcome backdating policy approved
+- [x] Cleaning-first Cohort A wedge approved
+- [x] CV/save-job Cohort A freeze approved
+- [x] Minimal-Sentry boundary approved
+- [x] Founder-owned legal-readiness gate approved
+- [x] Weekly operating cadence approved
+- [x] M5 operating plan drafted
+- [x] Outcome data-contract proposal drafted
+- [ ] Final founder review of updated PR #74
+- [ ] Merge PR #74
 
-Suggested rhythm:
+## Immediate beta-readiness queue after M5.0 merge
 
-- **Daily:** advance the active slice; do not open a second slice
-- **End of slice:** verify exit criteria, merge, update this file
-- **Weekly:** answer the guiding questions below
+This is a planning queue, **not automatic authorization**.
 
-## Guiding questions
+### Product / measurement
 
-Ask every week:
+1. Select and explicitly authorize the smallest outcome-measurement implementation unit if founder chooses it as the next work item.
+2. Preserve workflow/outcome separation and the approved M5 counting semantics.
 
-1. Can a Berlin candidate take one clearer step toward work than last week?
-2. Is the active slice still the highest-leverage unfinished journey step?
-3. Did anything land in the product that belongs in `NOT_NOW.md`?
-4. Are trust, privacy, and authorization still intact on `main`?
-5. What is the smallest demo I can show with seeded data?
+### Infrastructure
 
-## Pilot scoreboard
+1. Restore an isolated Preview environment before systematic external testing.
+2. Configure approved minimal Sentry before intentional Cohort A external traffic.
+3. Remove/re-authorize retained Production Demo fixtures by 2026-09-02.
 
-Fill during M5. Do not use these targets to justify pre-pilot feature expansion.
+### Operations
 
-| Metric | Target | Current |
-|--------|--------|---------|
-| Participating employers | 20 | 0 |
-| Verified vacancies | 100 | 0 |
-| Candidates | 200 | 0 |
-| Interviews | 10 | 0 |
-| Confirmed hires | 3 | 0 |
+1. Prepare cleaning-first employer acquisition with the 1–2 adjacent-employer exception only where justified.
+2. Prepare candidate recruitment channels.
+3. Complete founder-owned qualified German legal review/finalization gate.
+4. Establish support/contact channel and founder-assisted onboarding.
+5. Run one structured weekly M5 review using `Operate manually / Fix now / Watch / Defer`.
 
-## Slice board
+## Cohort A readiness gates
 
-| Slice | Outcome | Status |
-|-------|---------|--------|
-| 0 Foundation | Deployable shell + CI | Done — PR 0.1–0.4 merged; CI green; Production confirmed |
-| 1 Onboarding | Register → persisted essentials | Done — PR 1.1–1.4 merged (#21–#23); hosted migration + production smoke confirmed; D-018–D-025 Accepted |
-| 2 Matches | Essentials → seeded explainable matches | Done — PR 2.1–2.4 merged (#26–#29); hosted Production proof complete; Demo fixtures expire 2026-09-02 |
-| 3 Apply | Job detail → submitted application | Done — PR 3.1–3.5 merged (#33–#37); local + Production hosted proof complete; D-035–D-045 complete; Demo fixtures expire 2026-09-02 |
-| 4 Employer draft | Register → draft vacancy | Done — PR 4.1–4.5 merged (#41–#45); local + Preview/disposable hosted proof complete; publication not started |
-| 5 Verification → public vacancy | Verified publish + lifecycle | Active — D-055–D-067 Accepted; PR 5.1 Done; PR 5.2 in progress |
-| 5 Publish | Verification → public vacancy | Not started |
-| 6 Review | Applicant review → status update | Complete locally (PR #59–#63 merged); D-070 Accepted; hosted proof deferred |
-| 7 Trust ops | Admin moderation → audit | Done locally — D-071–D-075 Accepted 2026-08-07; PR 7.1 merged (#64); PR 7.2 (database contract) merged (#65); PR 7.3 (moderation UI) merged (#66); PR 7.4 (pilot funnel + legal placeholders + exit proof) merged (#67); local exit proof PASS |
-| 8 Deletion | Export/delete → confirmed removal | Planning Accepted (PR 8.1); PR 8.2 (deletion database contract) merged; PR 8.3a (employer export read contract) merged; PR 8.3b (role-scoped export API/UI) merged; PR 8.4 (deletion request UI + privileged Auth processing + D-090 stranded-processing recovery migration, 16th) merged (#72); PR 8.5 (local exit proof + Slice 8/M4 closure) implementation-complete locally, awaiting review/merge — Slice 8 not marked Done pending PR 8.5's review/merge |
+Before intentional external Cohort A traffic:
+
+- qualified German legal review/finalization of Impressum/business identity, Privacy notice, beta Terms, support/contact channel, and Sentry disclosure if required;
+- minimal Sentry configured within the approved privacy boundary;
+- isolated Preview available for systematic external testing of iterative builds;
+- technical/moderation/privacy support procedures understood;
+- demo-fixture cleanup deadline tracked.
+
+This gate does not establish or claim full GDPR compliance.
+
+## Baseline engineering state at M4 closure
+
+| Proof | Closure result |
+|---|---|
+| Migrations | 16 |
+| pgTAP | 1441/1441 across 33 files |
+| Vitest | 983 passed / 3 skipped |
+| Broad E2E | 38/38 |
+| Build | PASS |
+| Generated DB types | no drift |
+| Slice 8 local exit proof | PASS — `docs/48-slice-8-exit-proof.md` |
+
+Do not optimize M5 for larger test counts. The primary M5 numbers are participating employers, legitimate vacancies, completed candidate onboarding, applications, completed-interview conversions, and confirmed hires.
+
+## Completed implementation milestones
+
+| Milestone | Status | Evidence |
+|---|---|---|
+| M0 Foundation | Complete | Slice 0 |
+| M1 Candidate matching shell | Complete | Slices 1–2 |
+| M2 Applications | Complete | Slice 3 |
+| M3 Employer flow | Implementation complete | Slices 4–6; Slice 6 hosted proof remains separately deferred |
+| M4 Trust and beta readiness | **Complete** | Slices 7–8; `docs/44`, `docs/48`; PR #73 |
+| M5 Berlin private beta | **Active** | `docs/49`–`docs/51`; PR #74 M5.0 review |
 
 ## Decision discipline
 
-Record product/architecture choices in `docs/10-decisions.md`. Do not invent resolutions when documents conflict — stop and report.
+D-001–D-090 remain in `docs/10-decisions.md`.
+Founder-approved M5 operating/measurement decisions D-M5-1–D-M5-18 are recorded in `docs/49-m5-beta-transition-and-measurement.md`.
+
+Normal beta fixes use evidence-first lightweight delivery. Changes affecting schema/database, authorization/RLS, privacy, security, matching authority, employment/legal boundaries, or major architecture require explicit discovery and founder approval before implementation.

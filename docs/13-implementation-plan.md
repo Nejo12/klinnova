@@ -2,20 +2,40 @@
 
 ## Objective
 
-Deliver the smallest production-capable version of Stint that allows a candidate to create a lightweight profile, receive suitable Berlin job matches, and submit an application, while allowing an employer to publish a verified vacancy and review applicants.
+Deliver and validate the smallest production-capable version of Stint that allows a candidate to create a lightweight profile, receive suitable Berlin job matches, and submit an application, while allowing an employer to publish a verified vacancy and review applicants.
 
-Product scope remains defined by `docs/04-mvp.md`. This plan defines delivery order for a solo founder.
+Product scope remains defined by `docs/04-mvp.md`. This plan defines delivery order and the current operating phase for a solo founder.
 
-## Solo delivery rules
+## Delivery rules
 
-- Build **vertical slices**, not frontend/backend layers and not micro-task checklists.
-- One active slice at a time; track it in `docs/14-founder-dashboard.md`.
+### Implementation phase (Slices 0–8)
+
+- Build vertical slices, not frontend/backend layers and not micro-task checklists.
 - Each slice includes the UI, data, validation, authorization, tests, and observability needed to ship.
 - Prefer deterministic, explainable rules over opaque automation.
 - Treat accessibility, privacy, authorization, and verification as core requirements.
 - Do not add features because a framework or agent makes them easy.
-- Park non-urgent ideas in `NOT_NOW.md` without changing MVP scope.
+- Park non-urgent ideas in `NOT_NOW.md` without changing product scope.
 - Every pull request must leave the product deployable.
+
+### M5 beta phase
+
+M5 is operational and product-led. The default beta loop is:
+
+> Observe problem → confirm it matters → smallest fix → test → deploy → observe again.
+
+Feature expansion is frozen under D-M5-1 unless the change:
+
+1. is required to measure the beta;
+2. removes an observed blocker for a real user;
+3. fixes a bug, accessibility, security, or privacy problem; or
+4. is necessary for safe beta operation.
+
+Use heavier discovery/decision planning for schema/database, authorization/RLS, privacy, security, matching authority, employment/legal boundaries, or major architecture changes.
+
+M5 boundary/measurement: `docs/49-m5-beta-transition-and-measurement.md`.
+Outcome-contract proposal: `docs/50-m5-outcome-contract-proposal.md`.
+Operating plan: `docs/51-m5-operating-plan.md`.
 
 ## Recommended stack
 
@@ -24,304 +44,209 @@ Product scope remains defined by `docs/04-mvp.md`. This plan defines delivery or
 - SCSS Modules and CSS custom properties
 - Supabase PostgreSQL, Auth, Storage, and Row Level Security
 - React Hook Form and Zod
-- Resend and React Email
+- Resend and React Email where evidence/approved scope requires it
 - Vitest, Testing Library, MSW, and Playwright
-- Sentry and PostHog
-- GitHub Actions and Vercel preview deployments
+- GitHub Actions and Vercel
+- Minimal privacy-conscious Sentry error monitoring is approved for Cohort A readiness; PostHog/session replay remain deferred
 
 ## Vertical slices
 
-Each slice is the unit of planning, implementation, and review. Size for roughly 0.5–2 days of focused solo work when possible; larger slices are acceptable when the journey cannot be split without leaving `main` broken.
+Historical slice-specific contracts remain authoritative in their referenced discovery/build-plan/proposal/closure documents. This file keeps current high-level status rather than duplicating every merged PR detail.
 
 ### Slice 0 — Engineering foundation
 
 **Outcome:** deployable, tested application shell with Stint design tokens and reproducible local setup.
 
-**Build plan:** `docs/15-slice-0-build-plan.md` (four sequential PRs). **Status:** complete (PR 0.1–0.4 merged).
-
-**Includes:** Next.js bootstrap; strict TypeScript, ESLint, Prettier, absolute imports; SCSS tokens; env validation; Supabase local setup; test toolchain; CI; Vercel previews.
-
-**Exit criteria:**
-
-- `main` deploys successfully
-- lint, type-check, unit tests, and build run in CI
-- local setup is documented and reproducible
+**Status:** Complete — PR 0.1–0.4 merged.
 
 ### Slice 1 — Registration to persisted onboarding
 
 **Outcome:** a candidate can register and complete essential onboarding with durable progress.
 
-**Build plan:** `docs/16-slice-1-build-plan.md` (four sequential PRs; PR 1.1 decisions Accepted).
-**Schema proposal:** `docs/17-slice-1-schema-proposal.md` (Accepted). Auth: D-021/D-022 Accepted. Allow-lists: D-025 Accepted (2026-08-01).
-
-**Includes:** authentication; essential onboarding data persistence (MVP sequence as UI grouping); candidate profile essentials; step-motif progress; safe resume.
-
-**Exit criteria:**
-
-- onboarding can be resumed without data loss
-- no CV or phone number is required to complete essentials
-- preferences needed for matching are stored
+**Status:** Complete. Planning: `docs/16-slice-1-build-plan.md`, `docs/17-slice-1-schema-proposal.md`; D-018–D-025 Accepted.
 
 ### Slice 2 — Onboarding to seeded matches
 
 **Outcome:** after essentials, a candidate sees deterministic, explainable matches against seeded vacancies.
 
-**Includes:** seed/demo vacancies; match calculation from category, language, Berlin location, availability, employment type, shift, and work-authorisation declaration as a completion gate; `/candidate/matches` screen; empty states; match explanations.
+**Status:** Complete — PR #26–#29; closure `docs/21-slice-2-closure.md`; D-026–D-033 Accepted.
 
-**Accepted Slice 2 narrowings (D-026–D-033):** experience is excluded (no fields, eligibility, ordering, explanation, or display-only pseudo-requirement); travel minutes are unused for eligibility, ordering, reasons, and match claims (Berlin hard filter only); UI is `/candidate/matches` only (no detail/apply/save); fictional seed companies with `source = seed` and no verification claim; pure TypeScript matching with deterministic sort and no opaque scores; no automatic Production business-data insertion through schema migrations. Broader Matching v1 items remain later MVP intent where narrowed here.
-
-**Planning artifacts:** discovery `docs/18-slice-2-discovery.md`, build plan `docs/19-slice-2-build-plan.md`, schema/matching proposal `docs/20-slice-2-schema-and-matching-proposal.md`.
-
-**Exit criteria:**
-
-- a new candidate reaches relevant matches in under three minutes
-- each match explains why it appears
-- no opaque scores or recommendation black boxes
+Accepted narrowing remains authoritative: experience is excluded from current eligibility/matching; travel minutes are not an eligibility/ranking factor; Berlin is the hard geographic boundary; matching is deterministic and explainable.
 
 ### Slice 3 — Job detail to submitted application
 
 **Outcome:** a candidate can evaluate a vacancy and apply through Stint.
 
-**Broader MVP includes (still product intent):** job list and detail; salary, distance, shift, contract, language, verification, and freshness; save/unsave; profile-based application; optional CV upload with private storage; confirmation; application timeline; candidate application dashboard.
+**Status:** Complete — PR #33–#37; closure `docs/27-slice-3-closure.md`; D-035–D-045 Accepted.
 
-**Accepted Slice 3 narrowings (D-035–D-045; Accepted 2026-08-03):** authenticated `/candidate/jobs/[vacancyId]` detail for RLS-visible seed vacancies using schema-backed fields only; profile-based preview and atomic submit; reload-safe confirmation from RPC-generated versioned snapshots; Applied-state feedback; permanent DB unique one application per candidate per vacancy; status constrained to `submitted` only. Deferred from this slice: save/unsave; CV/Storage; salary/distance/experience/verification/interview-language fields; employer status transitions; withdrawal/resubmission; future application statuses beyond `submitted`; full applications dashboard. Employer implementation remains Slice 4+.
-
-**Planning artifacts:** discovery `docs/22-slice-3-discovery.md`, build plan `docs/23-slice-3-build-plan.md`, schema/journey proposal `docs/24-slice-3-schema-and-journey-proposal.md`.
-
-**Status:** **Done** — PR 3.1–3.5 merged (#33–#37); local + Production hosted proof complete (`docs/25`–`docs/27`).
-
-**Exit criteria (operational for narrowed Slice 3):**
-
-- exactly one application per vacancy per candidate
-- completed candidate can submit a profile-based Demo application with confirmation
-- duplicate submit is deterministic and safe
-- unauthenticated / incomplete candidates cannot apply
-- private documents remain out of Slice 3 (no CV upload); later privacy rules still apply when documents exist
-- submission is auditable via stored application + snapshots; employer-visible status timeline deferred
+Current product includes authenticated candidate job detail, profile-based atomic submit, reload-safe confirmation, duplicate safety, and application snapshots. Save/unsave and optional CV upload remain deferred under D-M5-6 and do not block Cohort A.
 
 ### Slice 4 — Employer registration to draft vacancy
 
 **Outcome:** a private or organisation employer can register, create an employer profile, and save a structured draft vacancy.
 
-**Includes:** employer onboarding for private and organisation employers; employer profile (company profile only for organisation employers); draft vacancy with required structured fields (salary, language, privacy-safe location, contract, shift/schedule, expiry or auto-expiry; employer type / workplace type / frequency where product requires).
-
-**Exit criteria:**
-
-- draft vacancies are not publicly visible
-- required eligibility fields are explicit before publish is possible later
-- exact private residential addresses are not publicly exposed
-
-**Planning status:** Contracts Accepted 2026-08-03 (D-046–D-054). Planning
-package `docs/28`–`docs/30` locked.
-
-**Status:** **Done** — PR 4.1–4.5 merged (#41–#45); local + Preview/disposable
-hosted proof complete (`docs/31`–`docs/33`). Verification and publication remain
-Slice 5.
+**Status:** Complete — PR #41–#45; closure `docs/33-slice-4-closure.md`; D-046–D-054 Accepted.
 
 ### Slice 5 — Employer verification to public vacancy
 
 **Outcome:** only verified employers can publish public vacancies.
 
-**Includes:** type-specific employer verification state (D-034); create/edit/publish/pause/expire/fill flows; public job visibility rules with privacy-safe location for private workplaces.
+**Status:** Complete — verification, operator review, lifecycle controls, public discovery, canonical candidate eligibility, and candidate discovery/application integration merged through PR #58; D-055–D-069 Accepted.
 
-**Planning status:** Planning package `docs/34`–`docs/36` locked; decisions
-D-055–D-067 **Accepted** 2026-08-05. PR 5.1 records acceptance (docs only).
-Slice 5 product implementation has **not** started. **PR 5.2 is not authorized
-until PR 5.1 merges.** Preview currently has no Preview-scoped Supabase
-configuration after Slice 4 teardown — future hosted proof requires explicit
-re-isolation (`docs/33`, D-067). Slice 6 / 7 / 8 have not started.
-
-**Exit criteria:**
-
-- unverified employers cannot publish public vacancies
-- language and salary information remain required and visible
-- published vacancies can be closed or expired
-- private residential addresses remain non-public
+Preview was torn down after prior hosted proof and remains intentionally unconfigured until M5 beta-readiness work restores an isolated Preview environment.
 
 ### Slice 6 — Applicant review to status update
 
-**Outcome:** a verified employer can review applicants and move applications forward; candidates see progress.
+**Outcome:** an employer can review applicants and move applications forward; candidates see progress.
 
-**Includes:** applicant list and detail; application status changes; interview invitation metadata without full messaging; candidate-visible timeline updates; status notification emails.
+**Status:** Implementation complete locally — PR #59–#63 merged; D-070 Accepted; local exit proof `docs/39-slice-6-exit-proof.md`; hosted proof remains a separately authorized/deferred follow-up (`docs/40-slice-6-hosted-proof-runbook.md`).
 
-**Exit criteria:**
+Current workflow statuses are exactly:
 
-- employers can update application status for their jobs only
-- candidates receive clear next-step status
-- interview/hire outcomes can be recorded for pilot measurement
+- `submitted`
+- `reviewing`
+- `shortlisted`
+- `accepted`
+- `rejected`
+
+Interview/hire outcomes are **not** encoded by these statuses. D-M5-2/D-M5-3/D-M5-4 make real-world interview/hire measurement a separate M5 outcome contract.
 
 ### Slice 7 — Admin moderation to audit event
 
 **Outcome:** Stint can be operated safely for a controlled Berlin pilot.
 
-**Includes:** admin authorization; employer review/approval; vacancy moderation; reports; suspension; stale-vacancy handling; audit events; transactional email completeness; privacy/terms/Impressum placeholders; basic funnel analytics.
+**Status:** Complete locally — PR #64–#67 merged; D-071–D-075 Accepted; local closure `docs/44-slice-7-exit-proof.md`. Hosted Slice 7 proof has not been run and is not required for the accepted local closure.
 
-**Planning status:** Discovery/build-plan/proposal package `docs/41`–`docs/43`
-locked; decisions D-071–D-075 **Accepted** 2026-08-07. PR 7.1 records
-acceptance (docs only). Employer review/approval is already Done (Slice 5).
-The first Slice 7 implementation contract is narrower than the broad list
-above — see `docs/42-slice-7-build-plan.md` and D-071–D-075 for the locked
-boundary and the reasoning for each narrowing. This line preserves the
-original broad intent; it is not silently edited. **Implementation status:**
-PR 7.1 (planning) merged (#64); PR 7.2 (moderation/audit database
-contract) merged (#65); PR 7.3 (operator moderation UI +
-suspended-employer UX) merged (#66); PR 7.4 (pilot funnel + legal
-placeholders + local exit proof, `docs/44-slice-7-exit-proof.md`) merged
-(#67). **Slice 7 is Done locally** — all three exit criteria below pass
-against the merged implementation; hosted proof has not been run. Slice 8
-(account deletion to confirmed data removal) planning is **Accepted**:
-decisions D-076–D-090 Accepted; PR 8.1 (planning) merged. PR 8.2
-(deletion/tombstone/request/access-gate database contract) is **merged** —
-no Auth Admin API call, no service-role application code, no UI. PR 8.3 is
-split into PR 8.3a (D-089 narrow employer-export read RPC) **merged**, and
-PR 8.3b (role-scoped export API/UI) **merged**. PR 8.4 (deletion request UI
-+ privileged Auth processing) is **merged** — implementation discovery
-found a stranded-`processing` recovery gap, closed by D-090 with one
-additive migration (16th). Slice 8's implementation PRs (8.1–8.4) are all
-merged; Slice 8's local implementation is complete. PR 8.5 (local exit
-proof + Slice 8/M4 closure, `docs/48-slice-8-exit-proof.md`) is
-implementation-complete locally, awaiting review/merge. Slice 8 itself is
-not marked Done pending PR 8.5's review/merge.
-
-**Exit criteria:**
-
-- administrators can suspend unsafe actors and remove vacancies
-- sensitive admin actions are audited
-- pilot funnel events are measurable
+Current M5 controls include operator authorization, employer suspension, vacancy moderation, audit events, legal placeholders, and deterministic pilot-funnel measurement. Full report intake, broad analytics, and transactional-email completeness remain evidence-dependent.
 
 ### Slice 8 — Account deletion to confirmed data removal
 
 **Outcome:** candidates and employers can request export and deletion; removal can be confirmed.
 
-**Includes:** account export; deletion request workflow; confirmation of data-removal path for MVP needs.
+**Status:** **Complete** — PR 8.1–8.5 all merged (#68–#73); D-076–D-090 Accepted; final local proof `docs/48-slice-8-exit-proof.md`.
 
-**Planning status:** PR 8.1 (discovery, data-ownership inventory, export/
-deletion contract proposal, build plan) merged — see
-`docs/45-slice-8-discovery.md`, `docs/46-slice-8-build-plan.md`,
-`docs/47-slice-8-data-removal-proposal.md`. Decisions D-076–D-090 are
-**Accepted** in `docs/10-decisions.md` (D-085/D-086/D-087 discovered and
-Accepted during PR 8.2 implementation; D-088/D-089 discovered and
-Accepted 2026-08-08 during PR 8.3 implementation start — D-077 left
-dual-capability export scope and the employer export's application-data
-source unresolved; D-090 discovered and Accepted 2026-08-08 during PR 8.4
-implementation — a crash between a successful processing claim and any
-subsequent step could permanently strand a request, which D-081 did not
-cover).
+Delivered scope includes role-scoped account export, whole-account deletion request/cancellation/confirmation, candidate/employer tombstoning, stale-JWT denial, isolated Auth soft-delete processing, durable deletion evidence, and D-090 stranded-processing lease recovery.
 
-**Implementation status:** PR 8.2 (deletion/tombstone/request/access-gate
-database contract) is **merged** —
-one additive migration (14th): `account_deleted_at` on both profile
-tables; canonical deleted-account helpers; the deleted-account gate
-composed into every candidate/employer RLS policy and self-service RPC;
-the `deletion_requests` state machine with self-service request/cancel
-RPCs and processor-only claim/domain-scrub/evidence/failure primitives;
-D-078/D-079 anonymization (D-085 dual-capability-aware, D-082 audit
-redaction and D-086 moderation removal folded into the employer side);
-the deleted-employer exclusion in `is_vacancy_effectively_public`; D-087's
-deleted-candidate transition freeze. No Auth Admin API call, no
-service-role application code, no UI. PR 8.3 is split into **PR 8.3a**
-(D-089's narrow `list_current_employer_export_applications()` read
-contract — one additive migration, 15th) **merged**, and **PR 8.3b**
-(D-088-compliant role-scoped export API/UI — `GET /candidate/account/export`
-and `GET /employer/account/export`, no new migration) **merged**. **PR 8.4**
-(deletion request UI + privileged Auth processing) is **merged**: an
-isolated server-only privileged Supabase client
-(`SUPABASE_SERVICE_ROLE_KEY`, fails closed if absent) confined to one
-processor module (`processAccountDeletionRequest`/
-`reconcileAccountDeletionRequest`, request-id-only, target derived from the
-claimed/reclaimed request row) drives D-081's six-phase claim/domain-scrub/Auth
-soft-delete/verify/evidence sequence; `/candidate/account/delete` and
-`/employer/account/delete` provide destructive-confirmation
-request/cancel UI on the existing PR 8.2 self-service RPCs, with
-server-authoritative FormData confirmation validation (never client-state
-alone) on both destructive actions. Implementation discovery found
-`_claim_deletion_request` cannot recover a request stranded
-at `processing` by a mid-flight crash (no RPC exposed its `user_id`, and
-`service_role` has no direct table read on `deletion_requests`). **D-090**
-closes this with one additive migration (16th,
-`20260808220000_deletion_processing_lease_and_recovery.sql`): a
-`processing_lease_started_at` column distinct from the historical
-`processing_started_at`, a `_reclaim_stale_deletion_request()` RPC
-(request-id-only, fixed 5-minute DB-owned threshold), reachable only from
-`reconcileAccountDeletionRequest`. A local Auth Admin integration proof
-(gated to `127.0.0.1`/`localhost`) exercises the real `deleteUser(id, true)`
-API against a disposable dual-capability identity (domain tombstoning,
-stale-JWT denial, fresh-login failure) and a second disposable identity
-through the stranded-processing recovery path end to end. Migration count
-is 16; pgTAP is 1437/1437 across 33 files at PR 8.4's own merge. **PR
-8.5** (local exit proof + Slice 8/M4 closure) is implementation-complete
-locally, awaiting review/merge — re-proves the full merged Slice 8
-implementation from clean main and adds no migration, generated-type
-change, or application runtime change; independent review found one
-proof gap (processing-state cancellation denial lacked an authoritative
-pgTAP assertion), closed by a test-only correction of 4 pgTAP assertions
-to the existing `30_account_deletion_tombstone_and_request_contract_test.sql`
-file — no RPC behavior change. pgTAP is now 1441/1441 across 33 files.
-Slice 8 itself is not marked Done, and M4 is not marked Complete, pending
-PR 8.5's review/merge.
+Final closure reference:
 
-**Exit criteria:**
+- merge commit `7a92e31fc25b3fe7d33d10fe7ffa5c5dd5a47789`
+- migrations: 16
+- pgTAP: 1441/1441 across 33 files
+- Vitest: 983 passed / 3 skipped at closure
+- broad E2E: 38/38 at closure
 
-- core GDPR user actions work for the MVP surface
-- deletion does not leave private documents publicly reachable
+MVP account-data export/deletion controls are implemented and locally proven. This is not a blanket GDPR-compliance claim.
 
 ## Milestone mapping
 
-Milestones remain planning checkpoints, not separate micro-backlogs:
+| Milestone | Slices | Checkpoint | Status |
+|---|---|---|---|
+| M0 Foundation | 0 | Shell deploys with CI | Complete |
+| M1 Candidate matching shell | 1–2 | Candidate reaches seeded matches | Complete |
+| M2 Applications | 3 | Candidate applies and tracks status | Complete |
+| M3 Employer flow | 4–6 | Verified employer publishes and reviews | Implementation complete; Slice 6 hosted proof remains separately deferred |
+| M4 Trust and beta readiness | 7–8 | Ops and account-data/privacy basics work | **Complete** |
+| M5 Berlin private beta | operate | Validate outcomes; freeze feature expansion | **Active** |
 
-| Milestone | Slices | Checkpoint |
-|-----------|--------|------------|
-| M0 Foundation | 0 | Shell deploys with CI |
-| M1 Candidate matching shell | 1–2 | Candidate reaches seeded matches |
-| M2 Applications | 3 | Candidate applies and tracks status |
-| M3 Employer flow | 4–6 | Verified employer publishes and reviews |
-| M4 Trust and beta readiness | 7–8 | Ops and GDPR basics work |
-| M5 Berlin private beta | operate | Validate outcomes; freeze feature expansion |
+## M5 — Berlin private beta
 
-### Berlin private beta targets
+### Overall targets
 
 - 20 participating employers
 - 100 verified vacancies
 - 200 candidates
-- 10 interviews
+- 10 completed-interview conversions
 - 3 confirmed hires
+
+### Staged cohorts
+
+| Cohort | Employers | Legitimate vacancies | Candidates | Outcome gate |
+|---|---:|---:|---:|---|
+| A — Proof | 3–5 | 10–20 | 20–30 | first completed-interview conversion |
+| B — Validation | 8–10 | 30–50 | 60–100 | repeated completed-interview conversions + first confirmed hire |
+| C — Full M5 | 20 | 100 | 200 | 10 completed-interview conversions + 3 confirmed hires |
+
+### Approved M5 counting semantics
+
+- **Participating employer:** count one unique employer once onboarding is complete, employer verification is `verified`, and at least one employer-submitted vacancy became effective-public during M5. Keep the historical count even if later paused/withdrawn/suspended/revoked; track current active/safe supply separately.
+- **Verified vacancy:** count one unique employer-submitted vacancy once it became effective-public during M5 while its employer was verified. Exclude seed/demo and drafts that never became public; keep the historical count even if later inactive; track current effective-public supply separately.
+- **Candidate:** count one unique candidate when authoritative essential onboarding is complete. A pre-existing completed candidate counts only when explicitly enrolled into an M5 cohort. Raw registrations are diagnostic only.
+- **Completed interview:** the outcome model may preserve multiple distinct completed interview rounds, but the top-level M5 target counts distinct applications with at least one active, non-voided `interview_completed` event — max one top-line interview conversion per application.
+- **Confirmed hire:** count a distinct application with an active employer-recorded `hired` event. `applications.status = accepted` never counts automatically.
+
+### Approved outcome-contract direction
+
+Interview/hire outcomes remain conceptually separate from application workflow status.
+
+Future implementation, if separately authorized, must follow the founder-approved constraints in `docs/49`/`docs/50`:
+
+- employer-owned application outcome events;
+- candidate read-only active outcome type + occurred date/time;
+- append-only void/replacement correction;
+- no new outcomes after candidate deletion;
+- preserve non-identifying historical outcomes under the current deletion model;
+- `occurred_at` may be backdated at most 30 days and may not be future-dated except negligible fixed clock-skew tolerance;
+- immutable DB-generated `recorded_at`;
+- no automatic coupling between outcome events and application status.
+
+No outcome schema/runtime implementation is authorized by M5.0 itself.
+
+### Cohort A operating boundary
+
+Cohort A is cleaning-first. Allow at most 1–2 adjacent low-language-barrier employers when founder access is strong and the hiring model remains simple. Do not deliberately run a broad multi-sector Cohort A.
+
+### Cohort A readiness boundary
+
+Before intentional Cohort A external traffic:
+
+- isolated Preview must be restored for systematic external testing;
+- minimal Sentry error monitoring must be configured with EU region where available, no session replay, no request/application/vacancy payload capture, unnecessary identifier scrubbing, Preview/Production separation, and <=30-day retention where supported;
+- qualified German legal review/finalization must cover Impressum/business identity, Privacy notice, beta Terms, support/contact channel, and Sentry disclosure if required;
+- founder owns the legal-readiness gate;
+- retained Production Demo fixtures must be removed or explicitly re-authorized by 2026-09-02.
+
+This readiness gate is not a claim of full GDPR compliance.
+
+### Weekly operating rule
+
+Run one structured M5 review per week. Classify each issue as:
+
+- Operate manually
+- Fix now
+- Watch
+- Defer
 
 This phase is operational and product-led. It should not trigger large feature expansion.
 
-## Initial domain model
+The next product/schema implementation is **not authorized** by M5 activation or PR #74 alone. Select it explicitly after final founder review/merge of M5.0.
 
-- `profiles`
-- `candidate_profiles`
-- `employer_profiles`
-- `companies`
-- `jobs`
-- `job_categories`
-- `languages`
-- `candidate_languages`
-- `job_language_requirements`
-- `candidate_preferences`
-- `saved_jobs`
-- `applications`
-- `employer_verifications`
-- `job_verifications`
-- `reports`
-- `audit_events`
+## Historical planning vocabulary
 
-A schema proposal must be reviewed before migrations are committed (`docs/17-slice-1-schema-proposal.md` for Slice 1). Candidate ownership and role are encoded from Slice 1. Employer verification and vacancy publication gates are encoded when employer/vacancy tables land (Slices 4–5), even if admin UI arrives in Slice 7.
+The early domain-model list in prior planning documents is historical vocabulary, not a declaration that every named table exists or is required for Cohort A. Actual merged schema/migrations are authoritative.
 
 ## Pull-request policy
 
-Each pull request should:
+### Normal M5 beta fix
 
-- advance one active vertical slice (or a coherent part of it)
-- state acceptance / exit criteria in the description
-- include tests for business-critical behavior
-- preserve strict TypeScript without `any`
-- contain no unrelated refactoring
-- update relevant documentation
-- pass lint, type-check, tests, and production build
-- include screenshots for visible UI changes
+A normal beta PR should:
+
+- cite the observed user/operational problem;
+- implement the smallest correction;
+- include tests appropriate to the risk;
+- preserve strict TypeScript without `any`;
+- contain no unrelated refactoring;
+- update relevant documentation only where the source of truth changes;
+- pass lint, type-check, tests, and production build.
+
+### Decision-heavy change
+
+For schema/database, authorization/RLS, privacy, security, matching authority, employment/legal boundaries, or major architecture:
+
+- perform explicit discovery/audit first;
+- record founder/decision approval;
+- define business/security/privacy invariants before migration/runtime work;
+- keep implementation decomposed and independently reviewable.
 
 ## Deferred work
 
-Deferred capabilities are listed in `NOT_NOW.md`. Do not implement them until MVP evidence and an explicit decision-log entry say otherwise.
+Deferred capabilities are listed in `NOT_NOW.md`. D-M5-1/D-M5-6 explicitly freeze CV upload, save/unsave jobs, and other speculative expansion for the initial Berlin private beta unless beta evidence justifies promotion.

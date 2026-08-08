@@ -33,7 +33,47 @@ Stint is not another generic job board. It is a trusted employment-access platfo
 - transparent job information
 - employer verification
 - application support without unnecessary bureaucracy
-- progress that is visible throughout the journey
+- visible progress through the hiring journey
+
+## Current phase — M5 Berlin private beta
+
+M0–M4 implementation is complete through merged PR #73. Slice 8 is complete and M4 — Trust and beta readiness — is closed.
+
+**M5 is active.** It is an operational/product-validation phase, not another broad implementation milestone.
+
+Overall M5 targets:
+
+- 20 participating employers
+- 100 verified vacancies
+- 200 candidates
+- 10 completed interviews
+- 3 confirmed hires
+
+Staged cohorts:
+
+| Cohort         | Employers | Legitimate vacancies | Candidates | Outcome gate                                |
+| -------------- | --------: | -------------------: | ---------: | ------------------------------------------- |
+| A — Proof      |       3–5 |                10–20 |      20–30 | first completed interview                   |
+| B — Validation |      8–10 |                30–50 |     60–100 | repeated interviews + first confirmed hire  |
+| C — Full M5    |        20 |                  100 |        200 | 10 completed interviews + 3 confirmed hires |
+
+Founder-approved beta boundary:
+
+- the merged M4 product is the minimum Cohort A boundary;
+- speculative feature expansion is frozen unless evidence shows a beta need;
+- completed interviews and confirmed hires are measured separately from application workflow status;
+- application status `accepted` never automatically counts as a confirmed hire;
+- optional CV upload and save/unsave jobs are deferred for initial M5;
+- minimal privacy-conscious Sentry error monitoring is planned before Cohort A external traffic; PostHog/session replay remain deferred.
+
+See:
+
+- [M5 beta transition and measurement](docs/49-m5-beta-transition-and-measurement.md)
+- [M5 outcome contract proposal](docs/50-m5-outcome-contract-proposal.md)
+- [M5 operating plan](docs/51-m5-operating-plan.md)
+- [Founder dashboard](docs/14-founder-dashboard.md)
+
+No product/schema outcome implementation is authorized by the M5.0 documentation work itself.
 
 ## MVP objective
 
@@ -43,7 +83,7 @@ Validate that candidates with limited German can:
 2. receive relevant job matches
 3. understand whether they can actually do a job
 4. apply without a German CV being mandatory
-5. track their progress from application to interview
+5. track their progress from application toward interview/hire outcomes
 
 At the same time, validate that employers can:
 
@@ -51,61 +91,68 @@ At the same time, validate that employers can:
 2. specify realistic language requirements
 3. receive suitable applicants
 4. review candidates efficiently
-5. communicate next steps clearly
+5. communicate/update next steps clearly
+6. produce trustworthy interview/hire outcome evidence for the beta
 
-## Initial scope
+## Delivered core product
 
 ### Candidate
 
-- authentication
-- six-step onboarding
-- language and German-level selection
-- work-authorisation self-declaration
-- location and travel-radius preferences
-- job-category preferences
-- availability and employment-type preferences
-- matched job feed
-- job detail page
-- save job
-- simple application
-- application tracking
-- profile completion guidance
+- email/password authentication
+- six-step essential onboarding with durable progress
+- language/German-comfort/work-authorisation/location/availability/preferences
+- deterministic explainable matching
+- public and authenticated job discovery
+- job detail
+- profile-based application
+- reload-safe confirmation
+- application inventory and status history
+- account export
+- account deletion request/confirmation/cancellation
 
 ### Employer
 
-- employer account for private and organisation employers
-- employer profile (company profile only for organisation employers)
-- type-specific employer verification
-- vacancy creation
-- language-requirement configuration
-- salary, shift, privacy-safe location, and contract details
-- applicant list
-- candidate review
-- application status updates
-- vacancy expiry and closing
+- private and organisation employer onboarding
+- employer/company profiles
+- type-specific manual verification workflow
+- structured vacancy draft/create/edit
+- publish/pause/resume/fill/withdraw/expiry/renew lifecycle
+- public vacancy visibility through effective-public rules
+- applicant list/detail
+- application status transitions
+- moderation/suspension-aware business operations
+- account export and whole-account deletion flow
 
-### Administration
+### Administration / trust
 
-- employer verification
-- vacancy moderation
-- user and employer reports
-- stale-job removal
-- audit trail
-- basic analytics
+- verification operator flow
+- employer suspension
+- vacancy moderation/restoration
+- audit events
+- legal-page placeholders
+- deterministic pilot funnel proof
+- account privacy/export/deletion controls
 
-## Out of scope for the first release
+## Deliberately deferred for initial M5
 
-- payroll
-- worker payments
-- freelancer classification
-- temporary-employment agency operations
-- video interviewing
-- native mobile applications
-- social networking
-- public candidate scraping
-- automated employment decisions
-- complex AI-branded features
-- broad nationwide expansion
+These remain product possibilities or longer-term MVP intent, but do not block Cohort A under the approved beta freeze:
+
+- optional CV upload
+- save/unsave jobs
+- real-time chat
+- public reviews/ratings
+- AI/vector matching
+- native apps
+- payroll/payments
+- subscriptions/billing
+- full ATS functionality
+- video interviews
+- multi-city rollout
+- unrestricted scraping
+- sophisticated analytics dashboards
+- PostHog/session replay
+
+See [Not now](NOT_NOW.md) and [MVP scope](docs/04-mvp.md).
 
 ## Brand system
 
@@ -119,6 +166,8 @@ At the same time, validate that employers can:
 - **AI principle:** invisible labour; describe outcomes, not the technology
 
 ## Documentation
+
+Core source-of-truth documents:
 
 - [Vision](docs/01-vision.md)
 - [Product principles](docs/02-principles.md)
@@ -134,248 +183,118 @@ At the same time, validate that employers can:
 - [Terminology](docs/12-terminology.md)
 - [Implementation plan](docs/13-implementation-plan.md)
 - [Founder dashboard](docs/14-founder-dashboard.md)
-- [Slice 0 build plan](docs/15-slice-0-build-plan.md) (complete; historical)
-- [Slice 1 build plan](docs/16-slice-1-build-plan.md) (complete; historical)
-- [Slice 1 schema proposal](docs/17-slice-1-schema-proposal.md)
-- [Slice 2 discovery](docs/18-slice-2-discovery.md) (planning locked; D-026–D-033 Accepted)
-- [Slice 2 build plan](docs/19-slice-2-build-plan.md) (planning locked)
-- [Slice 2 schema and matching proposal](docs/20-slice-2-schema-and-matching-proposal.md) (planning locked)
-- [Slice 2 closure evidence](docs/21-slice-2-closure.md) (complete; hosted Production proof recorded)
-- [Slice 3 discovery](docs/22-slice-3-discovery.md) (contracts Accepted 2026-08-03; D-035–D-045)
-- [Slice 3 build plan](docs/23-slice-3-build-plan.md) (Slice 3 Done; PR 3.1–3.5 merged #33–#37)
-- [Slice 3 schema and journey proposal](docs/24-slice-3-schema-and-journey-proposal.md) (contracts Accepted)
-- [Slice 3 exit proof (local)](docs/25-slice-3-exit-proof.md) (local automated proof complete)
-- [Slice 3 hosted-proof runbook](docs/26-slice-3-hosted-proof-runbook.md) (Production fallback executed 2026-08-03)
-- [Slice 3 closure evidence](docs/27-slice-3-closure.md) (complete; hosted Production proof recorded)
-- [Slice 4 discovery](docs/28-slice-4-discovery.md) (contracts Accepted 2026-08-03; D-046–D-054)
-- [Slice 4 build plan](docs/29-slice-4-build-plan.md) (PR 4.1–4.5 complete)
-- [Slice 4 schema and journey proposal](docs/30-slice-4-schema-and-journey-proposal.md) (contracts Accepted)
-- [Slice 4 exit proof (local)](docs/31-slice-4-exit-proof.md) (local proof via `pnpm proof:slice4`)
-- [Slice 4 hosted-proof runbook](docs/32-slice-4-hosted-proof-runbook.md) (executed 2026-08-04 on Preview/disposable)
-- [Slice 4 closure](docs/33-slice-4-closure.md) (Done — Preview/disposable hosted proof)
-- [Slice 5 discovery](docs/34-slice-5-discovery.md) (planning Done; D-055–D-067 Accepted 2026-08-05)
-- [Slice 5 build plan](docs/35-slice-5-build-plan.md) (PR 5.1 Done; PR 5.2 database foundation in progress)
-- [Slice 5 schema and publication proposal](docs/36-slice-5-schema-and-publication-proposal.md) (contract locked; lifecycle events decided)
+- [Slice 8 / M4 closure proof](docs/48-slice-8-exit-proof.md)
+- [M5 beta transition and measurement](docs/49-m5-beta-transition-and-measurement.md)
+- [M5 outcome contract proposal](docs/50-m5-outcome-contract-proposal.md)
+- [M5 operating plan](docs/51-m5-operating-plan.md)
 - [Not now](NOT_NOW.md)
 - [Agent instructions](AGENTS.md)
 
-## Development status
+Historical slice-specific discovery/build-plan/proposal/closure files remain in `docs/` and should be used when auditing an accepted implementation contract.
 
-Delivery follows a solo vertical-slice workflow tracked in `docs/14-founder-dashboard.md`. Slice 0, Slice 1, Slice 2, Slice 3, and Slice 4 are complete. Slice 2 delivered vacancy schema/RLS, matcher/loader, `/candidate/matches`, local critical journey, and owner-controlled hosted Demo fixtures (PR #26–#29). Slice 3 delivered candidate job detail, application preview/submit, snapshot-backed confirmation, Applied state, local exit proof, and owner-authorized Production hosted proof (PR #33–#37; closure in `docs/27-slice-3-closure.md`). Slice 4 delivered employer registration/onboarding, employer-owned draft vacancies, local exit proof, and owner-authorized Preview/disposable hosted proof (PR #41–#45; closure in `docs/33-slice-4-closure.md`). Slice 5 planning is **Done** (`docs/34`–`docs/36`; D-055–D-067 Accepted 2026-08-05; D-068–D-069 Accepted 2026-08-06). PR 5.1 is Done. PR 5.2 (verification + publication schema/RLS/RPCs/pgTAP) is Done. PR 5.3 employer verification request/status UI (`/employer/verification`, attestation-based request/resubmission, state-specific panels) is Done. PR 5.3a (merged) added three narrow Auth-bound read RPCs — `is_current_user_verification_operator()`, `list_pending_employer_verifications()`, `get_employer_verification_review(uuid)`. PR 5.3b (merged) added the operator review UI — `/internal/verification` (queue) and `/internal/verification/[employerProfileId]` (review detail with approve/reject), authorized via the PR 5.3a read RPCs and gated at the proxy layer alongside `/candidate/*` and `/employer/*`; no revocation UI, no publication UI, no public jobs routes, and no general admin dashboard. PR 5.4 (merged) added employer-facing publish/pause/resume/fill/withdraw/materialize-expiry/renew controls at `/employer/vacancies/[vacancyId]` on the existing PR 5.2 lifecycle RPCs (no migration); the vacancy list and manage page now show every lifecycle state, not only drafts. PR 5.5 UI work was correctly stopped after auditing the database contract: `anon` had zero table-level read access to vacancy data (only a boolean/ID-list helper), so PR 5.5a (Done, merged) added a narrow read-only migration — `list_effective_public_vacancies()`, `get_effective_public_vacancy(uuid)`, `get_effective_public_vacancy_languages(uuid)`, granted to `anon` and `authenticated`, no table grant or RLS change. PR 5.5b (Done, merged) is public-discovery-only: `/jobs` and `/jobs/[vacancyId]`, public navigation, metadata, and safe rendering, built entirely on the PR 5.5a RPCs. Before writing candidate-facing code, PR 5.5b audited the candidate-matching path and found it blocked: `resolveCandidateVacancyMatch()`/`matchCandidateToVacancy()` (shared by `/candidate/matches`, `/candidate/jobs/[vacancyId]`, and the apply Server Action) require `employment_types`, `shift_requirements`, `german_requirement`, and `available_from`, none of which the PR 5.5a projection exposes, and no `authenticated` RLS policy lets a candidate read another employer's vacancy row directly (confirmed by grepping every RLS policy and every RPC across all 10 migrations). `submit_candidate_application` itself did not enforce the full deterministic matcher transactionally either. PR 5.5c (Done, merged; PR #57) closed that gap: one additive migration (11th, the last migration in this repo) adds a canonical, non-short-circuiting SQL eligibility evaluator (`_evaluate_candidate_vacancy_eligibility`, internal only) ported rule-for-rule from the TypeScript matcher, shared by two new narrow authenticated RPCs — `resolve_current_candidate_vacancy_match(uuid)` and `list_current_candidate_vacancy_matches()` — and by a modified `submit_candidate_application`, which now rejects an ineligible submission transactionally (`{"result":"ineligible","missing_requirements":[...]}`) instead of only checking category (D-068). PR 5.5d (Done, merged; PR #58) switched `/candidate/matches` and `/candidate/jobs/[vacancyId]` onto those RPCs as the sole eligibility authority (D-069, no migration): the pre-submit TypeScript matcher check is removed from the application Server Action, which now only validates input, confirms the Auth session, and interprets `submit_candidate_application`'s own transactional result, including the new `ineligible` outcome; the "Application preview" section (D-043) is dropped since its profile fields are outside the new read boundary, replaced by a direct Submit control (eligible) or a labelled missing-requirements list (ineligible); `/candidate/matches`'s existing unauthenticated/missing-profile/incomplete redirect guards are preserved exactly via a new narrow completion guard (`loadCandidateCompletionStatus`, selecting only `onboarding_completed_at` under the existing `candidate_profiles_select_own` RLS policy — no matching-input column) — the canonical list RPC is only ever called once that guard reports a complete profile, so its own empty-array result can only mean "zero current eligible matches"; `/candidate/jobs/[vacancyId]`'s onboarding redirect for an incomplete candidate is unaffected either way, since the single-vacancy RPC reports `incomplete` as its own status rather than requiring a table read. The TypeScript matcher and its old callers are left in place, unused by any candidate route, not deleted. No employer applicant review. Hosted Demo fixtures on `https://stint.company` / project `kvrzmzoszitdicjvrprt` remain retained until 2026-09-02. Preview currently has no Preview-scoped Supabase configuration and must be re-isolated before any future hosted proof. Slice 5 is Done. Slice 6 (employer applicant review and application-status workflow) is active: D-070 is Accepted, and PR 6.1 (Done, merged PR #60) added the database contract — one additive migration (12th) widening `applications.status` to `submitted | reviewing | shortlisted | accepted | rejected`, an append-only `application_status_history` table with zero direct `authenticated` grant (RPC-mediated only), and four narrow RPCs (`list_current_employer_applications`, `get_current_employer_application`, `transition_current_employer_application_status`, `list_current_candidate_application_status_history`) gated on completed-employer identity plus vacancy ownership, not current verification state. PR 6.2 (Done, merged PR #61) added `/employer/applications` (list, vacancy/status filters) and `/employer/applications/[applicationId]` (detail, allowed-transitions-only status controls, status history), built entirely on the PR 6.1 RPCs, with a new "Applications" entry in the employer nav; no migration. PR 6.3 (Done, merged PR #62) added `/candidate/applications` (own applications, immutable-snapshot title/employer/city, no live vacancy read) and extended `/candidate/applications/[applicationId]` with a live current-status label and a candidate-safe status timeline via `list_current_candidate_application_status_history`; it also fixed a pre-existing bug where `vacancySnapshotV1Schema` required seed-only literals (`source: "seed"`, `demo_label: "Demo vacancy"`), which made every real employer application's confirmation page render "Application not available" — fixed schema-only, no migration. PR 6.4 (closure, this unit) audited the merged Slice 6 implementation against D-070 (no contradiction found, no code change required), ran the full local exit proof (`docs/39-slice-6-exit-proof.md` — Vitest 679/1 skip, pgTAP 914/29, migrations 12, all 7 required Playwright suites green), and prepared a disposable hosted-proof runbook (`docs/40-slice-6-hosted-proof-runbook.md`) that was **not executed** in this PR. Slice 6's local implementation is complete; Slice 6 itself is not marked Done pending a separately authorized hosted proof. No candidate withdrawal, notifications, or interview scheduling. Slice 7 (admin moderation to audit event) planning is **Accepted**: decisions D-071–D-075 Accepted 2026-08-07 after two corrective review passes, PR 7.1 (planning) merged (PR #64). PR 7.2 (admin moderation/audit database contract, merged PR #65) added one additive migration (13th, `20260807090000_admin_moderation_and_audit_contract.sql`) with `employer_suspension`/`vacancy_moderation` current-state tables (row-presence semantics, real FKs, `on delete cascade`) and an append-only `admin_audit_events` ledger (`event_type`/`target_kind` pairing declaratively CHECK-constrained; `target_id` existence procedural only, no polymorphic FK); `suspend_employer`/`unsuspend_employer`/`moderate_vacancy`/`restore_vacancy` operator RPCs plus target-scoped operator read RPCs (`get_employer_moderation_status`, `get_vacancy_moderation_status`, `list_employers_for_operator`, `list_employer_vacancies_for_operator`); suspension enforcement across every authoritative employer-mutating RPC and the `employer_profiles_update_own` RLS policy (narrowed so a suspended employer's own direct-table `UPDATE` paths are also blocked, not only RPCs); suspension denial folded into the three existing Slice 6 employer-review RPCs; and the canonical `is_vacancy_effectively_public` predicate gains `employer_not_suspended`/`vacancy_not_moderated` conditions inherited automatically by every public/candidate function that already delegates to it, with no `publication_state`/`verification_state` rewrite. PR 7.3 (employer/vacancy moderation UI, merged PR #66) added `/internal/employers` (operator list) and `/internal/employers/[employerProfileId]` (detail — identity, suspend/unsuspend, verification-revoke where verified, this employer's vacancies, audit history), extending the existing `requireActiveOperator()`/operator-RPC pattern from `/internal/verification`, unchanged; `/internal/employers/[employerProfileId]/vacancies/[vacancyId]` adds moderate/restore controls and audit history, denying an employer/vacancy id mismatch as a neutral unavailable state rather than redirecting; every employer-facing surface (`/employer/onboarding`, `/employer/applications`, `/employer/vacancies`, `/employer/verification`, and the direct `employer_profiles` Server Actions themselves) was audited for the suspended-employer case via one new self-scoped loader (`loadCurrentEmployerSuspensionStatus`, calling only `is_current_employer_suspended()` with no caller-supplied id) and a shared race-safe update helper (`updateOwnEmployerProfile`, pre-check plus zero-row detection via `.select().maybeSingle()`) so a suspended employer's direct-table save can no longer report a false success; no new migration. PR 7.4 (pilot readiness and Slice 7 local closure, merged PR #67) added `scripts/proof/pilot-funnel.mts` (`pnpm proof:pilot-funnel`) — a deterministic, read-only, localhost-only proof script, running entirely inside one PostgreSQL `REPEATABLE READ READ ONLY` transaction so its 16 aggregate metrics across candidate/employer/vacancy/application domains (five bounded `SELECT`-only queries) describe one coherent, `transaction_timestamp()`-stamped snapshot, satisfying D-075's "pilot funnel events are measurable" exit criterion without any third-party analytics, with no PII in output; `/privacy`, `/terms`, `/impressum` are structural legal placeholders (D-075) with a shared "Draft — legal review required" notice and no fabricated business/legal identity data, linked from a new shared `PublicFooter` on the landing page, `/jobs`, `/jobs/[vacancyId]`, and the auth pages; `docs/44-slice-7-exit-proof.md` records the full local exit proof, mapping all three accepted Slice 7 exit criteria (`docs/13-implementation-plan.md`) to evidence. Migration count remains 13; the database contract is unchanged by PR 7.4. Preview remains intentionally unconfigured; Production is untouched. **Slice 7 is Done locally**: all three accepted exit criteria (administrators can suspend unsafe actors and remove vacancies; sensitive admin actions are audited; pilot funnel events are measurable) pass against the merged implementation; hosted Slice 7 proof has not been run. Slice 8 (account deletion to confirmed data removal) planning is **Accepted**: decisions D-076–D-084 Accepted 2026-08-07 after a corrective review pass closed the export/deletion behavioral contracts (Auth mechanism/stale-JWT gate, candidate/employer tombstone field matrices, deletion-request concurrency/processing, audit-reason redaction); PR 8.1 merged. D-085 (whole-account deletion across capabilities) and D-086 (current-state moderation removal on employer deletion) were Accepted 2026-08-07, discovered during PR 8.2 implementation. PR 8.2 (deletion/tombstone/request/access-gate database contract) is **merged**: one additive migration (14th) adds `account_deleted_at` to `candidate_profiles`/`employer_profiles`; canonical self-scoped deleted-account helpers mirroring the PR 7.2 suspension-helper pattern; the deleted-account gate composed into every candidate/employer RLS policy and self-service RPC identified in `docs/45` §3.3; the `deletion_requests` table (user_id-scoped, RPC-mediated only) with `request_account_deletion`/`cancel_account_deletion_request` self-service RPCs and processor-only claim/domain-scrub/evidence/failure primitives; the D-078 candidate and D-079 employer anonymization RPCs (D-085 dual-capability-aware, D-082 audit-reason redaction and D-086 current-state moderation removal folded into the employer side); the deleted-employer exclusion added to `is_vacancy_effectively_public`; and D-087 (deleted-candidate application transition boundary, Accepted/implemented in a PR 8.2 review-fix pass alongside a whole-account cross-capability resurrection-boundary fix and an explicit deletion-function privilege matrix). No Supabase Auth Admin API call, no service-role application code, and no UI are part of PR 8.2. At PR 8.3 implementation start, discovery found D-077 left two behaviors unresolved: whether a dual-capability account's export is one combined download or two role-scoped ones, and how the employer export's application-process metadata would be read given the current RLS/RPC surface (no employer-scoped `applications` SELECT policy exists, and the existing review RPCs return candidate-identifying fields D-077 forbids in export). D-088 (exports are role-scoped, including for dual-capability accounts) and D-089 (employer export gets a dedicated narrow application-process read RPC, `list_current_employer_export_applications()`) were Accepted 2026-08-08 to close these, and PR 8.3 was explicitly split into **PR 8.3a** (the D-089 read contract) and **PR 8.3b** (the export API/UI). PR 8.3a (one additive migration, 15th) is **merged**. PR 8.3b (role-scoped candidate/employer account export API + minimal download UI, built entirely on PR 8.2's RLS reads and PR 8.3a's narrow RPC — no new migration) is **merged**: `GET /candidate/account/export` and `GET /employer/account/export` Route Handlers, each returning its own versioned (`"version": 1`) JSON envelope with `account` (`email`/`created_at` only) plus a role-specific section — never both in the same file, never a caller-selected role/target parameter; a small "Download candidate data"/"Download employer data" link on the candidate matches page and the employer home page respectively; a post-merge correction (same PR) made the employer export fail closed (rather than silently strip) if the D-089 RPC ever returns a broadened/unexpected row shape. PR 8.4 (deletion request UI + privileged Auth processing) is **merged**: one isolated server-only privileged module (`src/lib/account-deletion/privileged-supabase.ts`, reading `SUPABASE_SERVICE_ROLE_KEY`, fails closed if absent, never imported outside `processor.ts`) drives the D-081 six-phase claim/domain-scrub/Auth-soft-delete/verify/evidence sequence via `processAccountDeletionRequest(requestId)`/`reconcileAccountDeletionRequest(requestId)` (request-id-only, target derived from the claimed/reclaimed row, never a caller-supplied user id); `request_account_deletion()`/`cancel_account_deletion_request()` self-service RPCs drive `/candidate/account/delete` and `/employer/account/delete` (destructive-confirmation checkbox gating the delete button, blind-attempt pending-cancel control, no persisted status read since none is DB-exposed). Implementation discovery found a genuine crash window — a process terminating after a successful claim but before any subsequent step leaves a request permanently stranded at `processing`, since `_claim_deletion_request` only reclaims `pending`/`failed` and no existing RPC could re-derive the stranded row's `user_id`. **D-090 (deletion processing lease and stranded-request recovery), Accepted 2026-08-08**, closes this with one additive migration (the 16th, `20260808220000_deletion_processing_lease_and_recovery.sql`): a new `processing_lease_started_at` column (distinct from the historical `processing_started_at`, refreshed on every successful claim), a `deletion_requests_processing_lease_chk` CHECK constraint, and a new request-id-only `_reclaim_stale_deletion_request()` function (fixed 5-minute DB-owned staleness threshold, never a caller-selectable interval) reachable only from the privileged `reconcileAccountDeletionRequest` path — ordinary self-service processing never attempts stale recovery. A local Auth Admin integration proof (`STINT_DB_INTEGRATION=1`, gated to `127.0.0.1`/`localhost`) exercises both a dual-capability disposable identity through the real `deleteUser(id, true)`/`getUserById` API (domain tombstoning, company/vacancy/moderation/audit-redaction outcomes, stale pre-delete-JWT denial on read and mutate, fresh-login failure, an untouched control account) and a second disposable identity through the stranded-processing recovery path end to end; a static-security test proves `service_role`/Auth Admin usage stays confined to the one privileged module. Migration count is 16; pgTAP is 1437/1437 across 33 files at PR 8.4's own merge. Slice 8's implementation PRs (8.1–8.4) are all merged; Slice 8's local implementation is complete. PR 8.5 (local exit proof + Slice 8/M4 closure, `docs/48-slice-8-exit-proof.md`) is implementation-complete locally, awaiting review/merge — it independently re-proves the full merged Slice 8 implementation from clean main and adds no migration, generated-type change, or application runtime change; independent review found one proof gap (processing-state cancellation denial lacked an authoritative pgTAP assertion), closed by a test-only correction of 4 pgTAP assertions to the existing `30_account_deletion_tombstone_and_request_contract_test.sql` file — no RPC behavior change. pgTAP is now 1441/1441 across 33 files. Slice 8 itself is not marked Done, and M4 is not marked Complete, pending PR 8.5's review/merge. Preview remains intentionally unconfigured; Production is untouched; no hosted destructive proof is authorized. Product scope remains `docs/04-mvp.md`.
+## Engineering baseline at M4 closure
+
+- migrations: **16**
+- pgTAP: **1441/1441** across 33 files
+- Vitest: **983 passed / 3 skipped**
+- broad M5-relevant E2E closure sweep: **38/38**
+- generated database types: no drift
+- build: PASS
+- Slice 8 local exit proof: PASS
+
+M5 should not optimize for increasing test counts. New tests should follow real behavior/risk changes.
 
 ## Local development
 
 ### Prerequisites
 
 - Node.js 20 or newer (see `package.json` `engines`)
-- [pnpm](https://pnpm.io/) 8 or newer
-- Docker or another compatible container runtime (required to run local Supabase)
+- pnpm 8 or newer
+- Docker or another compatible container runtime for local Supabase
 
-A separately installed global Supabase CLI is **not** required. `pnpm install` installs the repository-pinned CLI (`supabase` in `devDependencies`). Scripts invoke that local binary via pnpm.
+A separately installed global Supabase CLI is not required. `pnpm install` installs the repository-pinned CLI.
 
 ### Setup
 
-1. Install the repository’s supported Node version.
-2. Ensure Docker (or a compatible container runtime) is running.
-3. Install dependencies (includes the pinned Supabase CLI):
-
 ```bash
 pnpm install
-```
-
-4. Create a local environment file from the committed example (never commit real secrets; never paste keys into chat, issues, or pull requests):
-
-```bash
 cp .env.example .env.local
-```
-
-5. Start local Supabase:
-
-```bash
 pnpm supabase:start
-```
-
-6. Inspect local connection values:
-
-```bash
 pnpm supabase:status
 ```
 
-7. Copy into `.env.local`:
+Copy the local browser-safe values into `.env.local`:
 
 - `API URL` → `NEXT_PUBLIC_SUPABASE_URL`
-- `Publishable` / browser-safe key → `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `Publishable` / legacy `anon` browser-safe key → `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
-Prefer the CLI `Publishable` key when present. Older CLI output may label the same browser-safe value as `anon key`; paste that value into `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — the application variable name describes the Next.js public boundary, not the CLI label.
-
-8. Apply migrations (local database reset) and run schema/RLS tests:
+Then reset/test the local database and start the app:
 
 ```bash
-pnpm supabase:db:reset   # local-only; recreates DB from migrations + local/CI seeds
-pnpm supabase:test:db    # pgTAP tests in supabase/tests/database
-```
-
-9. (Optional) Regenerate committed database types after schema changes:
-
-```bash
-pnpm db:types            # writes src/types/database.ts from local public schema
-pnpm db:types:check      # fails if committed types are stale
-```
-
-Generated `Insert` / `Update` types describe table shape only. They do **not** encode PostgreSQL column grants or RLS. Application mutations must use narrow validated inputs that omit server-owned fields (`onboarding_completed_at`, `work_authorisation_declared_at`) and must not treat generated types as authorization.
-
-10. Start the Next.js app:
-
-```bash
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000). Register at `/register`, confirm via Mailpit/Inbucket (`pnpm supabase:status` → Mailpit URL), sign in at `/login`, then continue essentials at `/candidate/onboarding`.
-
-11. When finished, stop local Supabase:
-
-```bash
-pnpm supabase:stop
-```
-
-### Authentication, onboarding, and completion (PR 1.2–1.4)
-
-- Email/password registration with required email confirmation
-- Cookie-based SSR sessions; refresh via `src/proxy.ts` (`getClaims()`)
-- Protected `/candidate/*` (anonymous → `/login`)
-- Idempotent `candidate_profiles` creation after signup/confirm/login (no Auth DB trigger)
-- Confirmation callback: `/auth/confirm` (supports `token_hash` + `type`, and PKCE `code`)
-- Essential onboarding at `/candidate/onboarding` with durable per-section save (D-025 allow-lists)
-- Progress derived from persisted fields; review offers **Confirm essentials** when answers look complete
-- Authoritative completion via `complete_candidate_onboarding()` (locks profile, validates persisted DB state; sets gate timestamp)
-- Database triggers clear `onboarding_completed_at` in the same transaction when essential profile/language edits leave essentials invalid
-- `work_authorisation_declared_at` stays non-null only while declaration is true (trigger-synced)
-- No matching / job feed on the completed-candidate home (Slice 2)
-- No password-recovery UI yet (before-pilot)
-- No service-role key for browser or ordinary SSR sessions
-
-Local Auth + onboarding + completion + matches journeys (requires local Supabase + Mailpit):
-
-```bash
-pnpm test:e2e:onboarding
-```
-
-Slice 2 critical exit journey (register → complete → matches → authz → invalidate → recover):
-
-```bash
-pnpm test:e2e:slice2
-```
-
-Slice 3 critical exit journey (register → complete → detail → preview → submit → confirmation → Applied → duplicate/single-row → authz/historical proofs):
-
-```bash
-pnpm test:e2e:slice3
-```
-
-Hosted Production Auth uses the repository owner’s Supabase project, Vercel Production public env, Site URL `https://stint.company`, and the configured redirect allow-list. Hosted completion and applications migrations are applied on Production. Slice 3 hosted Production proof is complete — see `docs/27-slice-3-closure.md`. Slice 4 hosted proof used an isolated Preview + disposable Supabase project (deleted after proof); Preview currently has no Preview-scoped Supabase variables and must be re-isolated before any future hosted proof — see `docs/33-slice-4-closure.md`.
-
-Hosted Demo vacancy fixtures (D-031) are **owner-run only** — never applied by migrations, CI, build, or deploy. See `supabase/fixtures/hosted/README.md` and `docs/21-slice-2-closure.md`.
-
-### Local-only notes
-
-- No Supabase account is needed for local development.
-- Do not run `supabase login`.
-- Do not link a remote Supabase project from the CLI for routine work.
-- Candidate schema, Auth, essential onboarding, and controlled completion RPCs exist; vacancy tables are Slice 2 PR 2.1.
-- Local/CI seeding is enabled for fictional Demo vacancy fixtures (`supabase/seeds`); hosted Production/Preview schema migrations do not auto-insert demo business data (D-031). Owner-run hosted Demo fixtures: temporarily `export SUPABASE_DB_URL='...'`, then `pnpm fixtures:hosted:apply -- --env <preview|production> --project-ref <ref>` (Production also needs `--confirm-production=I_UNDERSTAND_HOSTED_DEMO`), then `unset SUPABASE_DB_URL`. Never pass the connection string on the CLI; never paste credentials into issues, PRs, or evidence.
-- No service-role or secret key is required for ordinary app paths. Browser/SSR session paths use the publishable key + user cookies and RLS.
-- `pnpm supabase:db:reset` is local-only and destructive to the local database containers’ data.
-- Anonymous clients have no table privileges on candidate tables, so denied access surfaces as permission errors (`42501`), not empty result sets.
-- Sentry and PostHog remain deferred in `NOT_NOW.md`.
-
-### Tests and CI
-
-Unit and component tests use Vitest + React Testing Library (no Docker required):
-
-```bash
-pnpm test          # watch mode
-pnpm test:run      # single deterministic run
-pnpm test:coverage # deterministic run with coverage (text + html)
-```
-
-Database schema/RLS tests (Docker + local Supabase required):
-
-```bash
-pnpm supabase:start
 pnpm supabase:db:reset
 pnpm supabase:test:db
 pnpm db:types:check
+pnpm dev
+```
+
+Open `http://localhost:3000`.
+
+When finished:
+
+```bash
 pnpm supabase:stop
 ```
 
-End-to-end smoke (Playwright) expects a production build first:
+### Important environment/security boundaries
+
+- Browser and ordinary SSR session paths use the publishable key + user cookies and RLS.
+- `SUPABASE_SERVICE_ROLE_KEY` is used only by the isolated server-only account-deletion privileged processor introduced in Slice 8; it must never be exposed through `NEXT_PUBLIC_*`, client components, ordinary loaders, or general SSR session code.
+- Local destructive deletion integration tests are guarded to localhost/local Supabase.
+- Routine development must not link or mutate a hosted Supabase project through the local CLI.
+- Never paste credentials into issues, PRs, docs, or chat.
+
+### Hosted environments
+
+Production remains the current hosted environment.
+
+Preview is intentionally unconfigured after earlier isolated proof teardown. M5 beta-readiness work must restore an isolated Preview environment before systematic external testing of iterative builds.
+
+Hosted Demo vacancy fixtures are owner-run only and never applied by migrations/CI/build/deploy. Retained Production Demo fixtures must be removed or explicitly re-authorized by **2026-09-02**.
+
+### Tests and CI
+
+Core checks:
 
 ```bash
+pnpm format:check
+pnpm lint
+pnpm typecheck
+pnpm test:run
 pnpm build
-pnpm exec playwright install chromium   # once per machine
-pnpm test:e2e
+pnpm supabase:db:reset
+pnpm supabase:test:db
+pnpm db:types:check
+pnpm proof:migrations
+pnpm proof:pilot-funnel
 ```
 
-GitHub Actions (`.github/workflows/ci.yml`) runs two jobs on pull requests and pushes to `main`:
+GitHub Actions runs application and local database/schema/RLS checks on pull requests and pushes to `main`.
 
-1. Format check, lint, typecheck, unit coverage, production build, Playwright shell smoke
-2. Local Supabase start → migrate/reset → pgTAP schema/RLS tests → generated types check
+CI scaffold public values satisfy build-time validation only; they do not connect CI to the hosted Production project.
 
-The app job uses non-secret scaffold public values only:
+## Deployment / M5 readiness
 
-- `NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co`
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=stint-ci-scaffold-not-connected`
+Vercel remains the deployment platform.
 
-These values satisfy validation and build. They do not connect to a hosted Supabase project. The database job uses ephemeral local CLI values and does not require GitHub secrets.
+Before systematic M5 external testing:
 
-### Deployment (Vercel)
+1. restore isolated Preview Supabase/environment configuration;
+2. define minimal privacy-conscious Sentry settings and obtain founder approval before implementation;
+3. complete external-facing legal-page readiness review;
+4. keep Production Demo fixtures out of M5 metrics and clean/re-authorize them by the documented deadline.
 
-The repo is configured as a Next.js app via `vercel.json`. Preview deployments run for pull requests; production deploys from `main`.
-
-Set these browser-safe variables in the Vercel project for Preview and Production (placeholders are enough until a hosted Supabase project exists):
-
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-
-Do not add a service-role or secret key unless a later slice explicitly requires a server-only secret. Do not paste real credentials into issues or pull requests.
-
-### Environment variables
-
-| Variable                                 | Required locally | Exposure               | Notes                                                                    |
-| ---------------------------------------- | ---------------- | ---------------------- | ------------------------------------------------------------------------ |
-| `NEXT_PUBLIC_SUPABASE_URL`               | Yes              | Browser-safe           | Local default is `http://127.0.0.1:54321`                                |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`   | Yes              | Browser-safe           | From `pnpm supabase:status` (`Publishable` key; legacy label `anon key`) |
-| `SUPABASE_SERVICE_ROLE_KEY` / secret key | No               | Server-only (deferred) | Not required for the current shell; do not expose via `NEXT_PUBLIC_*`    |
-
-Environment access goes through `src/lib/env/`. Do not read `process.env` ad hoc in application code.
-
-### Scripts
-
-| Command                  | Purpose                                     |
-| ------------------------ | ------------------------------------------- |
-| `pnpm dev`               | Start the Next.js development server        |
-| `pnpm build`             | Create a production build                   |
-| `pnpm start`             | Serve the production build                  |
-| `pnpm lint`              | Run ESLint                                  |
-| `pnpm typecheck`         | Run TypeScript (`tsc --noEmit`)             |
-| `pnpm format`            | Format files with Prettier                  |
-| `pnpm format:check`      | Check Prettier formatting                   |
-| `pnpm test`              | Vitest watch mode                           |
-| `pnpm test:run`          | Vitest single run                           |
-| `pnpm test:coverage`     | Vitest run with coverage                    |
-| `pnpm test:e2e`          | Playwright shell smoke                      |
-| `pnpm test:e2e:employer` | Employer onboarding + vacancy draft E2E     |
-| `pnpm test:e2e:slice3`   | Slice 3 candidate critical journey E2E      |
-| `pnpm proof:migrations`  | Local migration inventory (checksums only)  |
-| `pnpm proof:slice4`      | Local Slice 4 exit-proof orchestrator       |
-| `pnpm supabase:start`    | Start local Supabase (project-pinned CLI)   |
-| `pnpm supabase:stop`     | Stop local Supabase                         |
-| `pnpm supabase:status`   | Show local URL and keys                     |
-| `pnpm supabase:db:reset` | Reset local DB from migrations (local-only) |
-| `pnpm supabase:test:db`  | Run pgTAP schema/RLS tests                  |
-| `pnpm db:types`          | Generate `src/types/database.ts` locally    |
-| `pnpm db:types:check`    | Fail if generated types are stale           |
+No PostHog/session replay or broad observability/analytics platform is authorized by M5.0.
 
 ## Guiding question
 
-> Does this help someone take one meaningful step toward work?
+> Does this help someone take one meaningful step toward work — and does the beta evidence show that it matters?
