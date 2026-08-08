@@ -175,10 +175,13 @@ decisions D-076–D-090 Accepted; PR 8.1 (planning) merged. PR 8.2
 no Auth Admin API call, no service-role application code, no UI. PR 8.3 is
 split into PR 8.3a (D-089 narrow employer-export read RPC) **merged**, and
 PR 8.3b (role-scoped export API/UI) **merged**. PR 8.4 (deletion request UI
-+ privileged Auth processing) is implementation-complete locally, awaiting
-review — implementation discovery found a stranded-`processing` recovery
-gap, closed by D-090 with one additive migration (16th). PR 8.5 has not
-started.
++ privileged Auth processing) is **merged** — implementation discovery
+found a stranded-`processing` recovery gap, closed by D-090 with one
+additive migration (16th). Slice 8's implementation PRs (8.1–8.4) are all
+merged; Slice 8's local implementation is complete. PR 8.5 (local exit
+proof + Slice 8/M4 closure, `docs/48-slice-8-exit-proof.md`) is
+implementation-complete locally, awaiting review/merge. Slice 8 itself is
+not marked Done pending PR 8.5's review/merge.
 
 **Exit criteria:**
 
@@ -221,16 +224,18 @@ service-role application code, no UI. PR 8.3 is split into **PR 8.3a**
 contract — one additive migration, 15th) **merged**, and **PR 8.3b**
 (D-088-compliant role-scoped export API/UI — `GET /candidate/account/export`
 and `GET /employer/account/export`, no new migration) **merged**. **PR 8.4**
-(deletion request UI + privileged Auth processing) is implementation-complete
-locally, awaiting review: an isolated server-only privileged Supabase client
+(deletion request UI + privileged Auth processing) is **merged**: an
+isolated server-only privileged Supabase client
 (`SUPABASE_SERVICE_ROLE_KEY`, fails closed if absent) confined to one
 processor module (`processAccountDeletionRequest`/
 `reconcileAccountDeletionRequest`, request-id-only, target derived from the
 claimed/reclaimed request row) drives D-081's six-phase claim/domain-scrub/Auth
 soft-delete/verify/evidence sequence; `/candidate/account/delete` and
 `/employer/account/delete` provide destructive-confirmation
-request/cancel UI on the existing PR 8.2 self-service RPCs. Implementation
-discovery found `_claim_deletion_request` cannot recover a request stranded
+request/cancel UI on the existing PR 8.2 self-service RPCs, with
+server-authoritative FormData confirmation validation (never client-state
+alone) on both destructive actions. Implementation discovery found
+`_claim_deletion_request` cannot recover a request stranded
 at `processing` by a mid-flight crash (no RPC exposed its `user_id`, and
 `service_role` has no direct table read on `deletion_requests`). **D-090**
 closes this with one additive migration (16th,
@@ -243,8 +248,17 @@ closes this with one additive migration (16th,
 API against a disposable dual-capability identity (domain tombstoning,
 stale-JWT denial, fresh-login failure) and a second disposable identity
 through the stranded-processing recovery path end to end. Migration count
-is 16; pgTAP is 1437/1437 across 33 files. PR 8.5 (local exit proof +
-closure) has not started.
+is 16; pgTAP is 1437/1437 across 33 files at PR 8.4's own merge. **PR
+8.5** (local exit proof + Slice 8/M4 closure) is implementation-complete
+locally, awaiting review/merge — re-proves the full merged Slice 8
+implementation from clean main and adds no migration, generated-type
+change, or application runtime change; independent review found one
+proof gap (processing-state cancellation denial lacked an authoritative
+pgTAP assertion), closed by a test-only correction of 4 pgTAP assertions
+to the existing `30_account_deletion_tombstone_and_request_contract_test.sql`
+file — no RPC behavior change. pgTAP is now 1441/1441 across 33 files.
+Slice 8 itself is not marked Done, and M4 is not marked Complete, pending
+PR 8.5's review/merge.
 
 **Exit criteria:**
 

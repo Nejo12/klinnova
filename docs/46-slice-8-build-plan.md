@@ -26,8 +26,8 @@
 > data (D-088); no new migration; a post-merge correction (same PR) made
 > the employer export fail closed if the D-089 RPC ever returns a
 > broadened/unexpected row shape. **PR 8.4 (deletion request UI +
-> privileged Auth processing) is implementation-complete locally, awaiting
-> review** — one isolated server-only privileged module
+> privileged Auth processing) is merged (#72)** — one isolated server-only
+> privileged module
 > (`src/lib/account-deletion/privileged-supabase.ts`/`processor.ts`, the
 > sole place `service_role`/Auth Admin credentials are used) drives D-081's
 > six-phase claim/domain-scrub/Auth-soft-delete/verify/evidence sequence
@@ -51,7 +51,17 @@
 > `deleteUser(id, true)` API against a disposable dual-capability identity
 > and, separately, against a disposable identity through the
 > stranded-processing recovery path end to end. Migration count is 16;
-> pgTAP is 1437/1437 across 33 files. PR 8.5 has not started.
+> pgTAP is 1437/1437 across 33 files at PR 8.4's own merge. Slice 8's
+> implementation PRs (8.1–8.4) are all merged; Slice 8's local
+> implementation is complete. **PR 8.5 (local exit proof + Slice 8/M4
+> closure) is implementation-complete locally, awaiting review/merge** —
+> see `docs/48-slice-8-exit-proof.md`. Independent review of PR 8.5 found
+> one proof gap (processing-state cancellation denial lacked an
+> authoritative pgTAP assertion), closed by a test-only correction of 4
+> assertions to the existing `30_account_deletion_tombstone_and_request_contract_test.sql`
+> file — no RPC behavior change; pgTAP is now 1441/1441 across 33 files.
+> Slice 8 itself is not marked Done, and M4 is not marked Complete,
+> pending PR 8.5's review/merge.
 
 **Outcome (`docs/13-implementation-plan.md`, unchanged):** candidates and
 employers can request export and deletion; removal can be confirmed.
@@ -273,7 +283,7 @@ their minimal download-control UI only.
 
 ### PR 8.4 — Deletion request + processing UI
 
-**Status: implementation-complete locally, awaiting review.**
+**Status: merged (#72).**
 `src/lib/account-deletion/privileged-supabase.ts` (isolated service-role
 client, fails closed without `SUPABASE_SERVICE_ROLE_KEY`) and
 `processor.ts` (`processAccountDeletionRequest`/
@@ -339,6 +349,17 @@ module (not a public route).
 
 ### PR 8.5 — Local exit proof + Slice 8 closure
 
+**Status: implementation-complete locally, awaiting review/merge.** See
+`docs/48-slice-8-exit-proof.md`. Independent review found one proof gap
+(processing-state cancellation denial lacked an authoritative pgTAP
+assertion), closed by a test-only correction — 4 new pgTAP assertions in
+the existing `30_account_deletion_tombstone_and_request_contract_test.sql`
+file, no migration, no schema change, no RPC behavior change. This PR's
+scope is therefore closure documentation plus one missing authoritative
+pgTAP proof assertion set, not documentation-only. Slice 8 itself is not
+marked Done, and M4 is not marked Complete, pending this PR's
+review/merge.
+
 **Gated by:** D-083 (private-document interpretation — evidence only, no
 build), D-084 (local proof boundary).
 
@@ -356,8 +377,10 @@ suites, exactly the discipline established since Slice 5).
 **Explicitly not included:** hosted proof of any kind (D-084); Storage
 work (D-083 — proof of absence only).
 
-**Database effects:** none beyond PR 8.2/8.3a. **Route effects:** none
-beyond PR 8.3b/8.4.
+**Database effects:** no migration, no schema change, no generated-type
+change beyond PR 8.2/8.3a/8.4 — one test-only pgTAP addition to an
+existing test file (see "Status" above). **Route effects:** none beyond
+PR 8.3b/8.4.
 
 ---
 

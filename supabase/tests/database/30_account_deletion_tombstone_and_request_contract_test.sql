@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(238);
+select plan(242);
 
 -- ---------------------------------------------------------------------------
 -- Fixtures
@@ -493,6 +493,52 @@ select is(
   (select count(*)::integer from public.deletion_requests where user_id = 'a3000000-0000-4000-8000-000000000032'),
   0,
   'cancellation deletes the pending row outright — no cancelled status is introduced'
+);
+
+-- Processing-state cancellation denial (PR 8.5 closure proof gap): employer
+-- C creates a second, independent pending request (the first was fully
+-- removed above, so the active-request uniqueness index does not block
+-- this), it is claimed into processing by the privileged claim primitive,
+-- and the SAME owning user then attempts ordinary self-service
+-- cancellation. This proves cancel_account_deletion_request()'s own
+-- `DELETE ... WHERE status = 'pending'` predicate denies cancellation once
+-- processing has begun — no new status, no row mutation, no row deletion.
+set local role authenticated;
+select set_config('request.jwt.claim.sub','a3000000-0000-4000-8000-000000000032',true);
+select set_config('request.jwt.claims','{"sub":"a3000000-0000-4000-8000-000000000032","role":"authenticated"}',true);
+
+insert into deletion_test_ids (label, id)
+select 'employer-c-processing-request', (public.request_account_deletion() ->> 'request_id')::uuid;
+
+reset role;
+
+select is(
+  public._claim_deletion_request((select id from deletion_test_ids where label='employer-c-processing-request')) ->> 'status',
+  'claimed',
+  'employer C''s second request can be claimed into processing ahead of the cancellation-denial proof'
+);
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub','a3000000-0000-4000-8000-000000000032',true);
+select set_config('request.jwt.claims','{"sub":"a3000000-0000-4000-8000-000000000032","role":"authenticated"}',true);
+
+select is(
+  public.cancel_account_deletion_request() ->> 'status',
+  'not_cancellable',
+  'employer C cannot cancel their own request through the ordinary self-service RPC once it has entered processing'
+);
+
+reset role;
+
+select is(
+  (select count(*)::integer from public.deletion_requests where id = (select id from deletion_test_ids where label='employer-c-processing-request')),
+  1,
+  'the processing request row is not deleted by the denied cancellation attempt'
+);
+select is(
+  (select status from public.deletion_requests where id = (select id from deletion_test_ids where label='employer-c-processing-request')),
+  'processing',
+  'the processing request''s status is unchanged by the denied cancellation attempt — no fake cancelled status is introduced'
 );
 
 set local role authenticated;
