@@ -6,6 +6,7 @@ import {
   CANDIDATE_EXPORT_BUTTON_LABEL,
   CANDIDATE_EXPORT_LEAD,
 } from "@/lib/account-export/messages";
+import { DELETE_ACCOUNT_HEADING } from "@/lib/account-deletion/messages";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { loadCandidateOnboarding } from "@/lib/onboarding/load-candidate";
 import { onboardingGroupHref } from "@/lib/onboarding/navigation";
@@ -79,6 +80,11 @@ export default async function CandidatePage() {
         <a className={styles.secondaryLink} href="/candidate/account/export">
           {CANDIDATE_EXPORT_BUTTON_LABEL}
         </a>
+      </p>
+      <p>
+        <Link className={styles.secondaryLink} href="/candidate/account/delete">
+          {DELETE_ACCOUNT_HEADING}
+        </Link>
       </p>
     </main>
   );

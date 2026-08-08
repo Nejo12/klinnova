@@ -170,12 +170,15 @@ placeholders + local exit proof, `docs/44-slice-7-exit-proof.md`) merged
 (#67). **Slice 7 is Done locally** — all three exit criteria below pass
 against the merged implementation; hosted proof has not been run. Slice 8
 (account deletion to confirmed data removal) planning is **Accepted**:
-decisions D-076–D-089 Accepted; PR 8.1 (planning) merged. PR 8.2
+decisions D-076–D-090 Accepted; PR 8.1 (planning) merged. PR 8.2
 (deletion/tombstone/request/access-gate database contract) is **merged** —
 no Auth Admin API call, no service-role application code, no UI. PR 8.3 is
 split into PR 8.3a (D-089 narrow employer-export read RPC) **merged**, and
-PR 8.3b (role-scoped export API/UI) implementation-complete locally,
-awaiting review. PR 8.4/8.5 have not started.
+PR 8.3b (role-scoped export API/UI) **merged**. PR 8.4 (deletion request UI
++ privileged Auth processing) is implementation-complete locally, awaiting
+review — implementation discovery found a stranded-`processing` recovery
+gap, closed by D-090 with one additive migration (16th). PR 8.5 has not
+started.
 
 **Exit criteria:**
 
@@ -192,12 +195,15 @@ awaiting review. PR 8.4/8.5 have not started.
 **Planning status:** PR 8.1 (discovery, data-ownership inventory, export/
 deletion contract proposal, build plan) merged — see
 `docs/45-slice-8-discovery.md`, `docs/46-slice-8-build-plan.md`,
-`docs/47-slice-8-data-removal-proposal.md`. Decisions D-076–D-089 are
+`docs/47-slice-8-data-removal-proposal.md`. Decisions D-076–D-090 are
 **Accepted** in `docs/10-decisions.md` (D-085/D-086/D-087 discovered and
 Accepted during PR 8.2 implementation; D-088/D-089 discovered and
 Accepted 2026-08-08 during PR 8.3 implementation start — D-077 left
 dual-capability export scope and the employer export's application-data
-source unresolved).
+source unresolved; D-090 discovered and Accepted 2026-08-08 during PR 8.4
+implementation — a crash between a successful processing claim and any
+subsequent step could permanently strand a request, which D-081 did not
+cover).
 
 **Implementation status:** PR 8.2 (deletion/tombstone/request/access-gate
 database contract) is **merged** —
@@ -214,9 +220,31 @@ service-role application code, no UI. PR 8.3 is split into **PR 8.3a**
 (D-089's narrow `list_current_employer_export_applications()` read
 contract — one additive migration, 15th) **merged**, and **PR 8.3b**
 (D-088-compliant role-scoped export API/UI — `GET /candidate/account/export`
-and `GET /employer/account/export`, no new migration) implementation-complete
-locally, awaiting review. PR 8.4 (deletion request UI + privileged Auth
-processing) and PR 8.5 (local exit proof + closure) have not started.
+and `GET /employer/account/export`, no new migration) **merged**. **PR 8.4**
+(deletion request UI + privileged Auth processing) is implementation-complete
+locally, awaiting review: an isolated server-only privileged Supabase client
+(`SUPABASE_SERVICE_ROLE_KEY`, fails closed if absent) confined to one
+processor module (`processAccountDeletionRequest`/
+`reconcileAccountDeletionRequest`, request-id-only, target derived from the
+claimed/reclaimed request row) drives D-081's six-phase claim/domain-scrub/Auth
+soft-delete/verify/evidence sequence; `/candidate/account/delete` and
+`/employer/account/delete` provide destructive-confirmation
+request/cancel UI on the existing PR 8.2 self-service RPCs. Implementation
+discovery found `_claim_deletion_request` cannot recover a request stranded
+at `processing` by a mid-flight crash (no RPC exposed its `user_id`, and
+`service_role` has no direct table read on `deletion_requests`). **D-090**
+closes this with one additive migration (16th,
+`20260808220000_deletion_processing_lease_and_recovery.sql`): a
+`processing_lease_started_at` column distinct from the historical
+`processing_started_at`, a `_reclaim_stale_deletion_request()` RPC
+(request-id-only, fixed 5-minute DB-owned threshold), reachable only from
+`reconcileAccountDeletionRequest`. A local Auth Admin integration proof
+(gated to `127.0.0.1`/`localhost`) exercises the real `deleteUser(id, true)`
+API against a disposable dual-capability identity (domain tombstoning,
+stale-JWT denial, fresh-login failure) and a second disposable identity
+through the stranded-processing recovery path end to end. Migration count
+is 16; pgTAP is 1437/1437 across 33 files. PR 8.5 (local exit proof +
+closure) has not started.
 
 **Exit criteria:**
 

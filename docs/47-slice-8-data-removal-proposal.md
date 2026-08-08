@@ -16,7 +16,14 @@ surface — closed by D-088 (role-scoped exports) and D-089 (a dedicated
 narrow employer-export read RPC) respectively, both Accepted 2026-08-08;
 see `docs/10-decisions.md`. PR 8.3 is accordingly split into PR 8.3a (the
 D-089 read contract, merged) and PR 8.3b (the export API/UI this §2
-describes — implementation-complete locally, awaiting review).
+describes, merged). PR 8.4 (the deletion request UI and privileged Auth
+soft-delete processing this document's §3/§10 describe) is
+implementation-complete locally, awaiting review. PR 8.4 implementation
+discovery found this §10 processing sequence had no recovery path for a
+request stranded at `processing` by a crash between a successful claim and
+any subsequent step — closed by D-090 (deletion processing lease and
+stranded-request recovery), Accepted 2026-08-08, with one additive
+migration (16th). Migration count is 16.
 
 ## 1. Current-state graph (summary; full inventory in `docs/45` §2)
 

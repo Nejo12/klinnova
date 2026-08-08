@@ -20,11 +20,38 @@
 > (role-scoped candidate/employer export API + download UI)** — an
 > explicit D-076 decomposition update, not a silent scope broadening. **PR
 > 8.3a is merged** — one additive migration (15th), adding only
-> `list_current_employer_export_applications()`. **PR 8.3b is
-> implementation-complete locally, awaiting review** — `GET
-> /candidate/account/export` and `GET /employer/account/export` Route
+> `list_current_employer_export_applications()`. **PR 8.3b is merged** —
+> `GET /candidate/account/export` and `GET /employer/account/export` Route
 > Handlers, each independently authorized and returning only its own role's
-> data (D-088); no new migration. PR 8.4/8.5 have not started.
+> data (D-088); no new migration; a post-merge correction (same PR) made
+> the employer export fail closed if the D-089 RPC ever returns a
+> broadened/unexpected row shape. **PR 8.4 (deletion request UI +
+> privileged Auth processing) is implementation-complete locally, awaiting
+> review** — one isolated server-only privileged module
+> (`src/lib/account-deletion/privileged-supabase.ts`/`processor.ts`, the
+> sole place `service_role`/Auth Admin credentials are used) drives D-081's
+> six-phase claim/domain-scrub/Auth-soft-delete/verify/evidence sequence
+> via `processAccountDeletionRequest(requestId)`/
+> `reconcileAccountDeletionRequest(requestId)`; `/candidate/account/delete`
+> and `/employer/account/delete` provide destructive-confirmation
+> request/cancel UI on PR 8.2's existing self-service RPCs. Implementation
+> discovery found `_claim_deletion_request` could not recover a request
+> stranded at `processing` by a mid-flight crash — no RPC exposed its
+> `user_id`, and `service_role` has no direct table read on
+> `deletion_requests` (confirmed empirically). **D-090 (deletion
+> processing lease and stranded-request recovery), Accepted 2026-08-08**,
+> closes this with one additive migration (16th,
+> `20260808220000_deletion_processing_lease_and_recovery.sql`): a
+> `processing_lease_started_at` column distinct from the historical
+> `processing_started_at`, and a request-id-only
+> `_reclaim_stale_deletion_request()` RPC (fixed 5-minute DB-owned
+> staleness threshold, reachable only from `reconcileAccountDeletionRequest`
+> — ordinary self-service processing never attempts stale recovery). A
+> local Auth Admin integration proof exercises the real
+> `deleteUser(id, true)` API against a disposable dual-capability identity
+> and, separately, against a disposable identity through the
+> stranded-processing recovery path end to end. Migration count is 16;
+> pgTAP is 1437/1437 across 33 files. PR 8.5 has not started.
 
 **Outcome (`docs/13-implementation-plan.md`, unchanged):** candidates and
 employers can request export and deletion; removal can be confirmed.
@@ -200,7 +227,10 @@ export builder (PR 8.3b).
 
 ### PR 8.3b — Role-scoped account export API + download UI
 
-**Status: implementation-complete locally, awaiting review.**
+**Status: merged (#71).** A post-merge correction on the same branch made
+the employer export fail closed (rather than silently strip via a
+non-strict schema) if `list_current_employer_export_applications()` ever
+returns an unexpected/broadened row shape.
 
 **Gated by:** D-077 (export format and scope), D-088 (exports are
 role-scoped), D-089 (employer export's application data source).
@@ -243,6 +273,28 @@ their minimal download-control UI only.
 
 ### PR 8.4 — Deletion request + processing UI
 
+**Status: implementation-complete locally, awaiting review.**
+`src/lib/account-deletion/privileged-supabase.ts` (isolated service-role
+client, fails closed without `SUPABASE_SERVICE_ROLE_KEY`) and
+`processor.ts` (`processAccountDeletionRequest`/
+`reconcileAccountDeletionRequest`, request-id-only) are the only files
+touching `service_role`/Auth Admin credentials, confirmed by a static
+security test; `/candidate/account/delete` and `/employer/account/delete`
+provide the destructive-confirmation request/cancel UI; a local Auth Admin
+integration test (`STINT_DB_INTEGRATION=1`, localhost-gated) proves the
+full dual-capability sequence — domain tombstoning, company/vacancy/
+moderation/audit-redaction outcomes, stale pre-delete-JWT denial on read
+and mutate, fresh generic-failure login, and an untouched control account
+— against the real `deleteUser(id, true)`/`getUserById` API, not a mock.
+Implementation discovery found a stranded-`processing` recovery gap
+(D-090, Accepted 2026-08-08): one additive migration (16th,
+`20260808220000_deletion_processing_lease_and_recovery.sql`) adds a
+`processing_lease_started_at` column and a request-id-only
+`_reclaim_stale_deletion_request()` RPC, reachable only from
+`reconcileAccountDeletionRequest`; the same integration test suite proves
+recovery end to end against a second disposable identity. Migration count
+is 16; pgTAP is 1437/1437 across 33 files.
+
 **Gated by:** D-080 (Auth deletion mechanism — the Auth-scrub processing
 half), D-081 (deletion-request state machine — UI/confirmation half).
 
@@ -257,7 +309,10 @@ acknowledgement, not a bare button); cancel-while-pending UI; the
 six-phase processing trigger (claim, anonymize, record domain-scrub
 evidence, invoke Auth soft delete via the isolated module, verify, record
 Auth-deletion evidence + complete — D-081); the manual reconciliation
-operation for the Auth-succeeded-but-evidence-write-failed case; a final
+operation, covering both the Auth-succeeded-but-evidence-write-failed case
+and, per D-090, a request stranded at `processing` by a mid-flight crash
+(recovered via a fixed 5-minute DB-owned staleness lease, never a
+caller-selectable interval); a final
 processing/success confirmation screen shown **before** the local session
 ends (not deferred to a later sign-in attempt, per D-081's corrected
 session semantics) — no special post-delete login-page state is built,

@@ -7,6 +7,7 @@ import {
   EMPLOYER_EXPORT_BUTTON_LABEL,
   EMPLOYER_EXPORT_LEAD,
 } from "@/lib/account-export/messages";
+import { DELETE_ACCOUNT_HEADING } from "@/lib/account-deletion/messages";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadEmployerProfile } from "@/lib/employer/load-employer";
 import {
@@ -92,6 +93,9 @@ export default async function EmployerHomePage() {
         <a className={styles.linkButton} href="/employer/account/export">
           {EMPLOYER_EXPORT_BUTTON_LABEL}
         </a>
+        <Link className={styles.linkButton} href="/employer/account/delete">
+          {DELETE_ACCOUNT_HEADING}
+        </Link>
       </p>
     </main>
   );
