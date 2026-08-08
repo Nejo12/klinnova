@@ -2,14 +2,26 @@
 
 > **Status:** Implementation active. PR 8.1 (this document + `docs/45`/
 > `docs/47` + `docs/10-decisions.md` D-076–D-084) merged. Decisions
-> D-076–D-086 are **Accepted** (2026-08-07) in `docs/10-decisions.md` —
-> D-085 (whole-account deletion across capabilities) and D-086
-> (current-state moderation removal) were discovered and Accepted during
-> PR 8.2's own implementation. **PR 8.2 (deletion/tombstone/request/
-> access-gate database contract) is implementation-complete locally,
-> awaiting review** — one additive migration (14th), pgTAP 1306/1306 (1136
-> prior + 170 new), no Auth Admin API call, no service-role application
-> code, no UI. PR 8.3/8.4/8.5 have not started.
+> D-076–D-089 are **Accepted** in `docs/10-decisions.md` — D-085
+> (whole-account deletion across capabilities), D-086 (current-state
+> moderation removal), and D-087 (deleted-candidate application transition
+> boundary) were discovered and Accepted during PR 8.2's own
+> implementation. **PR 8.2 (deletion/tombstone/request/access-gate
+> database contract) is merged** — 14 migrations, no Auth Admin API call,
+> no service-role application code, no UI. **D-088 (account exports are
+> role-scoped, including for dual-capability accounts) and D-089 (employer
+> export gets a dedicated narrow application-process read RPC) were
+> Accepted 2026-08-08**, discovered during PR 8.3 implementation start —
+> D-077 left dual-capability export scope unresolved (unlike deletion,
+> which D-085 already covers), and no existing RLS/RPC could satisfy the
+> employer export's narrow application-process requirement without
+> exposing candidate-identifying fields. **PR 8.3 is split into PR 8.3a
+> (narrow employer export application-process read contract) and PR 8.3b
+> (role-scoped candidate/employer export API + download UI)** — an
+> explicit D-076 decomposition update, not a silent scope broadening. **PR
+> 8.3a is implementation-complete locally, awaiting review** — one
+> additive migration (15th), adding only `list_current_employer_export_applications()`.
+> PR 8.3b/8.4/8.5 have not started.
 
 **Outcome (`docs/13-implementation-plan.md`, unchanged):** candidates and
 employers can request export and deletion; removal can be confirmed.
@@ -71,9 +83,9 @@ application remains a frozen historical record once its candidate is
 deleted, not an ongoing recruitment workflow; D-070 remains authoritative
 while the candidate account is active).
 
-**Objective:** the additive migration + pgTAP proof for everything PR 8.3/
-8.4's UI needs, following the exact PR 7.2 precedent (schema/RPCs/pgTAP
-first, UI later, no mixing).
+**Objective:** the additive migration + pgTAP proof for everything PR
+8.3a/8.3b/8.4's UI needs, following the exact PR 7.2 precedent
+(schema/RPCs/pgTAP first, UI later, no mixing).
 
 **Proposed contents — a conceptual inventory, not SQL (subject to the
 gating decisions' exact acceptance wording; materially larger than "one
@@ -151,29 +163,65 @@ none.
 
 ---
 
-### PR 8.3 — Account export UI/API
+### PR 8.3a — Employer export application-process read contract
 
-**Gated by:** D-077 (export format and scope).
+**Gated by:** D-077 (export format and scope), D-089 (narrow employer
+export read RPC).
+
+**Objective:** the single narrow database primitive D-089 requires,
+discovered as missing when PR 8.3 implementation started: `applications`
+has no employer-scoped SELECT RLS, and the existing employer-facing
+review RPCs return candidate-identifying fields D-077 forbids in bulk
+export.
+
+**Includes:** `list_current_employer_export_applications()` — zero
+arguments, `auth.uid()`-scoped, returns exactly `application_id`/
+`vacancy_id`/`status`/`submitted_at` for the caller's own owned
+vacancies' applications, deterministically ordered. Composes only the
+deleted-employer gate (`_is_employer_deleted`) — deliberately not
+suspension or verification state, per D-089's own-data-access reasoning.
+
+**Tests:** pgTAP — grants (authenticated-only, no anon/service_role/no
+new `applications` RLS policy), ownership isolation (cross-employer),
+suspension/verification-state non-gating, deleted-employer stale-JWT
+denial, deleted-candidate application preservation as a process record,
+exact result-column shape, candidate-PII absence in the serialized
+result, deterministic ordering, no mutation.
+
+**Database effects:** one additive migration (15th) — the RPC plus its
+grants/comment only; no table, column, index, RLS policy, trigger, or
+view. **Route effects:** none — no export route, no download UI, no
+export builder (PR 8.3b).
+
+---
+
+### PR 8.3b — Role-scoped account export API + download UI
+
+**Gated by:** D-077 (export format and scope), D-088 (exports are
+role-scoped), D-089 (employer export's application data source).
 
 **Objective:** implement the candidate and employer export payloads
-exactly as bounded in `docs/47` §2, built entirely on PR 8.2's RPCs (or
-existing RLS reads where sufficient).
+exactly as bounded in `docs/47` §2 and D-088's role-scoped-download
+contract, built on PR 8.2's existing RLS/RPCs plus PR 8.3a's narrow
+employer application-process RPC.
 
-**Includes:** an export route/Server Action per role, returning the
-versioned JSON envelope from `docs/47` §2; a field-by-field re-audit of
-`candidateSnapshotV1Schema`/`vacancySnapshotV1Schema` against the export
-boundary (`docs/45` §13) at implementation time, since that boundary
-cannot be finally verified until the current schema shape is read fresh.
+**Includes:** one export route per role, each returning its own versioned
+JSON envelope (`docs/47` §2); the employer export's applications section
+sourced exclusively from `list_current_employer_export_applications()`,
+never `list_current_employer_applications`/`get_current_employer_application`;
+a field-by-field re-audit of `candidateSnapshotV1Schema`/`vacancySnapshotV1Schema`
+against the export boundary (`docs/45` §13) at implementation time.
 
-**Tests:** Vitest/Testing Library for the export payload shape, boundary
+**Tests:** Vitest/Testing Library for each export payload shape, boundary
 exclusions (no candidate snapshot in employer export, no operator/PII
-fields anywhere), and authorization (own-user-only, no target parameter).
-A static-security test proving the employer export code path never reads
-`candidate_snapshot`, mirroring the PR 7.3/7.4 static-security convention.
+fields anywhere, no candidate/employer cross-contamination per D-088),
+and authorization (own-user-only, no target parameter, no role
+parameter). A static-security test proving the employer export code path
+never reads `candidate_snapshot`, mirroring the PR 7.3/7.4 static-security
+convention. Playwright coverage for the download control per role space.
 
-**Database effects:** none (unless PR 8.2 under-provisioned a read RPC,
-in which case that gap surfaces here, not silently patched by adding
-ad hoc client-side joins). **Route effects:** the export route(s) only.
+**Database effects:** none. **Route effects:** the export route(s) and
+their minimal download-control UI only.
 
 ---
 
@@ -237,8 +285,8 @@ suites, exactly the discipline established since Slice 5).
 **Explicitly not included:** hosted proof of any kind (D-084); Storage
 work (D-083 — proof of absence only).
 
-**Database effects:** none beyond PR 8.2. **Route effects:** none beyond
-PR 8.3/8.4.
+**Database effects:** none beyond PR 8.2/8.3a. **Route effects:** none
+beyond PR 8.3b/8.4.
 
 ---
 

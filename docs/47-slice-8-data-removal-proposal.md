@@ -8,7 +8,14 @@ a corrective review pass. No migration, no runtime code, no RLS change is
 introduced by this document — PR 8.2 is the first authorized
 implementation unit, and must follow this contract exactly, deferring
 only genuine implementation details (e.g. exact SQL identifiers) not
-already fixed here.
+already fixed here. PR 8.2 is merged. This §2 export boundary left two
+behaviors genuinely unresolved — dual-capability export scope, and how
+the employer's application-process metadata (§2's "narrow application
+process metadata only") would actually be read given the current RLS/RPC
+surface — closed by D-088 (role-scoped exports) and D-089 (a dedicated
+narrow employer-export read RPC) respectively, both Accepted 2026-08-08;
+see `docs/10-decisions.md`. PR 8.3 is accordingly split into PR 8.3a (the
+D-089 read contract) and PR 8.3b (the export API/UI this §2 describes).
 
 ## 1. Current-state graph (summary; full inventory in `docs/45` §2)
 
@@ -365,7 +372,7 @@ idempotency model in §8.
 Restated from §2: candidate export never contains employer/operator
 data; employer export never contains candidate snapshot/PII. Both
 `candidateSnapshotV1Schema`/`vacancySnapshotV1Schema` must be re-audited
-field-by-field against these boundaries at implementation time (PR 8.3),
+field-by-field against these boundaries at implementation time (PR 8.3b),
 not assumed correct from this document alone.
 
 ## 11. Confirmation semantics
