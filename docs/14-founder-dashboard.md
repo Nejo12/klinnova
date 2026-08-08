@@ -8,7 +8,7 @@ M5 boundary/metrics: `docs/49-m5-beta-transition-and-measurement.md`.
 M5 outcome proposal: `docs/50-m5-outcome-contract-proposal.md`.
 M5 operating plan: `docs/51-m5-operating-plan.md`.
 Deferred ideas: `NOT_NOW.md`.
-Historical slice detail remains in the individual discovery/build-plan/closure documents rather than this dashboard.
+Historical slice detail remains in the individual discovery/build-plan/closure documents.
 
 ## Current focus
 
@@ -18,31 +18,40 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 | Previous milestone | **M4 — Complete** (Slices 7–8 closed; PR #73 merged) |
 | Product boundary | Merged M4 implementation under D-M5-1 feature freeze |
 | Active work unit | M5.0 — beta transition + measurement contract + operating plan (docs/discovery only) |
+| PR | #74 — awaiting final founder review before merge |
 | Product/schema implementation | **Not authorized by M5.0** |
 | Preview | Intentionally unconfigured; isolated Preview restoration is beta-readiness work before systematic external testing |
-| Production | Existing production remains the live environment; no M5.0 product/schema mutation |
+| Production | Existing production remains live; no M5.0 product/schema mutation |
 | Hosted destructive proof | Not authorized / not run |
 | Demo fixture deadline | Remove or explicitly re-authorize retained Production Demo fixtures by **2026-09-02** |
-| Monitoring | Minimal privacy-conscious Sentry planned before Cohort A external traffic; no PostHog/session replay |
-| Legal readiness | Privacy/Terms/Impressum require external-facing beta readiness review/ownership |
+| Monitoring | Minimal privacy-conscious Sentry approved before intentional Cohort A external traffic; not configured in M5.0 |
+| Legal readiness | Founder-owned qualified German legal review/finalization gate before intentional Cohort A external traffic |
 
-## M5 targets
+## M5 targets and approved definitions
 
-| Metric | Full M5 target | Current definition status |
+| Metric | Full M5 target | Approved top-level counting rule |
 |---|---:|---|
-| Participating employers | 20 | Proposed precise definition in `docs/49`; founder approval pending |
-| Verified vacancies | 100 | Proposed precise definition in `docs/49`; founder approval pending |
-| Candidates | 200 | Proposed precise definition in `docs/49`; founder approval pending |
-| Completed interviews | 10 | Approved: employer records that an application-related interview actually took place |
-| Confirmed hires | 3 | Approved: employer records candidate hired for vacancy; `accepted` status alone never counts |
+| Participating employers | 20 | Unique employer with completed onboarding + verified state + at least one employer-submitted vacancy effective-public during M5; historical once counted |
+| Verified vacancies | 100 | Unique employer-submitted vacancy effective-public at least once during M5 while employer verified; historical once counted |
+| Candidates | 200 | Unique authoritative completed-onboarding candidate in cohort; pre-existing completed candidate requires explicit M5 cohort enrollment |
+| Completed interviews | 10 | Distinct applications with >=1 active non-voided `interview_completed` event; additional rounds do not increment top-line target |
+| Confirmed hires | 3 | Distinct applications with an active employer-recorded `hired` event; `accepted` status alone never counts |
+
+Track current active/safe employers and current effective-public vacancies separately from the historical cumulative target metrics.
 
 ## Staged cohorts
 
 | Cohort | Employers | Legitimate vacancies | Candidates | Outcome gate |
 |---|---:|---:|---:|---|
-| A — Proof | 3–5 | 10–20 | 20–30 | first completed interview |
-| B — Validation | 8–10 | 30–50 | 60–100 | repeated interviews + first confirmed hire |
-| C — Full M5 | 20 | 100 | 200 | 10 completed interviews + 3 confirmed hires |
+| A — Proof | 3–5 | 10–20 | 20–30 | first completed-interview conversion |
+| B — Validation | 8–10 | 30–50 | 60–100 | repeated completed-interview conversions + first confirmed hire |
+| C — Full M5 | 20 | 100 | 200 | 10 completed-interview conversions + 3 confirmed hires |
+
+## Cohort A wedge
+
+Cleaning-first is approved.
+
+Allow only **1–2 adjacent low-language-barrier employers** when founder access is strong and the hiring model remains simple. Do not deliberately run a broad multi-sector Cohort A.
 
 ## M5 scope freeze
 
@@ -66,50 +75,67 @@ Do not introduce without beta evidence:
 
 A change may enter active work only when it is required to measure the beta, removes an observed blocker, fixes a bug/accessibility/security/privacy problem, or is necessary for safe beta operation.
 
-## Current M5.0 deliverables
+## M5.0 deliverables
 
 - [x] Slice 8 marked complete
 - [x] M4 marked complete
 - [x] M5 marked active
 - [x] Beta scope freeze recorded
 - [x] Staged Cohorts A/B/C recorded
-- [x] Completed-interview definition recorded
-- [x] Confirmed-hire definition recorded
-- [x] Separate outcome-model direction recorded
-- [x] CV/save-job Cohort A freeze recorded
-- [x] Minimal-Sentry direction recorded
+- [x] Participating-employer definition approved
+- [x] Verified-vacancy definition approved
+- [x] Candidate definition approved
+- [x] Completed-interview top-line counting approved
+- [x] Confirmed-hire definition approved
+- [x] Separate outcome-model direction approved
+- [x] Candidate-safe outcome visibility approved
+- [x] Append-only void/replacement correction approved
+- [x] Deleted-candidate outcome freeze approved
+- [x] 30-day outcome backdating policy approved
+- [x] Cleaning-first Cohort A wedge approved
+- [x] CV/save-job Cohort A freeze approved
+- [x] Minimal-Sentry boundary approved
+- [x] Founder-owned legal-readiness gate approved
+- [x] Weekly operating cadence approved
 - [x] M5 operating plan drafted
 - [x] Outcome data-contract proposal drafted
-- [ ] Founder approves employer/vacancy/candidate counting semantics
-- [ ] Founder approves interview multiplicity rule
-- [ ] Founder approves Cohort A employer wedge
-- [ ] Founder approves outcome correction/candidate-visibility details
-- [ ] Founder approves Sentry retention/region/PII settings
-- [ ] Founder assigns legal-page readiness owner/gate
+- [ ] Final founder review of updated PR #74
+- [ ] Merge PR #74
 
-## Immediate beta-readiness queue after M5.0 approval
+## Immediate beta-readiness queue after M5.0 merge
 
-This is a planning queue, not automatic authorization.
+This is a planning queue, **not automatic authorization**.
 
 ### Product / measurement
 
-1. Approve exact top-line M5 counting semantics.
-2. Approve the separate interview/hire outcome contract.
-3. If authorized, implement only the smallest outcome-measurement contract and UI necessary to trust M5 interview/hire metrics.
+1. Select and explicitly authorize the smallest outcome-measurement implementation unit if founder chooses it as the next work item.
+2. Preserve workflow/outcome separation and the approved M5 counting semantics.
 
 ### Infrastructure
 
 1. Restore an isolated Preview environment before systematic external testing.
-2. Add minimal privacy-conscious Sentry error monitoring before Cohort A external traffic.
+2. Configure approved minimal Sentry before intentional Cohort A external traffic.
 3. Remove/re-authorize retained Production Demo fixtures by 2026-09-02.
 
 ### Operations
 
-1. Approve Cohort A employer segment.
-2. Prepare employer/candidate recruitment channels.
-3. Assign legal-page readiness responsibility.
-4. Establish founder-assisted onboarding/support channel.
-5. Run weekly funnel/blocker review during active cohorts.
+1. Prepare cleaning-first employer acquisition with the 1–2 adjacent-employer exception only where justified.
+2. Prepare candidate recruitment channels.
+3. Complete founder-owned qualified German legal review/finalization gate.
+4. Establish support/contact channel and founder-assisted onboarding.
+5. Run one structured weekly M5 review using `Operate manually / Fix now / Watch / Defer`.
+
+## Cohort A readiness gates
+
+Before intentional external Cohort A traffic:
+
+- qualified German legal review/finalization of Impressum/business identity, Privacy notice, beta Terms, support/contact channel, and Sentry disclosure if required;
+- minimal Sentry configured within the approved privacy boundary;
+- isolated Preview available for systematic external testing of iterative builds;
+- technical/moderation/privacy support procedures understood;
+- demo-fixture cleanup deadline tracked.
+
+This gate does not establish or claim full GDPR compliance.
 
 ## Baseline engineering state at M4 closure
 
@@ -123,7 +149,7 @@ This is a planning queue, not automatic authorization.
 | Generated DB types | no drift |
 | Slice 8 local exit proof | PASS — `docs/48-slice-8-exit-proof.md` |
 
-Do not optimize M5 for larger test counts. The primary M5 numbers are employers, legitimate vacancies, completed candidate onboarding, applications, completed interviews, and confirmed hires.
+Do not optimize M5 for larger test counts. The primary M5 numbers are participating employers, legitimate vacancies, completed candidate onboarding, applications, completed-interview conversions, and confirmed hires.
 
 ## Completed implementation milestones
 
@@ -134,11 +160,11 @@ Do not optimize M5 for larger test counts. The primary M5 numbers are employers,
 | M2 Applications | Complete | Slice 3 |
 | M3 Employer flow | Implementation complete | Slices 4–6; Slice 6 hosted proof remains separately deferred |
 | M4 Trust and beta readiness | **Complete** | Slices 7–8; `docs/44`, `docs/48`; PR #73 |
-| M5 Berlin private beta | **Active** | `docs/49`–`docs/51` |
+| M5 Berlin private beta | **Active** | `docs/49`–`docs/51`; PR #74 M5.0 review |
 
 ## Decision discipline
 
 D-001–D-090 remain in `docs/10-decisions.md`.
-Founder-approved M5 operating/measurement decisions D-M5-1 onward are recorded in `docs/49-m5-beta-transition-and-measurement.md` during the beta phase.
+Founder-approved M5 operating/measurement decisions D-M5-1–D-M5-18 are recorded in `docs/49-m5-beta-transition-and-measurement.md`.
 
 Normal beta fixes use evidence-first lightweight delivery. Changes affecting schema/database, authorization/RLS, privacy, security, matching authority, employment/legal boundaries, or major architecture require explicit discovery and founder approval before implementation.
