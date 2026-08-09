@@ -126,9 +126,12 @@ describe("CandidateMatchesPage", () => {
     expect(
       screen.getByRole("link", { name: /Review saved preferences/i }),
     ).toHaveAttribute("href", "/candidate/onboarding?group=review");
+    // M5.1 Unit B: sign-out is no longer a header action on this page —
+    // it now lives exclusively on /candidate/account, so it must not
+    // reappear here as an accidental primary-navigation destination.
     expect(
-      screen.getByRole("button", { name: /Log out/i }),
-    ).toBeInTheDocument();
+      screen.queryByRole("button", { name: /Log out/i }),
+    ).not.toBeInTheDocument();
     expect(screen.queryByText(/No jobs match/i)).toBeNull();
     expect(screen.queryByText(/supabase|invariant|sql|uuid/i)).toBeNull();
   });
@@ -218,7 +221,7 @@ describe("CandidateMatchesPage", () => {
     expect(within(card).queryByText(applicationId)).toBeNull();
   });
 
-  it("shows a fixed candidate data-download link with no role/target query parameter", () => {
+  it("links to Account rather than exposing the export link directly (M5.1 Unit B)", () => {
     render(
       <CandidateMatchesPage
         status="success"
@@ -227,11 +230,11 @@ describe("CandidateMatchesPage", () => {
       />,
     );
 
-    const downloadLink = screen.getByRole("link", {
-      name: "Download candidate data",
-    });
-    expect(downloadLink).toHaveAttribute("href", "/candidate/account/export");
-    expect(downloadLink.getAttribute("href")).not.toMatch(/\?/);
+    const accountLink = screen.getByRole("link", { name: "Account" });
+    expect(accountLink).toHaveAttribute("href", "/candidate/account");
+    expect(
+      screen.queryByRole("link", { name: "Download candidate data" }),
+    ).not.toBeInTheDocument();
   });
 
   it("never claims GDPR compliance or legal completeness for the download link", () => {

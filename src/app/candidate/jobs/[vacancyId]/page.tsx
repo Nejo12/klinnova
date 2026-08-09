@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { resolveJobDetailPageView } from "@/app/candidate/jobs/[vacancyId]/resolve-job-detail-view";
 import { CandidateJobDetailPage } from "@/components/candidate-job-detail/candidate-job-detail-page";
+import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadCurrentCandidateVacancyDetail } from "@/lib/matching/resolve-current-candidate-vacancy-detail";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -31,6 +32,9 @@ export default async function CandidateJobDetailRoutePage({
     redirect(view.href);
   }
 
+  const capabilities = await loadAccountCapabilities(supabase);
+  const showEmployerNav = capabilities?.hasEmployerProfile === true;
+
   if (view.kind === "ready") {
     return (
       <CandidateJobDetailPage
@@ -40,13 +44,24 @@ export default async function CandidateJobDetailRoutePage({
         vacancy={view.vacancy}
         languages={view.languages}
         application={view.application}
+        showEmployerNav={showEmployerNav}
       />
     );
   }
 
   if (view.kind === "unavailable") {
-    return <CandidateJobDetailPage status="unavailable" />;
+    return (
+      <CandidateJobDetailPage
+        status="unavailable"
+        showEmployerNav={showEmployerNav}
+      />
+    );
   }
 
-  return <CandidateJobDetailPage status="failure" />;
+  return (
+    <CandidateJobDetailPage
+      status="failure"
+      showEmployerNav={showEmployerNav}
+    />
+  );
 }

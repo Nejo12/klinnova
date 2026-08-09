@@ -52,6 +52,8 @@ test.describe("account export journeys", () => {
       expectedPath: /\/candidate$/,
     });
 
+    // Export lives on the Account destination (M5.1 Unit B).
+    await page.goto("/candidate/account");
     const exportPayload = await downloadAndParse(
       page,
       "Download candidate data",
@@ -147,6 +149,8 @@ test.describe("account export journeys", () => {
     await page.getByRole("link", { name: "Candidate" }).click();
     await expect(page).toHaveURL(/\/candidate/);
 
+    // Export lives on the Account destination (M5.1 Unit B).
+    await page.goto("/candidate/account");
     const candidateExport = await downloadAndParse(
       page,
       "Download candidate data",

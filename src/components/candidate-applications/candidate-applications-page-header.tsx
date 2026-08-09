@@ -1,8 +1,4 @@
-import Link from "next/link";
-
-import { LogoutButton } from "@/components/auth/logout-button";
-import styles from "@/components/candidate-matches/candidate-matches.module.scss";
-import { CapabilityNav } from "@/components/employer-onboarding/capability-nav";
+import { CandidateAppHeader } from "@/components/candidate-nav/candidate-app-header";
 
 type CandidateApplicationsPageHeaderProps = {
   showEmployerNav: boolean;
@@ -17,27 +13,9 @@ export function CandidateApplicationsPageHeader({
   showEmployerNav,
 }: CandidateApplicationsPageHeaderProps) {
   return (
-    <div className={styles.header}>
-      <Link className={styles.brand} href="/candidate">
-        Stint
-      </Link>
-      <div className={styles.headerActions}>
-        <nav aria-label="Candidate">
-          <Link
-            className={styles.link}
-            href="/candidate/applications"
-            aria-current="page"
-          >
-            Applications
-          </Link>
-        </nav>
-        <CapabilityNav
-          showCandidate
-          showEmployer={showEmployerNav}
-          current="candidate"
-        />
-        <LogoutButton />
-      </div>
-    </div>
+    <CandidateAppHeader
+      current="applications"
+      showEmployerNav={showEmployerNav}
+    />
   );
 }

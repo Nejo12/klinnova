@@ -1,9 +1,4 @@
-import Link from "next/link";
-
-import { CANDIDATE_EXPORT_BUTTON_LABEL } from "@/lib/account-export/messages";
-import { DELETE_ACCOUNT_HEADING } from "@/lib/account-deletion/messages";
-import { LogoutButton } from "@/components/auth/logout-button";
-import { CapabilityNav } from "@/components/employer-onboarding/capability-nav";
+import { CandidateAppHeader } from "@/components/candidate-nav/candidate-app-header";
 import { MatchCount } from "@/components/candidate-matches/match-count";
 import { MatchList } from "@/components/candidate-matches/match-list";
 import { MatchesEmptyState } from "@/components/candidate-matches/matches-empty-state";
@@ -29,29 +24,11 @@ export function CandidateMatchesPage(props: CandidateMatchesPageProps) {
 
   return (
     <main className={styles.page}>
-      <div className={styles.header}>
-        <Link className={styles.brand} href={brandHref}>
-          Stint
-        </Link>
-        <div className={styles.headerActions}>
-          <CapabilityNav
-            showCandidate
-            showEmployer={showEmployerNav}
-            current="candidate"
-          />
-          {/* Plain anchor, not next/link: this is a real file download from
-              a Route Handler, not a client-side page transition. The
-              server's Content-Disposition header is the authoritative
-              download mechanism, not this element. */}
-          <a className={styles.navLink} href="/candidate/account/export">
-            {CANDIDATE_EXPORT_BUTTON_LABEL}
-          </a>
-          <Link className={styles.navLink} href="/candidate/account/delete">
-            {DELETE_ACCOUNT_HEADING}
-          </Link>
-          <LogoutButton />
-        </div>
-      </div>
+      <CandidateAppHeader
+        current="matches"
+        showEmployerNav={showEmployerNav}
+        brandHref={brandHref}
+      />
 
       {props.status === "failure" ? (
         <>

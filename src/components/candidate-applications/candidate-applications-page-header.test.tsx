@@ -26,4 +26,21 @@ describe("CandidateApplicationsPageHeader", () => {
     expect(screen.getByRole("link", { name: "Employer" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Candidate" })).toBeInTheDocument();
   });
+
+  it("also exposes Matches, Profile, and Account (M5.1 Unit B coherent nav)", () => {
+    render(<CandidateApplicationsPageHeader showEmployerNav={false} />);
+
+    expect(screen.getByRole("link", { name: "Matches" })).toHaveAttribute(
+      "href",
+      "/candidate/matches",
+    );
+    expect(screen.getByRole("link", { name: "Profile" })).toHaveAttribute(
+      "href",
+      "/candidate/onboarding?group=review",
+    );
+    expect(screen.getByRole("link", { name: "Account" })).toHaveAttribute(
+      "href",
+      "/candidate/account",
+    );
+  });
 });

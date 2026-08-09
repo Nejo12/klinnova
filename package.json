@@ -27,6 +27,7 @@
     "test:e2e:candidate-applications": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/candidate-application-status-journey.spec.ts",
     "test:e2e:admin-moderation": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/admin-moderation.spec.ts",
     "test:e2e:publication-matching-integrity": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/publication-readiness-and-matching-integrity.spec.ts",
+    "test:e2e:candidate-navigation-ia": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/candidate-navigation-ia.spec.ts",
     "proof:migrations": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/proof/migration-inventory.mts",
     "proof:pilot-funnel": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/proof/pilot-funnel.mts",
     "proof:slice4": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/proof/slice4.mts",

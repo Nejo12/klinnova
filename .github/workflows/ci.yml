@@ -152,6 +152,9 @@ jobs:
       - name: Publication readiness and matching integrity journeys (local Supabase + Mailpit)
         run: pnpm test:e2e:publication-matching-integrity
 
+      - name: Candidate navigation and account IA journeys (local Supabase + Mailpit)
+        run: pnpm test:e2e:candidate-navigation-ia
+
       - name: Stop local Supabase
         if: always()
         run: pnpm supabase:stop

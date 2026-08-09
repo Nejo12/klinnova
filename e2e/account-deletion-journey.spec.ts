@@ -29,6 +29,12 @@ test.describe("account deletion journey", () => {
       expectedPath: /\/candidate$/,
     });
 
+    // Account actions live under the Account destination (M5.1 Unit B).
+    await page
+      .getByLabel("Candidate")
+      .getByRole("link", { name: "Account" })
+      .click();
+    await expect(page).toHaveURL(/\/candidate\/account$/);
     await page.getByRole("link", { name: "Delete my Stint account" }).click();
     await expect(page).toHaveURL(/\/candidate\/account\/delete$/);
 
