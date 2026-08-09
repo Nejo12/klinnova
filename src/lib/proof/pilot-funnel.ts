@@ -54,6 +54,7 @@ export type PilotFunnelReport = {
     employer: PilotFunnelDomain;
     vacancy: PilotFunnelDomain;
     application: PilotFunnelDomain;
+    outcome: PilotFunnelDomain;
   };
 };
 
@@ -289,6 +290,35 @@ async function buildApplicationFunnel(
   };
 }
 
+const OUTCOME_QUERY = `
+  select
+    count(distinct application_id) filter (
+      where outcome_type = 'interview_completed' and voided_at is null
+    ) as interview_conversions,
+    count(distinct application_id) filter (
+      where outcome_type = 'hired' and voided_at is null
+    ) as confirmed_hires
+  from public.application_outcome_events
+`;
+
+async function buildOutcomeFunnel(
+  run: SqlRowExecutor,
+): Promise<PilotFunnelDomain> {
+  const row = await queryRow(run, OUTCOME_QUERY, "outcome");
+  return {
+    interview_conversions: {
+      count: toCount(row.interview_conversions, "interview_conversions"),
+      definition:
+        "D-M5-22: distinct applications with at least one active (non-voided) interview_completed event — the top-level M5 interview-conversion metric. Multiple interview rounds on the same application still count once.",
+    },
+    confirmed_hires: {
+      count: toCount(row.confirmed_hires, "confirmed_hires"),
+      definition:
+        "D-M5-22: distinct applications with an active (non-voided) hired event — the top-level M5 confirmed-hire metric. applications.status = 'accepted' alone is never counted; hired is only ever recorded as an explicit outcome event.",
+    },
+  };
+}
+
 export async function buildPilotFunnelReport(
   run: SqlRowExecutor,
 ): Promise<PilotFunnelReport> {
@@ -296,10 +326,11 @@ export async function buildPilotFunnelReport(
   const employer = await buildEmployerFunnel(run);
   const vacancy = await buildVacancyFunnel(run);
   const application = await buildApplicationFunnel(run);
+  const outcome = await buildOutcomeFunnel(run);
 
   return {
     measuredAt,
     source: "local-supabase",
-    funnels: { candidate, employer, vacancy, application },
+    funnels: { candidate, employer, vacancy, application, outcome },
   };
 }
