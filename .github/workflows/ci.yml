@@ -149,6 +149,9 @@ jobs:
       - name: Auth, onboarding, and completion journeys (local Supabase + Mailpit)
         run: pnpm test:e2e:onboarding
 
+      - name: Publication readiness and matching integrity journeys (local Supabase + Mailpit)
+        run: pnpm test:e2e:publication-matching-integrity
+
       - name: Stop local Supabase
         if: always()
         run: pnpm supabase:stop

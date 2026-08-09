@@ -117,8 +117,14 @@ function ConfirmedLifecycleForm({
       {state.missing !== undefined && state.missing.length > 0 ? (
         <ul className={styles.checklist}>
           {mapReadinessChecklist(state.missing).map((item) => (
-            <li key={item.id} className={styles.checklistItem}>
-              <span className={styles.checklistMarker}>Missing</span>
+            <li
+              key={item.id}
+              className={styles.checklistItem}
+              data-complete={item.complete ? "true" : "false"}
+            >
+              <span className={styles.checklistMarker}>
+                {item.complete ? "Complete" : "Missing"}
+              </span>
               <span>{item.label}</span>
             </li>
           ))}

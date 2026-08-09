@@ -27,6 +27,24 @@ export const WORK_FREQUENCY_CODES = WORK_FREQUENCY_OPTIONS.map(
   (option) => option.code,
 ) as unknown as readonly [WorkFrequencyCode, ...WorkFrequencyCode[]];
 
+// Concrete shifts only; candidate "flexible" is a matcher rule, not a
+// vacancy value (D-029/docs/20) — must match
+// vacancies_shift_requirements_allow_list_chk exactly.
+export const SHIFT_REQUIREMENT_OPTIONS = [
+  { code: "morning", label: "Morning" },
+  { code: "daytime", label: "Daytime" },
+  { code: "evening", label: "Evening" },
+  { code: "night", label: "Night" },
+  { code: "weekend", label: "Weekend" },
+] as const;
+
+export type ShiftRequirementCode =
+  (typeof SHIFT_REQUIREMENT_OPTIONS)[number]["code"];
+
+export const SHIFT_REQUIREMENT_CODES = SHIFT_REQUIREMENT_OPTIONS.map(
+  (option) => option.code,
+) as unknown as readonly [ShiftRequirementCode, ...ShiftRequirementCode[]];
+
 export const SALARY_PERIOD_OPTIONS = [
   { code: "hourly", label: "Hourly" },
   { code: "monthly", label: "Monthly" },

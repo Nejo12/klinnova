@@ -31,9 +31,9 @@ insert into public.vacancies (
   workplace_type,work_frequency,salary_amount_cents,salary_currency,salary_period,
   salary_is_gross,cv_required,interview_english_ok,publication_state,source,published_at,expires_at
 ) values
-('a2400000-0000-4000-8000-000000000011','a2400000-0000-4000-8000-000000000001','Revoke One','revoke-one','summary','description','Berlin','Mitte','cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,'published','employer',now(),now()+interval '30 days'),
-('a2400000-0000-4000-8000-000000000012','a2400000-0000-4000-8000-000000000001','Revoke Two','revoke-two','summary','description','Berlin','Mitte','cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,'published','employer',now(),now()+interval '30 days'),
-('a2400000-0000-4000-8000-000000000013','a2400000-0000-4000-8000-000000000001','Keep Draft','keep-draft','summary','description','Berlin','Mitte','cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,'draft','employer',null,null);
+('a2400000-0000-4000-8000-000000000011','a2400000-0000-4000-8000-000000000001','Revoke One','revoke-one','summary','description','Berlin','Mitte','cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,'published','employer',now(),now()+interval '30 days'),
+('a2400000-0000-4000-8000-000000000012','a2400000-0000-4000-8000-000000000001','Revoke Two','revoke-two','summary','description','Berlin','Mitte','cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,'published','employer',now(),now()+interval '30 days'),
+('a2400000-0000-4000-8000-000000000013','a2400000-0000-4000-8000-000000000001','Keep Draft','keep-draft','summary','description','Berlin','Mitte','cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,'draft','employer',null,null);
 
 select ok(public.is_vacancy_effectively_public('a2400000-0000-4000-8000-000000000011',now()),'published vacancy starts public');
 

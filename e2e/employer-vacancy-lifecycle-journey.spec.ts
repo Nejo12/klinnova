@@ -68,6 +68,8 @@ test.describe("employer vacancy lifecycle journey", () => {
     await page
       .getByRole("checkbox", { name: "Interview can be in English" })
       .check();
+    await page.getByRole("checkbox", { name: "Full time" }).check();
+    await page.getByRole("checkbox", { name: "Evening" }).check();
     await page.getByLabel("Amount in EUR").fill("18.00");
     await page.getByLabel("Period").selectOption("hourly");
     await page.getByRole("button", { name: "Save draft" }).click();
@@ -84,11 +86,10 @@ test.describe("employer vacancy lifecycle journey", () => {
     });
 
     await page.reload();
-    await expect(
-      page
-        .getByLabel("Publication readiness")
-        .getByText("Ready for a future publication step", { exact: true }),
-    ).toBeVisible();
+    // Not yet verified — readiness must not claim ready merely because
+    // every vacancy field is complete (D-M5-19 aligned readiness with
+    // publish's own verification requirement).
+    await expect(page.getByText("Not ready for publication yet")).toBeVisible();
 
     // --- Employer: request verification ---
     await page.goto("/employer/verification");
@@ -136,6 +137,13 @@ test.describe("employer vacancy lifecycle journey", () => {
       timeout: 15_000,
     });
     await operatorContext.close();
+
+    await page.goto(`/employer/vacancies/${vacancyId}/edit`);
+    await expect(
+      page
+        .getByLabel("Publication readiness")
+        .getByText("Ready for a future publication step", { exact: true }),
+    ).toBeVisible();
 
     // --- Employer: manage page now offers Publish ---
     // The Publish form's own inline success message is not reliably

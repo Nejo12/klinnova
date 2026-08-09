@@ -30,9 +30,9 @@ insert into public.vacancies (
   salary_period, salary_is_gross, cv_required, interview_english_ok,
   publication_state, source
 ) values
-('a2200000-0000-4000-8000-000000000011','a2200000-0000-4000-8000-000000000001','Lifecycle One','lifecycle-one','summary','description','Berlin','Mitte','cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,'draft','employer'),
-('a2200000-0000-4000-8000-000000000012','a2200000-0000-4000-8000-000000000001','Lifecycle Two','lifecycle-two','summary','description','Berlin','Mitte','cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,false,true,'draft','employer'),
-('a2200000-0000-4000-8000-000000000013','a2200000-0000-4000-8000-000000000001','Lifecycle Three','lifecycle-three','summary','description','Berlin','Mitte','cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,false,'draft','employer');
+('a2200000-0000-4000-8000-000000000011','a2200000-0000-4000-8000-000000000001','Lifecycle One','lifecycle-one','summary','description','Berlin','Mitte','cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,'draft','employer'),
+('a2200000-0000-4000-8000-000000000012','a2200000-0000-4000-8000-000000000001','Lifecycle Two','lifecycle-two','summary','description','Berlin','Mitte','cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,false,true,'draft','employer'),
+('a2200000-0000-4000-8000-000000000013','a2200000-0000-4000-8000-000000000001','Lifecycle Three','lifecycle-three','summary','description','Berlin','Mitte','cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,false,'draft','employer');
 
 insert into public.vacancy_language_requirements (vacancy_id,language_code,min_proficiency)
 values

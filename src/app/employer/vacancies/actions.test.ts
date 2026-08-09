@@ -10,8 +10,10 @@ const redirect = vi.hoisted(() =>
     throw new Error(`REDIRECT:${path}`);
   }),
 );
+const revalidatePath = vi.hoisted(() => vi.fn());
 
 vi.mock("next/navigation", () => ({ redirect }));
+vi.mock("next/cache", () => ({ revalidatePath }));
 
 vi.mock("@/lib/supabase/server", () => ({
   createServerSupabaseClient: vi.fn(async () => ({
@@ -75,6 +77,7 @@ describe("employer vacancy actions", () => {
     loadEmployerProfile.mockReset();
     loadEmployerDraft.mockReset();
     redirect.mockClear();
+    revalidatePath.mockClear();
     getUser.mockResolvedValue({
       data: { user: { id: "emp-1" } },
       error: null,
