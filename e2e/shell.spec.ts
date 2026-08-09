@@ -12,7 +12,7 @@ test("shell smoke: brand, candidate heading, and employer preview link", async (
   ).toBeVisible();
 
   const employerLink = page.getByRole("link", {
-    name: "View employer and admin preview",
+    name: "View employer and admin",
   });
   await expect(employerLink).toBeVisible();
   await expect(employerLink).toHaveAttribute(
