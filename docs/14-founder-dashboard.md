@@ -17,7 +17,7 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 | Active milestone | **M5 — Berlin private beta** |
 | Previous milestone | **M4 — Complete** (Slices 7–8 closed; PR #73 merged) |
 | Product boundary | Merged M4 implementation under D-M5-1 feature freeze |
-| Active work unit | M5.1 — beta readiness closure (Unit A1 merged: publication/matching integrity, PR #76/#77; Unit B: candidate navigation/account IA, PR pending merge) |
+| Active work unit | M5.1 — beta readiness closure (Unit A1 merged: publication/matching integrity, PR #76/#77; Unit B merged: candidate navigation/account IA, PR #78; Unit C: password recovery, PR pending merge) |
 | PR | #74 — M5.0 merged |
 | Product/schema implementation | M5.1 product/schema work proceeds only through explicitly approved bounded units (e.g. Unit A1, Unit B); Production changes remain separately authorized |
 | Preview | Intentionally unconfigured; isolated Preview restoration is beta-readiness work before systematic external testing |
@@ -169,6 +169,6 @@ Do not optimize M5 for larger test counts. The primary M5 numbers are participat
 ## Decision discipline
 
 D-001–D-090 remain in `docs/10-decisions.md`.
-Founder-approved M5 operating/measurement decisions D-M5-1–D-M5-20 are recorded in `docs/49-m5-beta-transition-and-measurement.md`.
+Founder-approved M5 operating/measurement decisions D-M5-1–D-M5-21 are recorded in `docs/49-m5-beta-transition-and-measurement.md`.
 
 Normal beta fixes use evidence-first lightweight delivery. Changes affecting schema/database, authorization/RLS, privacy, security, matching authority, employment/legal boundaries, or major architecture require explicit discovery and founder approval before implementation.

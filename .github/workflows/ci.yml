@@ -155,6 +155,9 @@ jobs:
       - name: Candidate navigation and account IA journeys (local Supabase + Mailpit)
         run: pnpm test:e2e:candidate-navigation-ia
 
+      - name: Password recovery journeys (local Supabase + Mailpit)
+        run: pnpm test:e2e:password-recovery
+
       - name: Stop local Supabase
         if: always()
         run: pnpm supabase:stop

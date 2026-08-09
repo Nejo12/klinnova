@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  forgotPasswordSchema,
   loginSchema,
   parseInternalNextPath,
   registerSchema,
+  resetPasswordSchema,
   safeNextPath,
 } from "@/lib/auth/schemas";
 
@@ -76,6 +78,68 @@ describe("parseInternalNextPath", () => {
       "/employer/onboarding",
     );
     expect(parseInternalNextPath("/candidate")).toBe("/candidate");
+  });
+});
+
+describe("forgotPasswordSchema (M5.1 Unit C)", () => {
+  it("accepts a valid email and lowercases it", () => {
+    const parsed = forgotPasswordSchema.safeParse({
+      email: "Ada@Example.COM",
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.email).toBe("ada@example.com");
+    }
+  });
+
+  it("rejects an invalid email", () => {
+    expect(
+      forgotPasswordSchema.safeParse({ email: "not-an-email" }).success,
+    ).toBe(false);
+  });
+
+  it("rejects an empty email", () => {
+    expect(forgotPasswordSchema.safeParse({ email: "" }).success).toBe(false);
+  });
+});
+
+describe("resetPasswordSchema (M5.1 Unit C)", () => {
+  it("accepts matching passwords at the minimum length", () => {
+    const parsed = resetPasswordSchema.safeParse({
+      password: "password1",
+      confirmPassword: "password1",
+    });
+    expect(parsed.success).toBe(true);
+  });
+
+  it("rejects mismatched passwords, attributed to confirmPassword", () => {
+    const parsed = resetPasswordSchema.safeParse({
+      password: "password1",
+      confirmPassword: "password2",
+    });
+    expect(parsed.success).toBe(false);
+    if (!parsed.success) {
+      expect(parsed.error.issues[0]?.path).toEqual(["confirmPassword"]);
+    }
+  });
+
+  it("rejects a password shorter than 8 characters", () => {
+    expect(
+      resetPasswordSchema.safeParse({
+        password: "short1",
+        confirmPassword: "short1",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects a password longer than 72 characters", () => {
+    const long = "a".repeat(73);
+    expect(
+      resetPasswordSchema.safeParse({
+        password: long,
+        confirmPassword: long,
+      }).success,
+    ).toBe(false);
   });
 });
 
