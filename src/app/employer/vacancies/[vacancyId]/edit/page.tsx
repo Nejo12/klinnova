@@ -22,7 +22,7 @@ type EditEmployerVacancyPageProps = {
 };
 
 export const metadata = {
-  title: "Edit vacancy draft · Stint",
+  title: "Edit vacancy · Stint",
 };
 
 export default async function EditEmployerVacancyPage({
@@ -54,7 +54,7 @@ export default async function EditEmployerVacancyPage({
         showEmployer={capabilities?.hasEmployerProfile === true}
         currentPath="vacancies"
       />
-      <h1 className={styles.heading}>Edit vacancy draft</h1>
+      <h1 className={styles.heading}>Edit vacancy</h1>
       {loaded.draft.publicationState === "paused" ? (
         <p className={styles.note}>
           This vacancy is currently paused. Changes are saved immediately, but

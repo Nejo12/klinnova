@@ -20,8 +20,8 @@ export async function generateMetadata({
 }: EmployerVacancyDetailPageProps) {
   const { vacancyId } = await params;
   return {
-    title: `Vacancy draft · Stint`,
-    description: `Owner draft ${vacancyId}`,
+    title: `Vacancy · Stint`,
+    description: `Manage vacancy ${vacancyId}`,
   };
 }
 

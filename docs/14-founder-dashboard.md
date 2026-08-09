@@ -17,9 +17,9 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 | Active milestone | **M5 — Berlin private beta** |
 | Previous milestone | **M4 — Complete** (Slices 7–8 closed; PR #73 merged) |
 | Product boundary | Merged M4 implementation under D-M5-1 feature freeze |
-| Active work unit | M5.0 — beta transition + measurement contract + operating plan (docs/discovery only) |
-| PR | #74 — awaiting final founder review before merge |
-| Product/schema implementation | **Not authorized by M5.0** |
+| Active work unit | M5.1 — beta readiness closure (Unit A: source-of-truth + bounded entry/copy cleanup) |
+| PR | #74 — M5.0 merged |
+| Product/schema implementation | **Not authorized by M5.0**; M5.1 Unit A is copy/documentation-only |
 | Preview | Intentionally unconfigured; isolated Preview restoration is beta-readiness work before systematic external testing |
 | Production | Existing production remains live; no M5.0 product/schema mutation |
 | Hosted destructive proof | Not authorized / not run |
@@ -99,8 +99,8 @@ A change may enter active work only when it is required to measure the beta, rem
 - [x] Weekly operating cadence approved
 - [x] M5 operating plan drafted
 - [x] Outcome data-contract proposal drafted
-- [ ] Final founder review of updated PR #74
-- [ ] Merge PR #74
+- [x] Final founder review of updated PR #74
+- [x] Merge PR #74
 
 ## Immediate beta-readiness queue after M5.0 merge
 
@@ -160,7 +160,7 @@ Do not optimize M5 for larger test counts. The primary M5 numbers are participat
 | M2 Applications | Complete | Slice 3 |
 | M3 Employer flow | Implementation complete | Slices 4–6; Slice 6 hosted proof remains separately deferred |
 | M4 Trust and beta readiness | **Complete** | Slices 7–8; `docs/44`, `docs/48`; PR #73 |
-| M5 Berlin private beta | **Active** | `docs/49`–`docs/51`; PR #74 M5.0 review |
+| M5 Berlin private beta | **Active** | `docs/49`–`docs/51`; PR #74 M5.0 merged; M5.1 beta-readiness closure in progress |
 
 ## Decision discipline
 

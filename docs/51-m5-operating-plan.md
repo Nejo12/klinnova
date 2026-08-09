@@ -1,6 +1,6 @@
 # M5 Berlin Private Beta Operating Plan
 
-**Status:** Founder-approved operating direction; awaiting final founder review of PR #74 before merge
+**Status:** Founder-approved operating direction; merged (PR #74)
 
 **Date:** 2026-08-09
 
@@ -467,4 +467,4 @@ The founder has approved:
 - founder-owned qualified German legal-review gate;
 - weekly `Operate manually / Fix now / Watch / Defer` cadence.
 
-No additional M5.0 operating-plan decision remains open before final review of PR #74.
+No additional M5.0 operating-plan decision remains open. PR #74 is merged; the next founder decisions are the M5.1 beta-readiness-closure items tracked in `docs/14-founder-dashboard.md`.

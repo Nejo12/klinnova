@@ -36,7 +36,7 @@ describe("CandidateShell", () => {
     expect(steps[0]).toHaveAttribute("aria-current", "step");
 
     const employerLink = screen.getByRole("link", {
-      name: "View employer and admin preview",
+      name: "View employer and admin",
     });
     expect(employerLink).toHaveAttribute("href", "#employer-admin-experience");
   });

@@ -42,7 +42,7 @@ export async function requireCompletedEmployer(
     return {
       ok: false,
       reason: "incomplete",
-      error: "Finish employer onboarding before managing vacancy drafts.",
+      error: "Finish employer onboarding before continuing.",
     };
   }
 

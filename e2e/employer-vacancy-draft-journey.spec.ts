@@ -80,7 +80,7 @@ test.describe("employer vacancy draft journeys", () => {
 
     await page.getByRole("link", { name: "Vacancies", exact: true }).click();
     await expect(page).toHaveURL(/\/employer\/vacancies$/);
-    await expect(page.getByText(/no vacancy drafts yet/i)).toBeVisible();
+    await expect(page.getByText(/no vacancies yet/i)).toBeVisible();
     await expect(page.getByRole("button", { name: /publish/i })).toHaveCount(0);
 
     await page.getByRole("link", { name: "Create draft" }).click();
@@ -135,7 +135,7 @@ test.describe("employer vacancy draft journeys", () => {
       .getByRole("button", { name: "Delete draft permanently" })
       .click();
     await expect(page).toHaveURL(/\/employer\/vacancies$/, { timeout: 15_000 });
-    await expect(page.getByText(/no vacancy drafts yet/i)).toBeVisible();
+    await expect(page.getByText(/no vacancies yet/i)).toBeVisible();
   });
 
   test("organisation employer draft shows derived company and no selector", async ({
