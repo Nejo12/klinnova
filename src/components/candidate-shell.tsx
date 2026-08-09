@@ -37,7 +37,7 @@ export function CandidateShell() {
       </div>
 
       <a className={styles.textLink} href="#employer-admin-experience">
-        View employer and admin preview
+        View employer and admin
       </a>
     </section>
   );

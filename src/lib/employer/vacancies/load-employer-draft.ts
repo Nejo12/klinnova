@@ -75,7 +75,7 @@ export async function loadEmployerDraft(
     return {
       ok: false,
       reason: "unavailable",
-      error: "This vacancy draft is not available.",
+      error: "This vacancy is not available.",
     };
   }
 
@@ -124,7 +124,7 @@ export async function loadEmployerDraft(
     return {
       ok: false,
       reason: "unavailable",
-      error: "This vacancy draft is not available.",
+      error: "This vacancy is not available.",
     };
   }
 

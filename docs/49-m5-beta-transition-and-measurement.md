@@ -2,7 +2,7 @@
 
 ## Status
 
-**M5.0 — Approved founder decisions recorded; awaiting final founder review of PR #74 before merge.**
+**M5.0 — Approved founder decisions recorded; merged (PR #74).**
 
 M4 is complete. Slice 8 is complete. M5 — Berlin private beta — is the active milestone.
 
@@ -327,4 +327,4 @@ Any product/schema implementation must be selected explicitly after this PR's fi
 
 All previously listed M5.0 founder-review decisions are resolved by D-M5-8 through D-M5-18.
 
-The next founder decision should occur only when selecting the first post-M5.0 work unit after PR #74 merges.
+The next founder decision should occur only when selecting the first post-M5.0 work unit — PR #74 is merged.

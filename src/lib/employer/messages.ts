@@ -17,10 +17,10 @@ export const EMPLOYER_LAWFUL_HIRING_SUPPORT =
   "Confirm that you will only hire people who are allowed to work in Germany for the roles you post.";
 
 export const EMPLOYER_VERIFICATION_NOTICE =
-  "Your employer profile is complete and unverified. Verification and vacancy publication come later.";
+  "Your employer profile is complete. Verification is required before a vacancy can be published.";
 
 export const EMPLOYER_HOME_LEAD =
-  "Your employer profile is ready. Create private vacancy drafts now. Publication and verification come later.";
+  "Your employer profile is ready. Create private vacancy drafts, then publish once verified.";
 
 export const EMPLOYER_RESTRICTED_NOTICE =
   "Your employer account is temporarily restricted. Some employer actions are unavailable while the restriction is active.";

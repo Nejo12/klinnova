@@ -71,7 +71,7 @@ export default async function EmployerHomePage() {
 
       <p className={styles.actions}>
         <Link className={styles.button} href="/employer/vacancies">
-          Vacancy drafts
+          Vacancies
         </Link>
         <Link className={styles.linkButton} href="/employer/vacancies/new">
           Create draft
@@ -81,7 +81,9 @@ export default async function EmployerHomePage() {
         </Link>
       </p>
 
-      <p className={styles.note}>{EMPLOYER_VERIFICATION_NOTICE}</p>
+      {view.verificationState !== "verified" ? (
+        <p className={styles.note}>{EMPLOYER_VERIFICATION_NOTICE}</p>
+      ) : null}
 
       <h2 className={styles.heading}>Account data</h2>
       <p className={styles.note}>{EMPLOYER_EXPORT_LEAD}</p>

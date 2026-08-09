@@ -12,7 +12,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Vacancy drafts · Stint",
+  title: "Vacancies · Stint",
 };
 
 export default async function EmployerVacanciesPage() {
@@ -40,7 +40,7 @@ export default async function EmployerVacanciesPage() {
         showEmployer={capabilities?.hasEmployerProfile === true}
         currentPath="vacancies"
       />
-      <h1 className={styles.heading}>Vacancy drafts</h1>
+      <h1 className={styles.heading}>Vacancies</h1>
       {suspended ? <EmployerRestrictedNotice /> : null}
       <VacancyList drafts={loaded.drafts} />
     </main>

@@ -252,4 +252,4 @@ The M5.0 founder decisions relevant to this proposal are now resolved:
 - deleted-candidate behavior — approved;
 - 30-day backdating policy — approved.
 
-No outcome schema/runtime work may begin until the founder explicitly selects and authorizes that post-M5.0 work unit after PR #74 review/merge.
+No outcome schema/runtime work may begin until the founder explicitly selects and authorizes that work unit (PR #74 is merged; this remains a separate, not-yet-authorized unit).
