@@ -6,6 +6,9 @@ import {
   provisionLocalVerificationOperator,
 } from "./helpers/local-operator-proof";
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const runAuthJourney = process.env.E2E_AUTH_JOURNEY === "1";
+
 // D-M5-19 (M5.1 Unit A1) exit proof — the real end-to-end journey the
 // diagnosed bugs made impossible: an employer completing every
 // readiness-tracked field (including employment types / shift
@@ -43,9 +46,16 @@ async function registerAndOnboardPrivateEmployer(
 }
 
 test.describe("publication readiness and matching integrity (D-M5-19)", () => {
+  test.skip(
+    !runAuthJourney,
+    "Set E2E_AUTH_JOURNEY=1 with local Supabase URL/key to run this journey",
+  );
+
   test("employer completes readiness through the real form, publishes, and a compatible candidate matches and applies — with the required negative proofs along the way", async ({
     page,
   }) => {
+    test.setTimeout(90_000);
+    expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
     const stamp = Date.now();
     const { email: employerEmail, displayName: employerDisplayName } =
       await registerAndOnboardPrivateEmployer(page, stamp);
@@ -280,6 +290,8 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
   test("a candidate with incompatible employment type and shift does not see the published vacancy in Matches", async ({
     page,
   }) => {
+    test.setTimeout(90_000);
+    expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
     const stamp = Date.now() + 1;
     const { email: employerEmail, displayName: employerDisplayName } =
       await registerAndOnboardPrivateEmployer(page, stamp);
