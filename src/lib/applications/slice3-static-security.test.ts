@@ -107,6 +107,8 @@ describe("Slice 3 static security proof", () => {
     expect(confirmationPage).not.toMatch(
       /\/employer\/(applications|vacancies)/,
     );
-    expect(jobDetailPage).not.toMatch(/\/employer\//);
+    // M5.1 Unit B added the same dual-capability nav to job detail too
+    // (@/lib/employer/load-capabilities) — same narrowing as above.
+    expect(jobDetailPage).not.toMatch(/\/employer\/(applications|vacancies)/);
   });
 });

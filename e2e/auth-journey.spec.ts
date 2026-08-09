@@ -86,6 +86,9 @@ test.describe("local Auth journey", () => {
     expect(countError).toBeNull();
     expect(count).toBe(1);
 
+    // Sign-out lives on the Account destination (M5.1 Unit B), not the
+    // candidate home header.
+    await page.goto("/candidate/account");
     await page.getByRole("button", { name: "Log out" }).click();
     await expect(page).toHaveURL(/\/$/);
 

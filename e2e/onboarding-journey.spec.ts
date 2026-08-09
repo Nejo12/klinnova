@@ -150,7 +150,9 @@ test.describe("local onboarding persistence journey", () => {
     expect(languages).toHaveLength(1);
     expect(languages?.[0]?.language_code).toBe("de");
 
-    await page.goto("/candidate");
+    // Sign-out lives on the Account destination (M5.1 Unit B), not the
+    // candidate home header.
+    await page.goto("/candidate/account");
     await page.getByRole("button", { name: "Log out" }).click();
     await expect(page).toHaveURL(/\/$/);
 

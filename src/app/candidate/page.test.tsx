@@ -2,9 +2,13 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const loadCandidateOnboarding = vi.hoisted(() => vi.fn());
+const loadAccountCapabilities = vi.hoisted(() => vi.fn());
 
 vi.mock("@/lib/onboarding/load-candidate", () => ({
   loadCandidateOnboarding,
+}));
+vi.mock("@/lib/employer/load-capabilities", () => ({
+  loadAccountCapabilities,
 }));
 vi.mock("@/lib/supabase/server", () => ({
   createServerSupabaseClient: vi.fn().mockResolvedValue({}),
@@ -35,12 +39,17 @@ const incompleteData = {
   },
 };
 
-describe("CandidatePage account-data export link", () => {
+describe("CandidatePage", () => {
   beforeEach(() => {
     loadCandidateOnboarding.mockReset();
+    loadAccountCapabilities.mockReset();
+    loadAccountCapabilities.mockResolvedValue({
+      hasCandidateProfile: true,
+      hasEmployerProfile: false,
+    });
   });
 
-  it("shows a fixed candidate data-download link for an incomplete candidate", async () => {
+  it("links to the Account destination rather than exposing the export link directly (M5.1 Unit B)", async () => {
     loadCandidateOnboarding.mockResolvedValue({
       ok: true,
       data: incompleteData,
@@ -48,11 +57,11 @@ describe("CandidatePage account-data export link", () => {
 
     render(await CandidatePage());
 
-    const downloadLink = screen.getByRole("link", {
-      name: "Download candidate data",
-    });
-    expect(downloadLink).toHaveAttribute("href", "/candidate/account/export");
-    expect(downloadLink.getAttribute("href")).not.toMatch(/\?/);
+    const accountLink = screen.getByRole("link", { name: "Account" });
+    expect(accountLink).toHaveAttribute("href", "/candidate/account");
+    expect(
+      screen.queryByRole("link", { name: "Download candidate data" }),
+    ).not.toBeInTheDocument();
   });
 
   it("never claims GDPR compliance or legal completeness", async () => {

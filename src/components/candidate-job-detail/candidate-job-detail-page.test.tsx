@@ -159,4 +159,31 @@ describe("CandidateJobDetailPage", () => {
     ).toBeInTheDocument();
     expect(screen.queryByText("Demo Berlin Work Co")).toBeNull();
   });
+
+  it("shows the coherent candidate nav with no destination marked current (M5.1 Unit B)", () => {
+    render(
+      <CandidateJobDetailPage
+        status="ready"
+        eligible={true}
+        missingRequirements={[]}
+        vacancy={vacancy}
+        languages={languages}
+        application={null}
+      />,
+    );
+
+    for (const name of ["Matches", "Applications", "Profile", "Account"]) {
+      const link = screen.getByRole("link", { name });
+      expect(link).not.toHaveAttribute("aria-current");
+    }
+  });
+
+  it("shows the coherent candidate nav on the unavailable state too", () => {
+    render(<CandidateJobDetailPage status="unavailable" />);
+
+    expect(screen.getByRole("link", { name: "Account" })).toHaveAttribute(
+      "href",
+      "/candidate/account",
+    );
+  });
 });

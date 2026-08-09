@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { LogoutButton } from "@/components/auth/logout-button";
 import { AvailabilityGroupForm } from "@/components/onboarding/availability-group-form";
+import { CandidateAppHeader } from "@/components/candidate-nav/candidate-app-header";
 import { CategoriesGroupForm } from "@/components/onboarding/categories-group-form";
 import { EmploymentGroupForm } from "@/components/onboarding/employment-group-form";
 import { LanguagesGroupForm } from "@/components/onboarding/languages-group-form";
@@ -15,6 +14,7 @@ import {
   ONBOARDING_GROUP_LABELS,
   type OnboardingGroupId,
 } from "@/lib/onboarding/allow-lists";
+import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadCandidateOnboarding } from "@/lib/onboarding/load-candidate";
 import { onboardingGroupHref } from "@/lib/onboarding/navigation";
 import { resolveOnboardingGroupParam } from "@/lib/onboarding/progress";
@@ -56,15 +56,12 @@ export default async function CandidateOnboardingPage({
 
   const { profile, languages, progress, displayName } = loaded.data;
   const onboardingCompleted = profile.onboardingCompletedAt !== null;
+  const capabilities = await loadAccountCapabilities(supabase);
+  const showEmployerNav = capabilities?.hasEmployerProfile === true;
 
   return (
     <main className={styles.page}>
-      <div className={styles.header}>
-        <Link className={styles.brand} href="/candidate">
-          Stint
-        </Link>
-        <LogoutButton />
-      </div>
+      <CandidateAppHeader current="profile" showEmployerNav={showEmployerNav} />
 
       <OnboardingProgressNav progress={progress} current={current} />
 

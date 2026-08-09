@@ -10,22 +10,6 @@
   min-height: 70vh;
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.brand {
-  margin: 0;
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-tight);
-  color: var(--color-text-primary);
-  text-decoration: none;
-}
-
 .heading {
   margin: 0;
   font-size: var(--font-size-xl);

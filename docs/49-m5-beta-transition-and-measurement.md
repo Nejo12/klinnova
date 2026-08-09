@@ -335,6 +335,22 @@ Recorded on the disposable `hosted-proof/m5.1-preview-provisioning` branch (neve
 
 **Teardown performed same day:** `mailer_autoconfirm` restored to `false` on the Preview project; the ephemeral Supabase Preview branch deleted; the Vercel Preview env vars scoped to `hosted-proof/m5.1-preview-provisioning` removed; the Vercel Preview deployment removed. Production was not touched at any point in this exercise. The `hosted-proof/m5.1-preview-provisioning` branch itself was not merged.
 
+### D-M5-20 — Candidate navigation and account IA consolidation (Unit B)
+
+**Status:** Approved
+
+**Context:** re-inspection of current `main` found five inconsistent header/navigation implementations across authenticated candidate pages, not the two originally assumed — `/candidate` (inline brand + sign-out, no dual-capability switcher), `CandidateMatchesPage` (brand + capability switcher + export + delete + sign-out, no link to Applications), the shared `CandidateApplicationsPageHeader` (brand + Applications link + capability switcher + sign-out, no link to Matches/export/delete), `CandidateJobDetailPage` (brand + sign-out only, no capability switcher, no other nav), and `/candidate/onboarding` (brand + sign-out only). `/candidate/account/delete` had no header or navigation at all. No page exposed a coherent set of destinations, and none is a security or data-integrity defect — this is an information-architecture gap.
+
+**Decision:** consolidate every authenticated candidate surface onto one shared header (`CandidateAppHeader`/`CandidateNav`, `src/components/candidate-nav/`) exposing exactly four destinations — Matches, Applications, Profile (the existing `/candidate/onboarding?group=review` review/edit flow — no new profile editor), and Account (a new, minimal `/candidate/account` hub page listing the existing export, delete, and sign-out capabilities). Sign-out is deliberately removed from the shared header and lives only inside Account, so it cannot be an accidental primary-navigation destination. The existing, unmodified `DeleteAccountPanel` is unchanged and remains shared with the employer surface; only the surrounding page-level header was added around it (`/candidate/account/delete`), since the panel itself had no back-navigation logic to correct.
+
+**Explicitly not changed:** deletion domain semantics, export schema/content, account-deletion migrations/RPCs, Auth soft-delete behavior, deletion reconciliation, service-role handling, the onboarding-review flow's own logic, employer/admin navigation (including the separately-tracked employer "Vacancies" duplicate-link finding, left untouched and still tracked under the UX/readiness backlog below — not a shared component this unit needed to touch).
+
+**Label deviation:** the nav item for `/candidate/onboarding?group=review` is labelled "Profile" rather than "Profile / Preferences", to keep the nav's four labels short and non-wrapping at 360px; the fuller phrase remains accurate in prose elsewhere.
+
+**Required exit proof:** a completed candidate reaches Matches, Applications, Profile, and Account through the real consolidated nav, each with accurate `aria-current`; Profile opens the existing review flow without resetting saved answers; Account exposes export/delete/sign-out without any destructive action firing merely by navigating there; no horizontal overflow and keyboard/focus-visible reachability at 360/390/430px and desktop. Proven in `e2e/candidate-navigation-ia.spec.ts` (7 tests, real UI, local Supabase) plus Vitest coverage on the new/changed components; five pre-existing E2E specs that asserted the old sign-out location were updated to the new Account-based path, not weakened.
+
+**Consequences:** no schema/migration change (migration count unchanged at 17); no product/dependency change; new `src/components/candidate-nav/` component pair plus a new `/candidate/account` route; five existing candidate page/header components updated to render the shared header instead of their own inline markup; five pre-existing E2E specs updated for the new sign-out location.
+
 ## M5 measurement semantics summary
 
 | Metric | Top-level counting rule |

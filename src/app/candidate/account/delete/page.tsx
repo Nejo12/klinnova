@@ -5,6 +5,7 @@ import {
   confirmCandidateAccountDeletionAction,
 } from "@/app/candidate/account/delete/actions";
 import { DeleteAccountPanel } from "@/components/account-deletion/delete-account-panel";
+import { CandidateAppHeader } from "@/components/candidate-nav/candidate-app-header";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -28,12 +29,16 @@ export default async function CandidateDeleteAccountPage() {
   const dualCapability =
     capabilities?.hasCandidateProfile === true &&
     capabilities.hasEmployerProfile === true;
+  const showEmployerNav = capabilities?.hasEmployerProfile === true;
 
   return (
-    <DeleteAccountPanel
-      dualCapability={dualCapability}
-      confirmAction={confirmCandidateAccountDeletionAction}
-      cancelAction={cancelCandidateAccountDeletionAction}
-    />
+    <>
+      <CandidateAppHeader current="account" showEmployerNav={showEmployerNav} />
+      <DeleteAccountPanel
+        dualCapability={dualCapability}
+        confirmAction={confirmCandidateAccountDeletionAction}
+        cancelAction={cancelCandidateAccountDeletionAction}
+      />
+    </>
   );
 }

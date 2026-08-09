@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-import { LogoutButton } from "@/components/auth/logout-button";
 import { ApplicationSubmitForm } from "@/components/candidate-job-detail/application-submit-form";
+import { CandidateAppHeader } from "@/components/candidate-nav/candidate-app-header";
 import { JobDetailUnavailable } from "@/components/candidate-job-detail/job-detail-unavailable";
 import { MissingRequirementsList } from "@/components/candidate-job-detail/missing-requirements-list";
 import { WorkAuthorisationNotice } from "@/components/candidate-matches/work-authorisation-notice";
@@ -38,20 +38,18 @@ type CandidateJobDetailPageProps =
       vacancy: PublicVacancy;
       languages: PublicVacancyLanguage[];
       application: OwnedApplicationSummary | null;
+      showEmployerNav?: boolean;
     }
-  | { status: "unavailable" }
-  | { status: "failure" };
+  | { status: "unavailable"; showEmployerNav?: boolean }
+  | { status: "failure"; showEmployerNav?: boolean };
 
 export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
+  const showEmployerNav = props.showEmployerNav === true;
+
   if (props.status !== "ready") {
     return (
       <main className={styles.page}>
-        <div className={styles.header}>
-          <Link className={styles.brand} href="/candidate">
-            Stint
-          </Link>
-          <LogoutButton />
-        </div>
+        <CandidateAppHeader showEmployerNav={showEmployerNav} />
         <JobDetailUnavailable />
       </main>
     );
@@ -72,12 +70,7 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
 
   return (
     <main className={styles.page}>
-      <div className={styles.header}>
-        <Link className={styles.brand} href="/candidate">
-          Stint
-        </Link>
-        <LogoutButton />
-      </div>
+      <CandidateAppHeader showEmployerNav={showEmployerNav} />
 
       <Link className={styles.backLink} href="/candidate/matches">
         Back to matches
