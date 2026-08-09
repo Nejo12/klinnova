@@ -35,10 +35,10 @@ describe("EmployerShell", () => {
     // No false "not available" claims: verification, vacancy creation, and
     // applicant review are all implemented and must never be described as
     // unavailable on this section again.
+    expect(screen.queryByText(/not available yet/i)).not.toBeInTheDocument();
     expect(
-      screen.queryByText(/not available yet/i),
+      screen.queryByText(/not an employer dashboard/i),
     ).not.toBeInTheDocument();
-    expect(screen.queryByText(/not an employer dashboard/i)).not.toBeInTheDocument();
     expect(
       screen.queryByText(/not vacancy creation or moderation/i),
     ).not.toBeInTheDocument();
