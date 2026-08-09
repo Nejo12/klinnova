@@ -19,7 +19,7 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 | Product boundary | Merged M4 implementation under D-M5-1 feature freeze |
 | Active work unit | M5.1 — beta readiness closure (Unit A1 merged: publication/matching integrity, PR #76/#77; Unit B: candidate navigation/account IA, PR pending merge) |
 | PR | #74 — M5.0 merged |
-| Product/schema implementation | **Not authorized by M5.0**; M5.1 Unit A is copy/documentation-only |
+| Product/schema implementation | M5.1 product/schema work proceeds only through explicitly approved bounded units (e.g. Unit A1, Unit B); Production changes remain separately authorized |
 | Preview | Intentionally unconfigured; isolated Preview restoration is beta-readiness work before systematic external testing |
 | Production | Existing production remains live; no M5.0 product/schema mutation |
 | Hosted destructive proof | Not authorized / not run |

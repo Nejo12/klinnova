@@ -37,7 +37,9 @@ export default async function CandidateAccountPage() {
       <CandidateAppHeader current="account" showEmployerNav={showEmployerNav} />
 
       <h1 className={styles.heading}>Account</h1>
-      <p className={styles.lead}>Manage your Stint account data and sign in.</p>
+      <p className={styles.lead}>
+        Download your data, delete your account, or sign out.
+      </p>
 
       <section
         className={styles.section}
