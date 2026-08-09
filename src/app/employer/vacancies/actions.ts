@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 import { loadEmployerDraft } from "@/lib/employer/vacancies/load-employer-draft";
 import {
@@ -44,6 +45,12 @@ function formString(formData: FormData, key: string): string {
 function formBoolean(formData: FormData, key: string): boolean {
   const value = formData.get(key);
   return value === "true" || value === "on" || value === "1";
+}
+
+function formStringArray(formData: FormData, key: string): string[] {
+  return formData
+    .getAll(key)
+    .filter((value): value is string => typeof value === "string");
 }
 
 function fieldErrorsFromZod(
@@ -103,6 +110,8 @@ export async function createEmployerVacancyDraftAction(
     experienceNotes: formString(formData, "experienceNotes"),
     cvRequired: formData.get("cvRequired") ?? "",
     interviewEnglishOk: formData.get("interviewEnglishOk") ?? "",
+    employmentTypes: formStringArray(formData, "employmentTypes"),
+    shiftRequirements: formStringArray(formData, "shiftRequirements"),
     salaryAmountEur: formString(formData, "salaryAmountEur"),
     salaryPeriod: formString(formData, "salaryPeriod"),
     clearSalary: formBoolean(formData, "clearSalary"),
@@ -155,6 +164,8 @@ export async function createEmployerVacancyDraftAction(
       p_experience_notes: parsed.data.experienceNotes ?? undefined,
       p_cv_required: parsed.data.cvRequired ?? undefined,
       p_interview_english_ok: parsed.data.interviewEnglishOk ?? undefined,
+      p_employment_types: parsed.data.employmentTypes,
+      p_shift_requirements: parsed.data.shiftRequirements,
       p_salary_amount_cents: salary.value.salaryAmountCents ?? undefined,
       p_salary_period: salary.value.salaryPeriod ?? undefined,
     },
@@ -193,6 +204,8 @@ export async function updateEmployerVacancyDraftAction(
     experienceNotes: formString(formData, "experienceNotes"),
     cvRequired: formBoolean(formData, "cvRequired"),
     interviewEnglishOk: formBoolean(formData, "interviewEnglishOk"),
+    employmentTypes: formStringArray(formData, "employmentTypes"),
+    shiftRequirements: formStringArray(formData, "shiftRequirements"),
     salaryAmountEur: formString(formData, "salaryAmountEur"),
     salaryPeriod: formString(formData, "salaryPeriod"),
     clearSalary: formBoolean(formData, "clearSalary"),
@@ -250,6 +263,8 @@ export async function updateEmployerVacancyDraftAction(
       p_experience_notes: parsed.data.experienceNotes ?? "",
       p_cv_required: parsed.data.cvRequired,
       p_interview_english_ok: parsed.data.interviewEnglishOk,
+      p_employment_types: parsed.data.employmentTypes,
+      p_shift_requirements: parsed.data.shiftRequirements,
       p_salary_amount_cents: salary.value.clearSalary
         ? undefined
         : (salary.value.salaryAmountCents ?? undefined),
@@ -272,6 +287,12 @@ export async function updateEmployerVacancyDraftAction(
   if (rpc.data.status !== "ok") {
     return { error: mapUpdateDraftStatus(rpc.data.status), message: null };
   }
+
+  // The readiness checklist rendered by the edit page's Server Component is
+  // fetched once at initial load; without this, a successful save here
+  // never refreshes it, leaving the sidebar showing stale "Missing" items
+  // for fields that were just completed (D-M5-19).
+  revalidatePath(`/employer/vacancies/${parsed.data.vacancyId}/edit`);
 
   return {
     error: null,
@@ -334,6 +355,11 @@ export async function replaceEmployerVacancyLanguagesAction(
       message: null,
     };
   }
+
+  // See updateEmployerVacancyDraftAction's identical comment — without
+  // this, the edit page's readiness sidebar never reflects a just-saved
+  // language change until a full reload (D-M5-19).
+  revalidatePath(`/employer/vacancies/${parsed.data.vacancyId}/edit`);
 
   return {
     error: null,

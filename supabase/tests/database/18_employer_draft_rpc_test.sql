@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(58);
+select plan(60);
 
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -511,12 +511,44 @@ select set_config(
 );
 set local role authenticated;
 
+-- D-M5-19: fill every vacancy-level field employer_vacancy_draft_readiness
+-- now checks (workplace_type/work_frequency/cv_required/
+-- interview_english_ok/employment_types/shift_requirements), so the only
+-- remaining gap below is the employer-level verification requirement —
+-- proving readiness now genuinely agrees with what publish would require,
+-- not merely that every *vacancy* field is filled.
+select is(
+  public.update_employer_vacancy_draft(
+    current_setting('test.private_draft_id')::uuid,
+    p_workplace_type := 'apartment',
+    p_work_frequency := 'recurring',
+    p_cv_required := false,
+    p_interview_english_ok := true,
+    p_employment_types := array['full_time'],
+    p_shift_requirements := array['morning']
+  )->>'status',
+  'ok',
+  'owner sets the remaining vacancy-level readiness fields'
+);
+
 select is(
   public.employer_vacancy_draft_readiness(
     current_setting('test.private_draft_id')::uuid
   )->>'ready',
-  'true',
-  'coherent complete draft reports ready'
+  'false',
+  'vacancy-complete draft is still not ready while its employer is unverified'
+);
+
+select is(
+  (
+    select to_jsonb(array['verification'])
+  ),
+  (
+    select public.employer_vacancy_draft_readiness(
+      current_setting('test.private_draft_id')::uuid
+    )->'missing'
+  ),
+  'verification is the only remaining missing item once every vacancy field is complete'
 );
 
 reset role;

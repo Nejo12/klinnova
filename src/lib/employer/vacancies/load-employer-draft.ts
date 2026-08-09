@@ -28,6 +28,8 @@ export type EmployerDraftDetail = {
   experienceNotes: string | null;
   cvRequired: boolean | null;
   interviewEnglishOk: boolean | null;
+  employmentTypes: string[];
+  shiftRequirements: string[];
   salaryAmountCents: number | null;
   salaryCurrency: string | null;
   salaryPeriod: string | null;
@@ -94,6 +96,8 @@ export async function loadEmployerDraft(
       experience_notes,
       cv_required,
       interview_english_ok,
+      employment_types,
+      shift_requirements,
       salary_amount_cents,
       salary_currency,
       salary_period,
@@ -183,6 +187,8 @@ export async function loadEmployerDraft(
       experienceNotes: row.experience_notes,
       cvRequired: row.cv_required,
       interviewEnglishOk: row.interview_english_ok,
+      employmentTypes: row.employment_types,
+      shiftRequirements: row.shift_requirements,
       salaryAmountCents: row.salary_amount_cents,
       salaryCurrency: row.salary_currency,
       salaryPeriod: row.salary_period,

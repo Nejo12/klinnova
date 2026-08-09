@@ -159,6 +159,8 @@ describe("loadEmployerDraft", () => {
         experience_notes: null,
         cv_required: null,
         interview_english_ok: null,
+        employment_types: ["full_time"],
+        shift_requirements: [],
         salary_amount_cents: 1500,
         salary_currency: "EUR",
         salary_period: "hourly",
@@ -196,6 +198,10 @@ describe("loadEmployerDraft", () => {
     ]);
     expect(result.draft.ready).toBe(false);
     expect(result.draft.publicationState).toBe("draft");
+    // D-M5-19: employment_types/shift_requirements now flow through to the
+    // form for pre-population.
+    expect(result.draft.employmentTypes).toEqual(["full_time"]);
+    expect(result.draft.shiftRequirements).toEqual([]);
   });
 
   it("loads an owned paused vacancy as editable (D-058 editing matrix)", async () => {
@@ -230,6 +236,8 @@ describe("loadEmployerDraft", () => {
         experience_notes: null,
         cv_required: null,
         interview_english_ok: null,
+        employment_types: ["full_time"],
+        shift_requirements: ["morning"],
         salary_amount_cents: 1500,
         salary_currency: "EUR",
         salary_period: "hourly",

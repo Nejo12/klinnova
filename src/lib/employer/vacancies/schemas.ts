@@ -3,11 +3,13 @@ import { z } from "zod";
 import {
   SALARY_PERIOD_CODES,
   type SalaryPeriodCode,
+  SHIFT_REQUIREMENT_CODES,
   WORK_FREQUENCY_CODES,
   WORKPLACE_TYPE_CODES,
 } from "@/lib/employer/vacancies/allow-lists";
 import { eurStringToCents } from "@/lib/employer/vacancies/salary";
 import {
+  EMPLOYMENT_TYPE_CODES,
   JOB_CATEGORY_CODES,
   LANGUAGE_CODES,
   LANGUAGE_PROFICIENCY_CODES,
@@ -58,6 +60,21 @@ const optionalEnum = <T extends string>(codes: readonly [T, ...T[]]) =>
       }
       return value as T;
     });
+
+const optionalUniqueArrayEnum = <T extends string>(
+  codes: readonly [T, ...T[]],
+) =>
+  z
+    .array(z.enum(codes))
+    .superRefine((values, ctx) => {
+      if (new Set(values).size !== values.length) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Remove duplicate selections.",
+        });
+      }
+    })
+    .default([]);
 
 const booleanFromForm = z
   .union([z.boolean(), z.string()])
@@ -195,6 +212,8 @@ export const createDraftVacancyFormSchema = z.object({
   experienceNotes: optionalTrimmed(2000),
   cvRequired: optionalBooleanFromForm,
   interviewEnglishOk: optionalBooleanFromForm,
+  employmentTypes: optionalUniqueArrayEnum(EMPLOYMENT_TYPE_CODES),
+  shiftRequirements: optionalUniqueArrayEnum(SHIFT_REQUIREMENT_CODES),
   salaryAmountEur: z.string().default(""),
   salaryPeriod: z.string().default(""),
   clearSalary: z.boolean().default(false),
@@ -215,6 +234,8 @@ export const updateDraftVacancyFormSchema = z.object({
   experienceNotes: optionalTrimmed(2000),
   cvRequired: booleanFromForm,
   interviewEnglishOk: booleanFromForm,
+  employmentTypes: optionalUniqueArrayEnum(EMPLOYMENT_TYPE_CODES),
+  shiftRequirements: optionalUniqueArrayEnum(SHIFT_REQUIREMENT_CODES),
   salaryAmountEur: z.string().default(""),
   salaryPeriod: z.string().default(""),
   clearSalary: z.boolean().default(false),

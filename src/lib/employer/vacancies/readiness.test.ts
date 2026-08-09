@@ -44,4 +44,37 @@ describe("mapReadinessChecklist", () => {
       expect(item.label).not.toContain("Additional requirement");
     }
   });
+
+  it("D-M5-19: verification/workplace_type/work_frequency/cv_required/interview_english_ok/employment_types/shift_requirements are now part of the fixed pre-publish checklist, not only the post-failure path", () => {
+    const checklist = mapReadinessChecklist([]);
+    const ids = checklist.map((item) => item.id);
+    expect(ids).toEqual(
+      expect.arrayContaining([
+        "verification",
+        "workplace_type",
+        "work_frequency",
+        "employment_types",
+        "shift_requirements",
+        "cv_required",
+        "interview_english_ok",
+      ]),
+    );
+    // Every one of those items reports complete when absent from `missing`.
+    for (const id of [
+      "verification",
+      "workplace_type",
+      "work_frequency",
+      "employment_types",
+      "shift_requirements",
+      "cv_required",
+      "interview_english_ok",
+    ]) {
+      expect(checklist.find((item) => item.id === id)?.complete).toBe(true);
+    }
+  });
+
+  it("D-M5-19: deliberately excludes expiry from the fixed order — publish always defaults it, so it is never a real pre-publish blocker", () => {
+    const checklist = mapReadinessChecklist([]);
+    expect(checklist.some((item) => item.id === "expiry")).toBe(false);
+  });
 });

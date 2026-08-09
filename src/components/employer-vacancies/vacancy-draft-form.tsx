@@ -10,6 +10,7 @@ import {
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import {
   SALARY_PERIOD_OPTIONS,
+  SHIFT_REQUIREMENT_OPTIONS,
   WORK_FREQUENCY_OPTIONS,
   WORKPLACE_TYPE_OPTIONS,
 } from "@/lib/employer/vacancies/allow-lists";
@@ -19,7 +20,10 @@ import {
 } from "@/lib/employer/vacancies/messages";
 import { centsToEurString } from "@/lib/employer/vacancies/salary";
 import type { EmployerDraftDetail } from "@/lib/employer/vacancies/load-employer-draft";
-import { JOB_CATEGORY_OPTIONS } from "@/lib/onboarding/allow-lists";
+import {
+  EMPLOYMENT_TYPE_OPTIONS,
+  JOB_CATEGORY_OPTIONS,
+} from "@/lib/onboarding/allow-lists";
 
 type VacancyDraftFormProps =
   | { mode: "create"; draft?: undefined }
@@ -206,6 +210,36 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
             ))}
           </select>
         </div>
+
+        <fieldset className={styles.field}>
+          <legend className={styles.label}>Employment types</legend>
+          {EMPLOYMENT_TYPE_OPTIONS.map((option) => (
+            <label key={option.code} className={styles.checkboxRow}>
+              <input
+                type="checkbox"
+                name="employmentTypes"
+                value={option.code}
+                defaultChecked={draft?.employmentTypes.includes(option.code)}
+              />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </fieldset>
+
+        <fieldset className={styles.field}>
+          <legend className={styles.label}>Shift requirements</legend>
+          {SHIFT_REQUIREMENT_OPTIONS.map((option) => (
+            <label key={option.code} className={styles.checkboxRow}>
+              <input
+                type="checkbox"
+                name="shiftRequirements"
+                value={option.code}
+                defaultChecked={draft?.shiftRequirements.includes(option.code)}
+              />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </fieldset>
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="availableFrom">

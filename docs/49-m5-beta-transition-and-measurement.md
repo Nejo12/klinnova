@@ -290,6 +290,32 @@ The default M5 engineering loop is:
 
 Heavier planning remains reserved for changes affecting schema/database, authorization/RLS, privacy, security, matching authority, employment/legal boundaries, or major architecture.
 
+### D-M5-19 — Publication and matching integrity restoration (Unit A1)
+
+**Status:** Approved
+
+**Context:** the M5.1 Unit I baseline browser proof reproduced two core-journey blockers, subsequently traced to exact root cause by direct code/SQL investigation, not inferred:
+
+1. `employer_vacancy_draft_readiness` (PR 4.3) and `_employer_vacancy_publish_missing` (PR 5.2) are two independently-authoritative "is this vacancy ready" functions that silently diverged — the publish gate requires `verification`, `workplace_type`, `work_frequency`, `cv_required`, `interview_english_ok`, and `expiry`, none of which the on-page readiness checklist has ever checked. An employer can see "Ready for a future publication step" and then have publish rejected for fields never shown as incomplete.
+2. `src/components/employer-vacancies/vacancy-lifecycle-actions.tsx` renders every post-failure checklist row's status as the hardcoded literal string `"Missing"`, ignoring the correctly-computed `item.complete` value — so a failed publish attempt visually flips every previously-complete item to "Missing," contradicting the readiness panel shown moments earlier.
+3. The original schema (`20260804120000_employer_owned_draft_vacancies.sql`) enforced `publication_state = 'draft' OR cardinality(employment_types) > 0` (and the equivalent for `shift_requirements`) — empty match-critical arrays were only ever permitted while a vacancy remained a draft. `20260805110000_verification_and_vacancy_publication.sql` silently replaced this with `source <> 'seed' OR cardinality(...) > 0`, which is trivially true for every employer-sourced vacancy in every publication state, permanently. This is a confirmed constraint-level regression, not intended behavior.
+4. No employer-facing input for `employment_types`/`shift_requirements` has ever existed (confirmed since the form's creation, Slice 4/PR 4.4) — an always-existing gap, not a regression. `create_employer_vacancy_draft`/`update_employer_vacancy_draft` already accept both parameters; only the form-to-RPC wiring is missing.
+5. The canonical matcher (`_evaluate_candidate_vacancy_eligibility`) is not defective: `unnest('{}'::text[])` deterministically produces zero rows, so an empty vacancy array correctly excludes every candidate under the schema's original, intended semantics. Making the matcher treat empty arrays as "no restriction" was explicitly considered and rejected — it would silently match candidates against requirements the employer never actually specified, a worse failure mode (false positive) than the current one (false negative).
+
+**Decision:** implement the following as one coherent, additive correction, without changing matcher semantics:
+
+- fix the hardcoded `"Missing"` render in `vacancy-lifecycle-actions.tsx` to reflect each item's actual `complete` state;
+- bring `employer_vacancy_draft_readiness`'s checked field set into alignment with `_employer_vacancy_publish_missing`'s, so the on-page checklist and the publish gate never disagree;
+- restore the `employment_types`/`shift_requirements` non-empty constraints to their original publication-state-based exemption (`publication_state = 'draft' OR cardinality(...) > 0`), applying to every employer-sourced vacancy, not only seed rows;
+- add `employmentTypes`/`shiftRequirements` input controls to `VacancyDraftForm`, wired to the already-RPC-ready parameters;
+- add both fields to `_employer_vacancy_publish_missing` so an incomplete vacancy can no longer reach `published` without them.
+
+**Explicitly not changed:** the matcher's SQL predicates (`_evaluate_candidate_vacancy_eligibility` and its callers) remain exactly as written — an empty array continues to mean "excludes every candidate," never "no restriction." No candidate-facing behavior changes; this is entirely an employer-side data-completeness and readiness-accuracy correction.
+
+**Required exit proof:** a real local browser journey — employer onboard → verify → vacancy readiness accurately reports every missing field → complete all requirements → publish; candidate onboard with compatible requirements → vacancy appears in Matches → inspect job → apply successfully — plus explicit negative proofs: incomplete workplace type/work frequency cannot report false readiness; empty `employment_types`/`shift_requirements` cannot reach `published`; a non-matching candidate does not receive the vacancy; readiness reflects reality immediately after a sub-form save; a failed publish attempt does not flip unrelated complete fields to "Missing."
+
+**Consequences:** one additive migration (the 17th) containing the readiness-RPC alignment, the restored constraint, and the widened publish-gate field list; no change to any existing migration; the vacancy draft form and its RPC-calling Server Actions gain two new optional-until-publish fields; no change to `applications`, `candidate_profiles`, or any candidate-facing RPC.
+
 ## M5 measurement semantics summary
 
 | Metric | Top-level counting rule |

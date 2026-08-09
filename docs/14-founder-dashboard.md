@@ -125,6 +125,10 @@ This is a planning queue, **not automatic authorization**.
 4. Establish support/contact channel and founder-assisted onboarding.
 5. Run one structured weekly M5 review using `Operate manually / Fix now / Watch / Defer`.
 
+### UX / readiness backlog (not folded into Unit A1)
+
+1. `/employer` renders two exact-text "Vacancies" links (the shared `EmployerVacancyPageHeader` nav link and the employer-home body button, both introduced/renamed by PR #75) — deeper gated E2E specs (`E2E_AUTH_JOURNEY=1`) that select by exact accessible name hit a strict-mode ambiguity. Not yet a demonstrated user-facing blocker; not a publication/matching integrity issue. Address alongside Unit B or Unit I remediation — do not rename UI solely to satisfy the selector, and do not weaken the affected tests with an arbitrary `.first()`; target the intended nav region/link context instead. Discovered because this was the first session run of the full gated E2E suite — these specs are not part of CI's own `pnpm test:e2e` (smoke-tier only), so this predates M5.1 and was previously unobserved.
+
 ## Cohort A readiness gates
 
 Before intentional external Cohort A traffic:

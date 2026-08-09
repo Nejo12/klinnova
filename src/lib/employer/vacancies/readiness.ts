@@ -10,14 +10,16 @@ export const READINESS_ITEM_LABELS: Record<string, string> = {
   company: "Organisation company link",
   employer_completion: "Completed employer profile",
   publication_state: "Draft publication state",
-  // Returned by publish_employer_vacancy / resume_employer_vacancy
-  // (`incomplete` status, PR 5.2) rather than employer_vacancy_draft_readiness
-  // (PR 4.3, pre-verification) — that older RPC does not check these.
+  // D-M5-19: employer_vacancy_draft_readiness now checks every field
+  // publish_employer_vacancy requires (except expiry, see CHECKLIST_ORDER's
+  // own comment) — the two functions can no longer disagree.
   verification: "Employer verification",
   workplace_type: "Workplace type",
   work_frequency: "Work frequency",
   cv_required: "CV requirement declaration",
   interview_english_ok: "English-interview declaration",
+  employment_types: "Employment types",
+  shift_requirements: "Shift requirements",
   expiry: "Valid publication expiry (up to 90 days)",
 };
 
@@ -27,14 +29,28 @@ export type ReadinessChecklistItem = {
   complete: boolean;
 };
 
+// D-M5-19: matches employer_vacancy_draft_readiness's own field set exactly
+// — every field publish_employer_vacancy requires, so this checklist and
+// the publish gate can never disagree again. Deliberately excludes
+// "expiry": expires_at is genuinely null pre-publish and is always
+// defaulted by publish_employer_vacancy before its own gate runs, so
+// surfacing it here would be a permanent false negative, not a real
+// blocker — see the migration's own comment for the full reasoning.
 const CHECKLIST_ORDER = [
   "employer_completion",
+  "verification",
   "title",
   "job_category",
   "public_locality",
   "description",
+  "workplace_type",
+  "work_frequency",
+  "employment_types",
+  "shift_requirements",
   "salary",
   "languages",
+  "cv_required",
+  "interview_english_ok",
   "company",
 ] as const;
 

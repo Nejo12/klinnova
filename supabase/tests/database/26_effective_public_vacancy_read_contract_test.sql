@@ -58,43 +58,43 @@ insert into public.vacancies (
 ) values
 ('a2600000-0000-4000-8000-000000000210','a2600000-0000-4000-8000-000000000002',
   'Public Vacancy A Main','public-vacancy-a-main','summary','A full public description.','Berlin','Mitte',
-  'cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
+  'cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
   'published','employer','2026-08-05 12:00:00+00',null,null,null,null,now()+interval '30 days'),
 ('a2600000-0000-4000-8000-000000000211','a2600000-0000-4000-8000-000000000002',
   'Public Vacancy A Draft','public-vacancy-a-draft','summary','description','Berlin','Mitte',
-  'cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
+  'cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
   'draft','employer',null,null,null,null,null,null),
 ('a2600000-0000-4000-8000-000000000212','a2600000-0000-4000-8000-000000000002',
   'Public Vacancy A Paused','public-vacancy-a-paused','summary','description','Berlin','Mitte',
-  'cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
+  'cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
   'paused','employer',now()-interval '1 day',now(),null,null,null,now()+interval '30 days'),
 ('a2600000-0000-4000-8000-000000000213','a2600000-0000-4000-8000-000000000002',
   'Public Vacancy A Filled','public-vacancy-a-filled','summary','description','Berlin','Mitte',
-  'cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
+  'cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
   'filled','employer',now()-interval '1 day',null,now(),null,null,null),
 ('a2600000-0000-4000-8000-000000000214','a2600000-0000-4000-8000-000000000002',
   'Public Vacancy A Withdrawn','public-vacancy-a-withdrawn','summary','description','Berlin','Mitte',
-  'cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
+  'cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
   'withdrawn','employer',now()-interval '1 day',null,null,now(),null,null),
 ('a2600000-0000-4000-8000-000000000215','a2600000-0000-4000-8000-000000000002',
   'Public Vacancy A Expired','public-vacancy-a-expired','summary','description','Berlin','Mitte',
-  'cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
+  'cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
   'expired','employer',now()-interval '40 days',null,null,null,now()-interval '10 days',now()-interval '10 days'),
 ('a2600000-0000-4000-8000-000000000216','a2600000-0000-4000-8000-000000000002',
   'Public Vacancy A Elapsed Not Materialized','public-vacancy-a-elapsed','summary','description','Berlin','Mitte',
-  'cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
+  'cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
   'published','employer',now()-interval '40 days',null,null,null,null,now()-interval '1 minute'),
 ('a2600000-0000-4000-8000-000000000217','a2600000-0000-4000-8000-000000000002',
   'Public Vacancy A Pause Target','public-vacancy-a-pause-target','summary','description','Berlin','Mitte',
-  'cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
+  'cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
   'published','employer',now()-interval '1 hour',null,null,null,null,now()+interval '30 days'),
 ('a2600000-0000-4000-8000-000000000218','a2600000-0000-4000-8000-000000000002',
   'Public Vacancy A Fill Target','public-vacancy-a-fill-target','summary','description','Berlin','Mitte',
-  'cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
+  'cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
   'published','employer',now()-interval '1 hour',null,null,null,null,now()+interval '30 days'),
 ('a2600000-0000-4000-8000-000000000219','a2600000-0000-4000-8000-000000000002',
   'Public Vacancy A Withdraw Target','public-vacancy-a-withdraw-target','summary','description','Berlin','Mitte',
-  'cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
+  'cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
   'published','employer',now()-interval '1 hour',null,null,null,null,now()+interval '30 days');
 
 -- Employer B (organisation, owns company) vacancy — same published_at as A's
@@ -108,7 +108,7 @@ insert into public.vacancies (
 ) values (
   'a2600000-0000-4000-8000-000000000220','a2600000-0000-4000-8000-000000000003','a2600000-0000-4000-8000-000000000101',
   'Public Vacancy B Org','public-vacancy-b-org','summary','description','Berlin','Kreuzberg',
-  'cleaning','{}','{}','none','office','recurring',2000,'EUR','hourly',true,false,true,
+  'cleaning','{full_time}','{morning}','none','office','recurring',2000,'EUR','hourly',true,false,true,
   'published','employer','2026-08-05 12:00:00+00',now()+interval '30 days'
 );
 
@@ -126,11 +126,11 @@ insert into public.vacancies (
 ) values
 ('a2600000-0000-4000-8000-000000000221','a2600000-0000-4000-8000-000000000004',
   'Public Vacancy C Unverified','public-vacancy-c-unverified','summary','description','Berlin','Mitte',
-  'cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
+  'cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
   'published','employer',now()-interval '1 hour',now()+interval '30 days'),
 ('a2600000-0000-4000-8000-000000000222','a2600000-0000-4000-8000-000000000005',
   'Public Vacancy D Rejected','public-vacancy-d-rejected','summary','description','Berlin','Mitte',
-  'cleaning','{}','{}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
+  'cleaning','{full_time}','{morning}','none','private_home','recurring',1800,'EUR','hourly',true,true,true,
   'published','employer',now()-interval '1 hour',now()+interval '30 days');
 
 insert into public.vacancy_language_requirements (vacancy_id, language_code, min_proficiency) values
