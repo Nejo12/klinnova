@@ -316,6 +316,25 @@ Heavier planning remains reserved for changes affecting schema/database, authori
 
 **Consequences:** one additive migration (the 17th) containing the readiness-RPC alignment, the restored constraint, and the widened publish-gate field list; no change to any existing migration; the vacancy draft form and its RPC-calling Server Actions gain two new optional-until-publish fields; no change to `applications`, `candidate_profiles`, or any candidate-facing RPC.
 
+#### Hosted Preview proof evidence (Unit A1, 2026-08-09)
+
+Recorded on the disposable `hosted-proof/m5.1-preview-provisioning` branch (never merged to `main`), after PR #76 (containing D-M5-19's migration and code) was merged to `main` at `f602c15bca0519406f6e4e83d1c7f25a5d6c7cd8`.
+
+**Isolated infrastructure used:**
+- Supabase Preview branch `m5-1-unit-a1-hosted-proof` (project ref `hktsqjebxqasxuywstsl`), created ephemeral (`persistent: false`) and without Production data (`with_data: false`), parented to the `stint` Production project (`kvrzmzoszitdicjvrprt`) but never sharing data with it.
+- All 17 migrations applied to this Preview branch only, via `supabase db push --db-url <preview-connection-string>` (never `--linked`), confirmed by dry-run showing exactly the expected 12 remaining migrations before applying, and by a post-apply count of `supabase_migrations.schema_migrations` = 17.
+- A Vercel Preview deployment of the same commit, with `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` added to Vercel scoped to Preview + the `hosted-proof/m5.1-preview-provisioning` git branch only — Production's Vercel env vars were never modified.
+- Vercel Deployment Protection (a pre-existing, not newly created, project setting) was bypassed for automated access using the project's pre-existing "Protection Bypass for Automation" secret, sent as an `x-vercel-protection-bypass` header.
+
+**Auth configuration adjustment (Preview only):** the Preview branch's built-in mailer has a fixed anti-abuse send-rate quota that made real multi-account signup infeasible for this proof (confirmed directly via the Auth REST API: `over_email_send_rate_limit`). `mailer_autoconfirm` was temporarily set `true` on the Preview project only (recorded before: `false`; Production confirmed unchanged at `false` throughout and after) so registration could proceed through the real UI/session path without depending on real email delivery. **This proof therefore does not validate the real confirmation-email delivery path** — only everything from an authenticated session onward (onboarding, readiness, verification, publish, matching, application). `mailer_autoconfirm` was restored to `false` on the Preview project as part of teardown.
+
+**Journey results, both green, no direct DB edits used to manufacture matchability** (employment_types/shift_requirements entered exclusively through the real hosted checkboxes in both cases):
+- Positive: employer registers → onboards → creates a draft → readiness truthfully reports "not ready" while incomplete/unverified → completes every field including employment types/shift requirements via the real form → readiness reflects the save immediately with no reload → requests verification → a separately-provisioned operator account approves → readiness reports "ready" → publishes → a compatible candidate registers, onboards, sees the vacancy in Matches, opens the job detail page, and submits an application.
+- Negative: same employer/publish flow; a candidate with incompatible employment type/shift does not see the vacancy in Matches.
+- Confirmed by direct, read-only query against the Preview database after the run: 6 `auth.users` rows (2 employers, 2 operators, 2 candidates), 2 `employer_profiles` rows both `verified`, 2 `vacancies` rows both `published`, exactly **1** `applications` row (only the compatible candidate applied), 2 active `verification_operators` rows.
+
+**Teardown performed same day:** `mailer_autoconfirm` restored to `false` on the Preview project; the ephemeral Supabase Preview branch deleted; the Vercel Preview env vars scoped to `hosted-proof/m5.1-preview-provisioning` removed; the Vercel Preview deployment removed. Production was not touched at any point in this exercise. The `hosted-proof/m5.1-preview-provisioning` branch itself was not merged.
+
 ## M5 measurement semantics summary
 
 | Metric | Top-level counting rule |
