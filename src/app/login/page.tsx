@@ -60,6 +60,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       </p>
       <LoginForm nextPath={nextPathForForm} />
       <p className={styles.footer}>
+        <Link className={styles.link} href="/forgot-password">
+          Forgot password?
+        </Link>
+      </p>
+      <p className={styles.footer}>
         New here?{" "}
         <Link className={styles.link} href={registerHref}>
           Create an account

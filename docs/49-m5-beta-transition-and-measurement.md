@@ -351,6 +351,28 @@ Recorded on the disposable `hosted-proof/m5.1-preview-provisioning` branch (neve
 
 **Consequences:** no schema/migration change (migration count unchanged at 17); no product/dependency change; new `src/components/candidate-nav/` component pair plus a new `/candidate/account` route; five existing candidate page/header components updated to render the shared header instead of their own inline markup; five pre-existing E2E specs updated for the new sign-out location.
 
+### D-M5-21 — Password recovery (Unit C)
+
+**Status:** Approved
+
+**Context:** password recovery had never been implemented — no `resetPasswordForEmail`/`updateUser({password})` call, no `/forgot-password`/`/reset-password` route, and `/auth/confirm`'s allow-list explicitly excluded `type=recovery` (locked in by a pre-existing test asserting exactly that). Naively adding `recovery` to that allow-list would have been actively wrong: its success path always ends by ensuring a candidate profile and resolving a capability-based destination, which must never happen for a password-reset click.
+
+**Callback mechanism, confirmed empirically against the installed local Supabase version, not assumed:** `resetPasswordForEmail`'s email link does not point directly at the app. It points at GoTrue's own `/auth/v1/verify?token=...&type=recovery&redirect_to=...` endpoint, which verifies the token server-side and 303-redirects to `redirectTo` carrying only a PKCE `code` — `type=recovery` is consumed by GoTrue and does not survive onto the app's route (confirmed identical for the existing signup flow too: the custom `confirmation.html` template's `{{ .ConfirmationURL }}` goes through the exact same GoTrue-verify-redirect shape, landing on `/auth/confirm` as a bare `?code=...`, always exchanged through the generic code path — the `token_hash`/`type`-keyed `verifyOtp` branch already in `confirm.ts` was, in practice, dead code for every real browser-driven Mailpit flow before this unit). Since `redirectTo` itself does survive the redirect (GoTrue appends `code` onto whatever was passed), `requestPasswordResetAction` marks it with its own `?intent=recovery` query parameter — that is the actual signal `confirmAuthCallback`'s recovery branch keys on. `token_hash`+`type=recovery` is also accepted, in case a differently configured Supabase project ever emails a direct OTP-hash link instead of the verify-redirect form.
+
+**Decision:** implement the full bounded flow using only the existing Supabase Auth architecture — `/login`'s "Forgot password?" → `/forgot-password` (email request, enumeration-safe) → GoTrue verify-redirect → `/auth/confirm`'s new `intent=recovery` branch (never ensures a profile, never resolves a capability destination) → `/reset-password` (session-gated set-new-password) → explicit "Continue to sign in" (mirrors the account-deletion completed-state pattern, D-081/PART S: sign out the recovery session and land on `/login`, rather than silently continuing in it) → normal login with the new password.
+
+**Enumeration safety:** `requestPasswordResetAction` returns the identical generic message ("If an account exists for that email, we've sent password reset instructions.") regardless of whether the address exists or `resetPasswordForEmail` itself errored; it never logs the submitted email.
+
+**Invalid/expired handling:** a failed recovery verification (bad token, expired link, or a direct visit to `/reset-password` with no session) reaches the shared `/auth/error` page with a `reason=recovery`-specific message and a "Request another reset" link back to `/forgot-password` — never a raw Supabase error string, never a silent drop into onboarding.
+
+**Explicitly not built:** MFA, magic-link redesign, email-address change, a general "change password while logged in" settings page (an already-authenticated visitor to `/reset-password` can use the same form to change their own password — a legitimate self-service action gated by their own valid session, not a new capability; Supabase does not expose a durable server-side flag distinguishing a recovery-established session from a normal one, so this is the smallest safe behavior rather than a second UI).
+
+**Required exit proof:** a real local Supabase + Mailpit journey — register, confirm, log out, request reset, read the real recovery email, follow the real link, set a new password, confirm the old password now fails and the new one succeeds on the same account (no duplicate user, no onboarding reset) — plus an unknown-email request producing the identical generic response, and an invalid/malformed link reaching the safe retry state. Proven in `e2e/password-recovery-journey.spec.ts` (4 tests, real UI, local Supabase, gated behind `E2E_AUTH_JOURNEY` and wired into the Schema/RLS CI job exactly like Units A1/B), plus Vitest coverage across the new schemas, actions, components, and the `confirm.ts` recovery branch.
+
+**Explicit caveat:** this unit proves the recovery mechanism against local Supabase's built-in mailer via Mailpit only. It does not configure custom SMTP and does not prove Production/hosted email deliverability — that remains a separate, later concern.
+
+**Consequences:** no schema/migration change (migration count unchanged at 17); no new dependency; no Production/Preview/hosted mutation. New routes `/forgot-password` and `/reset-password`; `confirm.ts`'s `ConfirmSearchParams`/`ConfirmResult` gained an `intent` field and a `"recovery"` failure reason respectively; `/auth/error` gained a `reason=recovery` branch; `/login` gained a "Forgot password?" link.
+
 ## M5 measurement semantics summary
 
 | Metric | Top-level counting rule |

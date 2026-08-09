@@ -12,13 +12,16 @@ export async function GET(request: NextRequest) {
     type: searchParams.get("type"),
     code: searchParams.get("code"),
     next: searchParams.get("next"),
+    intent: searchParams.get("intent"),
   });
 
   if (!result.ok) {
     const path =
       result.reason === "profile"
         ? "/auth/error?reason=profile"
-        : "/auth/error";
+        : result.reason === "recovery"
+          ? "/auth/error?reason=recovery"
+          : "/auth/error";
     return redirect(path);
   }
 
