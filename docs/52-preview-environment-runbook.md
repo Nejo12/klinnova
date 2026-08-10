@@ -60,12 +60,23 @@ then referenced repeatedly (not re-run from scratch) as Preview is used.
   `slice4.mts`).
 - Both `preview-target-guard.ts` and `preview-db-push.ts` are unit tested
   with fabricated, clearly-fake project refs
-  (`preview-fake-ref-000`/`production-fake-ref-999`) and an injected fake
+  (`previewfakeref000000`/`productionfakeref9999`) and an injected fake
   runner. **No test in this repository, and no command run while building
   this runbook, has ever invoked `supabase` against a real hosted target.**
   Running `pnpm preview:db:push` today, with no `STINT_PREVIEW_*` env vars
   configured, fails closed immediately and reaches no network call — this
   has been verified.
+
+`scripts/proof/preview-target.mts` deliberately does **not** auto-load
+`.env.local`/`.env`, unlike `scripts/proof/slice4.mts` and the other
+local-only proof scripts. Those scripts only ever target local Supabase,
+so implicit dotenv loading is harmless convenience. `preview:db:push` is
+different in kind: it is an eventual **hosted-mutation** command, so its
+four `STINT_*` inputs must be supplied explicitly in the invoking shell's
+process environment for that one invocation — never sourced implicitly
+from a dotenv file that could be stale, wrong, or left over from an
+unrelated task, which would otherwise let a hosted push happen without
+the operator having consciously set its target that session.
 
 ## Required environment variables (not yet set anywhere)
 
