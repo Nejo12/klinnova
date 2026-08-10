@@ -13,7 +13,7 @@ A repo-grounded reconciliation of the Klinnova Design System Spec and Visual Val
 
 ## 1. Executive verdict
 
-**Ready for implementation planning, not for implementation.** Nothing found in the repository blocks starting a bounded Klinnova technical-preparation unit later. But three things need resolution before Development scopes actual work, and this document resolves the first two by hierarchy and flags the third for founder review.
+**Ready for implementation planning, not for implementation.** Nothing found in the repository blocks starting a bounded Klinnova technical-preparation unit later. Logo direction, Unit E sequencing, and vacancy-lifecycle labeling — the three items that originally needed resolution before Development could scope actual work — are now settled by approved Development decisions (§2, §5, §6, §8, §9, §17). The remaining open items (§17) are execution-timing and domain-cutover questions, not conceptual blockers.
 
 **What's already true:**
 
