@@ -257,7 +257,7 @@ pnpm supabase:stop
 
 Production remains the current hosted environment.
 
-Preview is intentionally unconfigured after earlier isolated proof teardown. M5 beta-readiness work must restore an isolated Preview environment before systematic external testing of iterative builds.
+Preview is intentionally unconfigured after earlier isolated proof teardown. M5 beta-readiness work must restore an isolated Preview environment before systematic external testing of iterative builds. `docs/52-preview-environment-runbook.md` documents the planned persistent Preview environment and ships guarded provisioning tooling (`pnpm preview:db:push`) — the external provisioning steps in that runbook have not been executed and Preview remains unprovisioned.
 
 Hosted Demo vacancy fixtures are owner-run only and never applied by migrations/CI/build/deploy. Retained Production Demo fixtures must be removed or explicitly re-authorized by **2026-09-02**.
 

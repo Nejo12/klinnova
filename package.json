@@ -32,6 +32,7 @@
     "test:e2e:outcome-events": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/application-outcome-events-journey.spec.ts",
     "test:e2e:outcome-ui": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/employer-application-outcome-ui-journey.spec.ts",
     "proof:migrations": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/proof/migration-inventory.mts",
+    "preview:db:push": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/proof/preview-target.mts",
     "proof:pilot-funnel": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/proof/pilot-funnel.mts",
     "proof:slice4": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/proof/slice4.mts",
     "fixtures:hosted:apply": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/fixtures/hosted-demo.mts apply",
