@@ -161,6 +161,9 @@ jobs:
       - name: Application outcome events journeys (local Supabase + Mailpit)
         run: pnpm test:e2e:outcome-events
 
+      - name: Employer application outcome UI journeys (local Supabase + Mailpit)
+        run: pnpm test:e2e:outcome-ui
+
       - name: Stop local Supabase
         if: always()
         run: pnpm supabase:stop

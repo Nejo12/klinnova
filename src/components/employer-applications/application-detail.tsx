@@ -1,11 +1,14 @@
 import Link from "next/link";
 
+import { ApplicationOutcomeHistory } from "@/components/employer-applications/application-outcome-history";
 import { ApplicationStatusHistory } from "@/components/employer-applications/application-status-history";
 import { ApplicationTransitionForm } from "@/components/employer-applications/application-transition-form";
+import { RecordOutcomeForm } from "@/components/employer-applications/record-outcome-form";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import { formatApplicationTimestamp } from "@/lib/employer/applications/format-timestamp";
 import type { EmployerApplicationDetailReady } from "@/lib/employer/applications/load-employer-application";
 import { CANDIDATE_DATA_REMOVED } from "@/lib/employer/applications/messages";
+import type { EmployerOutcomeEventRow } from "@/lib/employer/applications/schemas";
 import { applicationStatusLabel } from "@/lib/employer/applications/status";
 import {
   employmentTypeLabel,
@@ -19,9 +22,15 @@ import {
 
 type ApplicationDetailProps = {
   application: EmployerApplicationDetailReady;
+  outcomes: EmployerOutcomeEventRow[] | null;
+  todayIso: string;
 };
 
-export function ApplicationDetail({ application }: ApplicationDetailProps) {
+export function ApplicationDetail({
+  application,
+  outcomes,
+  todayIso,
+}: ApplicationDetailProps) {
   return (
     <>
       <p className={styles.actions}>
@@ -140,6 +149,16 @@ export function ApplicationDetail({ application }: ApplicationDetailProps) {
         applicationId={application.application_id}
         currentStatus={application.current_status}
         allowedTransitions={application.allowed_transitions}
+      />
+
+      <ApplicationOutcomeHistory
+        applicationId={application.application_id}
+        outcomes={outcomes}
+      />
+
+      <RecordOutcomeForm
+        applicationId={application.application_id}
+        todayIso={todayIso}
       />
     </>
   );

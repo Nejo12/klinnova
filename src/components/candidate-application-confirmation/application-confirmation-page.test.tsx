@@ -52,6 +52,7 @@ describe("ApplicationConfirmationPage", () => {
         showEmployerNav={false}
         confirmation={confirmation}
         history={history}
+        outcomes={[]}
       />,
     );
 
@@ -88,6 +89,7 @@ describe("ApplicationConfirmationPage", () => {
         showEmployerNav={false}
         confirmation={{ ...confirmation, demoLabel: null }}
         history={history}
+        outcomes={[]}
       />,
     );
     expect(screen.queryByText("Demo vacancy")).toBeNull();
@@ -100,6 +102,7 @@ describe("ApplicationConfirmationPage", () => {
         showEmployerNav={false}
         confirmation={{ ...confirmation, statusLabel: "In review" }}
         history={history}
+        outcomes={[]}
       />,
     );
     expect(screen.getAllByText("In review").length).toBeGreaterThan(0);
@@ -125,6 +128,7 @@ describe("ApplicationConfirmationPage", () => {
             occurred_at: "2026-08-05T09:00:00.000Z",
           },
         ]}
+        outcomes={[]}
       />,
     );
     expect(

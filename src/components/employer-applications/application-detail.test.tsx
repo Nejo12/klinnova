@@ -10,8 +10,15 @@ vi.mock(
   }),
 );
 
+vi.mock("@/app/employer/applications/[applicationId]/outcome-actions", () => ({
+  recordApplicationOutcomeAction: vi.fn(async () => ({ kind: "failure" })),
+  voidApplicationOutcomeAction: vi.fn(async () => ({ kind: "failure" })),
+}));
+
 import { ApplicationDetail } from "@/components/employer-applications/application-detail";
 import type { EmployerApplicationDetailReady } from "@/lib/employer/applications/load-employer-application";
+
+const TODAY_ISO = "2026-08-10";
 
 type LiveDetail = Extract<
   EmployerApplicationDetailReady,
@@ -79,7 +86,13 @@ function buildDeletedApplication(
 
 describe("ApplicationDetail", () => {
   it("renders applicant fields with neutral work-authorisation wording", () => {
-    render(<ApplicationDetail application={buildApplication()} />);
+    render(
+      <ApplicationDetail
+        application={buildApplication()}
+        outcomes={[]}
+        todayIso={TODAY_ISO}
+      />,
+    );
 
     expect(screen.getByText("J. Doe")).toBeInTheDocument();
     expect(screen.getByText("Declared")).toBeInTheDocument();
@@ -94,19 +107,33 @@ describe("ApplicationDetail", () => {
     render(
       <ApplicationDetail
         application={buildApplication({ work_authorisation_declared: false })}
+        outcomes={[]}
+        todayIso={TODAY_ISO}
       />,
     );
     expect(screen.getByText("Not declared")).toBeInTheDocument();
   });
 
   it("renders the vacancy section with title, submitted time, and current status", () => {
-    render(<ApplicationDetail application={buildApplication()} />);
+    render(
+      <ApplicationDetail
+        application={buildApplication()}
+        outcomes={[]}
+        todayIso={TODAY_ISO}
+      />,
+    );
     expect(screen.getByText("Morning kitchen support")).toBeInTheDocument();
     expect(screen.getAllByText("Submitted").length).toBeGreaterThan(0);
   });
 
   it("never renders candidate id, auth id, or actor identity", () => {
-    render(<ApplicationDetail application={buildApplication()} />);
+    render(
+      <ApplicationDetail
+        application={buildApplication()}
+        outcomes={[]}
+        todayIso={TODAY_ISO}
+      />,
+    );
     expect(screen.queryByText(/actor/i)).toBeNull();
     expect(
       screen.queryByText("11111111-1111-4111-8111-111111111111"),
@@ -120,14 +147,28 @@ describe("ApplicationDetail", () => {
           current_status: "accepted",
           allowed_transitions: [],
         })}
+        outcomes={[]}
+        todayIso={TODAY_ISO}
       />,
     );
     expect(screen.getByText(/status is final/i)).toBeInTheDocument();
-    expect(screen.queryByRole("combobox")).toBeNull();
+    // Scoped to the Status section specifically — a second, unrelated
+    // combobox (outcome type) is always present regardless of transition
+    // state (M5.1 Unit E).
+    const statusSection = screen
+      .getByRole("heading", { level: 2, name: "Status" })
+      .closest("section");
+    expect(statusSection?.querySelector("select")).toBeNull();
   });
 
   it("shows a neutral deleted-candidate state with no fabricated attributes", () => {
-    render(<ApplicationDetail application={buildDeletedApplication()} />);
+    render(
+      <ApplicationDetail
+        application={buildDeletedApplication()}
+        outcomes={[]}
+        todayIso={TODAY_ISO}
+      />,
+    );
     expect(screen.getByText("Deleted candidate")).toBeInTheDocument();
     expect(
       screen.getByText("Candidate data has been removed."),
@@ -141,15 +182,30 @@ describe("ApplicationDetail", () => {
   });
 
   it("still renders the vacancy section and status history for a deleted candidate's preserved application", () => {
-    render(<ApplicationDetail application={buildDeletedApplication()} />);
+    render(
+      <ApplicationDetail
+        application={buildDeletedApplication()}
+        outcomes={[]}
+        todayIso={TODAY_ISO}
+      />,
+    );
     expect(screen.getByText("Morning kitchen support")).toBeInTheDocument();
     expect(screen.getAllByText("Submitted").length).toBeGreaterThan(0);
   });
 
   it("renders no transition controls for a deleted candidate's application (D-087)", () => {
-    render(<ApplicationDetail application={buildDeletedApplication()} />);
+    render(
+      <ApplicationDetail
+        application={buildDeletedApplication()}
+        outcomes={[]}
+        todayIso={TODAY_ISO}
+      />,
+    );
     expect(screen.getByText(/status is final/i)).toBeInTheDocument();
-    expect(screen.queryByRole("combobox")).toBeNull();
+    const statusSection = screen
+      .getByRole("heading", { level: 2, name: "Status" })
+      .closest("section");
+    expect(statusSection?.querySelector("select")).toBeNull();
     expect(screen.queryByRole("button", { name: /update status/i })).toBeNull();
   });
 });

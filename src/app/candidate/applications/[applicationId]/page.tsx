@@ -4,6 +4,7 @@ import { resolveConfirmationPageView } from "@/app/candidate/applications/[appli
 import { ApplicationConfirmationPage } from "@/components/candidate-application-confirmation/application-confirmation-page";
 import { loadCandidateApplicationConfirmation } from "@/lib/applications/load-candidate-application-confirmation";
 import { loadCandidateApplicationHistory } from "@/lib/applications/load-candidate-application-history";
+import { loadCandidateApplicationOutcomes } from "@/lib/applications/load-candidate-application-outcomes";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -46,11 +47,17 @@ export default async function CandidateApplicationConfirmationRoutePage({
         />
       );
     }
+    // Fail-soft: an outcomes-read failure omits the (often-empty) outcomes
+    // section rather than failing the whole confirmation page, which has
+    // valuable information independent of this secondary read.
+    const outcomesResult =
+      await loadCandidateApplicationOutcomes(applicationId);
     return (
       <ApplicationConfirmationPage
         status="ready"
         confirmation={view.confirmation}
         history={historyResult.history}
+        outcomes={outcomesResult.ok ? outcomesResult.outcomes : []}
         showEmployerNav={showEmployerNav}
       />
     );
