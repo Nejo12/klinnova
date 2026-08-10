@@ -39,6 +39,47 @@ export type Database = {
         }
         Relationships: []
       }
+      application_outcome_events: {
+        Row: {
+          application_id: string
+          id: string
+          occurred_at: string
+          outcome_type: string
+          recorded_at: string
+          recorded_by: string
+          voided_at: string | null
+          voided_by: string | null
+        }
+        Insert: {
+          application_id: string
+          id?: string
+          occurred_at: string
+          outcome_type: string
+          recorded_at?: string
+          recorded_by: string
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Update: {
+          application_id?: string
+          id?: string
+          occurred_at?: string
+          outcome_type?: string
+          recorded_at?: string
+          recorded_by?: string
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_outcome_events_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       application_status_history: {
         Row: {
           actor_role: string
@@ -820,6 +861,10 @@ export type Database = {
         Returns: boolean
       }
       _language_proficiency_rank: { Args: { p_level: string }; Returns: number }
+      _outcome_occurred_at_window_valid: {
+        Args: { p_occurred_at: string; p_recorded_at: string }
+        Returns: boolean
+      }
       _process_deletion_domain_scrub: {
         Args: { p_request_id: string }
         Returns: Json
@@ -884,6 +929,13 @@ export type Database = {
         Returns: Json
       }
       cancel_account_deletion_request: { Args: never; Returns: Json }
+      candidate_application_outcomes: {
+        Args: { p_application_id: string }
+        Returns: {
+          occurred_at: string
+          outcome_type: string
+        }[]
+      }
       complete_candidate_onboarding: { Args: never; Returns: Json }
       complete_employer_onboarding: { Args: never; Returns: Json }
       create_employer_vacancy_draft: {
@@ -910,6 +962,16 @@ export type Database = {
       delete_employer_vacancy_draft: {
         Args: { p_vacancy_id: string }
         Returns: Json
+      }
+      employer_application_outcomes: {
+        Args: { p_application_id: string }
+        Returns: {
+          occurred_at: string
+          outcome_event_id: string
+          outcome_type: string
+          recorded_at: string
+          voided_at: string
+        }[]
       }
       employer_vacancy_draft_readiness: {
         Args: { p_vacancy_id: string }
@@ -1115,6 +1177,14 @@ export type Database = {
         Args: { p_expires_at?: string; p_vacancy_id: string }
         Returns: Json
       }
+      record_application_outcome: {
+        Args: {
+          p_application_id: string
+          p_occurred_at: string
+          p_outcome_type: string
+        }
+        Returns: Json
+      }
       reject_employer_verification: {
         Args: { p_employer_profile_id: string; p_reason: string }
         Returns: Json
@@ -1194,6 +1264,10 @@ export type Database = {
       visible_public_vacancy_ids: { Args: { p_at?: string }; Returns: string[] }
       visible_seed_company_ids: { Args: never; Returns: string[] }
       visible_seed_vacancy_ids: { Args: never; Returns: string[] }
+      void_application_outcome: {
+        Args: { p_outcome_event_id: string }
+        Returns: Json
+      }
       withdraw_employer_vacancy: {
         Args: { p_vacancy_id: string }
         Returns: Json

@@ -62,9 +62,10 @@ describe("pilot-funnel read-only static security proof", () => {
     const queryBlocks = [
       ...source.matchAll(/const [A-Z_]+_QUERY = `([\s\S]*?)`;/g),
     ].map((match) => match[1]?.trim() ?? "");
-    // Exactly the five metric queries — never BEGIN/COMMIT/ROLLBACK, which
-    // live in local-postgres.ts and are asserted separately below.
-    expect(queryBlocks).toHaveLength(5);
+    // Exactly the six metric queries (D-M5-22 added the outcome query) —
+    // never BEGIN/COMMIT/ROLLBACK, which live in local-postgres.ts and are
+    // asserted separately below.
+    expect(queryBlocks).toHaveLength(6);
     for (const block of queryBlocks) {
       expect(block.toLowerCase().startsWith("select")).toBe(true);
     }

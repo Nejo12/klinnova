@@ -42,6 +42,10 @@ const ZERO_ROWS: Record<string, Record<string, unknown>> = {
     applications_status_accepted: 0,
     applications_status_rejected: 0,
   },
+  outcome: {
+    interview_conversions: 0,
+    confirmed_hires: 0,
+  },
 };
 
 function queryLabel(sql: string): keyof typeof ZERO_ROWS {
@@ -50,6 +54,7 @@ function queryLabel(sql: string): keyof typeof ZERO_ROWS {
   if (sql.includes("join public.applications"))
     return "vacancy_with_application";
   if (sql.includes("from public.vacancies")) return "vacancy";
+  if (sql.includes("from public.application_outcome_events")) return "outcome";
   if (sql.includes("from public.applications")) return "application";
   throw new Error(`unrecognised query in test double: ${sql}`);
 }
@@ -115,6 +120,10 @@ describe("buildPilotFunnelReport", () => {
       "applications_status_shortlisted",
       "applications_status_accepted",
       "applications_status_rejected",
+    ]);
+    expect(Object.keys(report.funnels.outcome)).toEqual([
+      "interview_conversions",
+      "confirmed_hires",
     ]);
 
     for (const domain of Object.values(report.funnels)) {
@@ -194,7 +203,7 @@ describe("buildPilotFunnelReport", () => {
     );
   });
 
-  it("issues exactly five queries — no per-row or N+1 pattern", async () => {
+  it("issues exactly six queries — no per-row or N+1 pattern", async () => {
     let calls = 0;
     const executor: SqlRowExecutor = async (sql) => {
       calls += 1;
@@ -203,7 +212,7 @@ describe("buildPilotFunnelReport", () => {
 
     await buildPilotFunnelReport(executor);
 
-    expect(calls).toBe(5);
+    expect(calls).toBe(6);
   });
 
   it("scopes vacancy-side queries to source = 'employer', excluding seed/demo fixtures", async () => {
@@ -233,14 +242,14 @@ describe("buildPilotFunnelReport", () => {
     );
   });
 
-  it("reports exactly 16 metrics across all four domains", async () => {
+  it("reports exactly 18 metrics across all five domains", async () => {
     const report = await buildPilotFunnelReport(zeroStateExecutor());
     const total = Object.values(report.funnels).reduce(
       (sum, domain) => sum + Object.keys(domain).length,
       0,
     );
 
-    expect(total).toBe(16);
+    expect(total).toBe(18);
   });
 
   describe("vacancies_ever_published metric semantics", () => {
@@ -272,6 +281,43 @@ describe("buildPilotFunnelReport", () => {
       expect(
         metric(report.funnels.vacancy, "vacancies_effective_public").definition,
       ).toMatch(/is_vacancy_effectively_public/);
+    });
+  });
+
+  describe("outcome metrics (D-M5-22)", () => {
+    it("parses non-zero interview_conversions/confirmed_hires counts", async () => {
+      const report = await buildPilotFunnelReport(
+        pgStyleExecutor({
+          outcome: { interview_conversions: 7, confirmed_hires: 2 },
+        }),
+      );
+
+      expect(
+        metric(report.funnels.outcome, "interview_conversions").count,
+      ).toBe(7);
+      expect(metric(report.funnels.outcome, "confirmed_hires").count).toBe(2);
+    });
+
+    it("documents interview_conversions as one per application regardless of round count", async () => {
+      const report = await buildPilotFunnelReport(zeroStateExecutor());
+      const definition = metric(
+        report.funnels.outcome,
+        "interview_conversions",
+      ).definition;
+
+      expect(definition).toMatch(/distinct applications/i);
+      expect(definition).toMatch(/at least one active/i);
+      expect(definition).toMatch(/count once/i);
+    });
+
+    it("documents that applications.status = accepted alone never counts as a confirmed hire", async () => {
+      const report = await buildPilotFunnelReport(zeroStateExecutor());
+      const definition = metric(
+        report.funnels.outcome,
+        "confirmed_hires",
+      ).definition;
+
+      expect(definition).toMatch(/never counted/i);
     });
   });
 
