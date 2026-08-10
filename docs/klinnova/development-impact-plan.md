@@ -9,8 +9,6 @@ A repo-grounded reconciliation of the Klinnova Design System Spec and Visual Val
 **PR #81 (baseline stabilization):** untouched by this plan
 **Repository changes made while authoring this plan:** none
 
-> **Note on currency:** this document was authored before the founder's logo preference was updated to Option 2 (the angled doorway/aperture). Section 2 and section 17 below still reflect the *earlier* state, where the founder-approved direction was the two-segment step-evolution mark and Visual Validation's Option 2 recommendation was treated as a conflict to be resolved in the two-segment direction's favor. That conclusion is now superseded by the founder's current preference. This document is transferred here unedited, exactly as authored; the discrepancy is called out explicitly in the transfer commit's completion report rather than silently corrected.
-
 ---
 
 ## 1. Executive verdict
@@ -20,31 +18,29 @@ A repo-grounded reconciliation of the Klinnova Design System Spec and Visual Val
 **What's already true:**
 
 - Reduced-motion handling exists globally today (`globals.scss`) — no new implementation needed for that alone.
-- Vacancy lifecycle is already one field with six states — the "Draft/Published/Paused/Filled/Closed" requirement is a copy-only rename, not a schema change.
+- Vacancy lifecycle is already one field with six states — the Draft/Published/Paused/Filled/Expired/Withdrawn labels are a copy-only rename, not a schema change. `expired` and `withdrawn` display as their own distinct states; neither collapses into a single "Closed" label (§5, §6, §9-K6).
 - Candidate IA already has the same four destinations Klinnova proposes (Matches, Applications, Profile, Account) — only the bottom-tab-bar presentation is new.
 - No logo asset exists anywhere in the repo today — this is greenfield work, not a replacement.
 
 **Major risks:**
 
-- Visual Validation directly contradicts two of the four founder decisions supplied at authoring time (logo direction, tagline). Resolved below by the stated hierarchy — but worth explicit founder re-confirmation since Visual Validation was produced without apparent knowledge of decision A. (See currency note above regarding the logo conflict specifically.)
+- Visual Validation's tagline recommendation still conflicts with founder decision A (public tagline retirement) — resolved in the founder's favor per the stated hierarchy (§2). Its logo recommendation (Option 2, the angled doorway/aperture) now **aligns** with the founder-approved provisional direction rather than conflicting with it.
 - One Visual Validation mockup shows an application state ("Interview set") that doesn't exist in the product's status model at all — no scheduling-related data is tracked anywhere.
 - The employer/admin left-sidebar is a genuine **RESTRUCTURE**, not the lighter lift its position in the design doc might suggest — every employer page's outer wrapper changes.
 
-**Recommended interaction with Unit E:** Hybrid (option C, §8) — build Unit E now on the current, live token system, because Klinnova's own migration matrix already classifies the primitives Unit E needs (buttons, badges, timeline) as **DEFER** or token-only **RESTYLE**. Building on unfinished, unapproved primitives would mean building the rebrand foundation and Unit E at the same time — exactly the "rebrand as excuse for redesign" risk the design brief itself warns against — and would delay a real M5 beta-measurement requirement behind non-measurement work.
+**Approved interaction with Unit E:** Option B (§8) — Unit E proceeds now on the current, live Stint design system; it is not blocked on any Klinnova foundation, token, or primitive work landing first. Klinnova's own migration matrix already classifies the primitives Unit E needs (buttons, badges, timeline) as **DEFER** or token-only **RESTYLE**, so nothing built for Unit E today becomes structural throwaway once Klinnova styling lands later.
 
 ---
 
 ## 2. Source-of-truth reconciliation
 
-Per the stated hierarchy at authoring time (founder decisions → Design System Spec → Visual Validation → repo/product contracts → report-for-review), three items in the supplied Visual Validation directly conflicted with the founder decisions supplied at that time. All three resolved the same way: **the founder decision stands; the Visual Validation recommendation is recorded as evidence only.**
+Per the stated hierarchy (founder decisions → Design System Spec → Visual Validation → repo/product contracts → report-for-review), two items in the supplied Visual Validation directly conflict with founder decisions and resolve the same way: **the founder decision stands; the Visual Validation recommendation is recorded as evidence only.** A third item — logo direction — was originally reported as a conflict but is now resolved without conflict, and is recorded below as historical context rather than an open disagreement.
 
-> **Conflict 1 — Logo direction.** Visual Validation §01 recommends **Option 2, "the open door"** over the step-evolution direction, citing risk that the step mark "reads as a Stint variant." Decision C as supplied at authoring time approved the **two-segment step-evolution direction**, provisionally, pending the small-size validation checkpoint (§11) — not Option 2. Visual Validation's concern is real design feedback worth having in the room when the checkpoint sign-off happens, but at authoring time it did not change which direction Development prepares.
->
-> *(Superseded — see currency note at the top of this document. The founder's current preference is Option 2.)*
+> **Logo direction — resolved, no conflict.** Visual Validation §01 recommended **Option 2, "the open door,"** over the step-evolution direction, citing risk that the step mark "reads as a Stint variant." At this plan's original authoring, the founder-approved provisional direction was the two-segment step-evolution mark, and Visual Validation's recommendation appeared to conflict with it. **The founder's current decision is Option 2** — the angled doorway/aperture — which now aligns with, rather than conflicts with, Visual Validation's recommendation. Option 2 is the founder-approved **provisional** direction: it remains subject to the small-size/favicon validation checkpoint in §11 before final sign-off. This paragraph is retained as historical context for why the two documents once appeared to disagree; it does not describe a current open question (see §17).
 
-> **Conflict 2 — Tagline.** Visual Validation §06 recommends "reposition, not retire" — keeping "One step closer" as public candidate-facing marketing/app-store/onboarding copy, and explicitly states this "supersedes the prior document's retire recommendation." Founder decision A as supplied is more specific: **retire it as a public tagline entirely** (candidate-side included), retain only as an internal design principle, with public candidate-only reuse requiring separate future approval. Because that decision post-dates and is more specific than Visual Validation's internal reasoning about the Design Spec, it governs.
+> **Conflict — Tagline.** Visual Validation §06 recommends "reposition, not retire" — keeping "One step closer" as public candidate-facing marketing/app-store/onboarding copy, and explicitly states this "supersedes the prior document's retire recommendation." Founder decision A as supplied is more specific: **retire it as a public tagline entirely** (candidate-side included), retain only as an internal design principle, with public candidate-only reuse requiring separate future approval. Because that decision post-dates and is more specific than Visual Validation's internal reasoning about the Design Spec, it governs.
 
-> **Conflict 3 — Blue informational state.** Visual Validation §04/§07 recommends dropping the blue `--info` token, arguing it "added a fifth hue" the palette otherwise avoids. Founder decision D keeps it explicitly: semantic clarity over palette purity. This also reverses the Design System Spec's own draft — the Spec listed removing blue as an open question for founder review; Visual Validation then treated its own recommendation as settled. It is not; the founder decision settles it in the other direction.
+> **Conflict — Blue informational state.** Visual Validation §04/§07 recommends dropping the blue `--info` token, arguing it "added a fifth hue" the palette otherwise avoids. Founder decision D keeps it explicitly: semantic clarity over palette purity. This also reverses the Design System Spec's own draft — the Spec listed removing blue as an open question for founder review; Visual Validation then treated its own recommendation as settled. It is not; the founder decision settles it in the other direction.
 
 > **Repo/product contract holds firm.** The **application status model** (`submitted | reviewing | shortlisted | accepted | rejected`) and the **outcome-event model** being added by Unit D (`interview_completed | hired`, explicitly excluding any scheduling/invitation state) remain authoritative. Visual Validation's candidate Applications screen shows a status labelled **"Interview set"** with a scheduled date/time — this does not correspond to any status, outcome type, or stored field anywhere in the current schema or in Unit D. See §6 for the full breakdown; this is reported, not silently resolved by inventing a new state.
 
@@ -116,13 +112,13 @@ Legend: **DEFER** already conforms or untouched · **RENAME** label/copy only ·
 | Color tokens | `tokens.css`, D-017 baseline | Same token names, lightened oklch values, blue info state **kept** (decision D) | RESTYLE | Semantic names already map 1:1; only underlying values change. |
 | Type tokens / font family | System sans stack; Inter never actually loaded | DM Sans 400–700, tabular numerals for admin tables | RESTYLE | Same scale/roles; swap the family via `next/font/google`, zero new dependency (§14). |
 | Wordmark ("Stint") | `BrandMark` text component + ~15 hardcoded literals | "klinnova" lowercase, DM Sans 600, tightened tracking | RESTRUCTURE | Design Spec itself classifies this as restructure ("not a find-and-replace") — new typography treatment, not just a string swap. |
-| App icon / logo mark | None exists | Two-segment mark (founder-approved direction *at authoring time — see currency note*), ring+dot recognition device | RESTYLE in spirit, new build in practice | No legacy asset to evolve from — greenfield. Gated on §11 checkpoint. |
+| App icon / logo mark | None exists | Option 2 — the angled doorway/aperture mark (founder-approved provisional direction) | RESTYLE in spirit, new build in practice | No legacy asset to evolve from — greenfield. Provisional pending the §11 small-size/favicon validation checkpoint; no asset created, generated, or committed by this plan. |
 | Button / input / chip / badge primitives | Defined by D-017 tokens, consumed via SCSS Modules; no dedicated primitive component library yet — styles are largely per-feature SCSS Modules following the tokens | Same states/structure, new color values only | DEFER → RESTYLE | Structure and interaction states already match the spec's description; only token values need to flow through. |
 | Progress / step motif | `StepProgress` used only in the landing-page marketing preview today; real onboarding uses its own mechanism | Scope the literal step graphic to onboarding only; elsewhere use timelines/chips/counts | RESTYLE | Already narrowly scoped by circumstance — the current implementation isn't decoratively repeated anywhere, so no removal work is needed, only the color/token pass. |
 | Job card | `src/components/candidate-job-detail/`, `candidate-matches/` | Unchanged structure per spec | DEFER | Spec explicitly says no changes needed. |
 | Application status timeline | Real, already vertical-on-mobile per Slice 6 | Same pattern, reused not duplicated | DEFER | Matches spec's own description of what to keep. |
 | Employer verification badge | Exists (Slice 5), attestation-based | Single olive badge, tappable explanation | RESTYLE | Recolor only per Klinnova's own matrix note. |
-| Vacancy lifecycle labels | Single field `publication_state`: draft/published/paused/filled/expired/withdrawn | Draft/Published/Paused/Filled/Closed, displayed explicitly instead of generic "drafts" | RENAME | Field already exists — confirmed by migration inspection, not assumption. One small open item: does "Closed" cover both `expired` and `withdrawn`, or does it need two labels? (§17) |
+| Vacancy lifecycle labels | Single field `publication_state`: draft/published/paused/filled/expired/withdrawn | Draft/Published/Paused/Filled/Expired/Withdrawn, each displayed explicitly instead of generic "drafts" | RENAME | Field already exists — confirmed by migration inspection, not assumption. Approved mapping: `expired` displays as **Expired**, `withdrawn` displays as **Withdrawn** — distinct individual states, never collapsed into one visible "Closed" item status. A future broader view may group terminal vacancies under a "Closed" category heading, but each individual vacancy must still display its precise lifecycle state. No schema/lifecycle-model change. |
 | Candidate navigation (IA) | `CandidateNav`: top horizontal links, same 4 items (Matches/Applications/Profile/Account) | Bottom tab bar, same 4 items | RESTRUCTURE | Content model already matches exactly (Unit B/D-M5-20 already landed this IA); only the physical placement/chrome changes. |
 | Employer navigation (IA) | `EmployerVacancyPageHeader`: top horizontal nav, 4 items (Home/Vacancies/Applications/Verification), sign-out inline in header, no Account destination | Left sidebar, 5 items incl. Account, sign-out moved out of primary nav | RESTRUCTURE | Biggest structural item in this plan — new nested layout, new Account destination, sign-out relocation mirroring the candidate-side D-M5-20 precedent. Full feasibility answer in §6. |
 | Admin/operator navigation | `InternalNav`: flat 2-item nav via a real nested layout | Not explicitly specified by either document beyond "employer/admin" | DEFER | Out of stated scope; two items don't warrant a sidebar. Revisit only if the admin surface grows. |
@@ -138,7 +134,7 @@ Feasible, and it's exactly what Next.js App Router's nested `layout.tsx` mechani
 
 **2. Can vacancy lifecycle states be modeled as a single field today, or does "Vacancy drafts" reflect an existing constraint?**
 
-Yes — confirmed directly from the migration, not assumed. `public.vacancies.publication_state` already has the check constraint `in ('draft','published','paused','filled','expired','withdrawn')`. Five of Klinnova's five proposed states map directly; the sixth, "Closed," needs one small copy decision — the real schema distinguishes `expired` (time-based) from `withdrawn` (employer-initiated), and the mockup collapses both into one "Closed" label. That's a genuine open question, not a blocker: either "Closed" becomes a shared display label for both states, or Development renders two distinct labels. Either way, no new column, no new migration.
+Yes — confirmed directly from the migration, not assumed. `public.vacancies.publication_state` already has the check constraint `in ('draft','published','paused','filled','expired','withdrawn')`. **Approved resolution:** Draft, Published, Paused, and Filled map directly; the schema's `expired` (time-based) and `withdrawn` (employer-initiated) communicate materially different facts and are **not** collapsed into a single "Closed" label — `expired` displays as **Expired**, `withdrawn` displays as **Withdrawn**, each shown as its own distinct lifecycle state. A future broader presentation may group terminal vacancies under a wider visual/category heading such as "Closed," but the individual vacancy's precise lifecycle state must still display underneath that grouping. No new column, no new migration, no change to `publication_state` schema semantics.
 
 **3. Are tabular/monospace numeral fonts available today, or does that require a new font/file?**
 
@@ -208,15 +204,15 @@ The actual DNS/Vercel domain attachment; the actual Supabase dashboard changes; 
 
 ## 8. Unit E integration recommendation
 
-**Recommend Hybrid (C):** build Unit E's employer outcome-recording/void UI and candidate-safe outcome display directly on the current, live Stint token system and existing shared primitives — no Klinnova foundation slice first.
+**Approved: Option B.** Unit E proceeds now, using the current Stint design system. It is not blocked on any Klinnova foundation, token, or primitive work landing first.
 
-### Why not A (build directly on approved Klinnova primitives)
+### Why
 
-There is nothing to build "on" yet. The palette needs founder re-confirmation on the info-token question (already resolved by decision D, but the Spec/Validation disagreement means the actual CSS values need one more explicit pass), DM Sans isn't loaded, and the logo is pending the §11 checkpoint. Treating Unit E as blocked on Klinnova would mean standing up the rebrand foundation and Unit E simultaneously — precisely the "rebrand as an excuse for redesign" failure mode the design brief itself warns against — and would delay a real M5 beta-measurement requirement (Unit D/E) behind non-measurement work, which D-M5-1's feature freeze doesn't authorize.
+Unit E — employer outcome-recording/void UI and candidate-safe outcome display — is an M5 beta-measurement requirement, not rebrand-adjacent feature work. It primarily uses structures that already exist in the codebase: buttons, status badges/pills, and the application-detail/timeline surface (§3). Klinnova's own migration matrix (§5) classifies every one of these primitives as **DEFER** or token-level **RESTYLE** — meaning Unit E implemented today does not create meaningful structural throwaway work. A later Klinnova token pass (K1/K2) restyles these same components in place once it lands; Unit E does not need to be rebuilt or structurally reworked to receive that styling.
 
-### Why C over plain B
+Treating Unit E as blocked on Klinnova would mean standing up the rebrand foundation and Unit E simultaneously — precisely the "rebrand as an excuse for redesign" failure mode the design brief itself warns against — and would delay a real M5 beta-measurement requirement behind non-measurement work, which D-M5-1's feature freeze doesn't authorize. The two workstreams are independent: Unit D/Unit E continue on their existing track; the Klinnova slices in §9 proceed separately whenever the founder authorizes a first implementation unit.
 
-B ("stay behavior-first, migrate visuals afterward") is correct but underspecified on cost. The reason C is safe, not just expedient: Klinnova's own migration matrix (§5) already classifies every primitive Unit E actually touches — buttons, status badges, the application timeline — as DEFER or token-only RESTYLE. That means Unit E built today is not throwaway UI; it's exactly the shape a later token-only pass would restyle in place, with zero structural rework. The one Unit E surface with any real design-system tension is the vacancy-status/outcome vocabulary itself (§6, §2's "Interview set" discrepancy) — and that's a product-semantics question this plan explicitly does not resolve by invention, not a visual-system question.
+One caveat carries over regardless of styling and is unaffected by this decision: the outcome-vocabulary discrepancy identified in §2/§6 ("Interview set") is a product-semantics question, not a visual-system one. Unit E's actual outcome-type vocabulary is governed by Unit D's already-approved contract (`interview_completed`/`hired`), not by the Visual Validation mockup — this plan does not resolve that by invention.
 
 ---
 
@@ -271,16 +267,16 @@ The largest slice. New `src/app/employer/layout.tsx`; extract navigation out of 
 
 ### K6 — Vacancy lifecycle copy rename (RENAME)
 
-Display labels only: Draft/Published/Paused/Filled/Closed, replacing the generic "drafts" framing. Requires resolving the `expired`-vs-`withdrawn` "Closed" mapping first (§17).
+Display labels only: Draft, Published, Paused, Filled, **Expired**, **Withdrawn** — replacing the generic "drafts" framing. Approved mapping (§6, §17): `expired` displays as Expired and `withdrawn` displays as Withdrawn, each its own distinct visible state; neither collapses into a single "Closed" label. A future broader view may group both under a "Closed" category heading without changing what an individual vacancy displays.
 
 - **Depends on:** nothing — fully independent, smallest slice in this plan.
 - **Non-goals:** no schema/migration change — confirmed unnecessary in §6.
 - **Proof:** copy-assertion test updates only.
 - **Blocks Cohort A:** No.
 
-### K7 — Logo/mark implementation (RESTYLE, new build)
+### K7 — Logo/mark implementation, Option 2 (RESTYLE, new build)
 
-Only after the §11 small-size validation checkpoint produces real assets and the founder gives final written sign-off — separate from the already-provisional direction approval.
+Implements Option 2 — the angled doorway/aperture — the founder-approved provisional direction. Only after the §11 small-size/favicon validation checkpoint produces real assets and the founder gives final written sign-off does implementation begin; this slice does not create, generate, download, or commit any logo asset on its own.
 
 - **Depends on:** §11 checkpoint; Design deliverables listed there.
 - **Non-goals:** no favicon/app-icon shipped before the checkpoint passes.
@@ -316,7 +312,7 @@ K3 (wordmark/copy), K7 (logo), and K8 (domain) are the actual public identity ch
 
 ## 11. Logo small-size validation checkpoint — not implemented
 
-Founder decision C as supplied at authoring time was the two-segment direction, not Visual Validation's Option 2 — provisional, pending this checkpoint. *(See currency note at the top of this document: the founder's current preference is now Option 2, the angled doorway/aperture. The checkpoint requirements below apply regardless of which direction is finalized.)* No asset exists in the repository today to replace — this is new construction against a clean slate.
+The founder-approved provisional logo direction is **Option 2 — the angled doorway/aperture**. It remains provisional until it passes the small-size/favicon validation checkpoint below; final sign-off is a separate, later step (§17). No asset exists in the repository today — this is new construction against a clean slate. This section defines the required proof only; it does not create, generate, download, or commit any logo asset.
 
 ### Required proof before implementation
 
@@ -422,16 +418,15 @@ None of these are touched by K1–K9 as scoped in §9 — they route through the
 
 ## 17. Exact founder decisions still required
 
-Kept minimal at authoring time — not reopening anything already settled by decisions A–D as then supplied.
+Kept minimal — genuinely unresolved items only. The logo-direction choice, Unit E sequencing/classification, and the Expired-vs-Withdrawn/Closed vacancy-label mapping raised in earlier versions of this plan are now resolved (§2, §5, §6, §8, §9-K6, §11) and are not reopened here.
 
-1. Final written logo sign-off *after* the §11 small-size checkpoint produces real assets — a formality given the direction is already approved, but the checkpoint itself is a real gate, not a rubber stamp. *(See currency note: this now applies to Option 2, the angled doorway/aperture, per the founder's updated preference.)*
+1. Final written logo sign-off — required only *after* Option 2 (the angled doorway/aperture) passes the small-size/favicon validation checkpoint in §11. The provisional direction itself is already approved; this remaining item is the checkpoint-gated final confirmation, not an open direction choice.
 2. Timing: does the public identity cutover (K3+K7+K8) happen as one coordinated release, and roughly when relative to Cohort A — recommended approach is in §10, but the calendar call is the founder's.
 3. Old-domain (`stint.company`) fate after cutover — continue resolving, redirect, or eventual decommission (§7).
-4. Small copy decision: does "Closed" (vacancy lifecycle, §6/§9-K6) cover both `expired` and `withdrawn` as one label, or does the UI need to distinguish them?
-5. Confirm support/contact channel content ownership before any Klinnova legal-copy pass (existing D-M5-17 gate, not a new requirement).
+4. Confirm support/contact channel content ownership before any Klinnova legal-copy pass (existing D-M5-17 gate, not a new requirement).
 
 ---
 
 ## 18. Recommended next action
 
-Hold this document for founder review alongside the source Design Spec and Visual Validation. On approval: authorize the Unit E interaction model (Hybrid C, §8) so Unit D/E sequencing is not blocked by rebrand timing — Unit D (PR #80) and the stabilization PR (#81) continue on their own track, untouched by anything in this document. Separately, when ready, authorize a bounded first Klinnova implementation unit (most likely K1, the token foundation) as its own explicitly-scoped piece of work — not automatically triggered by this planning pass. No code, branch, commit, dependency, or hosted change was made while authoring this plan.
+Unit E already proceeds independently under the approved Option B interaction model (§8) — Unit D (PR #80) and the stabilization PR (#81) continue on their own track, unaffected by anything in this document. Separately, when ready, authorize a bounded first Klinnova implementation unit (most likely K1, the token foundation) as its own explicitly-scoped piece of work — not automatically triggered by this planning pass, and not a prerequisite for Unit E. No code, branch, commit, dependency, or hosted change was made while authoring or amending this plan.
