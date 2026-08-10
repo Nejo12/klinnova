@@ -41,7 +41,7 @@ insert into public.candidate_profiles (
   job_categories, employment_types, shift_preferences, onboarding_completed_at
 ) values (
   'a3300000-0000-4000-8000-000000000002','A1 Match Candidate','basic',true,now(),
-  'Berlin',30,current_date,array['cleaning'],array['full_time'],array['morning'],now()
+  'Berlin',30,(timezone('Europe/Berlin', now()))::date,array['cleaning'],array['full_time'],array['morning'],now()
 );
 
 -- Satisfies the vacancy's one required language (en/basic, added below).
@@ -56,7 +56,7 @@ insert into public.candidate_profiles (
   job_categories, employment_types, shift_preferences, onboarding_completed_at
 ) values (
   'a3300000-0000-4000-8000-000000000003','A1 No-Match Candidate','basic',true,now(),
-  'Berlin',30,current_date,array['cleaning'],array['part_time'],array['evening'],now()
+  'Berlin',30,(timezone('Europe/Berlin', now()))::date,array['cleaning'],array['part_time'],array['evening'],now()
 );
 
 set local role authenticated;
