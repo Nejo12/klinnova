@@ -312,7 +312,12 @@ test.describe("employer applicant review journey", () => {
       timeout: 15_000,
     });
     await expect(page.getByText(/status is final/i)).toBeVisible();
-    await expect(page.getByRole("combobox")).toHaveCount(0);
+    // Scoped to the Status section — a second, unrelated combobox (outcome
+    // type) is always present regardless of transition state (M5.1 Unit E).
+    const statusSection = page
+      .getByRole("heading", { level: 2, name: "Status" })
+      .locator("..");
+    await expect(statusSection.getByRole("combobox")).toHaveCount(0);
 
     // Full history is visible, initial event renders as "Submitted" (not
     // "null → submitted"), and never shows actor identity.
@@ -515,7 +520,10 @@ test.describe("employer applicant review journey", () => {
     });
     await expect(page.getByText(/status is final/i)).toBeVisible();
     await expect(page.getByText("Current status: In review")).toHaveCount(0);
-    await expect(page.getByRole("combobox")).toHaveCount(0);
+    const statusSectionAfterStale = page
+      .getByRole("heading", { level: 2, name: "Status" })
+      .locator("..");
+    await expect(statusSectionAfterStale.getByRole("combobox")).toHaveCount(0);
 
     // A reload reflects the same true canonical state.
     await page.reload();

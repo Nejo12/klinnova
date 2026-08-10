@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { outcomeTypeSchema } from "@/lib/applications/outcome-type";
 import { applicationStatusSchema } from "@/lib/employer/applications/status";
 import { isValidIsoCalendarDate } from "@/lib/matching/rules";
 import {
@@ -207,6 +208,76 @@ export const transitionApplicationRpcResultSchema = z.discriminatedUnion(
 // Form-facing schemas.
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// employer_application_outcomes / record_application_outcome /
+// void_application_outcome (M5.1 Unit E, D-M5-22). Field names/order match
+// the generated Functions[...] Returns shapes exactly — no widening.
+// employer_application_outcomes deliberately omits recorded_by/voided_by
+// (D-M5-22: always the calling employer themselves); this schema does not
+// accept them even if a future RPC change added them unexpectedly.
+// ---------------------------------------------------------------------------
+
+export const employerOutcomeEventRowSchema = z.object({
+  outcome_event_id: z.string().uuid(),
+  outcome_type: outcomeTypeSchema,
+  occurred_at: z.string().min(1),
+  recorded_at: z.string().min(1),
+  voided_at: z.string().min(1).nullable(),
+});
+
+export const employerOutcomeEventListSchema = z.array(
+  employerOutcomeEventRowSchema,
+);
+
+export type EmployerOutcomeEventRow = z.infer<
+  typeof employerOutcomeEventRowSchema
+>;
+
+/**
+ * Discriminant is `result`, matching every other outcome/transition RPC in
+ * this codebase. `already_hired`/`invalid_occurred_at` are distinct,
+ * non-error outcomes (a stale form or an out-of-window date, not a broken
+ * request) and must never be presented as a generic failure — mirrors the
+ * `already_in_state`/`invalid_transition` precedent in
+ * `transitionApplicationRpcResultSchema` above. `unavailable` is the one
+ * RPC-mandated collapse for every authorization/ownership/deleted-candidate
+ * case (D-070/D-087 no-existence-oracle pattern) — this schema does not
+ * invent a more specific discriminant the RPC itself does not return.
+ */
+export const recordApplicationOutcomeRpcResultSchema = z.discriminatedUnion(
+  "result",
+  [
+    z.object({
+      result: z.literal("ok"),
+      outcome_event_id: z.string().uuid(),
+      outcome_type: outcomeTypeSchema,
+      occurred_at: z.string().min(1),
+      recorded_at: z.string().min(1),
+    }),
+    z.object({ result: z.literal("already_hired") }),
+    z.object({ result: z.literal("invalid_outcome_type") }),
+    z.object({ result: z.literal("invalid_occurred_at") }),
+    z.object({ result: z.literal("unavailable") }),
+  ],
+);
+
+export const voidApplicationOutcomeRpcResultSchema = z.discriminatedUnion(
+  "result",
+  [
+    z.object({
+      result: z.literal("ok"),
+      outcome_event_id: z.string().uuid(),
+      voided_at: z.string().min(1),
+    }),
+    z.object({ result: z.literal("already_voided") }),
+    z.object({ result: z.literal("unavailable") }),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// Form-facing schemas.
+// ---------------------------------------------------------------------------
+
 export const applicationIdSchema = z.string().uuid("Invalid application.");
 
 export const applicationListFilterSchema = z.object({
@@ -226,4 +297,22 @@ export const transitionFormSchema = z.object({
   applicationId: applicationIdSchema,
   targetStatus: applicationStatusSchema,
   reason: optionalReason,
+});
+
+/**
+ * `occurredAtDate` is a plain calendar date from the record-outcome form's
+ * date-only input — `computeOccurredAtIso` (src/lib/applications/
+ * outcome-type.ts) converts it to the ISO instant actually sent to
+ * `record_application_outcome`. The RPC's own `invalid_occurred_at` check
+ * remains authoritative regardless of this schema's validation.
+ */
+export const recordOutcomeFormSchema = z.object({
+  applicationId: applicationIdSchema,
+  outcomeType: outcomeTypeSchema,
+  occurredAtDate: isoCalendarDateSchema,
+});
+
+export const voidOutcomeFormSchema = z.object({
+  applicationId: applicationIdSchema,
+  outcomeEventId: z.string().uuid("Invalid outcome event."),
 });

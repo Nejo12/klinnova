@@ -5,7 +5,9 @@ import { ApplicationUnavailable } from "@/components/employer-applications/appli
 import { EmployerRestrictedNotice } from "@/components/employer-shared/employer-restricted-notice";
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import { berlinTodayIso } from "@/lib/applications/outcome-type";
 import { loadEmployerApplication } from "@/lib/employer/applications/load-employer-application";
+import { loadEmployerApplicationOutcomes } from "@/lib/employer/applications/load-employer-application-outcomes";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { EMPLOYER_RESTRICTED_APPLICATIONS } from "@/lib/employer/messages";
 import { loadCurrentEmployerSuspensionStatus } from "@/lib/employer/suspension-guard";
@@ -69,6 +71,10 @@ export default async function EmployerApplicationDetailPage({
   }
 
   const capabilities = await loadAccountCapabilities(supabase);
+  const outcomesResult = await loadEmployerApplicationOutcomes(
+    supabase,
+    applicationId,
+  );
 
   return (
     <main className={styles.page}>
@@ -80,7 +86,11 @@ export default async function EmployerApplicationDetailPage({
       <h1 className={styles.heading}>
         {loaded.application.candidate_display_name}
       </h1>
-      <ApplicationDetail application={loaded.application} />
+      <ApplicationDetail
+        application={loaded.application}
+        outcomes={outcomesResult.ok ? outcomesResult.outcomes : null}
+        todayIso={berlinTodayIso()}
+      />
     </main>
   );
 }

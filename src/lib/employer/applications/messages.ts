@@ -26,3 +26,23 @@ export const APPLICATION_TERMINAL_STATE =
   "This application's status is final. No further status changes are available.";
 
 export const CANDIDATE_DATA_REMOVED = "Candidate data has been removed.";
+
+// ---------------------------------------------------------------------------
+// Outcome recording/void (M5.1 Unit E, D-M5-22).
+// ---------------------------------------------------------------------------
+
+export const OUTCOME_GENERIC_FAILURE =
+  "Something went wrong recording this outcome. Please try again.";
+
+export const OUTCOME_UNAVAILABLE = "This application is not available.";
+
+export const OUTCOME_ALREADY_HIRED =
+  "This application already has an active hired record. Void it first if it was recorded in error.";
+
+export const OUTCOME_INVALID_OCCURRED_AT =
+  "That date is outside the allowed range — up to 30 days in the past, and not in the future.";
+
+export const OUTCOME_ALREADY_VOIDED = "This event was already voided.";
+
+export const OUTCOME_EMPTY_HISTORY =
+  "No interview or hire events recorded yet.";

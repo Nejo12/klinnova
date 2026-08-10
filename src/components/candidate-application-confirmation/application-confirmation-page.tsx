@@ -6,6 +6,8 @@ import {
   type ApplicationConfirmation,
 } from "@/lib/applications/application-confirmation";
 import type { CandidateApplicationHistoryEntry } from "@/lib/applications/load-candidate-application-history";
+import type { CandidateApplicationOutcomeEntry } from "@/lib/applications/load-candidate-application-outcomes";
+import { ApplicationOutcomeTimeline } from "@/components/candidate-application-confirmation/application-outcome-timeline";
 import { ApplicationStatusTimeline } from "@/components/candidate-application-confirmation/application-status-timeline";
 import { CandidateApplicationsPageHeader } from "@/components/candidate-applications/candidate-applications-page-header";
 import { WORK_AUTHORISATION_NOTICE } from "@/components/candidate-matches/work-authorisation-notice";
@@ -17,6 +19,7 @@ type ApplicationConfirmationPageProps = { showEmployerNav: boolean } & (
       status: "ready";
       confirmation: ApplicationConfirmation;
       history: CandidateApplicationHistoryEntry[];
+      outcomes: CandidateApplicationOutcomeEntry[];
     }
   | { status: "unavailable" }
   | { status: "failure" }
@@ -50,7 +53,7 @@ export function ApplicationConfirmationPage(
     );
   }
 
-  const { confirmation, history } = props;
+  const { confirmation, history, outcomes } = props;
   const vacancyLanguagesHeadingId = "confirmation-vacancy-languages";
   const candidateLanguagesHeadingId = "confirmation-candidate-languages";
 
@@ -242,6 +245,10 @@ export function ApplicationConfirmationPage(
       </section>
 
       <ApplicationStatusTimeline history={history} />
+
+      {outcomes.length > 0 ? (
+        <ApplicationOutcomeTimeline outcomes={outcomes} />
+      ) : null}
 
       <nav className={styles.nav} aria-label="Application next steps">
         <Link
