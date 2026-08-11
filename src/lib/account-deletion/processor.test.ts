@@ -1,9 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const createPrivilegedDeletionClient = vi.hoisted(() => vi.fn());
+const captureException = vi.hoisted(() => vi.fn());
 
 vi.mock("@/lib/account-deletion/privileged-supabase", () => ({
   createPrivilegedDeletionClient,
+}));
+
+vi.mock("@sentry/nextjs", () => ({
+  captureException,
 }));
 
 type RpcCall = { name: string; args: unknown };
@@ -81,6 +86,7 @@ function makeClient(options: {
 
 beforeEach(() => {
   createPrivilegedDeletionClient.mockReset();
+  captureException.mockReset();
 });
 
 describe("processAccountDeletionRequest", () => {
@@ -159,17 +165,19 @@ describe("processAccountDeletionRequest", () => {
     );
   });
 
-  it("fails closed as a generic result, without crashing, when the privileged client itself cannot be constructed", async () => {
+  it("fails closed as a generic result, without crashing, when the privileged client itself cannot be constructed, and reports it to Sentry (M5.1 Unit G, G4)", async () => {
     const { processAccountDeletionRequest } =
       await import("@/lib/account-deletion/processor");
+    const configError = new Error(
+      "Invalid environment configuration:\n- SUPABASE_SERVICE_ROLE_KEY: Required",
+    );
     createPrivilegedDeletionClient.mockImplementation(() => {
-      throw new Error(
-        "Invalid environment configuration:\n- SUPABASE_SERVICE_ROLE_KEY: Required",
-      );
+      throw configError;
     });
 
     const result = await processAccountDeletionRequest("req-1");
     expect(result).toEqual({ kind: "failed", failureCode: "unknown" });
+    expect(captureException).toHaveBeenCalledExactlyOnceWith(configError);
   });
 
   it("records domain_scrub_failed and never calls Auth delete when scrub fails", async () => {
