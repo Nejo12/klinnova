@@ -67,6 +67,28 @@ describe("scrubSentryEvent", () => {
     });
   });
 
+  it("drops nested object and array values in event.extra entirely, rather than passing them through", () => {
+    const event = {
+      extra: {
+        nestedObject: { anything: "could be here" },
+        nestedArray: ["could", "hide", "anything"],
+        safeString: "keep me",
+        safeNumber: 42,
+        safeBoolean: true,
+        safeNull: null,
+      },
+    } as unknown as Sentry.ErrorEvent;
+
+    const scrubbed = scrubSentryEvent(event);
+
+    expect(scrubbed.extra).toEqual({
+      safeString: "keep me",
+      safeNumber: 42,
+      safeBoolean: true,
+      safeNull: null,
+    });
+  });
+
   it("redacts DB-connection-string and service-role-secret-shaped text embedded in the exception message", () => {
     const event = {
       exception: {
@@ -163,5 +185,88 @@ describe("scrubBreadcrumb", () => {
       url: "https://api.example.com/x",
       status_code: 500,
     });
+  });
+
+  it("strips the query string from a navigation breadcrumb's data.from", () => {
+    const breadcrumb = {
+      category: "navigation",
+      data: {
+        from: "/reset-password?token=abc123",
+        to: "/login",
+      },
+    } as unknown as Sentry.Breadcrumb;
+
+    const scrubbed = scrubBreadcrumb(breadcrumb);
+
+    expect(scrubbed?.data?.from).toBe("/reset-password");
+  });
+
+  it("strips the query string from a navigation breadcrumb's data.to", () => {
+    const breadcrumb = {
+      category: "navigation",
+      data: {
+        from: "/login",
+        to: "/reset-password?token=abc123",
+      },
+    } as unknown as Sentry.Breadcrumb;
+
+    const scrubbed = scrubBreadcrumb(breadcrumb);
+
+    expect(scrubbed?.data?.to).toBe("/reset-password");
+  });
+
+  it("redacts a Postgres connection string embedded in a console breadcrumb's message", () => {
+    const breadcrumb = {
+      category: "console",
+      message:
+        "connecting to postgresql://postgres:hunter2@db.abc.supabase.co:5432/postgres",
+    } as Sentry.Breadcrumb;
+
+    const scrubbed = scrubBreadcrumb(breadcrumb);
+
+    expect(scrubbed?.message).toBe(
+      "connecting to [redacted-connection-string]",
+    );
+  });
+
+  it("redacts an sb_secret_* token embedded in a console breadcrumb's message", () => {
+    const breadcrumb = {
+      category: "console",
+      message: "using key sb_secret_abcXYZ123 for this request",
+    } as Sentry.Breadcrumb;
+
+    const scrubbed = scrubBreadcrumb(breadcrumb);
+
+    expect(scrubbed?.message).toBe(
+      "using key [redacted-secret] for this request",
+    );
+  });
+
+  it("never passes arbitrary or nested breadcrumb data through unchanged, for any allowed category", () => {
+    const arbitraryData = {
+      password: "hunter2",
+      nested: { anything: "could be here" },
+      list: [1, 2, 3],
+    };
+
+    for (const category of ["console", "ui.click"] as const) {
+      const scrubbed = scrubBreadcrumb({
+        category,
+        data: arbitraryData,
+      } as unknown as Sentry.Breadcrumb);
+      expect(scrubbed?.data).toBeUndefined();
+    }
+
+    const fetchScrubbed = scrubBreadcrumb({
+      category: "fetch",
+      data: arbitraryData,
+    } as unknown as Sentry.Breadcrumb);
+    expect(fetchScrubbed?.data).toBeUndefined();
+
+    const navigationScrubbed = scrubBreadcrumb({
+      category: "navigation",
+      data: arbitraryData,
+    } as unknown as Sentry.Breadcrumb);
+    expect(navigationScrubbed?.data).toBeUndefined();
   });
 });

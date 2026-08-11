@@ -43,6 +43,13 @@ function sanitizeHeaders(
   return sanitized;
 }
 
+/**
+ * Keeps only safe primitive values (after redaction), by key allow-list.
+ * Nested objects/arrays/functions are dropped entirely rather than passed
+ * through unchanged — this beta error-monitoring scope has no case that
+ * needs structured extra context badly enough to justify the risk of an
+ * unbounded nested value carrying PII/secrets through untouched.
+ */
 function sanitizeExtra(
   extra: Record<string, unknown> | undefined,
 ): Record<string, unknown> | undefined {
@@ -54,8 +61,16 @@ function sanitizeExtra(
     if (SENSITIVE_EXTRA_KEY_PATTERN.test(key)) {
       continue;
     }
-    sanitized[key] =
-      typeof value === "string" ? redactSensitiveText(value) : value;
+    if (typeof value === "string") {
+      sanitized[key] = redactSensitiveText(value);
+    } else if (
+      typeof value === "number" ||
+      typeof value === "boolean" ||
+      value === null
+    ) {
+      sanitized[key] = value;
+    }
+    // Objects, arrays, functions, and undefined are dropped entirely.
   }
   return sanitized;
 }
@@ -125,37 +140,89 @@ const ALLOWED_BREADCRUMB_CATEGORIES = new Set([
   "ui.click",
 ]);
 
+function sanitizedUrlField(value: unknown): string | undefined {
+  return typeof value === "string" ? stripQueryString(value) : undefined;
+}
+
+/**
+ * Per-category allow-list for breadcrumb `data` (M5.1 Unit G) — an
+ * unrecognized field is dropped by construction, not merely a known-bad
+ * one removed. `navigation` keeps only sanitized `from`/`to` (Sentry's own
+ * router instrumentation puts the full URL, including query string, in
+ * these two fields — not `data.url`). `fetch`/`xhr` keep only
+ * `method`/`status_code`/a sanitized `url`. `console` and `ui.click` keep
+ * no `data` object at all — this app has no concrete need for either yet
+ * that would justify the risk.
+ */
+function sanitizeBreadcrumbData(
+  category: string,
+  data: Record<string, unknown> | undefined,
+): Record<string, unknown> | undefined {
+  if (category === "navigation") {
+    const sanitized: Record<string, unknown> = {};
+    const from = sanitizedUrlField(data?.from);
+    const to = sanitizedUrlField(data?.to);
+    if (from !== undefined) {
+      sanitized.from = from;
+    }
+    if (to !== undefined) {
+      sanitized.to = to;
+    }
+    return sanitized;
+  }
+
+  if (category === "fetch" || category === "xhr") {
+    const sanitized: Record<string, unknown> = {};
+    if (typeof data?.method === "string") {
+      sanitized.method = data.method;
+    }
+    if (typeof data?.status_code === "number") {
+      sanitized.status_code = data.status_code;
+    }
+    const url = sanitizedUrlField(data?.url);
+    if (url !== undefined) {
+      sanitized.url = url;
+    }
+    return sanitized;
+  }
+
+  return undefined;
+}
+
 /**
  * `beforeBreadcrumb` policy (M5.1 Unit G): retains only a conservative
- * allow-list of low-risk breadcrumb categories, and for network breadcrumbs
- * (`fetch`/`xhr`) strips any body/response/header data and sanitizes the
- * URL's query string — never dropping the breadcrumb's basic shape (method,
- * status, path), which is what actually helps reproduce a failure.
+ * allow-list of low-risk breadcrumb categories, and rebuilds each
+ * breadcrumb from an explicit field allow-list rather than deleting known-
+ * bad fields from the original — `data` is never passed through unchanged.
+ * `message` (e.g. a `console` breadcrumb's logged text) goes through the
+ * same sensitive-text redaction as exception/event messages.
  */
 export function scrubBreadcrumb(
   breadcrumb: Sentry.Breadcrumb,
 ): Sentry.Breadcrumb | null {
-  if (
-    breadcrumb.category === undefined ||
-    !ALLOWED_BREADCRUMB_CATEGORIES.has(breadcrumb.category)
-  ) {
+  const category = breadcrumb.category;
+  if (category === undefined || !ALLOWED_BREADCRUMB_CATEGORIES.has(category)) {
     return null;
   }
 
-  const data = breadcrumb.data;
-  if (data === undefined) {
-    return breadcrumb;
+  const sanitized: Sentry.Breadcrumb = { category };
+  if (breadcrumb.level !== undefined) {
+    sanitized.level = breadcrumb.level;
+  }
+  if (breadcrumb.timestamp !== undefined) {
+    sanitized.timestamp = breadcrumb.timestamp;
+  }
+  if (breadcrumb.type !== undefined) {
+    sanitized.type = breadcrumb.type;
+  }
+  if (typeof breadcrumb.message === "string") {
+    sanitized.message = redactSensitiveText(breadcrumb.message);
   }
 
-  const sanitizedData: Record<string, unknown> = { ...data };
-  delete sanitizedData.body;
-  delete sanitizedData.response;
-  delete sanitizedData.headers;
-  delete sanitizedData.request_body_size;
-  delete sanitizedData.response_body_size;
-  if (typeof sanitizedData.url === "string") {
-    sanitizedData.url = stripQueryString(sanitizedData.url);
+  const data = sanitizeBreadcrumbData(category, breadcrumb.data);
+  if (data !== undefined && Object.keys(data).length > 0) {
+    sanitized.data = data;
   }
 
-  return { ...breadcrumb, data: sanitizedData };
+  return sanitized;
 }
