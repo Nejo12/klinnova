@@ -177,9 +177,10 @@ environment works, not itself part of the persistent environment):
 7. Candidate matched to the vacancy and applied.
 8. Employer recorded a M5.1 Unit E outcome on that application.
 9. Candidate saw the candidate-safe projection of that outcome.
-10. Confirmed Production was untouched throughout — trivially true here,
-    since Preview is a fully separate Supabase project with no shared
-    database to leak into.
+10. Production remained outside the acceptance path: the Preview
+    deployment used the standalone Preview Supabase project and
+    Preview-scoped Vercel environment variables throughout; no Production
+    database mutation was performed.
 
 This ran the full application journey rather than the originally-scoped
 minimal six steps, because publishing a vacancy required a verified
