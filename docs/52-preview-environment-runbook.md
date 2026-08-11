@@ -1,20 +1,29 @@
 # 52 — Preview Environment Runbook (M5.1 Unit F)
 
-**Status: NOT YET PROVISIONED.** This document describes the intended
-persistent Preview environment and the guarded tooling this repository now
-ships to provision it safely. None of the external provisioning steps below
-have been executed. `README.md`'s "Hosted environments" section remains
-accurate: Preview is unconfigured until this runbook's steps are actually
-carried out and this status banner is updated.
+**Status: PROVISIONED.** Provisioned and accepted **2026-08-11** (M5.1 Unit
+F2). The persistent Preview environment described below is real: a
+standalone Supabase project (`stint-preview`, ref `klgrrqladmdtgnrggnsc`),
+verified Resend-backed confirmation email, and Vercel Preview-scoped
+environment variables. `README.md`'s "Hosted environments" section has been
+updated to match. See "Provisioning record (2026-08-11)" below for what was
+actually done and "Manual acceptance journey (D-F4) — completed 2026-08-11"
+for the acceptance evidence.
 
 This is intentionally a **persistent** runbook, not a one-shot proof script.
 It supersedes the throwaway proof-and-teardown pattern used by the earlier
 hosted-proof runbooks (`docs/26`, `docs/32`, `docs/40`) and the ephemeral
 Supabase branch used for the one-off M5.1 Unit A1 proof (`docs/49`, lines
-319-336). Those were single-use proofs, each torn down same-day. Preview
-readiness for M5 beta needs something that survives across many iterative
-builds, so this runbook is meant to be followed once to stand Preview up,
-then referenced repeatedly (not re-run from scratch) as Preview is used.
+319-336). Those were single-use proofs, each torn down same-day. The
+`stint-preview` Supabase project and the Vercel Preview-scoped
+configuration below are the persistent parts, meant to survive across many
+iterative builds and be referenced repeatedly, not re-provisioned from
+scratch. The one specific smoke-test branch deployment used to run the
+acceptance journey
+(`https://stint-git-chore-preview-f2-smoke-olaniyis-projects.vercel.app`)
+was not itself persistent — it was only the vehicle for proving the
+persistent environment works; any future branch's Preview deployment is
+covered by the same Supabase project and the same Vercel/redirect
+configuration.
 
 ## Governing decisions
 
@@ -78,71 +87,117 @@ from a dotenv file that could be stale, wrong, or left over from an
 unrelated task, which would otherwise let a hosted push happen without
 the operator having consciously set its target that session.
 
-## Required environment variables (not yet set anywhere)
+## Guarded push script inputs (intentionally never persisted anywhere)
 
-None of these are set in this repository, in CI, or in any Vercel project
-today. They are the four inputs `pnpm preview:db:push` requires once the
-external provisioning steps below have actually been carried out:
+These four `STINT_*` variables are the inputs `pnpm preview:db:push`
+requires, and remain — by design, unchanged since F1 — never set in this
+repository, in CI, or in any Vercel project. They are operator-shell-only,
+supplied fresh for each guarded push invocation, never sourced from a
+dotenv file (see "Deliberately does NOT auto-load .env.local/.env" above):
 
 | Variable | Purpose |
 | --- | --- |
-| `STINT_PREVIEW_SUPABASE_URL` | Preview project's API URL, `https://<preview-ref>.supabase.co` |
+| `STINT_PREVIEW_SUPABASE_URL` | Preview project's API URL, `https://klgrrqladmdtgnrggnsc.supabase.co` |
 | `STINT_PREVIEW_SUPABASE_DB_URL` | Preview project's direct Postgres connection string |
-| `STINT_PREVIEW_SUPABASE_PROJECT_REF` | The Preview project's ref, explicitly |
-| `STINT_PRODUCTION_SUPABASE_PROJECT_REF` | The Production project's ref (`kvrzmzoszitdicjvrprt` today), explicitly, so the guard can refuse it |
+| `STINT_PREVIEW_SUPABASE_PROJECT_REF` | `klgrrqladmdtgnrggnsc` |
+| `STINT_PRODUCTION_SUPABASE_PROJECT_REF` | `kvrzmzoszitdicjvrprt`, so the guard can refuse it |
 
-These are local/operator-shell inputs to the guarded push script, not
-`NEXT_PUBLIC_*` values and not things this repository's `.env.example`
-should carry — they must never be set in a way that exposes the Preview
-database URL to the browser bundle.
+These are not `NEXT_PUBLIC_*` values and not things this repository's
+`.env.example` should carry — they must never be set in a way that exposes
+the Preview database URL to the browser bundle.
 
-## External provisioning steps (not yet executed — future work)
+## Vercel Preview-scoped application environment variables (now configured)
 
-These require Supabase org, Resend, and Vercel account access this
-repository's tooling does not have and cannot script:
+Separately from the guard's own inputs above, these three app-runtime
+variables are now configured in Vercel, **Preview scope only** — never
+Production:
 
-1. **Create the standalone Preview Supabase project** (D-F1), same major
-   Postgres version as Production (`17`, per `supabase/config.toml`).
-   Record its project ref for `STINT_PREVIEW_SUPABASE_PROJECT_REF`.
-2. **Push current migrations** to it via `pnpm preview:db:push` with all
-   four `STINT_*` env vars set for that shell session only — never via
-   `supabase link`.
-3. **Verify `auth.stint.company` in Resend** (D-F2): add the DNS records
-   Resend requires for that subdomain, wait for verification, obtain an
-   API key.
-4. **Configure the Preview project's Supabase Auth settings**: SMTP host
-   pointed at Resend using the verified `auth.stint.company` sender
-   (fields match the commented-out `[auth.email.smtp]` block already in
-   `supabase/config.toml`, applied via the hosted project's dashboard, not
-   that local file); `mailer_autoconfirm` left `false`; redirect-URL
-   allow-list configured for the Vercel Preview URL pattern.
-5. **Configure Vercel Preview-scoped environment variables**:
-   `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-   pointed at the new Preview project, and a Preview-scoped
-   `SUPABASE_SERVICE_ROLE_KEY` (the Preview project's own — never
-   Production's) so the Slice 8 account-deletion processor works there.
-   Leave `NEXT_PUBLIC_SITE_URL` unset so the existing `VERCEL_URL` fallback
-   in `src/lib/auth/site-origin.ts` keeps working per-deployment.
-6. **Update this runbook's status banner** to PROVISIONED, with the date
-   and the Preview project ref, and update `README.md`'s "Hosted
-   environments" section to match reality.
+| Variable | Configured to |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://klgrrqladmdtgnrggnsc.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | The Preview project's publishable key |
+| `SUPABASE_SERVICE_ROLE_KEY` | The Preview project's own service-role key (never Production's) |
 
-## Manual acceptance journey (D-F4)
+`NEXT_PUBLIC_SITE_URL` remains unset for Preview (Production-only), so the
+existing `VERCEL_URL` fallback in `src/lib/auth/site-origin.ts` keeps
+resolving the correct per-deployment origin, unchanged from the F1 plan.
 
-Run once, by a human, against the live Preview deployment after step 5
-above:
+## Provisioning record (2026-08-11)
 
-1. Register a new candidate account using a real, reachable inbox.
-2. Receive the confirmation email at that inbox — sent from
-   `auth.stint.company` via Resend, not autoconfirmed — and click through.
-3. Complete candidate onboarding.
-4. Apply to a real (Preview-only, non-Production) vacancy fixture.
-5. As an employer account in the same Preview project, record an outcome
-   event on that application.
-6. Confirm the Production project's data is untouched throughout (distinct
-   project entirely — there is no shared database to check for leakage).
+All six steps below were carried out (M5.1 Unit F2), each by the operator
+directly in the respective provider's dashboard/CLI — this repository's
+tooling has no credentials for any of these services and did not perform
+any of them itself:
+
+1. **Standalone Preview Supabase project created** (D-F1): `stint-preview`,
+   project ref `klgrrqladmdtgnrggnsc`, API URL
+   `https://klgrrqladmdtgnrggnsc.supabase.co`. A distinct project from
+   Production (`kvrzmzoszitdicjvrprt`) in every respect — not a branch of
+   it.
+2. **Current migrations pushed** via the guarded `pnpm preview:db:push`
+   path. The F1 preflight guard verified the target project ref
+   (`klgrrqladmdtgnrggnsc`) before any mutation and explicitly excluded the
+   Production ref. No `supabase link` was used at any point. Production was
+   not targeted.
+3. **`auth.stint.company` verified in Resend** (D-F2): DNS verification
+   passed.
+4. **Preview project's Supabase Auth SMTP configured**: custom SMTP via
+   `smtp.resend.com`, sender `no-reply@auth.stint.company`.
+   `mailer_autoconfirm` remains disabled — real email confirmation delivery
+   was exercised, not bypassed.
+5. **Preview Auth URL configuration set**: Site URL configured for the
+   Preview deployment; Redirect URLs wildcard set to
+   `https://*-olaniyis-projects.vercel.app/**`. Real confirmation links
+   were confirmed to return users to the Preview application.
+6. **Vercel Preview-scoped environment variables configured** —
+   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+   `SUPABASE_SERVICE_ROLE_KEY` — Preview scope only, never Production.
+   `NEXT_PUBLIC_SITE_URL` remains unset for Preview. The resulting Preview
+   deployment reached Ready state; smoke checks on `/`, `/login`,
+   `/register` passed.
+
+## Manual acceptance journey (D-F4) — completed 2026-08-11
+
+Run once, by a human, against the live Preview deployment
+(`https://stint-git-chore-preview-f2-smoke-olaniyis-projects.vercel.app` —
+a smoke-test branch deployment used only to prove the persistent
+environment works, not itself part of the persistent environment):
+
+1. Candidate registration, using a real, reachable inbox.
+2. Real Resend confirmation email received at that inbox — sent from
+   `auth.stint.company`, not autoconfirmed — and clicked through, correctly
+   redirecting back to the Preview application.
+3. Candidate onboarding completed.
+4. Employer registration/onboarding completed.
+5. Employer verification request submitted, and approved by a separate
+   Preview-only verification operator (see "Preview verification operator"
+   below) through the real `/internal/verification` UI — not by directly
+   mutating the employer's verification state.
+6. Vacancy published.
+7. Candidate matched to the vacancy and applied.
+8. Employer recorded a M5.1 Unit E outcome on that application.
+9. Candidate saw the candidate-safe projection of that outcome.
+10. Production remained outside the acceptance path: the Preview
+    deployment used the standalone Preview Supabase project and
+    Preview-scoped Vercel environment variables throughout; no Production
+    database mutation was performed.
+
+This ran the full application journey rather than the originally-scoped
+minimal six steps, because publishing a vacancy required a verified
+employer, which required standing up a verification path — see below.
 
 No further automated hosted E2E is required for this unit's acceptance.
+
+### Preview verification operator
+
+A Preview-only verification operator was administratively bootstrapped
+through the existing `verification_operators` contract to make the
+`/internal/verification` approval step above possible (operator id
+`66837767-21db-4782-9421-0db1b4aa13fc`). Nothing in this runbook or in the
+verification-operator product contract currently requires this operator to
+be removed or rotated, and it has not been removed. Its ongoing retention
+is an open item for a separate decision, not something this closure
+resolved.
 
 ## Ongoing use: reset, not teardown
 

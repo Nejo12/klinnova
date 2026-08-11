@@ -307,7 +307,11 @@ Plan:
 - documented reset/teardown procedure;
 - hosted destructive proof remains separately authorized.
 
-This PR does not configure Preview.
+Provisioned **2026-08-11** (M5.1 Unit F2) as a standalone Preview Supabase
+project, satisfying the plan above — see
+`docs/52-preview-environment-runbook.md` for the full record. (This
+document's own originating PR did not configure Preview; that happened
+later, via M5.1 Unit F.)
 
 ### Minimal Sentry — approved readiness requirement
 
