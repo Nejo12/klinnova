@@ -20,7 +20,7 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 | Active work unit | M5.1 — beta readiness closure (Unit A1 merged: publication/matching integrity, PR #76/#77; Unit B merged: candidate navigation/account IA, PR #78; Unit C merged: password recovery, PR #79; Unit D: outcome DB/RLS/RPC contract, PR pending merge) |
 | PR | #74 — M5.0 merged |
 | Product/schema implementation | M5.1 product/schema work proceeds only through explicitly approved bounded units (e.g. Unit A1, Unit B); Production changes remain separately authorized |
-| Preview | Intentionally unconfigured; isolated Preview restoration is beta-readiness work before systematic external testing |
+| Preview | Provisioned **2026-08-11** — persistent, isolated Supabase project (`stint-preview`); see `docs/52-preview-environment-runbook.md` |
 | Production | Existing production remains live; no M5.0 product/schema mutation |
 | Hosted destructive proof | Not authorized / not run |
 | Demo fixture deadline | Remove or explicitly re-authorize retained Production Demo fixtures by **2026-09-02** |
@@ -113,7 +113,7 @@ This is a planning queue, **not automatic authorization**.
 
 ### Infrastructure
 
-1. Restore an isolated Preview environment before systematic external testing.
+1. ~~Restore an isolated Preview environment before systematic external testing.~~ Done **2026-08-11** — see `docs/52-preview-environment-runbook.md`.
 2. Configure approved minimal Sentry before intentional Cohort A external traffic.
 3. Remove/re-authorize retained Production Demo fixtures by 2026-09-02.
 
@@ -135,7 +135,7 @@ Before intentional external Cohort A traffic:
 
 - qualified German legal review/finalization of Impressum/business identity, Privacy notice, beta Terms, support/contact channel, and Sentry disclosure if required;
 - minimal Sentry configured within the approved privacy boundary;
-- isolated Preview available for systematic external testing of iterative builds;
+- ~~isolated Preview available for systematic external testing of iterative builds~~ — done **2026-08-11**;
 - technical/moderation/privacy support procedures understood;
 - demo-fixture cleanup deadline tracked.
 

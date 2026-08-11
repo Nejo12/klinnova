@@ -257,7 +257,7 @@ pnpm supabase:stop
 
 Production remains the current hosted environment.
 
-Preview is intentionally unconfigured after earlier isolated proof teardown. M5 beta-readiness work must restore an isolated Preview environment before systematic external testing of iterative builds. `docs/52-preview-environment-runbook.md` documents the planned persistent Preview environment and ships guarded provisioning tooling (`pnpm preview:db:push`) — the external provisioning steps in that runbook have not been executed and Preview remains unprovisioned.
+Preview is now provisioned: a persistent, isolated Supabase project (`stint-preview`), separate from Production in every respect, with a verified Resend-backed confirmation-email path and Vercel Preview-scoped environment variables. Provisioned and accepted **2026-08-11** (M5.1 Unit F2). `docs/52-preview-environment-runbook.md` is the full provisioning record and acceptance evidence.
 
 Hosted Demo vacancy fixtures are owner-run only and never applied by migrations/CI/build/deploy. Retained Production Demo fixtures must be removed or explicitly re-authorized by **2026-09-02**.
 
@@ -288,7 +288,7 @@ Vercel remains the deployment platform.
 
 Before systematic M5 external testing:
 
-1. restore isolated Preview Supabase/environment configuration;
+1. ~~restore isolated Preview Supabase/environment configuration~~ — **done 2026-08-11**, see `docs/52-preview-environment-runbook.md`;
 2. define minimal privacy-conscious Sentry settings and obtain founder approval before implementation;
 3. complete external-facing legal-page readiness review;
 4. keep Production Demo fixtures out of M5 metrics and clean/re-authorize them by the documented deadline.
