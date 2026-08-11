@@ -1,5 +1,7 @@
 import "server-only";
 
+import * as Sentry from "@sentry/nextjs";
+
 import { createPrivilegedDeletionClient } from "@/lib/account-deletion/privileged-supabase";
 import {
   claimDeletionRequestResultSchema,
@@ -194,10 +196,17 @@ async function claimAndProcess(
   let client: PrivilegedClient;
   try {
     client = createPrivilegedDeletionClient();
-  } catch {
+  } catch (error) {
     // Configuration failure (e.g. missing service-role secret) — nothing
     // was claimed, so there is no in-flight row to mark failed. Fails
-    // closed as a generic result rather than crashing the caller.
+    // closed as a generic result rather than crashing the caller. Reported
+    // to Sentry (M5.1 Unit G, G4) because this catch converts the
+    // exception into a typed result rather than rethrowing it, so
+    // automatic Sentry capture would otherwise never see it — the error
+    // itself is never logged/rendered anywhere else, and Sentry's own
+    // beforeSend scrubber (src/lib/observability/sentry-scrub.ts) strips
+    // any secret-shaped text from its message before it leaves the app.
+    Sentry.captureException(error);
     return { kind: "failed", failureCode: "unknown" };
   }
 
