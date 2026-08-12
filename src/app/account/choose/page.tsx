@@ -9,7 +9,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Choose where to continue · Stint",
+  title: "Choose where to continue · Klinnova",
 };
 
 /**
@@ -42,7 +42,7 @@ export default async function AccountChoosePage() {
     <main className={styles.page}>
       <div className={styles.header}>
         <Link className={styles.brand} href="/">
-          Stint
+          Klinnova
         </Link>
         <LogoutButton />
       </div>

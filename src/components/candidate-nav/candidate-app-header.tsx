@@ -28,7 +28,7 @@ export function CandidateAppHeader({
   return (
     <div className={styles.header}>
       <Link className={styles.brand} href={brandHref}>
-        Stint
+        Klinnova
       </Link>
       <div className={styles.headerActions}>
         <CandidateNav current={current} />

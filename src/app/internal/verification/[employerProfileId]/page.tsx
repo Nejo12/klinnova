@@ -19,7 +19,7 @@ export async function generateMetadata({
 }: InternalVerificationDetailPageProps) {
   const { employerProfileId } = await params;
   return {
-    title: "Verification review · Stint",
+    title: "Verification review · Klinnova",
     description: `Operator review ${employerProfileId}`,
   };
 }

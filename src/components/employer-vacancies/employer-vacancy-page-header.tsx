@@ -18,7 +18,7 @@ export function EmployerVacancyPageHeader({
   return (
     <div className={styles.header}>
       <Link className={styles.brand} href="/">
-        Stint
+        Klinnova
       </Link>
       <div className={styles.headerActions}>
         <nav aria-label="Employer">

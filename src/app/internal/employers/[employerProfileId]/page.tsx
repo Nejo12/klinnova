@@ -20,7 +20,7 @@ export async function generateMetadata({
 }: InternalEmployerDetailPageProps) {
   const { employerProfileId } = await params;
   return {
-    title: "Employer moderation · Stint",
+    title: "Employer moderation · Klinnova",
     description: `Operator moderation ${employerProfileId}`,
   };
 }

@@ -23,7 +23,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Verification · Stint",
+  title: "Verification · Klinnova",
 };
 
 function formatTimestamp(value: string | null): string | null {

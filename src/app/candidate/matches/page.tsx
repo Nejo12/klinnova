@@ -9,7 +9,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Matches · Stint",
+  title: "Matches · Klinnova",
 };
 
 export default async function CandidateMatchesRoutePage() {

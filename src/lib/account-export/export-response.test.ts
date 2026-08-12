@@ -63,7 +63,7 @@ describe("buildExportHttpResponse", () => {
       "application/json; charset=utf-8",
     );
     expect(response.headers["Content-Disposition"]).toBe(
-      'attachment; filename="stint-candidate-export-2026-08-08.json"',
+      'attachment; filename="klinnova-candidate-export-2026-08-08.json"',
     );
     expect(response.headers["Cache-Control"]).toBe("no-store");
   });
@@ -99,7 +99,7 @@ describe("buildExportHttpResponse", () => {
       payload: employerPayload,
     });
     expect(response.headers["Content-Disposition"]).toBe(
-      'attachment; filename="stint-employer-export-2026-08-08.json"',
+      'attachment; filename="klinnova-employer-export-2026-08-08.json"',
     );
   });
 

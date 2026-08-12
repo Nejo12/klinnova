@@ -11,7 +11,7 @@ export function PublicJobsNotFound() {
     <main className={styles.page}>
       <div className={styles.header}>
         <Link className={styles.brand} href="/">
-          Stint
+          Klinnova
         </Link>
       </div>
       <section aria-labelledby="public-job-not-found-heading">

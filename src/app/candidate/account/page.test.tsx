@@ -46,7 +46,7 @@ describe("CandidateAccountPage (M5.1 Unit B)", () => {
     expect(exportLink).toHaveAttribute("href", "/candidate/account/export");
 
     const deleteLink = screen.getByRole("link", {
-      name: "Delete my Stint account",
+      name: "Delete my Klinnova account",
     });
     expect(deleteLink).toHaveAttribute("href", "/candidate/account/delete");
 

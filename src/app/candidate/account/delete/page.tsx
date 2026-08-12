@@ -12,7 +12,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Delete account · Stint",
+  title: "Delete account · Klinnova",
 };
 
 export default async function CandidateDeleteAccountPage() {

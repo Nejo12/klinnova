@@ -11,7 +11,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Application · Stint",
+  title: "Application · Klinnova",
   robots: {
     index: false,
     follow: false,

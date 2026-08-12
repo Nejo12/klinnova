@@ -262,7 +262,7 @@ test.describe("employer application outcome UI journey (M5.1 Unit E)", () => {
       timeout: 15_000,
     });
 
-    // Candidate self-deletes their whole Stint account through the existing
+    // Candidate self-deletes their whole Klinnova account through the existing
     // Slice 8 self-service UI flow — no new service-role path.
     await candidatePage
       .getByLabel("Candidate")
@@ -270,19 +270,19 @@ test.describe("employer application outcome UI journey (M5.1 Unit E)", () => {
       .click();
     await expect(candidatePage).toHaveURL(/\/candidate\/account$/);
     await candidatePage
-      .getByRole("link", { name: "Delete my Stint account" })
+      .getByRole("link", { name: "Delete my Klinnova account" })
       .click();
     await expect(candidatePage).toHaveURL(/\/candidate\/account\/delete$/);
     await candidatePage
       .getByRole("checkbox", {
-        name: "I understand that this deletes my whole Stint account.",
+        name: "I understand that this deletes my whole Klinnova account.",
       })
       .check();
     await candidatePage
       .getByRole("button", { name: "Delete my account" })
       .click();
     await expect(candidatePage.getByRole("status")).toContainText(
-      "Your Stint account has been deleted.",
+      "Your Klinnova account has been deleted.",
       { timeout: 15_000 },
     );
     await candidateContext.close();

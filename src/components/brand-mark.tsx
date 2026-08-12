@@ -7,5 +7,5 @@ type BrandMarkProps = {
 export function BrandMark({ as = "p" }: BrandMarkProps) {
   const Tag = as;
 
-  return <Tag className={styles.mark}>Stint</Tag>;
+  return <Tag className={styles.mark}>Klinnova</Tag>;
 }

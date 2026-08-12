@@ -18,7 +18,7 @@ export async function generateMetadata({
 }: InternalVacancyDetailPageProps) {
   const { vacancyId } = await params;
   return {
-    title: "Vacancy moderation · Stint",
+    title: "Vacancy moderation · Klinnova",
     description: `Operator moderation ${vacancyId}`,
   };
 }

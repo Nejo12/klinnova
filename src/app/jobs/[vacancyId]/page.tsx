@@ -20,11 +20,11 @@ export async function generateMetadata({ params }: PublicJobDetailRouteProps) {
   const { vacancyId } = await params;
   const result = await getDetail(vacancyId);
   if (result.status !== "ready") {
-    return { title: "Job not found · Stint" };
+    return { title: "Job not found · Klinnova" };
   }
   const description = (result.vacancy.description ?? "").slice(0, 160);
   return {
-    title: `${result.vacancy.title} · Stint`,
+    title: `${result.vacancy.title} · Klinnova`,
     description: description.length > 0 ? description : undefined,
   };
 }

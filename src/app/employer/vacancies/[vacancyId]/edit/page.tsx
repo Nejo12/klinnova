@@ -22,7 +22,7 @@ type EditEmployerVacancyPageProps = {
 };
 
 export const metadata = {
-  title: "Edit vacancy · Stint",
+  title: "Edit vacancy · Klinnova",
 };
 
 export default async function EditEmployerVacancyPage({

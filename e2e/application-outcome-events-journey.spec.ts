@@ -315,7 +315,7 @@ test.describe("application outcome events journey (D-M5-22)", () => {
     expect(beforeDeletion.result).toBe("ok");
     const historicalEventId = beforeDeletion.outcome_event_id as string;
 
-    // Candidate self-deletes their whole Stint account through the existing
+    // Candidate self-deletes their whole Klinnova account through the existing
     // Slice 8 self-service UI flow — no new service-role path, matching
     // `account-deletion-journey.spec.ts`'s established local proof pattern.
     await candidatePage
@@ -324,19 +324,19 @@ test.describe("application outcome events journey (D-M5-22)", () => {
       .click();
     await expect(candidatePage).toHaveURL(/\/candidate\/account$/);
     await candidatePage
-      .getByRole("link", { name: "Delete my Stint account" })
+      .getByRole("link", { name: "Delete my Klinnova account" })
       .click();
     await expect(candidatePage).toHaveURL(/\/candidate\/account\/delete$/);
     await candidatePage
       .getByRole("checkbox", {
-        name: "I understand that this deletes my whole Stint account.",
+        name: "I understand that this deletes my whole Klinnova account.",
       })
       .check();
     await candidatePage
       .getByRole("button", { name: "Delete my account" })
       .click();
     await expect(candidatePage.getByRole("status")).toContainText(
-      "Your Stint account has been deleted.",
+      "Your Klinnova account has been deleted.",
       { timeout: 15_000 },
     );
     await candidateContext.close();

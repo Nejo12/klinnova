@@ -6,9 +6,9 @@ test("shell smoke: brand, candidate heading, and employer preview link", async (
   await page.goto("/");
 
   await expect(page.getByRole("banner")).toBeVisible();
-  await expect(page.getByRole("banner").getByText("Stint")).toBeVisible();
+  await expect(page.getByRole("banner").getByText("Klinnova")).toBeVisible();
   await expect(
-    page.getByRole("heading", { level: 1, name: "One step closer." }),
+    page.getByRole("heading", { level: 1, name: "Apply as a candidate." }),
   ).toBeVisible();
 
   const employerLink = page.getByRole("link", {

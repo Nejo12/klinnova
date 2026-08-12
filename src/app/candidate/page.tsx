@@ -13,7 +13,7 @@ import styles from "./page.module.scss";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Candidate · Stint",
+  title: "Candidate · Klinnova",
 };
 
 export default async function CandidatePage() {

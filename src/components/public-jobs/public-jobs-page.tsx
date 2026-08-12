@@ -23,7 +23,7 @@ export function PublicJobsPage(props: PublicJobsPageProps) {
       <main className={styles.page}>
         <div className={styles.header}>
           <Link className={styles.brand} href="/">
-            Stint
+            Klinnova
           </Link>
         </div>
 

@@ -14,7 +14,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Create vacancy draft · Stint",
+  title: "Create vacancy draft · Klinnova",
 };
 
 export default async function NewEmployerVacancyPage() {

@@ -30,7 +30,7 @@ export async function confirmEmployerAccountDeletionAction(
   // session cookies inside this same action would make Next.js refresh the
   // page's Server Component before the client ever renders the "completed"
   // state below, redirecting the user away from the success message they
-  // are owed (D-081). The panel's own "Return to Stint" control signs out
+  // are owed (D-081). The panel's own "Return to Klinnova" control signs out
   // as a separate, explicit follow-up step once that message has rendered.
   return { status: outcome.status };
 }
