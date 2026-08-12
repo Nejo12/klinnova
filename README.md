@@ -41,6 +41,8 @@ M0–M4 implementation is complete through merged PR #73. Slice 8 is complete an
 
 **M5 is active.** It is an operational/product-validation phase, not another broad implementation milestone.
 
+M5.1 beta-readiness execution is recovered and tracked durably in `docs/53-m5.1-beta-readiness-closure.md`. Units A through G2 are complete; **Unit H — legal/support readiness finalization — is the exact current next unit and has not started**. Unit I has baseline investigation evidence but is not formally closed. **Cohort A readiness is currently BLOCKED.**
+
 Overall M5 targets:
 
 - 20 participating employers
@@ -64,16 +66,18 @@ Founder-approved beta boundary:
 - completed interviews and confirmed hires are measured separately from application workflow status;
 - application status `accepted` never automatically counts as a confirmed hire;
 - optional CV upload and save/unsave jobs are deferred for initial M5;
-- minimal privacy-conscious Sentry error monitoring is planned before Cohort A external traffic; PostHog/session replay remain deferred.
+- minimal privacy-conscious Sentry error monitoring is required before Cohort A external traffic; Preview implementation/verification is complete through G1/G2, while Production Sentry remains intentionally unwired pending the separate legal/privacy/activation decision;
+- PostHog/session replay remain deferred.
 
 See:
 
 - [M5 beta transition and measurement](docs/49-m5-beta-transition-and-measurement.md)
 - [M5 outcome contract proposal](docs/50-m5-outcome-contract-proposal.md)
 - [M5 operating plan](docs/51-m5-operating-plan.md)
+- [M5.1 beta-readiness closure](docs/53-m5.1-beta-readiness-closure.md)
 - [Founder dashboard](docs/14-founder-dashboard.md)
 
-No product/schema outcome implementation is authorized by the M5.0 documentation work itself.
+M5.0 itself did not authorize product/schema outcome implementation. Subsequent separately authorized M5.1 Units D/E implemented the outcome contract; current execution state is recorded in `docs/53-m5.1-beta-readiness-closure.md` while the M5.0 documents retain their historical meaning.
 
 ## MVP objective
 
@@ -107,6 +111,7 @@ At the same time, validate that employers can:
 - profile-based application
 - reload-safe confirmation
 - application inventory and status history
+- candidate-safe interview/hire outcome visibility
 - account export
 - account deletion request/confirmation/cancellation
 
@@ -120,6 +125,7 @@ At the same time, validate that employers can:
 - public vacancy visibility through effective-public rules
 - applicant list/detail
 - application status transitions
+- employer interview/hire outcome record/void flow
 - moderation/suspension-aware business operations
 - account export and whole-account deletion flow
 
@@ -130,8 +136,9 @@ At the same time, validate that employers can:
 - vacancy moderation/restoration
 - audit events
 - legal-page placeholders
-- deterministic pilot funnel proof
+- deterministic pilot funnel proof including outcome metrics
 - account privacy/export/deletion controls
+- privacy-conscious Sentry repository integration with hosted Preview verification
 
 ## Deliberately deferred for initial M5
 
@@ -187,6 +194,8 @@ Core source-of-truth documents:
 - [M5 beta transition and measurement](docs/49-m5-beta-transition-and-measurement.md)
 - [M5 outcome contract proposal](docs/50-m5-outcome-contract-proposal.md)
 - [M5 operating plan](docs/51-m5-operating-plan.md)
+- [Preview environment runbook](docs/52-preview-environment-runbook.md)
+- [M5.1 beta-readiness closure](docs/53-m5.1-beta-readiness-closure.md)
 - [Not now](NOT_NOW.md)
 - [Agent instructions](AGENTS.md)
 
@@ -259,6 +268,8 @@ Production remains the current hosted environment.
 
 Preview is now provisioned: a persistent, isolated Supabase project (`stint-preview`), separate from Production in every respect, with a verified Resend-backed confirmation-email path and Vercel Preview-scoped environment variables. Provisioned and accepted **2026-08-11** (M5.1 Unit F2). `docs/52-preview-environment-runbook.md` is the full provisioning record and acceptance evidence.
 
+Minimal Sentry is implemented in the repository (G1) and verified in hosted Preview (G2), including client/server capture, source maps and privacy inspection. Production Sentry remains intentionally unwired pending the separate legal/privacy/activation decision; see `docs/53-m5.1-beta-readiness-closure.md`.
+
 Hosted Demo vacancy fixtures are owner-run only and never applied by migrations/CI/build/deploy. Retained Production Demo fixtures must be removed or explicitly re-authorized by **2026-09-02**.
 
 ### Tests and CI
@@ -286,14 +297,18 @@ CI scaffold public values satisfy build-time validation only; they do not connec
 
 Vercel remains the deployment platform.
 
-Before systematic M5 external testing:
+Before intentional Cohort A external traffic:
 
 1. ~~restore isolated Preview Supabase/environment configuration~~ — **done 2026-08-11**, see `docs/52-preview-environment-runbook.md`;
-2. define minimal privacy-conscious Sentry settings and obtain founder approval before implementation;
-3. complete external-facing legal-page readiness review;
-4. keep Production Demo fixtures out of M5 metrics and clean/re-authorize them by the documented deadline.
+2. ~~implement and verify minimal privacy-conscious Sentry in Preview~~ — **done through M5.1 G1/G2**; Production Sentry remains intentionally unwired pending separate legal/privacy/activation approval;
+3. complete **Unit H** external-facing legal/support readiness: qualified German review/finalization of Impressum/business identity, Privacy notice, beta Terms, support/contact channel, and any required Sentry disclosure;
+4. complete/formally close **Unit I** device/browser/accessibility/readiness proof and evidence-backed remediation/disposition;
+5. keep Production Demo fixtures out of M5 metrics and clean/re-authorize them by **2026-09-02**;
+6. complete Cohort A employer/candidate acquisition and founder-assisted support preparation.
 
-No PostHog/session replay or broad observability/analytics platform is authorized by M5.0.
+**Current Cohort A readiness: BLOCKED.** See `docs/53-m5.1-beta-readiness-closure.md`.
+
+No PostHog/session replay or broad observability/analytics platform is authorized for Cohort A.
 
 ## Guiding question
 
