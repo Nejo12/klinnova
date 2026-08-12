@@ -11,7 +11,7 @@ export const MODERATION_STALE_STATE =
   "This target's state has already changed. Reload to see the current state.";
 
 export const EMPLOYERS_LIST_LEAD =
-  "Employers with an account on Stint. Suspend an employer to hide their vacancies and block their account actions. This is not a full admin dashboard.";
+  "Employers with an account on Klinnova. Suspend an employer to hide their vacancies and block their account actions. This is not a full admin dashboard.";
 
 export const EMPLOYERS_LIST_EMPTY = "No employers found.";
 
