@@ -5,7 +5,7 @@ import styles from "@/components/legal/legal-page.module.scss";
 import { PublicFooter } from "@/components/public-shared/public-footer";
 
 export const metadata = {
-  title: "Privacy · Stint",
+  title: "Privacy · Klinnova",
   description: "Draft privacy placeholder — legal review required.",
   robots: { index: false, follow: false },
 };
@@ -14,7 +14,7 @@ export default function PrivacyPage() {
   return (
     <main className={styles.page}>
       <Link className={styles.brand} href="/">
-        Stint
+        Klinnova
       </Link>
       <h1 className={styles.heading}>Privacy</h1>
 
@@ -25,7 +25,7 @@ export default function PrivacyPage() {
           Controller / responsible party
         </h2>
         <p className={styles.body}>
-          Placeholder — the legal entity operating Stint has not yet been
+          Placeholder — the legal entity operating Klinnova has not yet been
           finalised. See{" "}
           <Link className={styles.backLink} href="/impressum">
             Impressum
@@ -36,17 +36,17 @@ export default function PrivacyPage() {
 
       <section className={styles.section} aria-labelledby="privacy-processed">
         <h2 className={styles.sectionHeading} id="privacy-processed">
-          What Stint currently processes
+          What Klinnova currently processes
         </h2>
         <p className={styles.body}>
-          As of this pilot build, Stint processes: candidate account and profile
-          information you provide during onboarding (name, city, language and
-          work-authorisation declarations, availability, and job preferences);
-          employer account and profile information (display name, locality,
-          contact details, and — for organisations — a company name); vacancy
-          and application information created through normal use of the product;
-          and operator-facing moderation/audit records generated when an
-          operator reviews, suspends, or moderates an account or vacancy.
+          As of this pilot build, Klinnova processes: candidate account and
+          profile information you provide during onboarding (name, city,
+          language and work-authorisation declarations, availability, and job
+          preferences); employer account and profile information (display name,
+          locality, contact details, and — for organisations — a company name);
+          vacancy and application information created through normal use of the
+          product; and operator-facing moderation/audit records generated when
+          an operator reviews, suspends, or moderates an account or vacancy.
         </p>
       </section>
 

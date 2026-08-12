@@ -4,15 +4,15 @@ import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 import styles from "@/components/auth/auth-form.module.scss";
 
 export const metadata = {
-  title: "Reset password · Stint",
-  description: "Request a password reset link for your Stint account.",
+  title: "Reset password · Klinnova",
+  description: "Request a password reset link for your Klinnova account.",
 };
 
 export default function ForgotPasswordPage() {
   return (
     <main className={styles.page}>
       <Link className={styles.brand} href="/">
-        Stint
+        Klinnova
       </Link>
       <h1 className={styles.heading}>Reset your password</h1>
       <p className={styles.lead}>

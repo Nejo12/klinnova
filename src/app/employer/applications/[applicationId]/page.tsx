@@ -24,7 +24,7 @@ export async function generateMetadata({
 }: EmployerApplicationDetailPageProps) {
   const { applicationId } = await params;
   return {
-    title: "Application · Stint",
+    title: "Application · Klinnova",
     description: `Employer applicant review ${applicationId}`,
   };
 }

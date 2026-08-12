@@ -9,7 +9,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const runAuthJourney = process.env.E2E_AUTH_JOURNEY === "1";
 
 const WORK_AUTHORISATION_NOTICE =
-  "Matches are shown using the work-authorisation declaration you provided during onboarding. Stint has not verified documents.";
+  "Matches are shown using the work-authorisation declaration you provided during onboarding. Klinnova has not verified documents.";
 
 const APPLICATION_SUBMIT_DISCLOSURE =
   "By submitting, the profile information shown here will be stored with your application and made available to a future employer review workflow.";

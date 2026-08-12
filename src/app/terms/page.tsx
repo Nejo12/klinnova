@@ -5,7 +5,7 @@ import styles from "@/components/legal/legal-page.module.scss";
 import { PublicFooter } from "@/components/public-shared/public-footer";
 
 export const metadata = {
-  title: "Terms · Stint",
+  title: "Terms · Klinnova",
   description: "Draft terms placeholder — legal review required.",
   robots: { index: false, follow: false },
 };
@@ -14,7 +14,7 @@ export default function TermsPage() {
   return (
     <main className={styles.page}>
       <Link className={styles.brand} href="/">
-        Stint
+        Klinnova
       </Link>
       <h1 className={styles.heading}>Terms</h1>
 
@@ -25,9 +25,9 @@ export default function TermsPage() {
           Service purpose
         </h2>
         <p className={styles.body}>
-          Stint connects candidates in Berlin with employers offering roles that
-          do not require fluent German, and gives employers tools to publish
-          vacancies and review applicants.
+          Klinnova connects candidates in Berlin with employers offering roles
+          that do not require fluent German, and gives employers tools to
+          publish vacancies and review applicants.
         </p>
       </section>
 
@@ -36,9 +36,9 @@ export default function TermsPage() {
           Pilot / beta status
         </h2>
         <p className={styles.body}>
-          Stint is currently operated as a controlled, founder-operated pilot.
-          Features, availability, and these terms may change without the notice
-          period a general-availability product would give.
+          Klinnova is currently operated as a controlled, founder-operated
+          pilot. Features, availability, and these terms may change without the
+          notice period a general-availability product would give.
         </p>
       </section>
 

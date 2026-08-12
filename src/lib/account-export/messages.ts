@@ -1,7 +1,7 @@
 export const CANDIDATE_EXPORT_LEAD =
-  "Download a copy of your Stint candidate data as JSON.";
+  "Download a copy of your Klinnova candidate data as JSON.";
 export const EMPLOYER_EXPORT_LEAD =
-  "Download a copy of your Stint employer data as JSON.";
+  "Download a copy of your Klinnova employer data as JSON.";
 
 export const CANDIDATE_EXPORT_BUTTON_LABEL = "Download candidate data";
 export const EMPLOYER_EXPORT_BUTTON_LABEL = "Download employer data";

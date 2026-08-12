@@ -8,8 +8,8 @@ import "@/styles/globals.scss";
 assertServerEnv();
 
 export const metadata: Metadata = {
-  title: "Stint",
-  description: "One step closer.",
+  title: "Klinnova",
+  description: "Connecting candidates and employers in Berlin.",
 };
 
 type RootLayoutProps = {

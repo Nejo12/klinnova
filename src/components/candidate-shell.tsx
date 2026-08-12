@@ -11,7 +11,7 @@ export function CandidateShell() {
     >
       <p className={styles.eyebrow}>Candidate experience</p>
       <h1 id="candidate-shell-heading" className={styles.heading}>
-        One step closer.
+        Apply as a candidate.
       </h1>
       <p className={styles.lead}>
         Let&apos;s start with what you can do. Applications do not need a CV to

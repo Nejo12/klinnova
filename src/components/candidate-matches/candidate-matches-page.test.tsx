@@ -115,7 +115,7 @@ describe("CandidateMatchesPage", () => {
     expect(
       screen.queryByRole("link", { name: /Back to candidate home/i }),
     ).toBeNull();
-    expect(screen.getByRole("link", { name: "Stint" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Klinnova" })).toHaveAttribute(
       "href",
       "/",
     );

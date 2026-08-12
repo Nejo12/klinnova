@@ -13,7 +13,7 @@ export const ONBOARDING_COMPLETE_FAILURE =
   "We could not confirm your essentials just now. Please try again.";
 
 export const WORK_AUTHORISATION_SUPPORT =
-  "This is your own declaration. Stint is not verifying documents at this step.";
+  "This is your own declaration. Klinnova is not verifying documents at this step.";
 
 export const WORK_AUTHORISATION_NOT_SURE_GUIDANCE =
   "That is fine. You can continue other questions and return when you are ready. Matching will wait until you can declare that you are allowed to work in Germany.";

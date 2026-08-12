@@ -31,8 +31,8 @@ export function LocationGroupForm({
       <fieldset className={styles.fieldset}>
         <legend className={styles.legend}>Where you can work</legend>
         <p className={styles.support}>
-          Stint starts in Berlin. Choose the longest one-way travel time you are
-          willing to take.
+          Klinnova starts in Berlin. Choose the longest one-way travel time you
+          are willing to take.
         </p>
         <p className={styles.option}>
           <span className={styles.optionLabel}>City: Berlin</span>

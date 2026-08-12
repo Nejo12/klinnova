@@ -143,7 +143,7 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
       page.getByRole("link", { name: "Download candidate data" }),
     ).toHaveAttribute("href", "/candidate/account/export");
     const deleteLink = page.getByRole("link", {
-      name: "Delete my Stint account",
+      name: "Delete my Klinnova account",
     });
     await expect(deleteLink).toBeVisible();
     await expect(page.getByRole("button", { name: "Log out" })).toBeVisible();
@@ -156,10 +156,12 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
     // Reaching the delete page itself must not trigger deletion either —
     // the confirmation checkbox/button must still require an explicit act.
     await page.goto("/candidate/account");
-    await page.getByRole("link", { name: "Delete my Stint account" }).click();
+    await page
+      .getByRole("link", { name: "Delete my Klinnova account" })
+      .click();
     await expect(page).toHaveURL(/\/candidate\/account\/delete$/);
     await expect(
-      page.getByRole("heading", { name: "Delete my Stint account" }),
+      page.getByRole("heading", { name: "Delete my Klinnova account" }),
     ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Delete my account" }),

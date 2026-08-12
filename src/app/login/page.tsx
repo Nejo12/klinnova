@@ -11,8 +11,8 @@ import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const metadata = {
-  title: "Sign in · Stint",
-  description: "Sign in to your Stint account.",
+  title: "Sign in · Klinnova",
+  description: "Sign in to your Klinnova account.",
 };
 
 type LoginPageProps = {
@@ -50,13 +50,13 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <main className={styles.page}>
       <Link className={styles.brand} href="/">
-        Stint
+        Klinnova
       </Link>
       <h1 className={styles.heading}>Sign in</h1>
       <p className={styles.lead}>
         {employerIntent
-          ? "Use the email and password for your Stint account to continue as an employer."
-          : "Use the email and password for your Stint account."}
+          ? "Use the email and password for your Klinnova account to continue as an employer."
+          : "Use the email and password for your Klinnova account."}
       </p>
       <LoginForm nextPath={nextPathForForm} />
       <p className={styles.footer}>

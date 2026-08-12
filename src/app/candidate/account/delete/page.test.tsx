@@ -51,7 +51,7 @@ describe("CandidateDeleteAccountPage (M5.1 Unit B)", () => {
       "page",
     );
     expect(
-      screen.getByRole("heading", { name: "Delete my Stint account" }),
+      screen.getByRole("heading", { name: "Delete my Klinnova account" }),
     ).toBeInTheDocument();
     // The confirm button requires the acknowledgement checkbox first —
     // navigating here alone must never itself delete anything.

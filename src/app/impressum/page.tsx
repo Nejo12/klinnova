@@ -5,7 +5,7 @@ import styles from "@/components/legal/legal-page.module.scss";
 import { PublicFooter } from "@/components/public-shared/public-footer";
 
 export const metadata = {
-  title: "Impressum · Stint",
+  title: "Impressum · Klinnova",
   description: "Draft Impressum placeholder — legal review required.",
   robots: { index: false, follow: false },
 };
@@ -14,7 +14,7 @@ export default function ImpressumPage() {
   return (
     <main className={styles.page}>
       <Link className={styles.brand} href="/">
-        Stint
+        Klinnova
       </Link>
       <h1 className={styles.heading}>Impressum</h1>
 

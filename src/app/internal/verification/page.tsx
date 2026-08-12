@@ -13,7 +13,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Verification queue · Stint",
+  title: "Verification queue · Klinnova",
 };
 
 export default async function InternalVerificationQueuePage() {

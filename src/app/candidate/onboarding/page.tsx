@@ -23,7 +23,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Onboarding · Stint",
+  title: "Onboarding · Klinnova",
 };
 
 type OnboardingPageProps = {

@@ -14,7 +14,6 @@ export function ShellHeader() {
             Jobs
           </Link>
         </nav>
-        <p className={styles.tagline}>One step closer.</p>
       </div>
     </header>
   );

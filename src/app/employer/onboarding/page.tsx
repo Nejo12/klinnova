@@ -16,7 +16,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Employer onboarding · Stint",
+  title: "Employer onboarding · Klinnova",
 };
 
 export default async function EmployerOnboardingPage() {
@@ -54,7 +54,7 @@ export default async function EmployerOnboardingPage() {
     <main className={styles.page}>
       <div className={styles.header}>
         <Link className={styles.brand} href="/">
-          Stint
+          Klinnova
         </Link>
         <div className={styles.headerActions}>
           <CapabilityNav

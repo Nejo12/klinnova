@@ -5,7 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Jobs in Berlin · Stint",
+  title: "Jobs in Berlin · Klinnova",
   description:
     "Browse verified Berlin vacancies that do not require fluent German. Sign in to check your eligibility and apply.",
 };

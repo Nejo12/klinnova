@@ -8,7 +8,7 @@ import {
 } from "@/lib/auth/messages";
 
 export const metadata = {
-  title: "Confirmation issue · Stint",
+  title: "Confirmation issue · Klinnova",
 };
 
 type AuthErrorPageProps = {
@@ -29,7 +29,7 @@ export default async function AuthErrorPage({
   return (
     <main className={styles.page}>
       <Link className={styles.brand} href="/">
-        Stint
+        Klinnova
       </Link>
       <h1 className={styles.heading}>We could not finish that step</h1>
       <p className={styles.lead}>{message}</p>

@@ -7,7 +7,7 @@ describe("CandidateAppHeader (M5.1 Unit B)", () => {
   it("renders the brand link, the candidate nav, and hides the capability switcher for a candidate-only account", () => {
     render(<CandidateAppHeader current="matches" showEmployerNav={false} />);
 
-    expect(screen.getByRole("link", { name: "Stint" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Klinnova" })).toHaveAttribute(
       "href",
       "/candidate",
     );
@@ -28,7 +28,7 @@ describe("CandidateAppHeader (M5.1 Unit B)", () => {
   it("supports a custom brand href (matches page failure state)", () => {
     render(<CandidateAppHeader showEmployerNav={false} brandHref="/" />);
 
-    expect(screen.getByRole("link", { name: "Stint" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Klinnova" })).toHaveAttribute(
       "href",
       "/",
     );

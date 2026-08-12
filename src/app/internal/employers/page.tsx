@@ -15,7 +15,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Employers · Stint",
+  title: "Employers · Klinnova",
 };
 
 type InternalEmployersPageProps = {

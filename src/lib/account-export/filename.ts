@@ -11,5 +11,5 @@ export function exportFilename(
   const isoDate = Number.isNaN(date.getTime())
     ? new Date().toISOString().slice(0, 10)
     : date.toISOString().slice(0, 10);
-  return `stint-${role}-export-${isoDate}.json`;
+  return `klinnova-${role}-export-${isoDate}.json`;
 }

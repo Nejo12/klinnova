@@ -8,7 +8,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Set new password · Stint",
+  title: "Set new password · Klinnova",
 };
 
 export default async function ResetPasswordPage() {
@@ -21,7 +21,7 @@ export default async function ResetPasswordPage() {
     return (
       <main className={styles.page}>
         <Link className={styles.brand} href="/">
-          Stint
+          Klinnova
         </Link>
         <h1 className={styles.heading}>We could not finish that step</h1>
         <p className={styles.lead}>{AUTH_RESET_LINK_INVALID}</p>
@@ -37,11 +37,11 @@ export default async function ResetPasswordPage() {
   return (
     <main className={styles.page}>
       <Link className={styles.brand} href="/">
-        Stint
+        Klinnova
       </Link>
       <h1 className={styles.heading}>Set a new password</h1>
       <p className={styles.lead}>
-        Choose a new password for your Stint account.
+        Choose a new password for your Klinnova account.
       </p>
       <ResetPasswordForm />
     </main>

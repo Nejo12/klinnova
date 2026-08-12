@@ -7,7 +7,7 @@ import { PublicFooter } from "@/components/public-shared/public-footer";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const metadata = {
-  title: "Register · Stint",
+  title: "Register · Klinnova",
   description: "Create a candidate account.",
 };
 
@@ -24,7 +24,7 @@ export default async function RegisterPage() {
   return (
     <main className={styles.page}>
       <Link className={styles.brand} href="/">
-        Stint
+        Klinnova
       </Link>
       <h1 className={styles.heading}>Create your account</h1>
       <p className={styles.lead}>

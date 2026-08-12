@@ -8,7 +8,7 @@ describe("CandidateShell", () => {
     render(<CandidateShell />);
 
     expect(
-      screen.getByRole("heading", { level: 1, name: "One step closer." }),
+      screen.getByRole("heading", { level: 1, name: "Apply as a candidate." }),
     ).toBeInTheDocument();
 
     expect(

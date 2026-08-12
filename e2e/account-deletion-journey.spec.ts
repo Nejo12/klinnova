@@ -35,7 +35,9 @@ test.describe("account deletion journey", () => {
       .getByRole("link", { name: "Account" })
       .click();
     await expect(page).toHaveURL(/\/candidate\/account$/);
-    await page.getByRole("link", { name: "Delete my Stint account" }).click();
+    await page
+      .getByRole("link", { name: "Delete my Klinnova account" })
+      .click();
     await expect(page).toHaveURL(/\/candidate\/account\/delete$/);
 
     const confirmButton = page.getByRole("button", {
@@ -44,7 +46,7 @@ test.describe("account deletion journey", () => {
     await expect(confirmButton).toBeDisabled();
 
     const confirmCheckbox = page.getByRole("checkbox", {
-      name: "I understand that this deletes my whole Stint account.",
+      name: "I understand that this deletes my whole Klinnova account.",
     });
     // Server-authoritative confirmation contract (not just client UX):
     // the checkbox must submit the exact field name/value both destructive
@@ -61,7 +63,7 @@ test.describe("account deletion journey", () => {
 
     await confirmButton.click();
     await expect(page.getByRole("status")).toContainText(
-      "Your Stint account has been deleted.",
+      "Your Klinnova account has been deleted.",
       { timeout: 15_000 },
     );
 
