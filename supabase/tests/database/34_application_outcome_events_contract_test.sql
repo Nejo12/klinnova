@@ -434,3 +434,5 @@ select is(
 
 select * from finish();
 rollback;
+
+-- CI Tier A verification: this comment proves a supabase/** change is NOT classified as docs-only. Throwaway, not for merge.
