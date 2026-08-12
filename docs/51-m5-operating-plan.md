@@ -9,6 +9,11 @@ Related:
 - M5 beta boundary and measurement: `docs/49-m5-beta-transition-and-measurement.md`
 - Outcome contract proposal: `docs/50-m5-outcome-contract-proposal.md`
 - Founder dashboard: `docs/14-founder-dashboard.md`
+- Current M5.1 execution/readiness state: `docs/53-m5.1-beta-readiness-closure.md`
+
+### Current execution-state note — 2026-08-12
+
+This document preserves the operating direction approved in M5.0. Subsequent separately authorized M5.1 work has now implemented the outcome contract through Units D/E, provisioned persistent isolated Preview through F/F2, and implemented plus hosted-Preview-verified minimal Sentry through G1/G2. Production Sentry remains intentionally unwired. Unit H (legal/support readiness) is the exact current next unit and is **not started**; Unit I has baseline investigation evidence but is not formally closed. Cohort A readiness remains **BLOCKED**. See `docs/53-m5.1-beta-readiness-closure.md` for the authoritative execution state.
 
 ## 1. Objective
 
@@ -315,7 +320,7 @@ later, via M5.1 Unit F.)
 
 ### Minimal Sentry — approved readiness requirement
 
-Before intentional Cohort A external traffic, configure Sentry subject to the approved boundary:
+The M5.0 requirement was to configure Sentry before intentional Cohort A external traffic subject to the approved boundary:
 
 - EU region where available on the selected plan;
 - error monitoring only;
@@ -327,7 +332,7 @@ Before intentional Cohort A external traffic, configure Sentry subject to the ap
 - retention target 30 days or less where supported;
 - no PostHog in Cohort A.
 
-This PR does not configure Sentry.
+**Current status:** repository implementation is complete through M5.1 G1 (PR #86), and hosted **Preview** activation/verification is complete through G2, including client capture, server `onRequestError` capture, source-map verification, privacy inspection, and temporary-test cleanup. **Production Sentry remains intentionally unwired** pending the separate legal/privacy/activation decision. Full evidence is recorded in `docs/53-m5.1-beta-readiness-closure.md`.
 
 ### Production demo fixtures
 
@@ -351,6 +356,8 @@ Intentional Cohort A external traffic is gated on qualified German legal review/
 - Terms suitable for the beta;
 - support/contact channel;
 - Sentry disclosure if required.
+
+**Current status:** open. M5.1 Unit H is the exact current next unit and has **not started**. This recovery/update does not authorize Unit H work.
 
 This is a readiness gate, **not** a claim of full GDPR compliance.
 
@@ -398,6 +405,8 @@ Count an application once when it has an active, non-voided employer-recorded `h
 
 `applications.status = accepted` never counts automatically.
 
+**Current implementation note:** the outcome contract described prospectively in M5.0 was subsequently implemented through separately authorized M5.1 Units D/E. The historical wording above remains the original operating rule; current implementation status is in `docs/53-m5.1-beta-readiness-closure.md`.
+
 ## 16. Outcome correction and candidate/deletion behavior
 
 Approved operating intent for future implementation:
@@ -413,6 +422,8 @@ Approved operating intent for future implementation:
 - DB-generate immutable `recorded_at`.
 
 No schema/runtime work is implemented by this PR.
+
+**Current implementation note:** this statement describes PR #74 itself and remains historically correct. Later M5.1 Units D/E implemented the approved contract under separate founder authorization.
 
 ## 17. Cohort advancement gates
 
@@ -471,4 +482,4 @@ The founder has approved:
 - founder-owned qualified German legal-review gate;
 - weekly `Operate manually / Fix now / Watch / Defer` cadence.
 
-No additional M5.0 operating-plan decision remains open. PR #74 is merged; the next founder decisions are the M5.1 beta-readiness-closure items tracked in `docs/14-founder-dashboard.md`.
+No additional M5.0 operating-plan decision remains open. PR #74 is merged. Current M5.1 execution/readiness state is in `docs/53-m5.1-beta-readiness-closure.md`: Units A through G2 are complete, Unit H is the exact current next unit and **not started**, Unit I is not formally closed, and Cohort A readiness is **BLOCKED**.

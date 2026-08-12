@@ -36,6 +36,7 @@ Use heavier discovery/decision planning for schema/database, authorization/RLS, 
 M5 boundary/measurement: `docs/49-m5-beta-transition-and-measurement.md`.
 Outcome-contract proposal: `docs/50-m5-outcome-contract-proposal.md`.
 Operating plan: `docs/51-m5-operating-plan.md`.
+Current M5.1 execution/readiness state: `docs/53-m5.1-beta-readiness-closure.md`.
 
 ## Recommended stack
 
@@ -178,7 +179,7 @@ MVP account-data export/deletion controls are implemented and locally proven. Th
 
 Interview/hire outcomes remain conceptually separate from application workflow status.
 
-Future implementation, if separately authorized, must follow the founder-approved constraints in `docs/49`/`docs/50`:
+The M5.0-approved future implementation direction was required to follow the founder-approved constraints in `docs/49`/`docs/50`:
 
 - employer-owned application outcome events;
 - candidate read-only active outcome type + occurred date/time;
@@ -189,7 +190,7 @@ Future implementation, if separately authorized, must follow the founder-approve
 - immutable DB-generated `recorded_at`;
 - no automatic coupling between outcome events and application status.
 
-No outcome schema/runtime implementation is authorized by M5.0 itself.
+M5.0 itself did not authorize outcome schema/runtime implementation. Subsequent separately authorized M5.1 Units D/E implemented and locally/hosted-Preview-proved the outcome DB/RLS/RPC contract, employer record/void UI, candidate-safe projection, and funnel integration. Current execution status is recorded in `docs/53-m5.1-beta-readiness-closure.md`; `docs/49`/`docs/50` remain the historical decision/proposal records.
 
 ### Cohort A operating boundary
 
@@ -199,11 +200,14 @@ Cohort A is cleaning-first. Allow at most 1–2 adjacent low-language-barrier em
 
 Before intentional Cohort A external traffic:
 
-- isolated Preview must be restored for systematic external testing;
-- minimal Sentry error monitoring must be configured with EU region where available, no session replay, no request/application/vacancy payload capture, unnecessary identifier scrubbing, Preview/Production separation, and <=30-day retention where supported;
+- ~~isolated Preview must be restored for systematic external testing~~ — complete through M5.1 F/F2; see `docs/52-preview-environment-runbook.md`;
+- ~~minimal Sentry must be implemented and verified in Preview within the approved privacy boundary~~ — complete through M5.1 G1/G2; Production Sentry remains intentionally unwired pending the separate legal/privacy/activation decision;
 - qualified German legal review/finalization must cover Impressum/business identity, Privacy notice, beta Terms, support/contact channel, and Sentry disclosure if required;
 - founder owns the legal-readiness gate;
-- retained Production Demo fixtures must be removed or explicitly re-authorized by 2026-09-02.
+- retained Production Demo fixtures must be removed or explicitly re-authorized by 2026-09-02;
+- remaining device/browser/accessibility/readiness closure and operational Cohort A preparation must be completed or explicitly dispositioned before the readiness verdict changes from BLOCKED.
+
+Current Cohort A readiness is **BLOCKED**. See `docs/53-m5.1-beta-readiness-closure.md` for the authoritative current execution/readiness state.
 
 This readiness gate is not a claim of full GDPR compliance.
 
@@ -218,7 +222,7 @@ Run one structured M5 review per week. Classify each issue as:
 
 This phase is operational and product-led. It should not trigger large feature expansion.
 
-The next product/schema implementation is **not authorized** by M5 activation or PR #74 alone. Select it explicitly after final founder review/merge of M5.0.
+M5 activation or PR #74 alone does not authorize later product/schema work. Subsequent M5.1 units require their own bounded founder authorization; current execution state and next-unit selection are recorded in `docs/53-m5.1-beta-readiness-closure.md`.
 
 ## Historical planning vocabulary
 

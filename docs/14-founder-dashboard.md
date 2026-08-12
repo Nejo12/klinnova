@@ -7,6 +7,7 @@ Delivery/phase plan: `docs/13-implementation-plan.md`.
 M5 boundary/metrics: `docs/49-m5-beta-transition-and-measurement.md`.
 M5 outcome proposal: `docs/50-m5-outcome-contract-proposal.md`.
 M5 operating plan: `docs/51-m5-operating-plan.md`.
+M5.1 execution/readiness closure: `docs/53-m5.1-beta-readiness-closure.md`.
 Deferred ideas: `NOT_NOW.md`.
 Historical slice detail remains in the individual discovery/build-plan/closure documents.
 
@@ -17,15 +18,16 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 | Active milestone | **M5 — Berlin private beta** |
 | Previous milestone | **M4 — Complete** (Slices 7–8 closed; PR #73 merged) |
 | Product boundary | Merged M4 implementation under D-M5-1 feature freeze |
-| Active work unit | M5.1 — beta readiness closure (Unit A1 merged: publication/matching integrity, PR #76/#77; Unit B merged: candidate navigation/account IA, PR #78; Unit C merged: password recovery, PR #79; Unit D: outcome DB/RLS/RPC contract, PR pending merge) |
-| PR | #74 — M5.0 merged |
-| Product/schema implementation | M5.1 product/schema work proceeds only through explicitly approved bounded units (e.g. Unit A1, Unit B); Production changes remain separately authorized |
+| Active work unit | **M5.1 Unit H — legal/support readiness finalization; NOT STARTED**. Units A→A1→B→C→D→E→F/F2→G1/G2 are complete. Unit I has baseline investigation evidence but is not formally closed. See `docs/53-m5.1-beta-readiness-closure.md`. |
+| PR | Current recovery/closure PR only; Unit H is not authorized by it |
+| Product/schema implementation | M5.1 work proceeds only through explicitly approved bounded units; Production changes remain separately authorized |
 | Preview | Provisioned **2026-08-11** — persistent, isolated Supabase project (`stint-preview`); see `docs/52-preview-environment-runbook.md` |
-| Production | Existing production remains live; no M5.0 product/schema mutation |
+| Monitoring | **Preview Sentry complete through G1/G2** — repository integration merged, hosted Preview client/server/source-map/privacy verification passed. **Production Sentry remains intentionally unwired** pending separate legal/privacy/activation approval. |
+| Production | Existing production remains live; no Unit G2 Production activation occurred |
+| Cohort A readiness | **BLOCKED** — legal/support, Production Sentry decision, Unit I closure, demo-fixture obligation, and operational preparation remain open |
 | Hosted destructive proof | Not authorized / not run |
 | Demo fixture deadline | Remove or explicitly re-authorize retained Production Demo fixtures by **2026-09-02** |
-| Monitoring | Minimal privacy-conscious Sentry approved before intentional Cohort A external traffic; not configured in M5.0 |
-| Legal readiness | Founder-owned qualified German legal review/finalization gate before intentional Cohort A external traffic |
+| Legal readiness | Founder-owned qualified German legal review/finalization gate before intentional Cohort A external traffic; Unit H is the exact current next unit |
 
 ## M5 targets and approved definitions
 
@@ -104,40 +106,45 @@ A change may enter active work only when it is required to measure the beta, rem
 
 ## Immediate beta-readiness queue after M5.0 merge
 
-This is a planning queue, **not automatic authorization**.
+This is a planning queue, **not automatic authorization**. Current execution status is authoritative in `docs/53-m5.1-beta-readiness-closure.md`.
 
 ### Product / measurement
 
-1. Select and explicitly authorize the smallest outcome-measurement implementation unit if founder chooses it as the next work item.
-2. Preserve workflow/outcome separation and the approved M5 counting semantics.
+1. ~~Implement the approved separate outcome-measurement contract and candidate-safe visibility.~~ Complete through M5.1 Units D/E.
+2. Preserve workflow/outcome separation and the approved M5 counting semantics during beta operation.
 
 ### Infrastructure
 
 1. ~~Restore an isolated Preview environment before systematic external testing.~~ Done **2026-08-11** — see `docs/52-preview-environment-runbook.md`.
-2. Configure approved minimal Sentry before intentional Cohort A external traffic.
+2. ~~Configure and verify approved minimal Sentry in Preview.~~ Done through M5.1 G1/G2. Production remains intentionally unwired pending the separate legal/privacy/activation decision.
 3. Remove/re-authorize retained Production Demo fixtures by 2026-09-02.
 
 ### Operations
 
 1. Prepare cleaning-first employer acquisition with the 1–2 adjacent-employer exception only where justified.
 2. Prepare candidate recruitment channels.
-3. Complete founder-owned qualified German legal review/finalization gate.
-4. Establish support/contact channel and founder-assisted onboarding.
+3. Complete founder-owned qualified German legal review/finalization gate — **Unit H, current next unit**.
+4. Establish support/contact channel and founder-assisted onboarding — **Unit H**.
 5. Run one structured weekly M5 review using `Operate manually / Fix now / Watch / Defer`.
 
-### UX / readiness backlog (not folded into Unit A1)
+### UX / readiness backlog (Unit I not formally closed)
 
-1. `/employer` renders two exact-text "Vacancies" links (the shared `EmployerVacancyPageHeader` nav link and the employer-home body button, both introduced/renamed by PR #75) — deeper gated E2E specs (`E2E_AUTH_JOURNEY=1`) that select by exact accessible name hit a strict-mode ambiguity. Not yet a demonstrated user-facing blocker; not a publication/matching integrity issue. Address alongside Unit B or Unit I remediation — do not rename UI solely to satisfy the selector, and do not weaken the affected tests with an arbitrary `.first()`; target the intended nav region/link context instead. Discovered because this was the first session run of the full gated E2E suite — these specs are not part of CI's own `pnpm test:e2e` (smoke-tier only), so this predates M5.1 and was previously unobserved.
+1. `/employer` renders two exact-text "Vacancies" links (the shared `EmployerVacancyPageHeader` nav link and the employer-home body button, both introduced/renamed by PR #75) — deeper gated E2E specs (`E2E_AUTH_JOURNEY=1`) that select by exact accessible name hit a strict-mode ambiguity. Not yet a demonstrated user-facing blocker; not a publication/matching integrity issue. Address/disposition under Unit I remediation — do not rename UI solely to satisfy the selector, and do not weaken the affected tests with an arbitrary `.first()`; target the intended nav region/link context instead. Discovered because this was the first session run of the full gated E2E suite — these specs are not part of CI's own `pnpm test:e2e` (smoke-tier only), so this predates M5.1 and was previously unobserved.
+2. Unit I has historical/baseline investigation evidence (including the baseline browser proof that surfaced Unit A1 blockers) but no formal closure artifact/PR. Device/browser/accessibility readiness therefore remains open.
 
 ## Cohort A readiness gates
 
 Before intentional external Cohort A traffic:
 
 - qualified German legal review/finalization of Impressum/business identity, Privacy notice, beta Terms, support/contact channel, and Sentry disclosure if required;
-- minimal Sentry configured within the approved privacy boundary;
+- ~~minimal Sentry configured within the approved privacy boundary in Preview~~ — complete through G1/G2; Production activation remains a separate unresolved gate;
 - ~~isolated Preview available for systematic external testing of iterative builds~~ — done **2026-08-11**;
 - technical/moderation/privacy support procedures understood;
-- demo-fixture cleanup deadline tracked.
+- Unit I device/browser/accessibility/readiness proof closed or explicitly dispositioned;
+- demo-fixture cleanup deadline tracked and satisfied/re-authorized as required;
+- Cohort A employer/candidate acquisition and founder-assisted onboarding preparation ready.
+
+**Current verdict: BLOCKED.** See `docs/53-m5.1-beta-readiness-closure.md`.
 
 This gate does not establish or claim full GDPR compliance.
 
@@ -164,11 +171,13 @@ Do not optimize M5 for larger test counts. The primary M5 numbers are participat
 | M2 Applications | Complete | Slice 3 |
 | M3 Employer flow | Implementation complete | Slices 4–6; Slice 6 hosted proof remains separately deferred |
 | M4 Trust and beta readiness | **Complete** | Slices 7–8; `docs/44`, `docs/48`; PR #73 |
-| M5 Berlin private beta | **Active** | `docs/49`–`docs/51`; PR #74 M5.0 merged; M5.1 beta-readiness closure in progress |
+| M5 Berlin private beta | **Active** | `docs/49`–`docs/53`; PR #74 M5.0 merged; M5.1 beta-readiness closure in progress; current next unit H |
 
 ## Decision discipline
 
 D-001–D-090 remain in `docs/10-decisions.md`.
 Founder-approved M5 operating/measurement decisions D-M5-1–D-M5-22 are recorded in `docs/49-m5-beta-transition-and-measurement.md`.
+
+When current documentation and execution history conflict, merged Git/PR evidence determines implementation status; accepted hosted proof determines external-configuration status. Historical planning documents retain their original meaning unless explicitly superseded. `docs/53-m5.1-beta-readiness-closure.md` is the durable M5.1 execution/readiness record.
 
 Normal beta fixes use evidence-first lightweight delivery. Changes affecting schema/database, authorization/RLS, privacy, security, matching authority, employment/legal boundaries, or major architecture require explicit discovery and founder approval before implementation.
