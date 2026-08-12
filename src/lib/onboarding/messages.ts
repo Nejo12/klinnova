@@ -17,3 +17,5 @@ export const WORK_AUTHORISATION_SUPPORT =
 
 export const WORK_AUTHORISATION_NOT_SURE_GUIDANCE =
   "That is fine. You can continue other questions and return when you are ready. Matching will wait until you can declare that you are allowed to work in Germany.";
+
+// CI Tier A verification: this comment proves a src/** change is NOT classified as docs-only. Throwaway, not for merge.
