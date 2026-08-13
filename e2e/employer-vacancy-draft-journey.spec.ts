@@ -1,6 +1,10 @@
 import { expect, test } from "@playwright/test";
 
 import { registerAndConfirm } from "./helpers/auth";
+import {
+  getLocalUserIdByEmail,
+  provisionLocalVerificationOperator,
+} from "./helpers/local-operator-proof";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const runAuthJourney = process.env.E2E_AUTH_JOURNEY === "1";
@@ -71,14 +75,19 @@ test.describe("employer vacancy draft journeys", () => {
 
   test("private employer creates, edits, reaches readiness, deletes draft", async ({
     page,
+    browser,
   }) => {
     expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
     const stamp = Date.now();
     const title = `Morning clean ${stamp}`;
+    const employerDisplayName = `Vacancy Private ${stamp}`;
 
     await completePrivateEmployer(page, stamp);
 
-    await page.getByRole("link", { name: "Vacancies", exact: true }).click();
+    await page
+      .getByLabel("Employer")
+      .getByRole("link", { name: "Vacancies" })
+      .click();
     await expect(page).toHaveURL(/\/employer\/vacancies$/);
     await expect(page.getByText(/no vacancies yet/i)).toBeVisible();
     await expect(page.getByRole("button", { name: /publish/i })).toHaveCount(0);
@@ -102,6 +111,10 @@ test.describe("employer vacancy draft journeys", () => {
     await page
       .getByLabel("Description")
       .fill("Wash kitchen floors before noon.");
+    await page.getByLabel("Workplace type").selectOption("office");
+    await page.getByLabel("Work frequency").selectOption("recurring");
+    await page.getByRole("checkbox", { name: "Full time" }).check();
+    await page.getByRole("checkbox", { name: "Morning" }).check();
     await page.getByLabel("Amount in EUR").fill("15.50");
     await page.getByLabel("Period").selectOption("hourly");
     await page.getByRole("button", { name: "Save draft" }).click();
@@ -117,7 +130,58 @@ test.describe("employer vacancy draft journeys", () => {
       timeout: 15_000,
     });
 
-    await page.reload();
+    // D-M5-19: employer verification is a genuine readiness requirement —
+    // employer_vacancy_draft_readiness and publish_employer_vacancy both
+    // require verification_state = 'verified'. Request and approve it
+    // through the real workflow (same pattern as
+    // internal-verification-journey.spec.ts) so this test legitimately
+    // reaches "Ready for a future publication step", rather than asserting
+    // a readiness state the product correctly does not allow.
+    const draftUrl = page.url();
+
+    await page
+      .getByRole("navigation", { name: "Employer" })
+      .getByRole("link", { name: "Verification", exact: true })
+      .click();
+    await page
+      .getByRole("checkbox", {
+        name: /I confirm that the information in my employer profile/i,
+      })
+      .check();
+    await page.getByRole("button", { name: "Request verification" }).click();
+    await expect(
+      page.getByRole("heading", { name: /Pending review/i }),
+    ).toBeVisible({ timeout: 15_000 });
+
+    const operatorContext = await browser.newContext();
+    const operatorPage = await operatorContext.newPage();
+    const operatorEmail = `vacancy.operator.${stamp}@example.test`;
+    await registerAndConfirm(operatorPage, {
+      email: operatorEmail,
+      password: `TestPass-${stamp}!`,
+      displayName: `Vacancy Operator ${stamp}`,
+    });
+    const operatorId = await getLocalUserIdByEmail(operatorEmail);
+    await provisionLocalVerificationOperator(operatorId);
+
+    await operatorPage.goto("/internal/verification");
+    await operatorPage
+      .getByRole("link", {
+        name: new RegExp(`Review.*${employerDisplayName}`, "i"),
+      })
+      .click();
+    await operatorPage
+      .getByRole("checkbox", {
+        name: /I confirm this employer should be verified/i,
+      })
+      .check();
+    await operatorPage.getByRole("button", { name: "Approve" }).click();
+    await expect(operatorPage).toHaveURL(/\/internal\/verification$/, {
+      timeout: 15_000,
+    });
+    await operatorContext.close();
+
+    await page.goto(draftUrl);
     await expect(
       page
         .getByLabel("Publication readiness")
@@ -126,7 +190,10 @@ test.describe("employer vacancy draft journeys", () => {
     await expect(page.getByRole("button", { name: /publish/i })).toHaveCount(0);
     await expect(page.getByRole("link", { name: /publish/i })).toHaveCount(0);
 
-    await page.getByRole("link", { name: "Vacancies", exact: true }).click();
+    await page
+      .getByLabel("Employer")
+      .getByRole("link", { name: "Vacancies" })
+      .click();
     await expect(page.getByRole("heading", { name: title })).toBeVisible();
 
     await page.getByRole("link", { name: "Manage" }).click();

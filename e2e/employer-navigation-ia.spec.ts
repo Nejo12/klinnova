@@ -109,4 +109,33 @@ test.describe("employer navigation IA (Unit I / I2)", () => {
     );
     expect(overflow).toBe(false);
   });
+
+  test("dashboard has exactly one nav-scoped 'Vacancies' link and a distinctly-named quick action, both reaching /employer/vacancies (I-03)", async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
+    const stamp = Date.now() + 2000;
+    await registerAndCompleteEmployerOnboarding(page, stamp);
+
+    // Exactly one "Vacancies" accessible name inside the primary nav.
+    const navVacancies = page
+      .getByLabel("Employer")
+      .getByRole("link", { name: "Vacancies" });
+    await expect(navVacancies).toHaveCount(1);
+    await expect(navVacancies).toHaveAttribute("href", "/employer/vacancies");
+
+    // The dashboard quick-action keeps its visible text "Vacancies" but
+    // exposes a distinct accessible name, so it no longer collides with the
+    // nav link under a page-wide role query.
+    const quickAction = page.getByRole("link", { name: "View vacancies" });
+    await expect(quickAction).toHaveCount(1);
+    await expect(quickAction).toHaveText("Vacancies");
+    await expect(quickAction).toHaveAttribute("href", "/employer/vacancies");
+
+    // A page-wide query for the exact text "Vacancies" still finds both
+    // elements (visible text intentionally unchanged) — only the
+    // accessible-name query is disambiguated.
+    await expect(page.getByText("Vacancies", { exact: true })).toHaveCount(2);
+  });
 });

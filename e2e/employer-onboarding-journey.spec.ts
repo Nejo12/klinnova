@@ -57,7 +57,7 @@ test.describe("employer onboarding journeys", () => {
     await expect(page.getByText(/Verification: unverified/i)).toBeVisible();
     await expect(page.getByText(/Organisation company/i)).toHaveCount(0);
     await expect(
-      page.getByRole("link", { name: "Vacancies", exact: true }),
+      page.getByLabel("Employer").getByRole("link", { name: "Vacancies" }),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Create draft", exact: true }),
@@ -110,7 +110,7 @@ test.describe("employer onboarding journeys", () => {
       page.getByText(new RegExp(`Organisation company: Org Care ${stamp}`)),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Vacancies", exact: true }),
+      page.getByLabel("Employer").getByRole("link", { name: "Vacancies" }),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: /publish/i })).toHaveCount(0);
   });
