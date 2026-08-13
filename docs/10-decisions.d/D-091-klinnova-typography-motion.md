@@ -112,17 +112,12 @@ Unit H remains the current execution focus. KDS-TM work must not block, interrup
 
 ## Source artifacts
 
-The approved source artifacts are the current supplied files:
+The founder-approved archival/reference source artifacts are now durably persisted in the repository:
 
-- `Klinnova Typography Refinement.html`
-- `Klinnova Motion System (1).html`
+- `docs/design-artifacts/klinnova/klinnova-typography-refinement.pdf`
+- `docs/design-artifacts/klinnova/klinnova-motion-system.pdf`
 
-They are not yet persisted in the repository. Their approved design content must not be reconstructed or altered unnecessarily. Preferred repository paths are:
-
-- `docs/design-artifacts/klinnova/klinnova-typography-refinement.html`
-- `docs/design-artifacts/klinnova/klinnova-motion-system.html`
-
-Until an exact file-preserving import path is available, the supplied original artifacts remain the authoritative visual source and this decision record preserves the approved direction and authorization boundary.
+These PDFs preserve the approved visual/specification direction and are the authoritative archival record of it. This decision record and `docs/06-design-system.md` remain the durable decision/authorization record; D-017 remains the current implemented/runtime token baseline. Persisting these artifacts does not authorize KDS-TM1 or KDS-TM2, and does not authorize Unit H, Unit I, K6, or any runtime implementation.
 
 ## Decision-log integration note
 

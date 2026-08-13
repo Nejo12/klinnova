@@ -511,14 +511,9 @@ Recording or merging this documentation does **not** authorize KDS-TM1 or KDS-TM
 
 ### Source-artifact preservation status
 
-The founder-approved source artifacts are the current files named:
+The founder-approved archival/reference source artifacts are now durably persisted in the repository:
 
-- `Klinnova Typography Refinement.html`
-- `Klinnova Motion System (1).html`
+- `docs/design-artifacts/klinnova/klinnova-typography-refinement.pdf`
+- `docs/design-artifacts/klinnova/klinnova-motion-system.pdf`
 
-At the time of this documentation update, they are **not yet persisted in the repository**. Their approved design content must not be reconstructed or altered unnecessarily. The preferred eventual repository locations remain:
-
-- `docs/design-artifacts/klinnova/klinnova-typography-refinement.html`
-- `docs/design-artifacts/klinnova/klinnova-motion-system.html`
-
-Until those exact artifacts are imported through a binary-safe/file-preserving repository path, this section and D-091 preserve the approved decision and implementation boundary, while the supplied original artifacts remain the authoritative visual source.
+These PDFs preserve the approved visual/specification direction. This section and D-091 remain the durable decision/authorization record; D-017 remains the current implemented/runtime token baseline. Persisting these artifacts does not authorize KDS-TM1 or KDS-TM2, and does not authorize Unit H, Unit I, K6, or any runtime implementation.
