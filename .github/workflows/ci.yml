@@ -209,6 +209,9 @@ jobs:
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
 
+      - name: Install Playwright WebKit (Unit I / I-05 mobile-Safari-equivalent smoke)
+        run: pnpm exec playwright install --with-deps webkit
+
       - name: Auth, onboarding, and completion journeys (local Supabase + Mailpit)
         run: pnpm test:e2e:onboarding
 
@@ -217,6 +220,12 @@ jobs:
 
       - name: Candidate navigation and account IA journeys (local Supabase + Mailpit)
         run: pnpm test:e2e:candidate-navigation-ia
+
+      - name: Employer navigation IA journeys (local Supabase + Mailpit)
+        run: pnpm test:e2e:employer-navigation-ia
+
+      - name: WebKit/mobile navigation IA smoke — Unit I / I-05 (local Supabase + Mailpit)
+        run: pnpm test:e2e:webkit-smoke
 
       - name: Password recovery journeys (local Supabase + Mailpit)
         run: pnpm test:e2e:password-recovery
