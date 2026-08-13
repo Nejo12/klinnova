@@ -418,3 +418,107 @@ The step motif communicates progression. It is not decorative filler.
 - Do not create tokens speculatively.
 - Dark mode is deferred.
 - The full MVP component library remains outside this decision and outside PR 0.2.
+
+## Klinnova typography and motion refinement — founder-approved future direction
+
+**Status:** FOUNDER APPROVED — DESIGN DIRECTION LOCKED. **REPOSITORY IMPLEMENTATION NOT AUTHORIZED.**
+
+This section records a Klinnova refinement/superseding specification for future typography and motion implementation. It does not change the currently implemented D-017 token baseline above, does not authorize edits to application code or styles, and does not start design-system discovery or implementation.
+
+The coherent experience principle is:
+
+**Quiet confidence + Calm continuity**
+
+### Typography — Quiet confidence
+
+The approved direction is:
+
+- use Apple/system-inspired typographic discipline without copying Apple;
+- use a system-native-first font strategy;
+- Apple platforms should naturally use their native system typography through the system stack;
+- cross-platform fallbacks remain native and appropriate to their platforms;
+- do not bundle or redistribute Apple SF Pro as a Klinnova webfont;
+- create hierarchy primarily through size, spacing and restrained weight rather than excessive boldness;
+- regular / medium / semibold form the principal weight hierarchy;
+- avoid excessively thin essential or body text;
+- mobile readability and accessibility take precedence over aesthetic thinness.
+
+The approved **Klinnova Typography Refinement** artifact is a refinement/superseding specification, not merely visual inspiration. Until separately authorized implementation occurs, the existing typography tokens and runtime remain unchanged.
+
+### Motion — Calm continuity
+
+Motion must communicate state, continuity, hierarchy or feedback. Motion must not exist merely as decoration.
+
+Approved constraints:
+
+- no springs or overshoot as the default Klinnova motion language;
+- no parallax;
+- no scroll-jacking;
+- no bouncing navigation;
+- no continuous decorative animation;
+- no gratuitous route transitions;
+- no animation that delays interaction or navigation;
+- submission-success treatment may be more expressive, but must remain restrained and purposeful;
+- route-transition scope remains narrow, with list → detail transitions preferred rather than general page animation;
+- reduced-motion behavior is mandatory and should preferably be centralized architecturally.
+
+Approved motion hierarchy:
+
+```text
+instant     80ms
+fast        160ms
+standard    240ms
+deliberate  380ms
+```
+
+The **240ms standard duration is founder-approved**.
+
+The approved **Klinnova Motion System** artifact is the future motion-system source specification. Until separately authorized implementation occurs, the existing D-017 motion tokens and runtime remain unchanged.
+
+### Required implementation gate
+
+Future work is split into two separately bounded stages.
+
+**KDS-TM1 — Typography + Motion Architecture Discovery** is read-only. It must investigate:
+
+- existing typography implementation and token locations;
+- current font-loading strategy;
+- existing font-size, weight, line-height and letter-spacing values;
+- hard-coded transition and animation values;
+- existing motion primitives;
+- current `prefers-reduced-motion` handling;
+- loading-state architecture;
+- modal, drawer and sheet transitions;
+- form-validation transitions;
+- candidate navigation transitions;
+- application/status feedback;
+- route/list → detail transition feasibility;
+- focus-management implications;
+- accessibility implications;
+- likely migration blast radius.
+
+Its output must be:
+
+current state → gaps → proposed token architecture → affected components/primitives → migration strategy → accessibility strategy → test strategy → blast radius → smallest safe implementation sequencing.
+
+KDS-TM1 performs **no implementation**.
+
+**KDS-TM2 — Typography + Motion Implementation** may begin only after founder review and explicit authorization of KDS-TM1. Its expected sequencing is:
+
+central design tokens first → shared primitives → bounded product surfaces → responsive/accessibility validation → reduced-motion verification → regression testing.
+
+Recording or merging this documentation does **not** authorize KDS-TM1 or KDS-TM2. Completion of KDS-TM1 does not automatically authorize KDS-TM2.
+
+### Source-artifact preservation status
+
+The founder-approved source artifacts are the current files named:
+
+- `Klinnova Typography Refinement.html`
+- `Klinnova Motion System (1).html`
+
+At the time of this documentation update, they are **not yet persisted in the repository**. Their approved design content must not be reconstructed or altered unnecessarily. The preferred eventual repository locations remain:
+
+- `docs/design-artifacts/klinnova/klinnova-typography-refinement.html`
+- `docs/design-artifacts/klinnova/klinnova-motion-system.html`
+
+Until those exact artifacts are imported through a binary-safe/file-preserving repository path, this section and D-091 preserve the approved decision and implementation boundary, while the supplied original artifacts remain the authoritative visual source.
