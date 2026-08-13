@@ -28,6 +28,8 @@
     "test:e2e:admin-moderation": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/admin-moderation.spec.ts",
     "test:e2e:publication-matching-integrity": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/publication-readiness-and-matching-integrity.spec.ts",
     "test:e2e:candidate-navigation-ia": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/candidate-navigation-ia.spec.ts",
+    "test:e2e:employer-navigation-ia": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/employer-navigation-ia.spec.ts",
+    "test:e2e:webkit-smoke": "E2E_AUTH_JOURNEY=1 playwright test --config=playwright.webkit-smoke.config.ts --workers=1 e2e/candidate-navigation-ia.spec.ts e2e/employer-navigation-ia.spec.ts",
     "test:e2e:password-recovery": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/password-recovery-journey.spec.ts",
     "test:e2e:outcome-events": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/application-outcome-events-journey.spec.ts",
     "test:e2e:outcome-ui": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/employer-application-outcome-ui-journey.spec.ts",
