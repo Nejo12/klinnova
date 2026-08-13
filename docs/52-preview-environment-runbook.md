@@ -199,6 +199,64 @@ be removed or rotated, and it has not been removed. Its ongoing retention
 is an open item for a separate decision, not something this closure
 resolved.
 
+### Preview verification operator retention — CLOSED (bounded founder-owned policy)
+
+This section refines "Preview verification operator" above without
+rewriting it: the operator's ongoing-retention decision, left open at F2
+closure, is now **CLOSED**. The founder has explicitly authorized bounded
+retention rather than rotation or removal.
+
+**Environment boundary.** The operator
+(`66837767-21db-4782-9421-0db1b4aa13fc`) is retained only in the
+standalone Preview Supabase project `klgrrqladmdtgnrggnsc`. No claim is
+made about whether an equivalent Production operator exists — Production
+was not inspected for this decision.
+
+**Purpose.** Retained to preserve the existing real Preview workflow for
+employer verification, employer moderation, and vacancy moderation during
+future controlled Preview testing/rehearsal. Not retained for Production
+operation, Cohort A support ownership, or general administration.
+
+**Current privilege understanding.** The active operator contract
+currently permits the existing Preview `/internal` verification/moderation
+RPC surfaces: reviewing/approving/rejecting/revoking employer
+verification; viewing operator-scoped employer/vacancy moderation state;
+suspending/unsuspending employers; moderating/restoring vacancies. It does
+not grant candidate-data access, arbitrary SQL access, service-role
+access, or any broader admin privilege.
+
+**Ownership.** Founder.
+
+**Mandatory reassessment triggers.** The retention decision must be
+reviewed at the earliest of:
+
+1. before or during the next K6 pre-cutover Preview rehearsal;
+2. the next intentional full Preview data-reset/security-hygiene pass;
+3. any evidence or reasonable suspicion that the operator credential was
+   shared, exposed, compromised, or is no longer securely controlled;
+4. a founder decision that no further Preview employer
+   verification/moderation testing is expected before Production cutover.
+
+At reassessment, the founder must choose explicitly among: continue
+bounded retention; rotate/re-bootstrap; deactivate/remove. No automatic
+rotation schedule is created — none is supported by the current
+architecture (no operator-management RPC exists; any change requires the
+same direct-Postgres, Preview-only path used for the original bootstrap).
+
+**Removal/rotation principle.** When the account is no longer required,
+least-privilege preference is to deactivate/remove it rather than retain
+it indefinitely. If future testing later requires an operator again,
+administrative re-bootstrap through the existing direct Preview-only
+contract is acceptable and requires separate authorization.
+
+**What this closure does not mean.** Operator privileges are not
+permanent; this does not establish or imply a Production operator; it
+does not close Unit H; it does not authorize K6; it does not make Cohort A
+ready. Cohort A readiness remains **BLOCKED**.
+
+No hosted mutation occurred to close this decision — the operator was not
+rotated, disabled, or removed, and no new operator was created.
+
 ## Ongoing use: reset, not teardown
 
 Because this Preview project is meant to persist across iterative builds,
