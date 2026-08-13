@@ -1566,3 +1566,34 @@ An initial proposal to base recovery directly on the existing `processing_starte
 **Alternatives:** widen `_claim_deletion_request` itself to unconditionally accept `processing` (rejected — breaks single-writer semantics for a genuinely active, non-crashed request); add a separate new lease column distinct from `processing_started_at` under a different name/shape (considered and effectively what was adopted, distinguishing it explicitly from the rejected direct-`processing_started_at`-based proposal); an automatic background sweep/cron to detect and reconcile stale rows (rejected — reintroduces a scheduled worker, explicitly out of MVP scope); document permanently-stranded `processing` as an accepted MVP limitation (rejected — no Accepted decision authorized it, and D-081 requires retryability).
 
 **Consequences:** PR 8.4 adds one additive migration (the 16th, `20260808220000_deletion_processing_lease_and_recovery.sql`) containing the new column, the CHECK constraint, the `_claim_deletion_request` lease-refresh update, and the new `_reclaim_stale_deletion_request` function with its grants/comment. No table, index, trigger, RLS policy, new deletion status, or new failure code is added. `reconcileAccountDeletionRequest`'s runtime gains a stale-reclaim branch, reachable only when `_claim_deletion_request` itself reports an already-`processing` row; `processAccountDeletionRequest`'s behavior is otherwise unchanged. pgTAP proves, among other properties, that a just-retried request whose historical `processing_started_at` is old is never treated as stale merely because of that — staleness is judged from the lease alone.
+
+## D-092 — M5/Cohort A employer pricing: private-beta free policy
+
+**Status:** Accepted
+
+**Accepted:** 2026-08-13
+
+**Context:** `docs/51-m5-operating-plan.md` §18 lists payments/payroll and subscriptions as explicit M5 non-goals, and the product has no payment/billing/subscription mechanism in this slice. No prior decision recorded whether employers are charged during Cohort A. `docs/54-cohort-a-employer-acquisition-playbook.md` §13 flagged this as an open founder decision blocking finalized outreach messaging (the "Do I need to pay?" objection, the discovery-call script's commercial-terms step, and the interested-employer response template).
+
+**Decision:** During the current M5/Cohort A private beta, employer participation is free. Specifically:
+
+- no subscription fee;
+- no placement fee;
+- no commission;
+- no other paid employer service of any kind during Cohort A.
+
+Candidate participation remains free, unchanged from existing practice.
+
+This is a **private-beta commercial policy**, not a permanent pricing commitment. It does not establish, imply, or foreclose any future monetization model, price, subscription, commission, or fee structure. Future commercial/pricing terms for Klinnova beyond Cohort A are explicitly unresolved and remain a separate, later founder-gated decision.
+
+**Approved external wording:**
+
+> During the current Klinnova private beta, participation is free for employers. There are no subscription fees, placement fees, or commissions during this beta phase. Future commercial terms are not yet defined.
+
+Do not say "Klinnova is free forever," "there will never be fees," or "all future services will be free" — none of those are approved; only the Cohort A private-beta scope above is decided.
+
+**Alternatives:** charge a placement fee or commission during Cohort A (rejected — adds friction/complexity to a trust-building beta with only 3–5 employers, and no billing infrastructure exists to support it); leave pricing unstated/ambiguous in outreach (rejected — this was the prior status quo and was blocking finalized outreach messaging per `docs/54` §13); commit to permanent free pricing beyond the beta (rejected — forecloses a future monetization decision without evidence or need to decide it now).
+
+**Consequences:** `docs/54-cohort-a-employer-acquisition-playbook.md`'s outreach templates, call script, and objection handling are updated to state this policy directly instead of deferring the question. This decision does not authorize, imply, or require any product/billing implementation work — no payment feature exists or is being built, and none is proposed by this decision.
+
+**Acceptance note:** Accepted 2026-08-13 by repository owner (founder) as part of M5.1 Klinnova readiness coordination.

@@ -10,6 +10,8 @@
 
 **Naming note:** This document is an internal repository operating record and follows repository convention in referring to the underlying product/engineering identity as "Stint" where relevant. Everything the founder sends or shows to an employer must use **Klinnova**, the current public-facing identity (`docs/53-m5.1-beta-readiness-closure.md`, K2/K5). See §13 for why the domain/brand split still matters for outreach.
 
+**Pricing note:** The founder has decided employer pricing for M5/Cohort A (D-092, `docs/10-decisions.md`): participation is free for employers during the private beta — no subscription, placement fee, or commission. This is a beta-scoped policy, not a permanent commitment; future commercial terms remain undecided. §6, §7, and §8 below use this wording directly.
+
 ---
 
 ## 1. Employer Ideal Candidate Profile (ICP)
@@ -132,7 +134,7 @@ Sixteen fields is the ceiling for Cohort A's scale (3–5 employers, a few dozen
 
 ## 6. Outreach messaging framework
 
-Founder-usable structures, not scripts to read verbatim. None of these claim Klinnova is publicly launched, promise guaranteed candidates/hires, or state a price — see §8 and §13 for why pricing is deliberately absent.
+Founder-usable structures, not scripts to read verbatim. None of these claim Klinnova is publicly launched or promise guaranteed candidates/hires. Where pricing comes up naturally, use the approved free-during-beta wording (D-092) — see §8 for the full objection response; do not improvise beyond it (e.g. do not say "free forever").
 
 **Warm introduction** (via a mutual contact)
 > Structure: reference the mutual contact by name → one sentence on what Klinnova is (Berlin hiring for cleaning and similar roles, private beta) → one sentence on why you thought of them specifically (recurring cleaning need, property portfolio, etc.) → ask for 10–15 minutes, no commitment implied.
@@ -150,7 +152,7 @@ Founder-usable structures, not scripts to read verbatim. None of these claim Kli
 > Structure: one short message, no guilt/pressure language, restate the one-sentence value proposition, make it trivially easy to say no ("totally fine if this isn't useful right now").
 
 **Response when employer is interested**
-> Structure: thank them → propose a specific short call/meeting time → briefly set expectations (private beta, founder-assisted onboarding, no cost commitment stated — see §8) → confirm Berlin location and cleaning/premises-support nature of the work before scheduling, to avoid a wasted call.
+> Structure: thank them → propose a specific short call/meeting time → briefly set expectations (private beta, founder-assisted onboarding, free to participate during the beta with no subscription/placement/commission fees — see §8) → confirm Berlin location and cleaning/premises-support nature of the work before scheduling, to avoid a wasted call.
 
 ## 7. Founder call / meeting script
 
@@ -165,7 +167,7 @@ A short discovery-call outline, not a sales pitch.
 7. **Candidate matching** — candidates are shown vacancies that fit their stated language, availability, and location; a match is not a guarantee of interview or hire (`docs/12`).
 8. **Founder-assisted onboarding** — the founder can walk the employer through onboarding and help phrase a vacancy honestly, but will not fabricate details on the employer's behalf (`docs/51` §7).
 9. **Feedback expectations** — the founder will ask for brief feedback after publication and after any interview/hire (`docs/51` §9); this is what makes the beta useful.
-10. **Pricing / commercial terms** — **do not state a price or "free" status.** See §8 and §13: this is an open founder decision, not yet resolved in the repository. If asked directly, use the objection-handling response in §8, not an improvised answer.
+10. **Pricing / commercial terms** — participation is free for employers during the current private beta: no subscription fee, no placement fee, no commission, no other paid employer service during Cohort A (D-092, `docs/10-decisions.md`). This is a beta-scoped policy, not a permanent commitment — future commercial terms are not yet defined. Use the exact wording in §8 if asked directly; do not add or improvise beyond it.
 
 ## 8. Objection handling
 
@@ -173,14 +175,14 @@ A short discovery-call outline, not a sales pitch.
 |---|---|
 | "Why should I use this instead of Indeed/Kleinanzeigen?" | Klinnova is deliberately narrow: Berlin, cleaning-first, built around candidates with limited German who general boards often filter out by CV/language defaults. It's a small private beta, not a claim to replace a general job board. |
 | "Do applicants speak German?" | Some do, some don't — the platform is built so a vacancy's actual language requirement (from "English accepted" to "Fluent German") determines who is shown the role, so mismatches are avoided rather than hidden. |
-| "Do I need to pay?" | **Founder decision needed — do not answer with a specific figure or "free."** Hold response: "We're still finalizing commercial terms for the beta; nothing will be charged without a clear conversation first." |
+| "Do I need to pay?" | "No. Participation in the current Klinnova private beta is free for employers. There are no subscription fees, placement fees, or commissions during this beta phase. Future commercial terms have not been decided yet." (D-092, `docs/10-decisions.md`.) Do not add "free forever" or any permanent-pricing claim beyond this. |
 | "Can you guarantee workers?" | No — a match is not a guarantee of interview or hire (`docs/12`). Be direct about this; overpromising damages trust in a beta this small. |
 | "Can you upload our jobs for us?" | Founder-assisted onboarding can help phrase and structure a real vacancy the employer describes, but will not invent or embellish facts the employer didn't state (`docs/51` §7). |
 | "What information do you need from us?" | A completed employer profile (private or organisation), an attestation that the information is accurate and the vacancy is genuine — no ID/passport, tax number, or business-registration document at this stage (D-057). |
 | "How do you verify employers?" | Manual review of the profile plus the attestation by the founder/an authorized reviewer — not an automated or document-based check in this stage. |
 | "Is this already live/public?" | No — currently a private beta with a small number of employers by design, and the public brand/domain cutover has not happened yet (see §13). Be straightforward about this rather than implying broader scale. |
 
-Anything not covered above and not resolvable from `docs/51`/`docs/53` should be treated the same way as the pricing question: flagged, not improvised.
+Anything not covered above and not resolvable from `docs/51`/`docs/53`/`docs/10-decisions.md` should be flagged, not improvised — pricing is no longer in that category (D-092), but §13 below still lists what remains genuinely open.
 
 ## 9. First-batch sourcing plan
 
@@ -224,7 +226,7 @@ What the repository does support: candidate recruitment is only *meaningfully* u
 
 Precise next real-world actions once this playbook is approved. None of these are performed by this task.
 
-1. Decide the pricing/commercial-terms answer for §8/§13 (or explicitly decide to keep holding it open a while longer) before any outreach that might raise the question.
+1. Pricing is decided (D-092, §8) — no further action needed before outreach on this point. Confirm the remaining §13 caveats (legal identity, support channel, domain mismatch) don't block the specific outreach planned.
 2. Build the first prospect batch per §9 (target ~20–30), using the founder's own network and direct knowledge of Berlin cleaning businesses/property managers — no scraping.
 3. Set up the tracking sheet using the fields in §5.
 4. Begin outreach in the channel order from `docs/51` §6 (warm network first), using the message structures in §6.
@@ -235,13 +237,17 @@ Precise next real-world actions once this playbook is approved. None of these ar
 9. Escalate any recurring objection or product blocker per `docs/51` §8/§10, not silently.
 10. Do not begin candidate recruitment ramp-up (§11) until the guideline in §11 is met, and do not treat Cohort A as ready for GO/NO-GO based on employer acquisition alone — Unit H, Production Sentry decision, and K6 remain independent gates (`docs/53-m5.1-beta-readiness-closure.md`).
 
-## 13. Unresolved commercial/support/legal wording — founder decisions required before outreach messaging is finalized
+## 13. Unresolved commercial/support/legal wording — remaining founder decisions before outreach
 
-These are explicitly flagged rather than answered, per this task's authorization.
+### Resolved
 
-1. **Are employers free during M5/Cohort A?** **Unresolved.** No repository document (`docs/51`, `docs/49`, `docs/50`, `docs/53`, or any Decision in `docs/10-decisions.md`) states a price or a "free" commitment for employers. The product itself has no payment/billing/subscription mechanism (payments/payroll and subscriptions are both explicit M5 non-goals, `docs/51` §18) — so no employer *can* be charged through Klinnova today — but the absence of a payment feature is not the same as a recorded commercial policy. **Founder decision required** before this can be stated definitively in outreach (§6, §8, §10 all currently avoid the question rather than answering it).
-2. **Legal entity/business identity (Impressum).** Still open — Unit H has not started (`docs/53`). Do not present a finalized company/legal identity to employers; if asked, defer rather than improvise.
-3. **Support/contact channel.** Still open — Unit H item (`docs/53`). The founder is the de facto support channel today; there is no separate published support address/process yet. Do not promise a dedicated support channel beyond direct founder contact.
-4. **Brand/domain mismatch.** The product's user-visible identity is already "Klinnova" (K2, complete), but Production still runs on the `stint.company` domain — the Klinnova domain cutover (K6) has not occurred (`docs/53` K5 section). A discerning employer signing up today will see "Klinnova" branding at a `stint.company` URL. This is not a legal problem, but it is a plausible outreach/trust question ("why does the link say stint.company?"). **Founder decision suggested** (not required to block outreach): prepare a one-line honest answer ("we're mid-rebrand; the product is Klinnova, the URL hasn't caught up yet") rather than being surprised by the question.
+**Are employers free during M5/Cohort A? RESOLVED — 2026-08-13.** The founder has decided: employer participation is free during the M5/Cohort A private beta — no subscription fee, no placement fee, no commission, no other paid employer service (D-092, `docs/10-decisions.md`). This is a beta-scoped policy, not a permanent commitment; future commercial terms remain undecided. §6, §7, and §8 above now use this wording directly. Do not extend it beyond the approved wording (no "free forever," no "never any fees," no promise about future services).
 
-Nothing else in `docs/51`/`docs/53`/`docs/10-decisions.md` was found to materially affect outreach wording beyond these four points.
+### Still open — do not resolve these silently
+
+1. **Legal entity/business identity (Impressum).** Still open — Unit H has not started (`docs/53`). Do not present a finalized company/legal identity to employers; if asked, defer rather than improvise.
+2. **Support/contact channel.** Still open — Unit H item, linked to the same legal/support readiness finalization (`docs/53`). The founder is the de facto support channel today; there is no separate published support address/process yet. Do not promise a dedicated support channel beyond direct founder contact.
+3. **K6 domain cutover has not occurred.** The Klinnova public-domain cutover (K6) remains separately gated and has not happened (`docs/53` K5 section). Production still runs on the `stint.company` domain.
+4. **Brand/domain mismatch.** The product's user-visible identity is already "Klinnova" (K2, complete), but Production still runs on `stint.company` because K6 (point 3 above) hasn't occurred. A discerning employer signing up today will see "Klinnova" branding at a `stint.company` URL. This is not a legal problem, but it is a plausible outreach/trust question ("why does the link say stint.company?"). The founder must be ready to explain this honestly if it comes up before K6 — e.g. "we're mid-rebrand; the product is Klinnova, the URL hasn't caught up yet" — rather than being surprised by the question or glossing over it.
+
+Nothing else in `docs/51`/`docs/53`/`docs/10-decisions.md` was found to materially affect outreach wording beyond these points.
