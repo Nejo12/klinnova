@@ -78,7 +78,10 @@ test.describe("employer vacancy draft journeys", () => {
 
     await completePrivateEmployer(page, stamp);
 
-    await page.getByRole("link", { name: "Vacancies", exact: true }).click();
+    await page
+      .getByLabel("Employer")
+      .getByRole("link", { name: "Vacancies" })
+      .click();
     await expect(page).toHaveURL(/\/employer\/vacancies$/);
     await expect(page.getByText(/no vacancies yet/i)).toBeVisible();
     await expect(page.getByRole("button", { name: /publish/i })).toHaveCount(0);
@@ -126,7 +129,10 @@ test.describe("employer vacancy draft journeys", () => {
     await expect(page.getByRole("button", { name: /publish/i })).toHaveCount(0);
     await expect(page.getByRole("link", { name: /publish/i })).toHaveCount(0);
 
-    await page.getByRole("link", { name: "Vacancies", exact: true }).click();
+    await page
+      .getByLabel("Employer")
+      .getByRole("link", { name: "Vacancies" })
+      .click();
     await expect(page.getByRole("heading", { name: title })).toBeVisible();
 
     await page.getByRole("link", { name: "Manage" }).click();

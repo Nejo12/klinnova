@@ -70,7 +70,11 @@ export default async function EmployerHomePage() {
       </ul>
 
       <p className={styles.actions}>
-        <Link className={styles.button} href="/employer/vacancies">
+        <Link
+          className={styles.button}
+          href="/employer/vacancies"
+          aria-label="View vacancies"
+        >
           Vacancies
         </Link>
         <Link className={styles.linkButton} href="/employer/vacancies/new">
