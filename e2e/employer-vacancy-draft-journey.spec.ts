@@ -111,6 +111,10 @@ test.describe("employer vacancy draft journeys", () => {
     await page
       .getByLabel("Description")
       .fill("Wash kitchen floors before noon.");
+    await page.getByLabel("Workplace type").selectOption("office");
+    await page.getByLabel("Work frequency").selectOption("recurring");
+    await page.getByRole("checkbox", { name: "Full time" }).check();
+    await page.getByRole("checkbox", { name: "Morning" }).check();
     await page.getByLabel("Amount in EUR").fill("15.50");
     await page.getByLabel("Period").selectOption("hourly");
     await page.getByRole("button", { name: "Save draft" }).click();
