@@ -21,16 +21,19 @@
 
 .heading {
   margin: 0;
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-xl);
+  font-size: var(--type-heading-size);
+  font-weight: var(--type-heading-weight);
+  line-height: var(--type-heading-line-height);
+  letter-spacing: var(--type-heading-tracking);
   color: var(--color-text-primary);
 }
 
 .lead {
   margin: 0;
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
+  font-size: var(--type-body-size);
+  font-weight: var(--type-body-weight);
+  line-height: var(--type-body-line-height);
+  letter-spacing: var(--type-body-tracking);
   color: var(--color-text-secondary);
 }
 
@@ -47,8 +50,10 @@
 }
 
 .label {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--type-label-size);
+  font-weight: var(--type-label-weight);
+  line-height: var(--type-label-line-height);
+  letter-spacing: var(--type-label-tracking);
   color: var(--color-text-primary);
 }
 
@@ -99,7 +104,8 @@
   border-radius: var(--radius-md);
   background-color: var(--color-status-danger-bg);
   color: var(--color-status-danger);
-  font-size: var(--font-size-sm);
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-supporting-line-height);
 }
 
 .message {
@@ -108,12 +114,14 @@
   border-radius: var(--radius-md);
   background-color: var(--color-status-success-bg);
   color: var(--color-status-success);
-  font-size: var(--font-size-sm);
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-supporting-line-height);
 }
 
 .footer {
   margin: 0;
-  font-size: var(--font-size-sm);
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-supporting-line-height);
   color: var(--color-text-secondary);
 }
 

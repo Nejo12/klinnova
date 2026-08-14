@@ -21,10 +21,10 @@
 
 .heading {
   margin: 0;
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-tight);
-  line-height: var(--line-height-3xl);
+  font-size: var(--type-display-size);
+  font-weight: var(--type-display-weight);
+  letter-spacing: var(--type-display-tracking);
+  line-height: var(--type-display-line-height);
   color: var(--color-text-primary);
 }
 
@@ -38,8 +38,8 @@
 
 .note {
   margin: 0;
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-supporting-line-height);
   color: var(--color-text-muted);
 }
 

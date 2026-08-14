@@ -62,10 +62,10 @@
 .heading {
   margin: 0;
   flex: 1 1 12rem;
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-tight);
-  line-height: var(--line-height-3xl);
+  font-size: var(--type-display-size);
+  font-weight: var(--type-display-weight);
+  letter-spacing: var(--type-display-tracking);
+  line-height: var(--type-display-line-height);
   color: var(--color-text-primary);
   overflow-wrap: anywhere;
 }
@@ -103,9 +103,9 @@
 
 .sectionHeading {
   margin: 0;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-lg);
+  font-size: var(--type-subheading-size);
+  font-weight: var(--type-subheading-weight);
+  line-height: var(--type-subheading-line-height);
   color: var(--color-text-primary);
 }
 
@@ -133,8 +133,8 @@
 
 .metaValue {
   margin: 0;
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-supporting-line-height);
   color: var(--color-text-primary);
   overflow-wrap: anywhere;
 }
@@ -150,8 +150,8 @@
 
 .languageItem {
   margin: 0;
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-supporting-line-height);
   color: var(--color-text-primary);
 }
 
