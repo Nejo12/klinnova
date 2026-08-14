@@ -517,3 +517,16 @@ The founder-approved archival/reference source artifacts are now durably persist
 - `docs/design-artifacts/klinnova/klinnova-motion-system.pdf`
 
 These PDFs preserve the approved visual/specification direction. This section and D-091 remain the durable decision/authorization record; D-017 remains the current implemented/runtime token baseline. Persisting these artifacts does not authorize KDS-TM1 or KDS-TM2, and does not authorize Unit H, Unit I, K6, or any runtime implementation.
+
+### KDS-TM1 current-state reconciliation — COMPLETE
+
+This subsection records the current execution state without rewriting the historical authorization language above.
+
+- **KDS-TM1 is COMPLETE.** The founder reviewed and accepted the read-only typography/motion architecture discovery on 2026-08-14.
+- Accepted architecture: **central tokens → semantic shared patterns/primitives → bounded surface migration → Preview proof**.
+- **Recommendation A is accepted:** the approved Klinnova typography/motion system is a **pre-K6 Production-readiness requirement** and should be implemented and Preview-proven before public Production activation.
+- Typography remains **Quiet confidence**: system-native-first; Apple-inspired discipline without bundling/distributing Apple SF Pro; 400/500/600 as the principal hierarchy; 700 retained only where contextually justified; hierarchy driven primarily by size, spacing and position; mobile readability protected.
+- Motion remains **Calm continuity** with semantic durations `80ms / 160ms / 240ms / 380ms`, purposeful state/continuity feedback, centralized reduced-motion behavior, and the approved no-springs/no-bounce/no-parallax/no-scroll-jacking/no-gratuitous-global-route-animation boundaries.
+- **KDS-TM2 implementation is NOT STARTED and NOT AUTHORIZED.** The expected bounded sequence is TM2.1 foundations → TM2.2 shared/public/auth surfaces → TM2.3 candidate surfaces → TM2.4 employer/admin surfaces → TM2.5 Preview proof/closure, each subject to explicit founder authorization as applicable.
+- The currently implemented D-017 runtime tokens, font stack and motion values remain unchanged by this reconciliation.
+- KDS completion does not itself authorize K6, Production mutation, Unit H implementation, Production Sentry activation or Cohort A traffic.
