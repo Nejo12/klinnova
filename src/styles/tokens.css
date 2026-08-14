@@ -75,13 +75,18 @@
   --color-status-danger-bg: var(--color-oxblood-100);
 
   /* 4. Font families */
+  /* KDS-TM2.1: system-native-first (Quiet confidence). No installed/optional
+     Inter preference — Apple platforms resolve -apple-system to San
+     Francisco without bundling/redistributing it as a Klinnova webfont. */
   --font-family-ui:
-    Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+    -apple-system, BlinkMacSystemFont, "Segoe UI", ui-sans-serif, sans-serif;
 
   --font-family-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 
   /* 5. Font weights */
+  /* KDS-TM2.1: 400/500/600 are the principal Quiet-confidence hierarchy.
+     700 remains available for existing justified consumers; no broad
+     reweighting occurs in this unit. */
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -115,6 +120,47 @@
   --letter-spacing-tight: -0.02em;
   --letter-spacing-normal: 0;
   --letter-spacing-wide: 0.04em;
+
+  /* 6a. Semantic typography roles (KDS-TM2.1) */
+  /* Quiet confidence: hierarchy is driven by size/spacing/position first,
+     restrained weight second. Each role resolves through the primitive
+     type scale above — no raw rem/weight values are duplicated here, and
+     no page-specific tokens exist. Central declaration only; no surface
+     migration occurs in this unit. */
+  --type-display-size: var(--font-size-3xl);
+  --type-display-line-height: var(--line-height-3xl);
+  --type-display-weight: var(--font-weight-semibold);
+  --type-display-tracking: var(--letter-spacing-tight);
+
+  --type-heading-size: var(--font-size-2xl);
+  --type-heading-line-height: var(--line-height-2xl);
+  --type-heading-weight: var(--font-weight-semibold);
+  --type-heading-tracking: var(--letter-spacing-normal);
+
+  --type-subheading-size: var(--font-size-lg);
+  --type-subheading-line-height: var(--line-height-lg);
+  --type-subheading-weight: var(--font-weight-medium);
+  --type-subheading-tracking: var(--letter-spacing-normal);
+
+  --type-body-size: var(--font-size-md);
+  --type-body-line-height: var(--line-height-md);
+  --type-body-weight: var(--font-weight-regular);
+  --type-body-tracking: var(--letter-spacing-normal);
+
+  --type-body-supporting-size: var(--font-size-sm);
+  --type-body-supporting-line-height: var(--line-height-sm);
+  --type-body-supporting-weight: var(--font-weight-regular);
+  --type-body-supporting-tracking: var(--letter-spacing-normal);
+
+  --type-label-size: var(--font-size-sm);
+  --type-label-line-height: var(--line-height-sm);
+  --type-label-weight: var(--font-weight-medium);
+  --type-label-tracking: var(--letter-spacing-normal);
+
+  --type-caption-size: var(--font-size-xs);
+  --type-caption-line-height: var(--line-height-xs);
+  --type-caption-weight: var(--font-weight-regular);
+  --type-caption-tracking: var(--letter-spacing-normal);
 
   /* 7. Spacing */
   --space-0: 0;
@@ -159,10 +205,13 @@
   --opacity-disabled: 0.48;
 
   /* 11. Motion */
+  /* KDS-TM2.1: Calm continuity semantic duration hierarchy. `normal`/`slow`
+     had zero consumers in this codebase, so no compatibility alias was
+     needed — `fast` keeps its name with an updated value. */
   --duration-instant: 80ms;
-  --duration-fast: 140ms;
-  --duration-normal: 220ms;
-  --duration-slow: 360ms;
+  --duration-fast: 160ms;
+  --duration-standard: 240ms;
+  --duration-deliberate: 380ms;
 
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-enter: cubic-bezier(0, 0, 0.2, 1);
