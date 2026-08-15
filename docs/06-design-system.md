@@ -530,3 +530,17 @@ This subsection records the current execution state without rewriting the histor
 - **KDS-TM2 implementation is NOT STARTED and NOT AUTHORIZED.** The expected bounded sequence is TM2.1 foundations → TM2.2 shared/public/auth surfaces → TM2.3 candidate surfaces → TM2.4 employer/admin surfaces → TM2.5 Preview proof/closure, each subject to explicit founder authorization as applicable.
 - The currently implemented D-017 runtime tokens, font stack and motion values remain unchanged by this reconciliation.
 - KDS completion does not itself authorize K6, Production mutation, Unit H implementation, Production Sentry activation or Cohort A traffic.
+
+### KDS-TM2 implementation and closure — COMPLETE
+
+This subsection records that the bounded sequence anticipated above has now executed and closed, without rewriting the historical authorization language above.
+
+- **KDS-TM2.1 — Foundations:** COMPLETE / MERGED (PR #107). Central primitive/semantic typography and motion tokens declared in `src/styles/tokens.css`; no surface migration.
+- **KDS-TM2.2 — Shared/public/auth surfaces:** COMPLETE / MERGED (PR #108).
+- **KDS-TM2.3 — Candidate product surfaces:** COMPLETE / MERGED (PR #110).
+- **KDS-TM2.4 — Employer/admin product surfaces:** COMPLETE / MERGED (PR #111).
+- **KDS-TM2.5 — Preview proof + closure:** COMPLETE. Cross-surface verification (public, auth, candidate, employer, admin/internal, legal/support readability-only) performed against merged `main` at `febb583693d350a95effef6af5eb262a94276d9f`, at the founder-required 360/390/430/768/1024/1280px matrix, with reduced-motion and keyboard-focus proof, plus this closure record.
+- **KDS is now COMPLETE.** Quiet confidence (size/spacing/position-led hierarchy, 400/500/600 principal weights, 700 retained only for one pre-existing Unit H-owned legal kicker) and Calm continuity (`80/160/240/380ms`, centralized reduced-motion, no springs/parallax/scroll-jacking/gratuitous route animation) are implemented and Preview-equivalent-proven across every required surface family.
+- Hosted `preview.klinnova.com` proof was attempted and found blocked by Vercel Deployment Protection/SSO (unauthenticated requests redirect to `vercel.com/login`); this is an access constraint, not a design-system defect, and is carried forward rather than hidden. Local production-build proof against local Supabase/Mailpit (identical merged code and tokens) substituted.
+- Known residuals explicitly carried forward, none of which are KDS regressions (all independently reproduced on unmodified `main`): the pre-existing `/internal/employers` mobile table overflow; the pre-existing `publishVacancy`-helper-dependent `admin-moderation.spec.ts` test brittleness; the pre-existing unused `.status` class in `onboarding.module.scss`; the one legal-page 700-weight kicker (Unit H-owned).
+- **KDS COMPLETE does not mean:** Unit H is complete, Production Sentry is enabled, K6 is authorized, Production is activated, or Cohort A is unblocked. See `docs/53-m5.1-beta-readiness-closure.md` for those gates, which remain independently governed.
