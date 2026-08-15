@@ -205,6 +205,26 @@ export const transitionApplicationRpcResultSchema = z.discriminatedUnion(
 );
 
 // ---------------------------------------------------------------------------
+// N4: mark_employer_application_seen / count_unseen_current_employer_applications.
+// Independent of application status (D-070) — never encodes hiring-workflow
+// state, never touches application_status_history.
+// ---------------------------------------------------------------------------
+
+export const markApplicationSeenRpcResultSchema = z.discriminatedUnion(
+  "result",
+  [
+    z.object({ result: z.literal("ok") }),
+    z.object({ result: z.literal("unavailable") }),
+    z.object({ result: z.literal("employer_unavailable") }),
+  ],
+);
+
+export const countUnseenApplicationsRpcResultSchema = z.object({
+  result: z.enum(["ok", "unavailable", "employer_unavailable"]),
+  count: z.number().int().min(0),
+});
+
+// ---------------------------------------------------------------------------
 // Form-facing schemas.
 // ---------------------------------------------------------------------------
 

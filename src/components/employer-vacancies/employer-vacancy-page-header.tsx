@@ -8,12 +8,15 @@ type EmployerVacancyPageHeaderProps = {
   showCandidate: boolean;
   showEmployer: boolean;
   currentPath: "home" | "vacancies" | "applications" | "verification";
+  /** N4: unseen-application count for the Applications nav indicator. No badge when 0/omitted. */
+  unseenApplicationsCount?: number;
 };
 
 export function EmployerVacancyPageHeader({
   showCandidate,
   showEmployer,
   currentPath,
+  unseenApplicationsCount,
 }: EmployerVacancyPageHeaderProps) {
   return (
     <div className={styles.header}>
@@ -50,6 +53,16 @@ export function EmployerVacancyPageHeader({
                 }
               >
                 Applications
+                {unseenApplicationsCount !== undefined &&
+                  unseenApplicationsCount > 0 && (
+                    <>
+                      {" "}
+                      <span className={styles.navBadge}>
+                        {unseenApplicationsCount}
+                        <span className={styles.srOnly}> new</span>
+                      </span>
+                    </>
+                  )}
               </Link>
             </li>
             <li>

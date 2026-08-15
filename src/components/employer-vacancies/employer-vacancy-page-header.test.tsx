@@ -60,4 +60,74 @@ describe("EmployerVacancyPageHeader", () => {
       screen.getByRole("link", { name: "Applications" }),
     ).toBeInTheDocument();
   });
+
+  it("shows no badge when unseenApplicationsCount is omitted (accessible name stays exactly 'Applications')", () => {
+    render(
+      <EmployerVacancyPageHeader
+        showCandidate={false}
+        showEmployer={true}
+        currentPath="home"
+      />,
+    );
+    expect(
+      screen.getByRole("link", { name: "Applications" }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows no badge when unseenApplicationsCount is 0", () => {
+    render(
+      <EmployerVacancyPageHeader
+        showCandidate={false}
+        showEmployer={true}
+        currentPath="home"
+        unseenApplicationsCount={0}
+      />,
+    );
+    expect(
+      screen.getByRole("link", { name: "Applications" }),
+    ).toBeInTheDocument();
+  });
+
+  it("exposes an unambiguous accessible name including the count when unseenApplicationsCount is positive", () => {
+    render(
+      <EmployerVacancyPageHeader
+        showCandidate={false}
+        showEmployer={true}
+        currentPath="home"
+        unseenApplicationsCount={3}
+      />,
+    );
+    expect(
+      screen.getByRole("link", { name: /^Applications\s*3\s*new$/ }),
+    ).toHaveAttribute("href", "/employer/applications");
+  });
+
+  it("does not create a duplicate/ambiguous accessible name for the Applications link when a badge is shown", () => {
+    render(
+      <EmployerVacancyPageHeader
+        showCandidate={false}
+        showEmployer={true}
+        currentPath="home"
+        unseenApplicationsCount={5}
+      />,
+    );
+    expect(
+      screen.queryByRole("link", { name: "Applications" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /Applications/ })).toHaveLength(
+      1,
+    );
+  });
+
+  it("visibly displays the numeric count (not only in the accessible name)", () => {
+    render(
+      <EmployerVacancyPageHeader
+        showCandidate={false}
+        showEmployer={true}
+        currentPath="home"
+        unseenApplicationsCount={7}
+      />,
+    );
+    expect(screen.getByText("7")).toBeInTheDocument();
+  });
 });

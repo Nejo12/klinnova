@@ -126,6 +126,7 @@ export type Database = {
           candidate_id: string
           candidate_snapshot: Json
           created_at: string
+          employer_seen_at: string | null
           id: string
           snapshot_version: number
           status: string
@@ -138,6 +139,7 @@ export type Database = {
           candidate_id: string
           candidate_snapshot: Json
           created_at?: string
+          employer_seen_at?: string | null
           id?: string
           snapshot_version: number
           status: string
@@ -150,6 +152,7 @@ export type Database = {
           candidate_id?: string
           candidate_snapshot?: Json
           created_at?: string
+          employer_seen_at?: string | null
           id?: string
           snapshot_version?: number
           status?: string
@@ -938,6 +941,7 @@ export type Database = {
       }
       complete_candidate_onboarding: { Args: never; Returns: Json }
       complete_employer_onboarding: { Args: never; Returns: Json }
+      count_unseen_current_employer_applications: { Args: never; Returns: Json }
       create_employer_vacancy_draft: {
         Args: {
           p_available_from?: string
@@ -1163,6 +1167,10 @@ export type Database = {
           verification_state: string
           website: string
         }[]
+      }
+      mark_employer_application_seen: {
+        Args: { p_application_id: string }
+        Returns: Json
       }
       materialize_employer_vacancy_expiry: {
         Args: { p_vacancy_id: string }

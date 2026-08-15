@@ -7,6 +7,7 @@ import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/emplo
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import { APPLICATION_LIST_LEAD } from "@/lib/employer/applications/messages";
 import { loadEmployerApplications } from "@/lib/employer/applications/load-employer-applications";
+import { loadUnseenApplicationsCount } from "@/lib/employer/applications/load-unseen-applications-count";
 import { parseApplicationListFilters } from "@/lib/employer/applications/parse-list-filters";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { EMPLOYER_RESTRICTED_APPLICATIONS } from "@/lib/employer/messages";
@@ -47,6 +48,7 @@ export default async function EmployerApplicationsPage({
           showCandidate={capabilities?.hasCandidateProfile === true}
           showEmployer={capabilities?.hasEmployerProfile === true}
           currentPath="applications"
+          unseenApplicationsCount={0}
         />
         <h1 className={styles.heading}>Applications</h1>
         <EmployerRestrictedNotice message={EMPLOYER_RESTRICTED_APPLICATIONS} />
@@ -67,6 +69,7 @@ export default async function EmployerApplicationsPage({
   }
 
   const capabilities = await loadAccountCapabilities(supabase);
+  const unseenApplicationsCount = await loadUnseenApplicationsCount(supabase);
   const vacancyTitle =
     filter.vacancyId !== null
       ? (loaded.applications[0]?.vacancy_title ?? null)
@@ -78,6 +81,7 @@ export default async function EmployerApplicationsPage({
         showCandidate={capabilities?.hasCandidateProfile === true}
         showEmployer={capabilities?.hasEmployerProfile === true}
         currentPath="applications"
+        unseenApplicationsCount={unseenApplicationsCount}
       />
       <h1 className={styles.heading}>Applications</h1>
       <p className={styles.lead}>{APPLICATION_LIST_LEAD}</p>

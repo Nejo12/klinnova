@@ -3,10 +3,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const loadEmployerProfile = vi.hoisted(() => vi.fn());
 const loadAccountCapabilities = vi.hoisted(() => vi.fn());
+const loadUnseenApplicationsCount = vi.hoisted(() =>
+  vi.fn().mockResolvedValue(0),
+);
 
 vi.mock("@/lib/employer/load-employer", () => ({ loadEmployerProfile }));
 vi.mock("@/lib/employer/load-capabilities", () => ({
   loadAccountCapabilities,
+}));
+vi.mock("@/lib/employer/applications/load-unseen-applications-count", () => ({
+  loadUnseenApplicationsCount,
 }));
 vi.mock("@/lib/supabase/server", () => ({
   createServerSupabaseClient: vi.fn().mockResolvedValue({}),
@@ -40,6 +46,8 @@ describe("EmployerHomePage account-data export link", () => {
       hasCandidateProfile: false,
       hasEmployerProfile: true,
     });
+    loadUnseenApplicationsCount.mockReset();
+    loadUnseenApplicationsCount.mockResolvedValue(0);
   });
 
   it("shows a fixed employer data-download link for a completed employer", async () => {

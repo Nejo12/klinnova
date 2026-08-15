@@ -4,6 +4,7 @@ import { EmployerRestrictedNotice } from "@/components/employer-shared/employer-
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import { VacancyList } from "@/components/employer-vacancies/vacancy-list";
+import { loadUnseenApplicationsCount } from "@/lib/employer/applications/load-unseen-applications-count";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadCurrentEmployerSuspensionStatus } from "@/lib/employer/suspension-guard";
 import { loadEmployerDrafts } from "@/lib/employer/vacancies/load-employer-drafts";
@@ -30,6 +31,7 @@ export default async function EmployerVacanciesPage() {
   }
 
   const capabilities = await loadAccountCapabilities(supabase);
+  const unseenApplicationsCount = await loadUnseenApplicationsCount(supabase);
   const suspension = await loadCurrentEmployerSuspensionStatus(supabase);
   const suspended = suspension.ok && suspension.suspended;
 
@@ -39,6 +41,7 @@ export default async function EmployerVacanciesPage() {
         showCandidate={capabilities?.hasCandidateProfile === true}
         showEmployer={capabilities?.hasEmployerProfile === true}
         currentPath="vacancies"
+        unseenApplicationsCount={unseenApplicationsCount}
       />
       <h1 className={styles.heading}>Vacancies</h1>
       {suspended ? <EmployerRestrictedNotice /> : null}

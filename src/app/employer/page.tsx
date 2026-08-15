@@ -8,6 +8,7 @@ import {
   EMPLOYER_EXPORT_LEAD,
 } from "@/lib/account-export/messages";
 import { DELETE_ACCOUNT_HEADING } from "@/lib/account-deletion/messages";
+import { loadUnseenApplicationsCount } from "@/lib/employer/applications/load-unseen-applications-count";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadEmployerProfile } from "@/lib/employer/load-employer";
 import {
@@ -48,6 +49,7 @@ export default async function EmployerHomePage() {
   }
 
   const capabilities = await loadAccountCapabilities(supabase);
+  const unseenApplicationsCount = await loadUnseenApplicationsCount(supabase);
 
   return (
     <main className={styles.page}>
@@ -55,6 +57,7 @@ export default async function EmployerHomePage() {
         showCandidate={capabilities?.hasCandidateProfile === true}
         showEmployer={capabilities?.hasEmployerProfile === true}
         currentPath="home"
+        unseenApplicationsCount={unseenApplicationsCount}
       />
 
       <h1 className={styles.heading}>Welcome, {view.displayName}</h1>
