@@ -64,6 +64,18 @@ const N2_PRIVILEGED_FILES = new Set([
   "src/lib/applications/privileged-employer-recipient-lookup.ts",
 ]);
 
+/**
+ * N3 ("N3: notify candidates of meaningful status changes") introduces a
+ * third, independently-scoped privileged Auth Admin lookup, mirroring N2's
+ * exact pattern to resolve a candidate's email for a status-change
+ * notification. It has its own equally strict isolation proof
+ * (`src/lib/applications/n3-static-security.test.ts`); excluded here for
+ * the same reason as N2 above.
+ */
+const N3_PRIVILEGED_FILES = new Set([
+  "src/lib/applications/privileged-candidate-recipient-lookup.ts",
+]);
+
 describe("PR 8.4 account-deletion privileged-boundary static security proof", () => {
   it("imports privileged-supabase.ts only from processor.ts", () => {
     const files = allSourceFiles().filter(
@@ -92,7 +104,8 @@ describe("PR 8.4 account-deletion privileged-boundary static security proof", ()
       if (
         PRE_EXISTING_SERVICE_ROLE_REFERENCES.has(file) ||
         ACCOUNT_DELETION_PRIVILEGED_FILES.has(file) ||
-        N2_PRIVILEGED_FILES.has(file)
+        N2_PRIVILEGED_FILES.has(file) ||
+        N3_PRIVILEGED_FILES.has(file)
       ) {
         continue;
       }
@@ -105,7 +118,8 @@ describe("PR 8.4 account-deletion privileged-boundary static security proof", ()
     for (const file of allSourceFiles()) {
       if (
         ACCOUNT_DELETION_PRIVILEGED_FILES.has(file) ||
-        N2_PRIVILEGED_FILES.has(file)
+        N2_PRIVILEGED_FILES.has(file) ||
+        N3_PRIVILEGED_FILES.has(file)
       ) {
         continue;
       }
