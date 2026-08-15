@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { isNotifiableApplicationStatus } from "@/lib/applications/candidate-status-email";
+import { notifyCandidateOfStatusChange } from "@/lib/applications/notify-candidate-status-change";
 import {
   transitionApplicationRpcResultSchema,
   transitionFormSchema,
@@ -76,8 +78,32 @@ export async function transitionEmployerApplicationAction(
   revalidateApplicationRoutes(parsed.data.applicationId);
 
   switch (rpc.data.result) {
-    case "updated":
+    case "updated": {
+      // Only a genuinely new status ("updated", never "already_in_state")
+      // notifies the candidate, and only when it lands on one of the three
+      // notifiable statuses — "submitted"/"reviewing" must never email.
+      // Awaited before returning so the attempt actually runs within this
+      // request; a mail failure of any kind must not turn a successful
+      // transition into a failure.
+      if (isNotifiableApplicationStatus(rpc.data.current_status)) {
+        try {
+          await notifyCandidateOfStatusChange({
+            applicationId: parsed.data.applicationId,
+            toStatus: rpc.data.current_status,
+          });
+        } catch (error) {
+          console.error(
+            "[applications] candidate notification threw unexpectedly",
+            {
+              applicationId: parsed.data.applicationId,
+              toStatus: rpc.data.current_status,
+              error: String(error),
+            },
+          );
+        }
+      }
       return { kind: "updated", currentStatus: rpc.data.current_status };
+    }
     case "already_in_state":
       return {
         kind: "already_in_state",
