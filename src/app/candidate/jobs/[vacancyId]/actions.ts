@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { notifyEmployerOfNewApplication } from "@/lib/applications/notify-employer-new-application";
 import { submitApplicationRpcResultSchema } from "@/lib/applications/submit-application-result";
 import type { SubmitCandidateApplicationState } from "@/lib/applications/submit-action-state";
 import { parseMissingRequirementCodes } from "@/lib/matching/missing-requirement-codes";
@@ -69,6 +70,24 @@ export async function submitCandidateApplicationAction(
       );
       if (!applicationId.success) {
         return { status: "failure" };
+      }
+      // Only a genuinely new row ("submitted") should notify the employer —
+      // "already_applied" means no new application was persisted, and must
+      // never generate a false new-application email. Awaited (not
+      // fire-and-forget) so the attempt actually runs within this request;
+      // never allowed to turn a persisted application into a failure.
+      if (parsed.data.result === "submitted") {
+        try {
+          await notifyEmployerOfNewApplication({
+            applicationId: applicationId.data,
+            vacancyId,
+          });
+        } catch (error) {
+          console.error(
+            "[applications] employer notification threw unexpectedly",
+            { applicationId: applicationId.data, error: String(error) },
+          );
+        }
       }
       redirect(`/candidate/applications/${applicationId.data}`);
     }
