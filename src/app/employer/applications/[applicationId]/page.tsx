@@ -8,6 +8,8 @@ import styles from "@/components/employer-vacancies/employer-vacancies.module.sc
 import { berlinTodayIso } from "@/lib/applications/outcome-type";
 import { loadEmployerApplication } from "@/lib/employer/applications/load-employer-application";
 import { loadEmployerApplicationOutcomes } from "@/lib/employer/applications/load-employer-application-outcomes";
+import { loadUnseenApplicationsCount } from "@/lib/employer/applications/load-unseen-applications-count";
+import { markEmployerApplicationSeen } from "@/lib/employer/applications/mark-employer-application-seen";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { EMPLOYER_RESTRICTED_APPLICATIONS } from "@/lib/employer/messages";
 import { loadCurrentEmployerSuspensionStatus } from "@/lib/employer/suspension-guard";
@@ -48,6 +50,10 @@ export default async function EmployerApplicationDetailPage({
           showCandidate={capabilities?.hasCandidateProfile === true}
           showEmployer={capabilities?.hasEmployerProfile === true}
           currentPath="applications"
+          // A suspended employer's own count RPC call already resolves to
+          // employer_unavailable/0 — skip the round trip on this
+          // restricted-notice branch rather than calling it just to get 0.
+          unseenApplicationsCount={0}
         />
         <h1 className={styles.heading}>Application</h1>
         <EmployerRestrictedNotice message={EMPLOYER_RESTRICTED_APPLICATIONS} />
@@ -70,7 +76,21 @@ export default async function EmployerApplicationDetailPage({
     redirect("/auth/error?reason=profile");
   }
 
+  // N4: the owning employer has now successfully verified ownership and
+  // loaded this application's detail — the intended seen-acknowledgement
+  // event. Never lets a failure here affect the page render; the detail
+  // below is already loaded and must display regardless.
+  try {
+    await markEmployerApplicationSeen(supabase, applicationId);
+  } catch (error) {
+    console.error("[applications] mark-seen threw unexpectedly", {
+      applicationId,
+      error: String(error),
+    });
+  }
+
   const capabilities = await loadAccountCapabilities(supabase);
+  const unseenApplicationsCount = await loadUnseenApplicationsCount(supabase);
   const outcomesResult = await loadEmployerApplicationOutcomes(
     supabase,
     applicationId,
@@ -82,6 +102,7 @@ export default async function EmployerApplicationDetailPage({
         showCandidate={capabilities?.hasCandidateProfile === true}
         showEmployer={capabilities?.hasEmployerProfile === true}
         currentPath="applications"
+        unseenApplicationsCount={unseenApplicationsCount}
       />
       <h1 className={styles.heading}>
         {loaded.application.candidate_display_name}

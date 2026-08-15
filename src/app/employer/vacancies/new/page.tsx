@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import { VacancyDraftForm } from "@/components/employer-vacancies/vacancy-draft-form";
+import { loadUnseenApplicationsCount } from "@/lib/employer/applications/load-unseen-applications-count";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import {
   VACANCY_PRIVATE_NOTICE,
@@ -32,6 +33,7 @@ export default async function NewEmployerVacancyPage() {
   }
 
   const capabilities = await loadAccountCapabilities(supabase);
+  const unseenApplicationsCount = await loadUnseenApplicationsCount(supabase);
 
   return (
     <main className={styles.page}>
@@ -39,6 +41,7 @@ export default async function NewEmployerVacancyPage() {
         showCandidate={capabilities?.hasCandidateProfile === true}
         showEmployer={capabilities?.hasEmployerProfile === true}
         currentPath="vacancies"
+        unseenApplicationsCount={unseenApplicationsCount}
       />
       <h1 className={styles.heading}>Create vacancy draft</h1>
       <p className={styles.lead}>

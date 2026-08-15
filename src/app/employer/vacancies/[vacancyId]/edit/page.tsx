@@ -7,6 +7,7 @@ import { LanguageRequirementsEditor } from "@/components/employer-vacancies/lang
 import { ReadinessChecklist } from "@/components/employer-vacancies/readiness-checklist";
 import { VacancyDraftForm } from "@/components/employer-vacancies/vacancy-draft-form";
 import { VacancyUnavailable } from "@/components/employer-vacancies/vacancy-unavailable";
+import { loadUnseenApplicationsCount } from "@/lib/employer/applications/load-unseen-applications-count";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadEmployerDraft } from "@/lib/employer/vacancies/load-employer-draft";
 import {
@@ -46,6 +47,7 @@ export default async function EditEmployerVacancyPage({
   }
 
   const capabilities = await loadAccountCapabilities(supabase);
+  const unseenApplicationsCount = await loadUnseenApplicationsCount(supabase);
 
   return (
     <main className={styles.page}>
@@ -53,6 +55,7 @@ export default async function EditEmployerVacancyPage({
         showCandidate={capabilities?.hasCandidateProfile === true}
         showEmployer={capabilities?.hasEmployerProfile === true}
         currentPath="vacancies"
+        unseenApplicationsCount={unseenApplicationsCount}
       />
       <h1 className={styles.heading}>Edit vacancy</h1>
       {loaded.draft.publicationState === "paused" ? (

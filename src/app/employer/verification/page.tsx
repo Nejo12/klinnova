@@ -5,6 +5,7 @@ import { EmployerRestrictedNotice } from "@/components/employer-shared/employer-
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
 import { VerificationRequestForm } from "@/components/employer-verification/verification-request-form";
 import styles from "@/components/employer-verification/employer-verification.module.scss";
+import { loadUnseenApplicationsCount } from "@/lib/employer/applications/load-unseen-applications-count";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadEmployerProfile } from "@/lib/employer/load-employer";
 import { EMPLOYER_RESTRICTED_VERIFICATION } from "@/lib/employer/messages";
@@ -65,6 +66,7 @@ export default async function EmployerVerificationPage() {
   }
 
   const capabilities = await loadAccountCapabilities(supabase);
+  const unseenApplicationsCount = await loadUnseenApplicationsCount(supabase);
   const onboardingIncomplete = loaded.data?.onboardingCompletedAt === null;
   const requestedAt = formatTimestamp(view.requestedAt);
   const reviewedAt = formatTimestamp(view.reviewedAt);
@@ -79,6 +81,7 @@ export default async function EmployerVerificationPage() {
         showCandidate={capabilities?.hasCandidateProfile === true}
         showEmployer={capabilities?.hasEmployerProfile === true}
         currentPath="verification"
+        unseenApplicationsCount={unseenApplicationsCount}
       />
 
       <h1 className={styles.heading}>Verification</h1>
