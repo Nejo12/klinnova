@@ -62,9 +62,10 @@
 
 .heading {
   margin: 0;
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-xl);
+  font-size: var(--type-heading-size);
+  font-weight: var(--type-heading-weight);
+  line-height: var(--type-heading-line-height);
+  letter-spacing: var(--type-heading-tracking);
   color: var(--color-text-primary);
 }
 
@@ -72,14 +73,14 @@
 .support,
 .note {
   margin: 0;
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line-height);
   color: var(--color-text-secondary);
 }
 
 .support,
 .note {
-  font-size: var(--font-size-sm);
+  font-size: var(--type-body-supporting-size);
   color: var(--color-text-muted);
 }
 
@@ -89,7 +90,7 @@
   border-radius: var(--radius-md);
   background-color: var(--color-support-subtle);
   color: var(--color-text-primary);
-  font-size: var(--font-size-sm);
+  font-size: var(--type-body-supporting-size);
 }
 
 .list {
@@ -127,7 +128,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  font-size: var(--font-size-sm);
+  font-size: var(--type-body-supporting-size);
   color: var(--color-text-secondary);
 }
 
@@ -168,8 +169,10 @@
 }
 
 .label {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--type-label-size);
+  font-weight: var(--type-label-weight);
+  line-height: var(--type-label-line-height);
+  letter-spacing: var(--type-label-tracking);
   color: var(--color-text-primary);
 }
 
@@ -265,13 +268,13 @@
   border-radius: var(--radius-md);
   background-color: var(--color-status-danger-bg);
   color: var(--color-status-danger);
-  font-size: var(--font-size-sm);
+  font-size: var(--type-body-supporting-size);
 }
 
 .fieldError {
   margin: 0;
   color: var(--color-status-danger);
-  font-size: var(--font-size-sm);
+  font-size: var(--type-body-supporting-size);
 }
 
 .status {
@@ -280,7 +283,7 @@
   border-radius: var(--radius-md);
   background-color: var(--color-status-success-bg);
   color: var(--color-status-success);
-  font-size: var(--font-size-sm);
+  font-size: var(--type-body-supporting-size);
 }
 
 .checklist {
@@ -296,7 +299,7 @@
   display: flex;
   gap: var(--space-3);
   align-items: flex-start;
-  font-size: var(--font-size-sm);
+  font-size: var(--type-body-supporting-size);
   color: var(--color-text-secondary);
 }
 
@@ -331,7 +334,7 @@
 
 .detailList dd {
   margin: 0;
-  font-size: var(--font-size-sm);
+  font-size: var(--type-body-supporting-size);
   color: var(--color-text-secondary);
   white-space: pre-wrap;
 }
