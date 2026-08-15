@@ -55,10 +55,10 @@
 
 .heading {
   margin: 0;
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-tight);
-  line-height: var(--line-height-3xl);
+  font-size: var(--type-display-size);
+  font-weight: var(--type-display-weight);
+  letter-spacing: var(--type-display-tracking);
+  line-height: var(--type-display-line-height);
   color: var(--color-text-primary);
 }
 
@@ -75,8 +75,8 @@
   padding: var(--space-4);
   border-left: var(--border-width-strong) solid var(--color-border-strong);
   background-color: var(--color-bg-subtle);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-supporting-line-height);
   color: var(--color-text-secondary);
 }
 
@@ -151,8 +151,8 @@
 
 .summary {
   margin: 0;
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-supporting-line-height);
   color: var(--color-text-secondary);
 }
 
@@ -180,8 +180,8 @@
 
 .metaValue {
   margin: 0;
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-supporting-line-height);
   color: var(--color-text-primary);
   overflow-wrap: anywhere;
 }
@@ -212,8 +212,8 @@
   border-radius: var(--radius-sm);
   background-color: var(--color-support-subtle);
   color: var(--color-support-strong);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-supporting-line-height);
 }
 
 .empty,
@@ -240,8 +240,8 @@
 .errorBody {
   margin: 0;
   max-width: 34rem;
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line-height);
   color: var(--color-text-secondary);
 }
 
