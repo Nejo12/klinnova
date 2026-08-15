@@ -50,6 +50,20 @@ const ACCOUNT_DELETION_PRIVILEGED_FILES = new Set([
   "src/lib/account-deletion/processor.ts",
 ]);
 
+/**
+ * N2 (`docs` PR "N2: notify employer of new applications") introduces a
+ * second, independently-scoped privileged Auth Admin lookup — resolving an
+ * employer's email via `auth.admin.getUserById` to notify them of a new
+ * application. It has its own equally strict isolation proof
+ * (`src/lib/applications/n2-static-security.test.ts`); it is excluded here
+ * only so this account-deletion-scoped test keeps asserting its own
+ * boundary (`processor.ts`) rather than a broader repo-wide ban on
+ * `auth.admin`/service-role usage.
+ */
+const N2_PRIVILEGED_FILES = new Set([
+  "src/lib/applications/privileged-employer-recipient-lookup.ts",
+]);
+
 describe("PR 8.4 account-deletion privileged-boundary static security proof", () => {
   it("imports privileged-supabase.ts only from processor.ts", () => {
     const files = allSourceFiles().filter(
@@ -77,7 +91,8 @@ describe("PR 8.4 account-deletion privileged-boundary static security proof", ()
     for (const file of allSourceFiles()) {
       if (
         PRE_EXISTING_SERVICE_ROLE_REFERENCES.has(file) ||
-        ACCOUNT_DELETION_PRIVILEGED_FILES.has(file)
+        ACCOUNT_DELETION_PRIVILEGED_FILES.has(file) ||
+        N2_PRIVILEGED_FILES.has(file)
       ) {
         continue;
       }
@@ -88,7 +103,10 @@ describe("PR 8.4 account-deletion privileged-boundary static security proof", ()
 
   it("confines auth.admin/deleteUser calls to the isolated processor module", () => {
     for (const file of allSourceFiles()) {
-      if (ACCOUNT_DELETION_PRIVILEGED_FILES.has(file)) {
+      if (
+        ACCOUNT_DELETION_PRIVILEGED_FILES.has(file) ||
+        N2_PRIVILEGED_FILES.has(file)
+      ) {
         continue;
       }
       const source = readSource(file);

@@ -7,6 +7,9 @@ const redirect = vi.hoisted(() =>
 );
 const getUser = vi.hoisted(() => vi.fn());
 const rpc = vi.hoisted(() => vi.fn());
+const notifyEmployerOfNewApplication = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ status: "sent", providerMessageId: "test-id" }),
+);
 
 vi.mock("next/navigation", () => ({
   redirect,
@@ -17,6 +20,10 @@ vi.mock("@/lib/supabase/server", () => ({
     auth: { getUser },
     rpc,
   })),
+}));
+
+vi.mock("@/lib/applications/notify-employer-new-application", () => ({
+  notifyEmployerOfNewApplication,
 }));
 
 import { submitCandidateApplicationAction } from "@/app/candidate/jobs/[vacancyId]/actions";
@@ -40,6 +47,11 @@ describe("submitCandidateApplicationAction", () => {
     redirect.mockClear();
     getUser.mockReset();
     rpc.mockReset();
+    notifyEmployerOfNewApplication.mockReset();
+    notifyEmployerOfNewApplication.mockResolvedValue({
+      status: "sent",
+      providerMessageId: "test-id",
+    });
   });
 
   it("returns validation_error for malformed vacancy IDs without an auth check or RPC", async () => {
@@ -101,9 +113,14 @@ describe("submitCandidateApplicationAction", () => {
     expect(rpc).toHaveBeenCalledWith("submit_candidate_application", {
       p_vacancy_id: VACANCY_ID,
     });
+    expect(notifyEmployerOfNewApplication).toHaveBeenCalledTimes(1);
+    expect(notifyEmployerOfNewApplication).toHaveBeenCalledWith({
+      applicationId: APPLICATION_ID,
+      vacancyId: VACANCY_ID,
+    });
   });
 
-  it("redirects to the same confirmation after already_applied", async () => {
+  it("redirects to the same confirmation after already_applied, without notifying the employer (N2: no false new-application email for a non-new row)", async () => {
     authed();
     rpc.mockResolvedValue({
       data: { result: "already_applied", application_id: APPLICATION_ID },
@@ -116,6 +133,71 @@ describe("submitCandidateApplicationAction", () => {
         form(VACANCY_ID),
       ),
     ).rejects.toThrow(`REDIRECT:/candidate/applications/${APPLICATION_ID}`);
+    expect(notifyEmployerOfNewApplication).not.toHaveBeenCalled();
+  });
+
+  it("still redirects successfully when employer notification rejects (N2: mail failure never turns a persisted application into a failure)", async () => {
+    authed();
+    rpc.mockResolvedValue({
+      data: { result: "submitted", application_id: APPLICATION_ID },
+      error: null,
+    });
+    notifyEmployerOfNewApplication.mockRejectedValue(
+      new Error("provider unreachable"),
+    );
+
+    await expect(
+      submitCandidateApplicationAction(
+        initialSubmitCandidateApplicationState,
+        form(VACANCY_ID),
+      ),
+    ).rejects.toThrow(`REDIRECT:/candidate/applications/${APPLICATION_ID}`);
+    expect(notifyEmployerOfNewApplication).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not attempt employer notification for incomplete, unavailable, or ineligible RPC results", async () => {
+    authed();
+
+    rpc.mockResolvedValueOnce({ data: { result: "incomplete" }, error: null });
+    await expect(
+      submitCandidateApplicationAction(
+        initialSubmitCandidateApplicationState,
+        form(VACANCY_ID),
+      ),
+    ).rejects.toThrow("REDIRECT:/candidate/onboarding");
+
+    rpc.mockResolvedValueOnce({ data: { result: "unavailable" }, error: null });
+    await submitCandidateApplicationAction(
+      initialSubmitCandidateApplicationState,
+      form(VACANCY_ID),
+    );
+
+    rpc.mockResolvedValueOnce({
+      data: { result: "ineligible", missing_requirements: ["category"] },
+      error: null,
+    });
+    await submitCandidateApplicationAction(
+      initialSubmitCandidateApplicationState,
+      form(VACANCY_ID),
+    );
+
+    expect(notifyEmployerOfNewApplication).not.toHaveBeenCalled();
+  });
+
+  it("does not attempt employer notification when the RPC call itself errors", async () => {
+    authed();
+    rpc.mockResolvedValue({
+      data: null,
+      error: { message: "permission denied" },
+    });
+
+    const state = await submitCandidateApplicationAction(
+      initialSubmitCandidateApplicationState,
+      form(VACANCY_ID),
+    );
+
+    expect(state).toEqual({ status: "failure" });
+    expect(notifyEmployerOfNewApplication).not.toHaveBeenCalled();
   });
 
   it("fails safely when a successful RPC omits a valid application id", async () => {
