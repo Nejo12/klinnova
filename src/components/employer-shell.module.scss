@@ -33,17 +33,19 @@
 
 .heading {
   margin: 0;
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--type-heading-size);
+  font-weight: var(--type-heading-weight);
+  /* Deliberately retained: this heading keeps its tighter brand tracking
+     rather than the role's default --type-heading-tracking (normal). */
   letter-spacing: var(--letter-spacing-tight);
-  line-height: var(--line-height-2xl);
+  line-height: var(--type-heading-line-height);
   color: var(--color-text-primary);
 }
 
 .lead {
   margin: 0;
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line-height);
   color: var(--color-text-secondary);
 }
 
@@ -126,9 +128,9 @@
 
 .panelHeading {
   margin: 0;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-lg);
+  font-size: var(--type-subheading-size);
+  font-weight: var(--type-subheading-weight);
+  line-height: var(--type-subheading-line-height);
   color: var(--color-text-primary);
 }
 
@@ -153,8 +155,8 @@
 
 .metaRow dd {
   margin: 0;
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line-height);
   color: var(--color-text-primary);
 }
 
@@ -206,7 +208,9 @@
   }
 
   .heading {
-    font-size: var(--font-size-3xl);
-    line-height: var(--line-height-3xl);
+    /* At this breakpoint, size/line-height match --type-display-* exactly;
+       weight and tracking are inherited unchanged from the base rule. */
+    font-size: var(--type-display-size);
+    line-height: var(--type-display-line-height);
   }
 }
