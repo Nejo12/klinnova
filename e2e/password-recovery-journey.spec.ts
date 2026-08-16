@@ -69,14 +69,13 @@ async function waitForRecoveryMessage(
 }
 
 /**
- * Extract the real recovery link. Empirically confirmed against the
- * installed local Supabase version: the default recovery email template's
- * `{{ .ConfirmationURL }}` always points at GoTrue's own
- * `/auth/v1/verify?token=...&type=recovery&redirect_to=...` endpoint, not
- * directly at our app — the browser must follow GoTrue's 303 redirect to
- * actually land on `/auth/confirm`. Falls back to a direct
- * `/auth/confirm?...type=recovery...` link in case a differently
- * configured project ever emails one instead.
+ * Extract the real recovery link. The recovery template (C4G-R) links
+ * directly to our own `/auth/confirm?token_hash=...&type=recovery...`
+ * interstitial — never `{{ .ConfirmationURL }}`, which would point at
+ * GoTrue's own `/auth/v1/verify` and consume the one-time token on any GET,
+ * including automated email-link-prefetch scanners, before a human ever
+ * clicks. The GoTrue-hosted-verify pattern is still matched as a fallback
+ * in case a differently configured project ever emails one instead.
  */
 function extractRecoveryLink(message: MailpitMessage): string {
   const haystack = `${message.Text}\n${message.HTML}`
@@ -85,9 +84,9 @@ function extractRecoveryLink(message: MailpitMessage): string {
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"');
   const patterns = [
-    /https?:\/\/[^\s"'<>]+\/auth\/v1\/verify\?[^\s"'<>]*type=recovery[^\s"'<>]*/i,
     /https?:\/\/[^\s"'<>]+\/auth\/confirm\?[^\s"'<>]+type=recovery[^\s"'<>]*/i,
     /\/auth\/confirm\?[^\s"'<>]+type=recovery[^\s"'<>]*/i,
+    /https?:\/\/[^\s"'<>]+\/auth\/v1\/verify\?[^\s"'<>]*type=recovery[^\s"'<>]*/i,
   ];
   for (const pattern of patterns) {
     const match = haystack.match(pattern);
@@ -156,6 +155,15 @@ test.describe("password recovery journey (M5.1 Unit C)", () => {
     const recoveryLink = extractRecoveryLink(recoveryMessage);
     await page.goto(recoveryLink);
 
+    // Scanner-resistant interstitial (C4G-R): the emailed link lands on a
+    // page that performs no Auth call until the human explicitly submits it.
+    await expect(
+      page.getByRole("heading", { name: "Reset your password" }),
+    ).toBeVisible();
+    await page
+      .getByRole("button", { name: "Continue to password reset" })
+      .click();
+
     // Reach the real set-new-password UI.
     await expect(page).toHaveURL(/\/reset-password$/, { timeout: 15_000 });
     await expect(
@@ -207,11 +215,26 @@ test.describe("password recovery journey (M5.1 Unit C)", () => {
     );
   });
 
-  test("an invalid/malformed recovery link reaches the safe retry state, not onboarding or a raw error", async ({
+  test("an invalid/malformed recovery link renders the interstitial (no Auth call on GET), and fails safely only after the human submits it", async ({
     page,
   }) => {
     test.setTimeout(30_000);
     await page.goto("/auth/confirm?token_hash=not-a-real-token&type=recovery");
+
+    // GET alone must never consume anything — it lands on the
+    // scanner-resistant interstitial, not an error page (C4G-R).
+    await expect(page).toHaveURL(
+      /\/auth\/confirm\?token_hash=not-a-real-token&type=recovery$/,
+    );
+    await expect(
+      page.getByRole("heading", { name: "Reset your password" }),
+    ).toBeVisible();
+
+    // Only the explicit human submit actually attempts verification, which
+    // then fails safely for a garbage token.
+    await page
+      .getByRole("button", { name: "Continue to password reset" })
+      .click();
     await expect(page).toHaveURL(/\/auth\/error\?reason=recovery$/, {
       timeout: 15_000,
     });
@@ -221,6 +244,20 @@ test.describe("password recovery journey (M5.1 Unit C)", () => {
     await expect(
       page.getByRole("link", { name: "Request another reset" }),
     ).toHaveAttribute("href", "/forgot-password");
+  });
+
+  test("a GET to the confirmation/recovery interstitial with no token at all renders the error state directly", async ({
+    page,
+  }) => {
+    test.setTimeout(30_000);
+    await page.goto("/auth/confirm");
+    await expect(
+      page.getByText(
+        /confirmation link is invalid or has expired\. request a new one/i,
+      ),
+    ).toBeVisible();
+    // No form is rendered — nothing to submit.
+    await expect(page.getByRole("button")).toHaveCount(0);
   });
 
   test("visiting /reset-password directly with no recovery session reaches the safe retry state", async ({

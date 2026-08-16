@@ -247,10 +247,20 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
-# Confirmation email points at the Next.js callback with token_hash (SSR-safe).
+# Confirmation email points at the Next.js callback with token_hash
+# (SSR-safe, scanner-resistant — C4G-R). Never ConfirmationURL: that points
+# at GoTrue's own /auth/v1/verify, which consumes the one-time token on the
+# first GET it receives, including automated email-link-prefetch/security
+# scanners, before a human ever clicks.
 [auth.email.template.confirmation]
 subject = "Confirm your email address"
 content_path = "./supabase/templates/confirmation.html"
+
+# Recovery email points at the same Next.js callback, same scanner-resistance
+# reasoning as confirmation above (C4G-R).
+[auth.email.template.recovery]
+subject = "Reset your password"
+content_path = "./supabase/templates/recovery.html"
 
 # Uncomment to customize invite email template
 # [auth.email.template.invite]

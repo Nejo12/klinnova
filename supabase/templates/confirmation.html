@@ -4,8 +4,15 @@
 </p>
 <p>
   <!--
-    Use ConfirmationURL so signup emailRedirectTo (including validated next)
-    is preserved for candidate and employer registration (D-047).
+    Direct token_hash link to our own /auth/confirm interstitial — never
+    ConfirmationURL, which points at GoTrue's /auth/v1/verify and consumes
+    the one-time token on the first GET it receives, including automated
+    email-link-prefetch/security scanners, before a human ever clicks
+    (C4G-R). RedirectTo already carries our own ?next=<intent> — always
+    present, even when empty, since registerAction always sets it — so
+    appending further params with `&` is always syntactically safe.
   -->
-  <a href="{{ .ConfirmationURL }}">Confirm email address</a>
+  <a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=signup"
+    >Confirm email address</a
+  >
 </p>
