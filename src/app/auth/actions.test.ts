@@ -91,7 +91,7 @@ describe("registerAction", () => {
       password: "password123",
       options: {
         data: { display_name: "Ada" },
-        emailRedirectTo: "https://stint.company/auth/confirm",
+        emailRedirectTo: "https://stint.company/auth/confirm?next=",
       },
     });
     expect(state).toEqual({ error: null, message: AUTH_CHECK_EMAIL });

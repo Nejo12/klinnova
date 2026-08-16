@@ -87,9 +87,11 @@ export async function registerAction(
   });
 
   const confirmUrl = new URL("/auth/confirm", origin);
-  if (intentPath !== null) {
-    confirmUrl.searchParams.set("next", intentPath);
-  }
+  // Always set `next` (even empty): guarantees the email template's
+  // {{ .RedirectTo }} value always carries a query string, so appending
+  // `&token_hash=...&type=...` in the template is always syntactically
+  // safe (C4G-R) — never a bare path that would need a leading `?` instead.
+  confirmUrl.searchParams.set("next", intentPath ?? "");
 
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,

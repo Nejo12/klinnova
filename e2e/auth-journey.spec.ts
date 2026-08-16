@@ -41,6 +41,9 @@ test.describe("local Auth journey", () => {
     const confirmTarget = extractConfirmNavigationTarget(message);
 
     await page.goto(confirmTarget);
+    // Scanner-resistant interstitial (C4G-R): no Auth call until the human
+    // explicitly submits it.
+    await page.getByRole("button", { name: "Confirm email address" }).click();
     await expect(page).toHaveURL(/\/candidate$/, { timeout: 15_000 });
     await expect(
       page.getByRole("heading", { level: 1, name: `Welcome, ${displayName}` }),

@@ -1,0 +1,13 @@
+<h2>Reset your password</h2>
+<p>Follow the link below to set a new password for your Klinnova account.</p>
+<p>
+  <!--
+    Direct token_hash link, same reasoning as confirmation.html (C4G-R).
+    RedirectTo already carries ?intent=recovery — requestPasswordResetAction
+    always sets it — so appending further params with `&` is always
+    syntactically safe.
+  -->
+  <a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=recovery"
+    >Reset password</a
+  >
+</p>

@@ -26,6 +26,9 @@ export async function registerAndConfirm(
 
   const message = await waitForMailpitMessage(options.email);
   await page.goto(extractConfirmNavigationTarget(message));
+  // Scanner-resistant interstitial (C4G-R): the emailed link lands on a
+  // page that performs no Auth call until the human explicitly submits it.
+  await page.getByRole("button", { name: "Confirm email address" }).click();
   await expect(page).toHaveURL(options.expectedPath ?? /\/candidate$/, {
     timeout: 15_000,
   });
