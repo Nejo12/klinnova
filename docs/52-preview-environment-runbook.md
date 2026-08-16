@@ -118,9 +118,24 @@ Production:
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | The Preview project's publishable key |
 | `SUPABASE_SERVICE_ROLE_KEY` | The Preview project's own service-role key (never Production's) |
 
-`NEXT_PUBLIC_SITE_URL` remains unset for Preview (Production-only), so the
-existing `VERCEL_URL` fallback in `src/lib/auth/site-origin.ts` keeps
-resolving the correct per-deployment origin, unchanged from the F1 plan.
+`NEXT_PUBLIC_SITE_URL` remains unset for the general Preview scope
+(Production-only), so the existing `VERCEL_URL` fallback in
+`src/lib/auth/site-origin.ts` keeps resolving the correct per-deployment
+origin, unchanged from the F1 plan.
+
+### K4 branch-scoped experiment — reconciled (C4C/C4D1)
+
+Between 2026-08-12 and 2026-08-16, a `NEXT_PUBLIC_SITE_URL` value scoped
+specifically to the git branch `preview/klinnova-k3` existed in Vercel,
+alongside (not instead of) the general Preview scope above. It was a
+one-off K4 experiment testing whether Vercel's Git integration correctly
+applies a branch-scoped env var to that branch's own Preview deployment;
+the branch itself never merged into `main` and had no other Preview-role
+dependency. The Klinnova production readiness (C4C) connectivity audit
+identified it as orphaned — no active deployment or alias used the branch
+by the time of that audit — and C4D1 removed both the branch-scoped
+variable and the abandoned branch. The statement above is accurate again
+as of C4D1: no branch-scoped `NEXT_PUBLIC_SITE_URL` exists for Preview.
 
 ## Provisioning record (2026-08-11)
 
