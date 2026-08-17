@@ -14,19 +14,31 @@ import styles from "./public-jobs.module.scss";
 
 type PublicJobCardProps = {
   item: PublicVacancyListItem;
+  /**
+   * Heading level for the job title. Defaults to "h2" to preserve the
+   * exact rendering on /jobs, where each card sits directly under that
+   * page's own <h1>. The homepage reuses this card lower in its own
+   * heading hierarchy, so it passes "h3" to avoid implying every job
+   * title is a top-level page section.
+   */
+  headingLevel?: "h2" | "h3";
 };
 
-export function PublicJobCard({ item }: PublicJobCardProps) {
+export function PublicJobCard({
+  item,
+  headingLevel = "h2",
+}: PublicJobCardProps) {
   const { vacancy, languages } = item;
   const titleId = `public-job-title-${vacancy.vacancyId}`;
   const detailHref = `/jobs/${vacancy.vacancyId}`;
+  const TitleTag = headingLevel;
 
   return (
     <article className={styles.card} aria-labelledby={titleId}>
       <div className={styles.cardHeader}>
-        <h2 className={styles.cardTitle} id={titleId}>
+        <TitleTag className={styles.cardTitle} id={titleId}>
           {vacancy.title}
-        </h2>
+        </TitleTag>
         {vacancy.source === "seed" ? (
           <p className={styles.demoLabel}>{DEMO_VACANCY_LABEL}</p>
         ) : null}
