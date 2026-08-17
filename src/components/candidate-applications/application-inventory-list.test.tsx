@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { ApplicationInventoryList } from "@/components/candidate-applications/application-inventory-list";
+import styles from "@/components/candidate-matches/candidate-matches.module.scss";
 import type { ApplicationInventoryRow } from "@/lib/applications/snapshot-schemas";
 import type { ApplicationStatus } from "@/lib/applications/status";
 
@@ -31,6 +32,13 @@ function buildRow(
       available_from: null,
     },
   };
+}
+
+const cardReducedEmphasisClass = styles.cardReducedEmphasis;
+if (cardReducedEmphasisClass === undefined) {
+  throw new Error(
+    "cardReducedEmphasis class missing from candidate-matches.module.scss",
+  );
 }
 
 describe("ApplicationInventoryList", () => {
@@ -143,5 +151,30 @@ describe("ApplicationInventoryList", () => {
     render(<ApplicationInventoryList active={[]} closed={[]} />);
 
     expect(screen.queryAllByRole("heading", { level: 2 })).toHaveLength(0);
+  });
+
+  it("de-emphasizes closed cards but not active cards", () => {
+    render(
+      <ApplicationInventoryList
+        active={[
+          buildRow(
+            "11111111-1111-4111-8111-111111111111",
+            "Active card",
+            "submitted",
+          ),
+        ]}
+        closed={[
+          buildRow(
+            "33333333-3333-4333-8333-333333333333",
+            "Closed card",
+            "accepted",
+          ),
+        ]}
+      />,
+    );
+
+    const [activeCard, closedCard] = screen.getAllByRole("article");
+    expect(activeCard).not.toHaveClass(cardReducedEmphasisClass);
+    expect(closedCard).toHaveClass(cardReducedEmphasisClass);
   });
 });
