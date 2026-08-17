@@ -13,6 +13,7 @@ describe("ShellHeader", () => {
 
   it("exposes Jobs, For candidates, and For employers in the Site nav", () => {
     render(<ShellHeader />);
+    fireEvent.click(screen.getByRole("button", { name: "Menu" }));
 
     const nav = screen.getByRole("navigation", { name: "Site" });
     expect(within(nav).getByRole("link", { name: "Jobs" })).toHaveAttribute(
@@ -29,6 +30,7 @@ describe("ShellHeader", () => {
 
   it("exposes Sign in and Create account actions to real routes", () => {
     render(<ShellHeader />);
+    fireEvent.click(screen.getByRole("button", { name: "Menu" }));
 
     const nav = screen.getByRole("navigation", { name: "Site" });
     expect(within(nav).getByRole("link", { name: "Sign in" })).toHaveAttribute(
