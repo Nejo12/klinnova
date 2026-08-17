@@ -1,25 +1,12 @@
-import { CandidateShell } from "@/components/candidate-shell";
-import { EmployerShell } from "@/components/employer-shell";
-import { PublicFooter } from "@/components/public-shared/public-footer";
-import { ShellHeader } from "@/components/shell-header";
+import { Homepage } from "@/components/homepage/homepage";
+import { loadPublicVacancies } from "@/lib/public-jobs/load-public-vacancies";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
-import styles from "./page.module.scss";
+export const dynamic = "force-dynamic";
 
-export default function HomePage() {
-  return (
-    <>
-      <ShellHeader />
-      <main className={styles.main}>
-        <CandidateShell />
-        <EmployerShell />
-      </main>
-      <footer className={styles.footer}>
-        <p className={styles.footerCopy}>
-          Candidate registration is available. Essential onboarding follows
-          next.
-        </p>
-        <PublicFooter />
-      </footer>
-    </>
-  );
+export default async function HomePage() {
+  const supabase = await createServerSupabaseClient();
+  const jobsResult = await loadPublicVacancies(supabase);
+
+  return <Homepage jobsResult={jobsResult} />;
 }
