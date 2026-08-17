@@ -1,9 +1,24 @@
+@use "../../styles/breakpoints" as *;
+
 .main {
   display: block;
 }
 
 .footer {
-  border-top: var(--border-width-default) solid var(--color-border-default);
   background-color: var(--color-bg-surface);
-  padding: var(--space-4) 0;
+  max-width: var(--layout-content-max);
+  margin-inline: auto;
+  padding: var(--space-4) var(--layout-gutter-mobile);
+}
+
+@media (min-width: $breakpoint-md) {
+  .footer {
+    padding-inline: var(--layout-gutter-tablet);
+  }
+}
+
+@media (min-width: $breakpoint-lg) {
+  .footer {
+    padding-inline: var(--layout-gutter-desktop);
+  }
 }

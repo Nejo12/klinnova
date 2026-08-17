@@ -223,12 +223,19 @@
   color: var(--color-text-muted);
 }
 
+@media (min-width: $breakpoint-md) {
+  .hero {
+    padding-inline: var(--layout-gutter-tablet);
+  }
+}
+
 @media (min-width: $breakpoint-lg) {
   .hero {
     flex-direction: row;
     align-items: center;
     gap: var(--space-10);
     padding-block: var(--space-16);
+    padding-inline: var(--layout-gutter-desktop);
   }
 
   .copy,

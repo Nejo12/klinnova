@@ -53,6 +53,10 @@
 }
 
 @media (min-width: $breakpoint-md) {
+  .section {
+    padding-inline: var(--layout-gutter-tablet);
+  }
+
   .list {
     grid-template-columns: repeat(2, 1fr);
   }

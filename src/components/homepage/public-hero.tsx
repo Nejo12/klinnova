@@ -60,9 +60,9 @@ export function PublicHero() {
       >
         <div className={styles.previewHeader}>
           <div>
-            <h3 className={styles.previewTitle} id="hero-preview-title">
+            <p className={styles.previewTitle} id="hero-preview-title">
               Reinigungskraft
-            </h3>
+            </p>
             <p className={styles.previewCompany}>Hauswerk Berlin · Mitte</p>
           </div>
           <span className={styles.verifiedBadge}>Verified employer</span>

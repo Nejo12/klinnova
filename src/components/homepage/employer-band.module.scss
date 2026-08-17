@@ -1,20 +1,22 @@
 @use "../../styles/breakpoints" as *;
 
 .section {
+  padding: var(--space-10) var(--layout-gutter-mobile);
+  background-color: var(--color-bg-inverse);
+}
+
+.inner {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-  padding: var(--space-10) var(--layout-gutter-mobile);
-  background-color: var(--color-bg-inverse);
+  max-width: var(--layout-content-max);
+  margin-inline: auto;
 }
 
 .copy {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  max-width: var(--layout-content-max);
-  margin-inline: auto;
-  width: 100%;
 }
 
 .eyebrow {
@@ -23,7 +25,7 @@
   font-weight: var(--font-weight-semibold);
   letter-spacing: var(--letter-spacing-wide);
   text-transform: uppercase;
-  color: var(--color-clay-500, var(--color-accent-warm));
+  color: var(--color-accent-warm);
 }
 
 .heading {
@@ -82,9 +84,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  max-width: var(--layout-content-max);
-  margin-inline: auto;
-  width: 100%;
   padding: var(--space-5);
   border-radius: var(--radius-lg);
   background-color: var(--color-bg-surface);
@@ -186,24 +185,24 @@
   color: var(--color-text-muted);
 }
 
+@media (min-width: $breakpoint-md) {
+  .section {
+    padding-inline: var(--layout-gutter-tablet);
+  }
+}
+
 @media (min-width: $breakpoint-lg) {
   .section {
-    flex-direction: row;
     padding-inline: var(--layout-gutter-desktop);
+  }
+
+  .inner {
+    flex-direction: row;
     align-items: center;
   }
 
   .copy,
   .panel {
     flex: 1;
-    margin-inline: 0;
-  }
-
-  .copy {
-    max-width: none;
-  }
-
-  .panel {
-    max-width: none;
   }
 }

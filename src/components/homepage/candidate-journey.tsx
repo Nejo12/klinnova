@@ -24,11 +24,7 @@ export function CandidateJourney() {
         </h2>
         <ol className={styles.steps}>
           {STEPS.map((step, index) => (
-            <li
-              key={step}
-              className={styles.step}
-              aria-label={`Step ${index + 1}`}
-            >
+            <li key={step} className={styles.step}>
               <span className={styles.stepNumber}>{index + 1}</span>
               <span>{step}</span>
             </li>

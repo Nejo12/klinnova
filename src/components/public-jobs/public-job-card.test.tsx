@@ -89,4 +89,21 @@ describe("PublicJobCard", () => {
       "/jobs/11111111-1111-4111-8111-111111111111",
     );
   });
+
+  it("renders the title as h2 by default", () => {
+    render(<PublicJobCard item={makeItem()} />);
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Evening cleaner" }),
+    ).toBeInTheDocument();
+  });
+
+  it("renders the title as h3 when headingLevel is passed", () => {
+    render(<PublicJobCard item={makeItem()} headingLevel="h3" />);
+    expect(
+      screen.getByRole("heading", { level: 3, name: "Evening cleaner" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { level: 2 }),
+    ).not.toBeInTheDocument();
+  });
 });

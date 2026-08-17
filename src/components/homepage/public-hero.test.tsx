@@ -24,6 +24,16 @@ describe("PublicHero", () => {
     expect(screen.queryByText(/€\/h/)).not.toBeInTheDocument();
     expect(screen.queryByText(/work permission/i)).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Apply" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Apply" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/minutes|commute/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/data stays yours|your data/i),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/part.time|full.time|mini.job/i),
+    ).not.toBeInTheDocument();
   });
 
   it("renders the illustrative match card using real match-reason copy", () => {

@@ -29,7 +29,7 @@ export function OpenJobsPreview({ result }: OpenJobsPreviewProps) {
         <ul className={styles.list}>
           {items.map((item) => (
             <li key={item.vacancy.vacancyId}>
-              <PublicJobCard item={item} />
+              <PublicJobCard item={item} headingLevel="h3" />
             </li>
           ))}
         </ul>

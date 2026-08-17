@@ -16,9 +16,15 @@ describe("CandidateJourney", () => {
   it("lists the four real steps in order", () => {
     render(<CandidateJourney />);
 
-    const steps = screen.getAllByRole("listitem", { name: /^Step \d/ });
+    const lists = screen.getAllByRole("list");
+    expect(lists).toHaveLength(2);
+    const steps = within(lists[0]!).getAllByRole("listitem");
     expect(steps).toHaveLength(4);
     expect(steps[0]).toHaveTextContent("Your situation, set once");
+    expect(steps[1]).toHaveTextContent("Vacancies that match it");
+    expect(steps[2]).toHaveTextContent(
+      "Apply, a CV only when a role needs one",
+    );
     expect(steps[3]).toHaveTextContent(
       "Status you can see, updates by email",
     );
@@ -40,5 +46,16 @@ describe("CandidateJourney", () => {
         "Illustrative example — sample data, not real Klinnova activity.",
       ),
     ).toBeInTheDocument();
+  });
+
+  it("has no fake Apply affordance on the illustrative timeline card", () => {
+    render(<CandidateJourney />);
+
+    expect(
+      screen.queryByRole("link", { name: "Apply" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Apply" }),
+    ).not.toBeInTheDocument();
   });
 });

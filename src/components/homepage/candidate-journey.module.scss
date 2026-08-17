@@ -168,6 +168,12 @@
   color: var(--color-text-muted);
 }
 
+@media (min-width: $breakpoint-md) {
+  .section {
+    padding-inline: var(--layout-gutter-tablet);
+  }
+}
+
 @media (min-width: $breakpoint-lg) {
   .section {
     flex-direction: row;
