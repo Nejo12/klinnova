@@ -1029,6 +1029,20 @@ fixed by the Founder Rulings above and not open to further interpretation:
   treatment, matching the Design's "neutral grey circle" language. **No
   positive reason block anywhere — deferred in full per Founder Ruling #1,
   not part of this or any task in this plan.**
+- **Task M — Candidate home (`/candidate`) incomplete-state restyle.**
+  Files: `src/app/candidate/page.tsx`, `src/app/candidate/page.module.scss`,
+  `src/app/candidate/page.test.tsx`. This is the one gap between Section 5's
+  declared scope and Tasks A–K: the home page's own progress line ("X of Y
+  sections saved," currently plain text, not the `OnboardingProgressNav`
+  component Task G restyles) needs its own visual pass — a real progress
+  bar reusing the same visual language Task A/G establish (segment bar,
+  never color-only), and a clearer heading/CTA hierarchy for the single
+  "Continue onboarding" / "Review and confirm essentials" action. Acceptance
+  criteria: `resolveCandidateHomeView`'s redirect behavior is untouched
+  (Founder Ruling #2 — verified by `page.test.tsx`'s existing assertions
+  continuing to pass unmodified); `progress.completeCount`/`totalGroups`
+  remain the only data driving the bar (no new query); no destination cards,
+  no applications preview, no avatar (all out of scope per Ruling #2).
 
 **Task L — removed (Founder Ruling #2).** The discovery draft proposed a
 candidate-home restructure contingent on `/candidate` becoming a persistent
