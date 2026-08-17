@@ -272,3 +272,48 @@
   font-size: var(--type-body-supporting-size);
   line-height: var(--type-body-supporting-line-height);
 }
+
+.reviewTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-5);
+}
+
+.reviewTableRow {
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.reviewTableHeaderCell {
+  padding: var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  vertical-align: top;
+  width: 30%;
+  text-align: left;
+}
+
+.reviewTableValueCell {
+  padding: var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  vertical-align: top;
+}
+
+.reviewTableActionCell {
+  padding: var(--space-4);
+  text-align: right;
+  vertical-align: top;
+}
+
+.reviewTableLink {
+  color: var(--color-text-link);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.reviewTableLink:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}

@@ -4,15 +4,22 @@ import {
   JOB_CATEGORY_OPTIONS,
   ONBOARDING_GROUP_LABELS,
   SHIFT_PREFERENCE_OPTIONS,
-  TRAVEL_TIME_OPTIONS,
   type OnboardingGroupId,
 } from "@/lib/onboarding/allow-lists";
 import type { ProgressLanguage, ProgressProfile } from "@/lib/onboarding/progress";
 
+function formatAvailableFromDate(isoDate: string): string {
+  const date = new Date(isoDate);
+  if (Number.isNaN(date.getTime())) {
+    return "Not answered";
+  }
+  return new Intl.DateTimeFormat("en-GB", { dateStyle: "long" }).format(date);
+}
+
 export function formatReviewRow(
   group: OnboardingGroupId,
   profile: ProgressProfile,
-  languages: readonly ProgressLanguage[],
+  _languages: readonly ProgressLanguage[],
 ): { label: string; value: string } {
   const label = ONBOARDING_GROUP_LABELS[group];
 
@@ -59,7 +66,7 @@ export function formatReviewRow(
       if (!profile.availableFrom) {
         return { label, value: "Not answered" };
       }
-      return { label, value: profile.availableFrom };
+      return { label, value: formatAvailableFromDate(profile.availableFrom) };
     }
 
     case "employment": {

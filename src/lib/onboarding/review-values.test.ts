@@ -51,4 +51,11 @@ describe("formatReviewRow", () => {
       ),
     ).toEqual({ label: "Work authorisation", value: "Not answered" });
   });
+
+  it("formats availability as a human-readable date, not raw ISO string", () => {
+    expect(formatReviewRow("availability", profile, [])).toEqual({
+      label: "Earliest availability",
+      value: "1 September 2026",
+    });
+  });
 });
