@@ -80,6 +80,9 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
           {vacancy.source === "seed" ? (
             <p className={styles.demoLabel}>{DEMO_VACANCY_LABEL}</p>
           ) : null}
+          {vacancy.source === "employer" ? (
+            <p className={styles.verifiedBadge}>Verified employer</p>
+          ) : null}
           {application !== null ? (
             <p className={styles.appliedLabel}>{APPLIED_STATUS_LABEL}</p>
           ) : null}
