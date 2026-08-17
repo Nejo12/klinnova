@@ -51,6 +51,32 @@
   text-transform: uppercase;
 }
 
+.acceptedBanner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: var(--border-width-default) solid var(--color-support);
+  border-left: var(--border-width-strong) solid var(--color-support-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--color-support-subtle);
+}
+
+.acceptedBannerHeading {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-md);
+  color: var(--color-support-strong);
+}
+
+.acceptedBannerBody {
+  margin: 0;
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-supporting-line-height);
+  color: var(--color-text-secondary);
+}
+
 .section {
   display: flex;
   flex-direction: column;
@@ -122,23 +148,62 @@
 .timeline {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .timelineItem {
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--space-2) var(--space-3);
-  padding: var(--space-2) 0;
-  border-top: var(--border-width-default) solid var(--color-border-default);
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding-bottom: var(--space-4);
 }
 
-.timelineItem:first-child {
-  border-top: none;
+.timelineItem:last-child {
+  padding-bottom: 0;
+}
+
+.timelineRail {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-self: stretch;
+  width: var(--space-4);
+  flex: none;
+}
+
+.timelineRail::before {
+  content: "";
+  position: absolute;
+  top: var(--space-4);
+  bottom: calc(-1 * var(--space-4));
+  left: 50%;
+  width: var(--border-width-default);
+  transform: translateX(-50%);
+  background-color: var(--color-border-default);
+}
+
+.timelineItem:last-child .timelineRail::before {
+  content: none;
+}
+
+.timelineDot {
+  position: relative;
+  z-index: 1;
+  width: var(--space-3);
+  height: var(--space-3);
+  margin-top: var(--space-1);
+  border-radius: var(--radius-pill);
+  border: var(--border-width-strong) solid var(--color-support);
+  background-color: var(--color-support-subtle);
+}
+
+.timelineContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
 }
 
 .timelineStatus {

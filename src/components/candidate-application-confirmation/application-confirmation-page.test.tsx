@@ -14,6 +14,7 @@ const VACANCY_ID = "22222222-2222-4222-8222-222222222201";
 
 const confirmation: ApplicationConfirmation = {
   applicationId: APPLICATION_ID,
+  status: "submitted" as const,
   statusLabel: "Submitted",
   submittedAtIso: "2026-08-03T14:30:00.000Z",
   submittedAtLabel: "3 August 2026, 14:30 UTC",
@@ -100,7 +101,11 @@ describe("ApplicationConfirmationPage", () => {
       <ApplicationConfirmationPage
         status="ready"
         showEmployerNav={false}
-        confirmation={{ ...confirmation, statusLabel: "In review" }}
+        confirmation={{
+          ...confirmation,
+          status: "reviewing",
+          statusLabel: "In review",
+        }}
         history={history}
         outcomes={[]}
       />,
@@ -108,12 +113,54 @@ describe("ApplicationConfirmationPage", () => {
     expect(screen.getAllByText("In review").length).toBeGreaterThan(0);
   });
 
+  it("renders the accepted banner when status is accepted, distinct from hired/employment", () => {
+    render(
+      <ApplicationConfirmationPage
+        status="ready"
+        showEmployerNav={false}
+        confirmation={{
+          ...confirmation,
+          status: "accepted",
+          statusLabel: "Accepted",
+        }}
+        history={history}
+        outcomes={[]}
+      />,
+    );
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Application accepted" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/separate from being hired/i)).toBeInTheDocument();
+    expect(screen.queryByText(/employer will|response time/i)).toBeNull();
+    expect(screen.queryByText(/within \d+ days?/i)).toBeNull();
+    expect(screen.queryByText(/contact (us|klinnova)/i)).toBeNull();
+  });
+
+  it("does not render the accepted banner for a non-accepted status", () => {
+    render(
+      <ApplicationConfirmationPage
+        status="ready"
+        showEmployerNav={false}
+        confirmation={{ ...confirmation, status: "submitted" }}
+        history={history}
+        outcomes={[]}
+      />,
+    );
+    expect(
+      screen.queryByRole("heading", { level: 2, name: "Application accepted" }),
+    ).toBeNull();
+  });
+
   it("renders the status timeline in RPC order, with no from_status, reason, or actor identity", () => {
     render(
       <ApplicationConfirmationPage
         status="ready"
         showEmployerNav={false}
-        confirmation={{ ...confirmation, statusLabel: "Rejected" }}
+        confirmation={{
+          ...confirmation,
+          status: "rejected",
+          statusLabel: "Rejected",
+        }}
         history={[
           {
             to_status: "submitted",

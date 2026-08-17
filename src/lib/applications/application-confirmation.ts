@@ -44,6 +44,7 @@ export type ConfirmationLanguageRequirement = {
 export type ApplicationConfirmation = {
   /** Route identity only — never render in candidate-facing copy. */
   applicationId: string;
+  status: ApplicationStatus;
   statusLabel: string;
   submittedAtIso: string;
   submittedAtLabel: string;
@@ -155,6 +156,7 @@ export function buildApplicationConfirmation(input: {
 
   return {
     applicationId: input.applicationId,
+    status: input.status,
     statusLabel: applicationStatusLabel(input.status),
     submittedAtIso: input.submittedAt,
     submittedAtLabel,

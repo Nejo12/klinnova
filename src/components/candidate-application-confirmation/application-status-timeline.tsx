@@ -34,15 +34,20 @@ export function ApplicationStatusTimeline({
               key={`${entry.to_status}-${entry.occurred_at}-${index}`}
               className={styles.timelineItem}
             >
-              <p className={styles.timelineStatus}>
-                {applicationStatusLabel(entry.to_status)}
-              </p>
-              <time
-                className={styles.timelineTime}
-                dateTime={entry.occurred_at}
-              >
-                {occurredAtLabel ?? entry.occurred_at}
-              </time>
+              <span className={styles.timelineRail} aria-hidden="true">
+                <span className={styles.timelineDot} />
+              </span>
+              <div className={styles.timelineContent}>
+                <p className={styles.timelineStatus}>
+                  {applicationStatusLabel(entry.to_status)}
+                </p>
+                <time
+                  className={styles.timelineTime}
+                  dateTime={entry.occurred_at}
+                >
+                  {occurredAtLabel ?? entry.occurred_at}
+                </time>
+              </div>
             </li>
           );
         })}

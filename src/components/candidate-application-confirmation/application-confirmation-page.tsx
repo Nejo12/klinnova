@@ -86,6 +86,25 @@ export function ApplicationConfirmationPage(
         </div>
       </dl>
 
+      {confirmation.status === "accepted" ? (
+        <section
+          className={styles.acceptedBanner}
+          aria-labelledby="accepted-banner-heading"
+        >
+          <h2
+            className={styles.acceptedBannerHeading}
+            id="accepted-banner-heading"
+          >
+            Application accepted
+          </h2>
+          <p className={styles.acceptedBannerBody}>
+            This application has been accepted. Accepted is a status on this
+            application only — it is separate from being hired, employment
+            starting, or a contract being signed.
+          </p>
+        </section>
+      ) : null}
+
       <section
         className={styles.section}
         aria-labelledby="confirmation-vacancy-heading"
