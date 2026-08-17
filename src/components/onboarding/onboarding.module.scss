@@ -40,18 +40,35 @@
 }
 
 .progressLabel {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-muted);
 }
 
 .progressList {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0;
   margin: 0;
-  padding: 0;
+  padding: var(--space-1) 0;
   list-style: none;
+  overflow-x: auto;
+}
+
+.progressList li {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.progressList li:not(:last-child)::after {
+  content: "";
+  flex: 0 0 auto;
+  width: var(--space-6);
+  height: var(--step-line-width);
+  background-color: var(--color-border-default);
+  margin: 0 var(--space-1);
 }
 
 .progressItem {
@@ -60,25 +77,47 @@
   gap: var(--space-2);
   min-height: var(--touch-target-min);
   padding: var(--space-2) var(--space-3);
-  border: var(--border-width-default) solid var(--color-border-default);
-  border-radius: var(--radius-md);
-  background-color: var(--color-bg-surface);
+  border-radius: var(--radius-pill);
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   text-decoration: none;
+  white-space: nowrap;
+}
+
+.progressItem::before {
+  content: "";
+  flex: 0 0 auto;
+  width: var(--step-size);
+  height: var(--step-size);
+  border-radius: 50%;
+  border: var(--step-line-width) solid var(--step-color-upcoming);
+  background-color: transparent;
+  transition:
+    width var(--duration-fast) var(--ease-standard),
+    height var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard);
 }
 
 .progressItem[data-state="complete"] {
-  border-color: var(--color-support-strong);
-  background-color: var(--color-support-subtle);
   color: var(--color-support-strong);
 }
 
+.progressItem[data-state="complete"]::before {
+  border-color: var(--step-color-complete);
+  background-color: var(--step-color-complete);
+}
+
 .progressItem[data-state="current"] {
-  border-color: var(--color-action-primary);
-  background-color: var(--color-action-subtle);
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
+}
+
+.progressItem[data-state="current"]::before {
+  width: calc(var(--step-size) * 1.6);
+  height: calc(var(--step-size) * 1.6);
+  border-color: var(--step-color-current);
+  background-color: var(--step-color-current);
 }
 
 .progressMarker {
@@ -86,6 +125,11 @@
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.progressItem[data-state="current"] .progressMarker {
+  color: inherit;
 }
 
 .form {
