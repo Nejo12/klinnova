@@ -9,6 +9,10 @@ vi.mock("@/components/onboarding/complete-onboarding-form", () => ({
   ),
 }));
 
+vi.mock("@/components/onboarding/onboarding-review-table", () => ({
+  OnboardingReviewTable: () => <div data-testid="review-table">Review Table</div>,
+}));
+
 describe("OnboardingReview", () => {
   it("offers server confirmation when essentials are valid but not completed", () => {
     render(
@@ -30,6 +34,17 @@ describe("OnboardingReview", () => {
           totalGroups: 6,
           essentialsValid: true,
         }}
+        profile={{
+          germanComfort: "basic",
+          workAuthorisationDeclared: true,
+          city: "Berlin",
+          travelRadiusMinutes: 30,
+          jobCategories: ["cleaning"],
+          availableFrom: "2026-09-01",
+          employmentTypes: ["full_time"],
+          shiftPreferences: ["daytime"],
+        }}
+        languages={[]}
       />,
     );
 
@@ -66,6 +81,17 @@ describe("OnboardingReview", () => {
           totalGroups: 6,
           essentialsValid: true,
         }}
+        profile={{
+          germanComfort: "basic",
+          workAuthorisationDeclared: true,
+          city: "Berlin",
+          travelRadiusMinutes: 30,
+          jobCategories: ["cleaning"],
+          availableFrom: "2026-09-01",
+          employmentTypes: ["full_time"],
+          shiftPreferences: ["daytime"],
+        }}
+        languages={[]}
       />,
     );
 
@@ -95,6 +121,17 @@ describe("OnboardingReview", () => {
           totalGroups: 6,
           essentialsValid: false,
         }}
+        profile={{
+          germanComfort: "basic",
+          workAuthorisationDeclared: null,
+          city: null,
+          travelRadiusMinutes: null,
+          jobCategories: [],
+          availableFrom: null,
+          employmentTypes: [],
+          shiftPreferences: [],
+        }}
+        languages={[]}
       />,
     );
 
