@@ -8,13 +8,20 @@ import type { ApplicationInventoryRow } from "@/lib/applications/snapshot-schema
 
 type ApplicationInventoryCardProps = {
   application: ApplicationInventoryRow;
-  /** "reduced" de-emphasizes closed-group rows (opacity + typography weight, never color alone). */
+  /** "reduced" de-emphasizes closed-group rows (background surface + typography weight, never color alone). */
   emphasis?: "default" | "reduced";
+  /**
+   * Heading level for the card title. Defaults to "h2" for a standalone
+   * card. `ApplicationInventoryList` passes "h3" so cards nest correctly
+   * under their own "Active"/"Closed" group `<h2>`.
+   */
+  headingLevel?: "h2" | "h3";
 };
 
 export function ApplicationInventoryCard({
   application,
   emphasis = "default",
+  headingLevel = "h2",
 }: ApplicationInventoryCardProps) {
   const titleId = `application-title-${application.id}`;
   const submittedAtLabel = formatSubmittedAtUtc(application.submitted_at);
@@ -22,13 +29,14 @@ export function ApplicationInventoryCard({
     emphasis === "reduced"
       ? `${styles.card} ${styles.cardReducedEmphasis}`
       : styles.card;
+  const TitleTag = headingLevel;
 
   return (
     <article className={cardClassName} aria-labelledby={titleId}>
       <div className={styles.cardHeader}>
-        <h2 className={styles.cardTitle} id={titleId}>
+        <TitleTag className={styles.cardTitle} id={titleId}>
           {application.vacancy_snapshot.title}
-        </h2>
+        </TitleTag>
       </div>
 
       <p className={styles.company}>

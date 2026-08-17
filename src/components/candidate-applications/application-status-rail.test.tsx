@@ -12,6 +12,10 @@ describe("ApplicationStatusRail", () => {
     expect(screen.getByText("Decision")).toBeInTheDocument();
     expect(screen.queryByText("Accepted")).not.toBeInTheDocument();
     expect(screen.queryByText("Rejected")).not.toBeInTheDocument();
+
+    const currentNodes = document.querySelectorAll('[aria-current="step"]');
+    expect(currentNodes.length).toBe(1);
+    expect(currentNodes[0]).toHaveTextContent("Shortlisted");
   });
 
   it("lights the 4th node for both accepted and rejected, never renders those words as the node label", () => {

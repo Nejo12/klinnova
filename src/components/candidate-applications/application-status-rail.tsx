@@ -1,6 +1,8 @@
 import type { ApplicationStatus } from "@/lib/applications/status";
 import { APPLICATION_STATUS_CODES } from "@/lib/applications/status";
 
+import styles from "./application-status-rail.module.scss";
+
 const RAIL_NODE_LABELS = [
   "Submitted",
   "In review",
@@ -12,9 +14,7 @@ type ApplicationStatusRailProps = {
   status: ApplicationStatus;
 };
 
-export function ApplicationStatusRail({
-  status,
-}: ApplicationStatusRailProps): JSX.Element {
+export function ApplicationStatusRail({ status }: ApplicationStatusRailProps) {
   // Clamp the node index to the range [0, 3] to ensure accepted/rejected both map to the 4th node
   const currentNodeIndex = Math.min(
     APPLICATION_STATUS_CODES.indexOf(status),
@@ -22,40 +22,18 @@ export function ApplicationStatusRail({
   );
 
   return (
-    <ol
-      style={{
-        display: "flex",
-        gap: "1rem",
-        listStyle: "none",
-        padding: 0,
-        margin: 0,
-      }}
-    >
+    <ol className={styles.rail}>
       {RAIL_NODE_LABELS.map((label, index) => (
         <li
           key={index}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.5rem",
-          }}
+          className={styles.node}
+          aria-current={index === currentNodeIndex ? "step" : undefined}
         >
           <div
-            style={{
-              width: "2rem",
-              height: "2rem",
-              borderRadius: "50%",
-              border: "2px solid currentColor",
-              backgroundColor:
-                index <= currentNodeIndex ? "currentColor" : "transparent",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            aria-current={index <= currentNodeIndex ? "step" : undefined}
+            className={styles.dot}
+            data-state={index <= currentNodeIndex ? "complete" : "upcoming"}
           />
-          <span>{label}</span>
+          <span className={styles.label}>{label}</span>
         </li>
       ))}
     </ol>

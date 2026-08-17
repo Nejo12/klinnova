@@ -68,10 +68,9 @@ describe("ApplicationInventoryList", () => {
       screen.queryByRole("heading", { level: 2, name: "Closed" }),
     ).toBeNull();
 
-    const cardHeadings = screen.getAllByRole("heading", { level: 2 });
-    // "Active" group heading, then the two card titles in given order.
+    // Card titles nest under the "Active" group heading as h3, not h2.
+    const cardHeadings = screen.getAllByRole("heading", { level: 3 });
     expect(cardHeadings.map((heading) => heading.textContent)).toEqual([
-      "Active",
       "Second submitted",
       "First submitted",
     ]);
@@ -103,9 +102,9 @@ describe("ApplicationInventoryList", () => {
       screen.queryByRole("heading", { level: 2, name: "Active" }),
     ).toBeNull();
 
-    const cardHeadings = screen.getAllByRole("heading", { level: 2 });
+    // Card titles nest under the "Closed" group heading as h3, not h2.
+    const cardHeadings = screen.getAllByRole("heading", { level: 3 });
     expect(cardHeadings.map((heading) => heading.textContent)).toEqual([
-      "Closed",
       "Second closed",
       "First closed",
     ]);

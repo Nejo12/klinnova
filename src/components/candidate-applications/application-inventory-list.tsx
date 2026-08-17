@@ -26,7 +26,10 @@ export function ApplicationInventoryList({
           <ul className={styles.list}>
             {active.map((application) => (
               <li key={application.id}>
-                <ApplicationInventoryCard application={application} />
+                <ApplicationInventoryCard
+                  application={application}
+                  headingLevel="h3"
+                />
               </li>
             ))}
           </ul>
@@ -42,6 +45,7 @@ export function ApplicationInventoryList({
                 <ApplicationInventoryCard
                   application={application}
                   emphasis="reduced"
+                  headingLevel="h3"
                 />
               </li>
             ))}
