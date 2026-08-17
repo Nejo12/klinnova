@@ -25,9 +25,38 @@ describe("resolveInventoryPageView", () => {
   });
 
   it("resolves success with the applications array unchanged", () => {
-    const applications = [{ id: "a" }] as never;
+    const applications = [{ id: "a", status: "submitted" }] as never;
     expect(resolveInventoryPageView({ status: "ready", applications })).toEqual(
-      { kind: "success", applications },
+      {
+        kind: "success",
+        applications,
+        active: applications,
+        closed: [],
+      },
+    );
+  });
+
+  it("splits mixed-status applications into active/closed, preserving order", () => {
+    const submitted = { id: "a", status: "submitted" };
+    const reviewing = { id: "b", status: "reviewing" };
+    const shortlisted = { id: "c", status: "shortlisted" };
+    const accepted = { id: "d", status: "accepted" };
+    const rejected = { id: "e", status: "rejected" };
+    const applications = [
+      submitted,
+      accepted,
+      reviewing,
+      rejected,
+      shortlisted,
+    ] as never;
+
+    expect(resolveInventoryPageView({ status: "ready", applications })).toEqual(
+      {
+        kind: "success",
+        applications,
+        active: [submitted, reviewing, shortlisted],
+        closed: [accepted, rejected],
+      },
     );
   });
 
