@@ -10,7 +10,9 @@ vi.mock("@/components/onboarding/complete-onboarding-form", () => ({
 }));
 
 vi.mock("@/components/onboarding/onboarding-review-table", () => ({
-  OnboardingReviewTable: () => <div data-testid="review-table">Review Table</div>,
+  OnboardingReviewTable: () => (
+    <div data-testid="review-table">Review Table</div>
+  ),
 }));
 
 describe("OnboardingReview", () => {

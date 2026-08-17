@@ -31,9 +31,7 @@ export function VacancyFactChips({ vacancy }: VacancyFactChipsProps) {
       {vacancy.publicLocality !== null ? (
         <div className={styles.metaRow}>
           <dt className={styles.metaLabel}>Location</dt>
-          <dd className={styles.metaValue}>
-            {vacancy.publicLocality}, Berlin
-          </dd>
+          <dd className={styles.metaValue}>{vacancy.publicLocality}, Berlin</dd>
         </div>
       ) : null}
       {vacancy.workplaceType !== null ? (

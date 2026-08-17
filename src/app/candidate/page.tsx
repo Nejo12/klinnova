@@ -56,8 +56,7 @@ export default async function CandidatePage() {
       <section className={styles.section}>
         <div className={styles.progress}>
           <p className={styles.progressCaption}>
-            {progress.completeCount} of {progress.totalGroups} sections
-            saved.
+            {progress.completeCount} of {progress.totalGroups} sections saved.
           </p>
           <div
             className={styles.progressBar}

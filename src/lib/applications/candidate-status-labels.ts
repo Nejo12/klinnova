@@ -1,4 +1,7 @@
-import { applicationStatusLabel, type ApplicationStatus } from "@/lib/applications/status";
+import {
+  applicationStatusLabel,
+  type ApplicationStatus,
+} from "@/lib/applications/status";
 
 export function candidateStatusDisplayLabel(status: ApplicationStatus): string {
   if (status === "rejected") {

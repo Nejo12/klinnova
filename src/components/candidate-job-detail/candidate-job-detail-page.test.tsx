@@ -110,7 +110,9 @@ describe("CandidateJobDetailPage", () => {
       name: /you don.t currently meet these requirements/i,
     });
     expect(
-      within(missingList).getAllByRole("listitem").map((item) => item.textContent),
+      within(missingList)
+        .getAllByRole("listitem")
+        .map((item) => item.textContent),
     ).toEqual(["Preferred job category", "German level"]);
     expect(document.body.textContent ?? "").not.toContain("✓");
   });

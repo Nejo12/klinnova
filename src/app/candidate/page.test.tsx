@@ -93,12 +93,12 @@ describe("CandidatePage", () => {
 
     const segments = container.querySelectorAll("[data-state]");
     expect(segments).toHaveLength(6);
-    expect(
-      container.querySelectorAll('[data-state="complete"]'),
-    ).toHaveLength(0);
-    expect(
-      container.querySelectorAll('[data-state="upcoming"]'),
-    ).toHaveLength(6);
+    expect(container.querySelectorAll('[data-state="complete"]')).toHaveLength(
+      0,
+    );
+    expect(container.querySelectorAll('[data-state="upcoming"]')).toHaveLength(
+      6,
+    );
 
     expect(screen.getByText("0 of 6 sections saved.")).toBeInTheDocument();
   });
@@ -125,12 +125,12 @@ describe("CandidatePage", () => {
     expect(progressBar).toHaveAttribute("aria-valuenow", "3");
     expect(progressBar).toHaveAttribute("aria-valuemax", "6");
 
-    expect(
-      container.querySelectorAll('[data-state="complete"]'),
-    ).toHaveLength(3);
-    expect(
-      container.querySelectorAll('[data-state="upcoming"]'),
-    ).toHaveLength(3);
+    expect(container.querySelectorAll('[data-state="complete"]')).toHaveLength(
+      3,
+    );
+    expect(container.querySelectorAll('[data-state="upcoming"]')).toHaveLength(
+      3,
+    );
 
     expect(screen.getByText("3 of 6 sections saved.")).toBeInTheDocument();
   });
