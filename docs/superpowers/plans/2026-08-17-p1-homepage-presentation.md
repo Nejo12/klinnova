@@ -2035,6 +2035,10 @@ describe("FinalCta", () => {
       }),
     ).toBeInTheDocument();
 
+    expect(
+      screen.getByText("Klinnova is working and starting in Berlin."),
+    ).toBeInTheDocument();
+
     expect(screen.queryByText(/join early access/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/hundreds of jobs/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/guaranteed/i)).not.toBeInTheDocument();
