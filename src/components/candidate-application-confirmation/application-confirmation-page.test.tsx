@@ -151,6 +151,31 @@ describe("ApplicationConfirmationPage", () => {
     ).toBeNull();
   });
 
+  it("gates the accepted banner on the real status enum, not statusLabel (regression guard)", () => {
+    // statusLabel is always derived from status via applicationStatusLabel in
+    // real data, so this pairing never occurs outside a test. It exists to
+    // catch a future refactor that accidentally gates on
+    // statusLabel === "Accepted" instead of status === "accepted": such an
+    // implementation would incorrectly render the banner here, while the
+    // real status-based gate correctly does not.
+    render(
+      <ApplicationConfirmationPage
+        status="ready"
+        showEmployerNav={false}
+        confirmation={{
+          ...confirmation,
+          status: "shortlisted",
+          statusLabel: "Accepted",
+        }}
+        history={history}
+        outcomes={[]}
+      />,
+    );
+    expect(
+      screen.queryByRole("heading", { level: 2, name: "Application accepted" }),
+    ).toBeNull();
+  });
+
   it("renders the status timeline in RPC order, with no from_status, reason, or actor identity", () => {
     render(
       <ApplicationConfirmationPage
