@@ -127,10 +127,12 @@
   background-color: var(--color-bg-surface);
 }
 
-/* Closed-group rows: reduced visual emphasis via opacity + lighter type weight
-   (never color alone) — see plan Founder ruling on "never color alone" cues. */
+/* Closed-group rows: reduced visual emphasis via background surface + lighter
+   type weight (never color alone, never opacity — opacity composites every
+   descendant's color/link contrast against the card background, which drops
+   below WCAG AA). See plan Founder ruling on "never color alone" cues. */
 .cardReducedEmphasis {
-  opacity: var(--opacity-disabled);
+  background-color: var(--color-bg-subtle);
 }
 
 .cardReducedEmphasis .cardTitle,
