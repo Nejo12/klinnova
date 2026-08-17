@@ -1,7 +1,7 @@
 @use "../../styles/breakpoints" as *;
 
 .section {
-  padding: var(--space-10) var(--layout-gutter-mobile);
+  padding-block: var(--space-10);
   background-color: var(--color-bg-inverse);
 }
 
@@ -11,6 +11,7 @@
   gap: var(--space-8);
   max-width: var(--layout-content-max);
   margin-inline: auto;
+  padding-inline: var(--layout-gutter-mobile);
 }
 
 .copy {
@@ -186,17 +187,14 @@
 }
 
 @media (min-width: $breakpoint-md) {
-  .section {
+  .inner {
     padding-inline: var(--layout-gutter-tablet);
   }
 }
 
 @media (min-width: $breakpoint-lg) {
-  .section {
-    padding-inline: var(--layout-gutter-desktop);
-  }
-
   .inner {
+    padding-inline: var(--layout-gutter-desktop);
     flex-direction: row;
     align-items: center;
   }
