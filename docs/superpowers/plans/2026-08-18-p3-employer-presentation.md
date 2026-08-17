@@ -1,17 +1,127 @@
 # P3 Employer Presentation Polish — Discovery Plan
 
-> **Status: DISCOVERY ONLY. STOP BEFORE IMPLEMENTATION.** No product code has
-> been changed. Three genuine PRODUCT DECISION REQUIRED items block parts of
-> this plan (Section 10) — everything else is either implementable as
-> written or blocked on those same three decisions. Do not implement any
-> task in Section 6 until this document has been reviewed and the decisions
-> in Section 10 are resolved.
+> **Status: APPROVED IN PRINCIPLE, amended per Founder rulings
+> (2026-08-18).** All three Product Decision Required items, plus the two
+> query/data flags, have been resolved by the Founder — see "Founder
+> Rulings (applied)" immediately below. This document is now the binding
+> scope for implementation. The original discovery-only classifications are
+> preserved throughout (marked RESOLVED, cross-referenced to the ruling that
+> settled them) so the reasoning trail stays visible. **No implementation
+> has occurred in this amendment — this is a docs-only commit. P3
+> implementation has not started, and no PR has been opened.**
 
-> **For agentic workers:** once decisions are resolved, REQUIRED SUB-SKILL:
-> use superpowers:subagent-driven-development (recommended) or
-> superpowers:executing-plans to implement task-by-task. Steps use checkbox
-> (`- [ ]`) syntax for tracking. Do not implement Tasks J and K (Section 6)
-> until PRODUCT DECISION REQUIRED items #1 and #2 (Section 10) are resolved.
+> **For agentic workers:** REQUIRED SUB-SKILL: use
+> superpowers:subagent-driven-development (recommended) or
+> superpowers:executing-plans to implement this plan task-by-task. Steps use
+> checkbox (`- [ ]`) syntax for tracking. Scope is now fixed by the Founder
+> Rulings section below — do not implement anything the rulings explicitly
+> ruled out: CEFR German levels, a new multi-step vacancy-form workflow or
+> new route, any CV field/data/query/storage, an Account nav item, or a new
+> per-vacancy application-count query.
+
+## Founder Rulings (applied 2026-08-18)
+
+The Founder reviewed the discovery plan and returned rulings resolving the
+three Section 10 PRODUCT DECISION REQUIRED items plus the query/data flags.
+Each resolves the correspondingly numbered item from the original discovery
+pass (Section 10 below, now marked RESOLVED with a cross-reference back
+here).
+
+1. **German-requirement control — PRESERVE THE REAL 4-VALUE DOMAIN.** Do
+   not introduce the design's CEFR A1–C2 scale. Do not change
+   `vacancies.german_requirement`'s schema, its CHECK constraint, its
+   validation, or its use in matching. Build the employer-facing control
+   (which does not exist today) around the existing four values only —
+   `none | basic | conversational | comfortable` — using the existing
+   `GERMAN_REQUIREMENT_LABELS` copy and the design's radio/segmented visual
+   treatment. Wire it to the existing, currently-unused
+   `p_german_requirement` RPC parameter on the draft create/update RPCs. No
+   migration required. Resolves Section 10 item #1.
+2. **Vacancy form structure — PRESERVE THE SINGLE-PAGE ARCHITECTURE.** Do
+   not build a new four-step-plus-review workflow, no new routes, no new
+   form state machine. Keep `VacancyDraftForm`'s existing 3 fieldsets and
+   the existing decoupled `LanguageRequirementsEditor` (still requiring a
+   saved vacancy first, exactly as today) on the exact same pages they
+   render on now. Presentation-only improvements only: clearer visual
+   section headings/hierarchy within the single page, an orientation/
+   progress aid where truthful to the real field order, and stronger visual
+   emphasis on the review/readiness content the detail/manage page already
+   shows (`ReadinessChecklist`). No new page, no new step, no new routing,
+   no new form state. Resolves Section 10 item #2.
+3. **CV field — REMOVE ENTIRELY.** No "CV attached" UI, no CV field, no CV
+   data, no CV query, no CV storage feature is authorized in P3. Confirmed
+   fabricated in the original discovery pass; this ruling makes the removal
+   binding rather than a recommendation. Resolves Section 10 item #3.
+4. **Navigation — PRESERVE THE REAL IA.** The design's "Home, Vacancies,
+   Applications, Account" nav classification is factually wrong (confirmed
+   in discovery: the real fourth nav item is Verification, and Account is
+   not a nav destination). Ship the real nav unchanged. Do not add an
+   Account nav item, do not follow the design's classification. Resolves
+   Section 10 item #7.
+5. **Vacancy lifecycle — PRESERVE ALL SIX STATES.** Including `withdrawn`,
+   which the design's mock omitted. Already correctly scoped in the
+   original discovery pass (Section 1, Task B); this ruling makes it
+   binding, not merely a recommendation.
+6. **`employer_seen_at` additive projections — KEPT, CONDITIONALLY
+   APPROVED.** Both proposed additive `SELECT`-list changes satisfy the
+   Founder's stated test — see "Query/data rulings" below for the full
+   justification and the exact RPCs/files affected. Resolves Section 10
+   items #4 and #5.
+7. **Per-vacancy application counts — DEFERRED.** No new grouped `COUNT`
+   query is added solely to power P3 presentation. See "Query/data
+   rulings" below for the resulting UI simplification. Resolves Section 10
+   item #6.
+
+### Query/data rulings (detail)
+
+**`employer_seen_at` additive projections — kept.** Two RPCs are extended
+to return an already-existing column they don't currently return:
+
+- `list_current_employer_applications` (latest definition in
+  `supabase/migrations/20260807220000_account_deletion_tombstone_and_request_contract.sql:2077-2137`)
+  gains `employer_seen_at` in its `RETURNS TABLE`/`SELECT` list. Consumed by
+  `src/lib/employer/applications/load-employer-applications.ts` →
+  `src/components/employer-applications/application-list.tsx`.
+- `get_current_employer_application` (jsonb projection,
+  `20260806140000_application_status_and_review_contract.sql:495-512`)
+  gains an `employer_seen_at` key. Consumed by
+  `src/components/employer-applications/application-detail.tsx`.
+
+Both satisfy the Founder's three-part test:
+1. **The existing UI cannot access the state without it.** The only
+   existing access path is `count_unseen_current_employer_applications()`
+   — an aggregate total, not a per-row or per-application value. Without
+   these two changes, neither the applications list (which row is unseen)
+   nor the detail page ("First opened") can show *which* application(s)
+   are unseen — only how many, in total, across the employer's whole
+   account.
+2. **No new unseen/read semantics.** Same column
+   (`applications.employer_seen_at`), same meaning, same write path
+   (unchanged by this plan) — only where it is *read* changes.
+3. **Strictly projection/access plumbing for the already-shipped N4
+   feature.** `employer_seen_at` was introduced by
+   `20260811000000_employer_application_seen_contract.sql`, shipped in PR
+   #116 (`feat/n4-employer-application-attention`, merged prior to this
+   branch's base). These two changes expose that existing feature's data in
+   two more places; they do not build a new feature.
+
+**Per-vacancy application counts — deferred.** No `count_current_employer_applications_by_vacancy`-style
+query (or equivalent) is added. Resulting UI simplification, applied to
+Tasks F and G:
+- The home "Your vacancies" mini-list and the `/employer/vacancies` list
+  rows show **no application-count figure** (the design's "5 applications"
+  / "3 open applications" copy is dropped, not substituted with a fake
+  number). The qualitative lifecycle word + one-sentence consequence per
+  row (e.g. "Paused — existing applications stay open") needs no count and
+  is unaffected.
+- The home "needs your action" side card ships **only the
+  draft-with-missing-fields reason** (real data: existing per-draft
+  readiness). The design's "paused, N open applications" reason is dropped
+  from P3 — it would require the same deferred count query to know whether
+  a paused vacancy has any open applications at all. Listed explicitly in
+  Section 11 as deferred, not silently cut.
+
+---
 
 **Goal:** Restyle and reconcile the presentation of the existing employer
 product (`/employer`, `/employer/onboarding`, `/employer/verification`,
@@ -24,14 +134,18 @@ readiness logic, the application state machine, allowed transitions,
 unseen/read semantics, notifications, matching, Auth, or transactional email.
 
 **Architecture:** No new routes, no new tables, no schema/enum changes, no
-change to any RPC's *logic* — the only backend edits proposed are two
-additive `SELECT`-list extensions (exposing an already-existing column,
-`employer_seen_at`, in two RPC projections that don't currently return it)
-and one new grouped-`COUNT` aggregate query for per-vacancy application
-counts. Every other change is markup/SCSS/component restructuring against
-data already returned today. Two structural items (the German-level control,
-the vacancy-form section/review-step restructure) are flagged as PRODUCT
-DECISION REQUIRED and excluded from implementable scope until resolved.
+change to any RPC's *logic* — the only backend edits are two additive
+`SELECT`-list extensions (exposing an already-existing column,
+`employer_seen_at`, in two RPC projections that don't currently return it —
+Founder Ruling #6). No new grouped-`COUNT` query is added (Founder Ruling
+#7 — per-vacancy application counts are deferred; the home and
+vacancies-list UI are simplified instead, dropping every count figure). The
+employer-facing German-requirement control (Founder Ruling #1) and the
+vacancy-form section restyle (Founder Ruling #2) are both in scope, built
+strictly on the existing 4-value domain and the existing single-page form
+architecture respectively — no schema change, no new route, no new form
+step. Every other change is markup/SCSS/component restructuring against
+data already returned today.
 
 **Tech Stack:** Next.js App Router (Server Components + Server Actions),
 React, TypeScript (strict, no `any`), Supabase Postgres (RPCs, RLS), SCSS
@@ -105,10 +219,25 @@ throughout this plan rather than re-derived from scratch.
   projection has no locality/district field (matches the P2 no-fabricated-
   district precedent) and **no CV/resume field exists anywhere in the
   product** — the design mock's "CV | Attached" row is fabricated and is
-  dropped from scope (Section 10, item #6).
-- STOP BEFORE IMPLEMENTATION. This plan, once written, is committed on its
-  own branch — no product code changes occur in this discovery unit. No PR
-  is opened.
+  **removed entirely per Founder Ruling #3** (Section 10, item #3).
+- German-requirement values are exactly `none | basic | conversational |
+  comfortable` — never CEFR — per Founder Ruling #1. The control built in
+  Task J is a visual restyle of the value set that already governs
+  matching; it introduces no new value, no schema/CHECK-constraint change,
+  no new matching semantics.
+- Vacancy create/edit remains a **single page** with the existing 3
+  fieldsets and the existing decoupled `LanguageRequirementsEditor` — no
+  new route, no new step, no new form state machine, per Founder Ruling #2.
+- No CV field/data/query/storage anywhere in employer or candidate surfaces
+  per Founder Ruling #3.
+- Employer navigation stays exactly Home/Vacancies/Applications/
+  Verification — no Account nav item — per Founder Ruling #4.
+- No new grouped-`COUNT` query for per-vacancy application counts — deferred
+  per Founder Ruling #7; the UI is simplified (no count figures) rather
+  than gaining new query scope.
+- STOP BEFORE IMPLEMENTATION. This amendment, once written, is committed on
+  the same branch — no product code changes occur in this unit. No PR is
+  opened.
 
 ---
 
@@ -132,9 +261,10 @@ throughout this plan rather than re-derived from scratch.
 - **Proposed change:** one attention slot — unseen-applications card when
   count > 0, readiness/verification card when not verified, nothing else
   competes for that slot. A "needs your action" side card names specific
-  vacancies (draft-with-missing-fields, paused-with-open-applications) —
-  **this needs a new per-vacancy application count that isn't loaded today**
-  (Section 10, item #5). See Task F.
+  vacancies — **RESOLVED per Founder Ruling #7 (deferred count query):**
+  ships with only the draft-with-missing-fields reason (real, existing
+  readiness data); the paused-with-open-applications reason is dropped for
+  P3, listed in Section 11. See Task F.
 
 ### `/employer/onboarding`, `/employer/verification`
 
@@ -166,11 +296,12 @@ throughout this plan rather than re-derived from scratch.
   filled, Withdraw, Renew to draft). The design mock only shows five
   (missing `withdrawn` entirely — Section 10, item #7).
 - **Presentation weakness:** flat list, not grouped by live/not-live; no
-  per-row consequence sentence; no per-row application count.
+  per-row consequence sentence.
 - **Proposed change:** group Live vs. Not live, one lifecycle word + one
   consequence sentence per row (extend the existing pattern to cover
-  `withdrawn`), action on the row. Application counts per row need the new
-  aggregate query (Section 10, item #5).
+  `withdrawn`, per Founder Ruling #5), action on the row. **RESOLVED per
+  Founder Ruling #7:** no per-row application count — the design's "5
+  applications" figure is dropped, not added via a new query.
 
 ### Vacancy create (`/employer/vacancies/new`) and edit (`/employer/vacancies/[vacancyId]/edit`)
 
@@ -187,8 +318,9 @@ throughout this plan rather than re-derived from scratch.
   `replaceDraftLanguagesSchema`, which **requires an existing `vacancyId`**
   — languages can only be set after the draft exists, on the detail/manage
   page, not during initial create.
-- **No German-requirement control exists anywhere in the employer UI today**
-  — see Section 3 and Section 10, item #1.
+- **No German-requirement control exists anywhere in the employer UI
+  today** — see Section 3. **RESOLVED per Founder Ruling #1:** Task J
+  builds it around the real 4-value domain, never CEFR.
 - **No separate review/publish page exists.** Publish happens via a
   `Publish` button (gated `publicationState === "draft"`,
   `vacancy-lifecycle-actions.tsx:191,225-234`) directly on the vacancy
@@ -206,16 +338,16 @@ throughout this plan rather than re-derived from scratch.
 - **Presentation weakness:** no visual section grouping or sticky index; the
   15-item checklist has no distilled 4-line summary comparable to the mock's
   review card.
-- **Proposed change — PRODUCT DECISION REQUIRED (Section 10, item #2):** the
-  design's "four named sections + separate review step" doesn't map 1:1
-  onto (a) a single-page 3-fieldset form, (b) a decoupled language editor
-  requiring a saved vacancy first, and (c) a 15-item checklist vs. a 4-line
-  review summary. A presentation-only path exists (visually group the
-  existing 3 fieldsets + a 4th "Requirements" group once the vacancy exists,
-  with a sticky index; treat the *existing* detail/manage page as the
-  "review and publish" step rather than building a new one) but it reshapes
-  create-flow page boundaries, not just styling, and needs explicit sign-off
-  before implementation.
+- **Proposed change — RESOLVED per Founder Ruling #2:** the design's "four
+  named sections + separate review step" is **not built as a new
+  workflow.** The single-page 3-fieldset form and the decoupled language
+  editor (still requiring a saved vacancy first) are preserved exactly as
+  they are today, on the exact same pages. In scope: visually group the
+  existing 3 fieldsets under clearer headings within the single page, an
+  orientation/progress aid where truthful to the real field order, and
+  stronger visual emphasis on the existing `ReadinessChecklist` on the
+  detail/manage page. No new route, no new step, no new form state. See
+  Task K.
 
 ### `/employer/applications` (`src/app/employer/applications/page.tsx`)
 
@@ -257,7 +389,8 @@ throughout this plan rather than re-derived from scratch.
   design's "Availability" row maps cleanly to `shift_preferences`
   (presentation remap only); "Work permission" maps to
   `work_authorisation_declared` (presentation-only). "CV | Attached" has no
-  backing data anywhere — Section 10, item #6.
+  backing data anywhere — **RESOLVED per Founder Ruling #3: removed
+  entirely, not built.**
 - **Status history:** `application_status_history` already has real,
   per-transition `occurred_at` timestamps and is already returned in full by
   `get_current_employer_application` (`status_history` key) — **no schema
@@ -291,7 +424,8 @@ throughout this plan rather than re-derived from scratch.
   `/employer/account/export` (a route-handler file download), both linked
   from the bottom of the `/employer` home page today, not from any nav item.
   Design's "KEEP, out of scope" is safe for content; its assumption that
-  Account is a nav destination is not — see Section 10, item #7.
+  Account is a nav destination is not — **RESOLVED per Founder Ruling #4:
+  ship the real nav, do not add an Account nav item.**
 
 ### Employer navigation/header
 
@@ -317,8 +451,8 @@ Every element from the design's seven numbered sections, classified.
 | Single attention slot (unseen when > 0, readiness when not verified) | IMPLEMENTABLE WITH EXISTING DATA | Both signals already load today (`loadUnseenApplicationsCount`, verification state). |
 | "3 applications you have not opened" count | IMPLEMENTABLE AS-IS | Same aggregate RPC already powering the nav badge. |
 | Aggregate status totals removed | IMPLEMENTABLE AS-IS | Deletion, not addition. |
-| "Your vacancies" mini-list with per-row application counts | **NEW QUERY DEPENDENCY (Section 10, item #5)** | `EmployerDraftListItem` has no application-count field today. |
-| "Needs your action" side card (draft missing fields / paused with N open applications) | PARTIALLY IMPLEMENTABLE | Draft-missing-fields uses existing readiness data (`ready`/`checklist`, already loaded per draft row). Paused-with-N-open-applications needs the same new count query as above. |
+| "Your vacancies" mini-list with per-row application counts | **RESOLVED — DROPPED (Founder Ruling #7)** | `EmployerDraftListItem` has no application-count field today; no new query added. Mini-list shows title/locality/lifecycle state, no counts. |
+| "Needs your action" side card (draft missing fields / paused with N open applications) | **RESOLVED — SIMPLIFIED (Founder Ruling #7)** | Ships with only draft-missing-fields (existing readiness data). Paused-with-N-open-applications is dropped, not built — see Section 11. |
 | Verification readiness card, warm-neutral not oxblood | IMPLEMENTABLE AS-IS | Styling only. |
 | Sidebar: total vacancies (plain), unseen applications (oxblood pill) | IMPLEMENTABLE AS-IS | Both counts already available (`loadEmployerDrafts.length`, existing unseen aggregate). |
 
@@ -327,31 +461,31 @@ Every element from the design's seven numbered sections, classified.
 | Design element | Classification | Notes |
 |---|---|---|
 | Grouped Live / Not live | IMPLEMENTABLE AS-IS | Pure derivation from `publicationState`. |
-| Lifecycle word + one consequence sentence per row | **DESIGN CORRECTION REQUIRED (Section 10, item #7 addendum)** | Real enum has 6 states, design shows 5 — add `withdrawn` following the same pattern. |
-| Per-row application count ("5 applications") | **NEW QUERY DEPENDENCY** | Same gap as home's mini-list, Section 10 item #5. |
+| Lifecycle word + one consequence sentence per row | **RESOLVED — DESIGN CORRECTION APPLIED (Founder Ruling #5)** | Real enum has 6 states, design shows 5 — `withdrawn` is added following the same pattern, binding per ruling. |
+| Per-row application count ("5 applications") | **RESOLVED — DROPPED (Founder Ruling #7)** | No new query added; row shows lifecycle word + consequence sentence only, same gap as home's mini-list. |
 | Action per row (Review / Edit / Resume / Continue / View) | IMPLEMENTABLE AS-IS | Maps directly to existing per-state actions already in `vacancy-lifecycle-actions.tsx`. |
 
 ### 03 · Create and review a vacancy
 
 | Design element | Classification | Notes |
 |---|---|---|
-| Four named sections + sticky rail index | **PRODUCT DECISION REQUIRED (Section 10, item #2)** | Real form is a single page with 3 fieldsets + a decoupled language editor; grouping is achievable but reshapes page boundaries, needs sign-off. |
-| Minimum German level, single-choice radio, 7 CEFR options | **PRODUCT DECISION REQUIRED (Section 10, item #1)** | Real field is a 4-value non-CEFR scale (`none/basic/conversational/comfortable`) with **no employer-facing UI at all today**. Not a restyle — value-set mismatch plus missing UI. |
+| Four named sections + sticky rail index | **RESOLVED — SCOPED DOWN (Founder Ruling #2)** | Real form stays a single page with the existing 3 fieldsets + decoupled language editor; sections are grouped visually within that one page, no new step/route/form state. See Task K. |
+| Minimum German level, single-choice radio, 7 CEFR options | **RESOLVED — REAL 4 VALUES ONLY (Founder Ruling #1)** | Built as No German required/Basic/Conversational/Comfortable using `GERMAN_REQUIREMENT_LABELS`, never CEFR. No schema/matching change. See Task J. |
 | Work permission checkbox | IMPLEMENTABLE AS-IS | Real field (`cvRequired`... — actually a distinct "must be permitted to work" concept; confirm exact form field name at implementation time), already in the form. |
-| Separate "Review and publish" step with 4-line summary + Publish/Keep as draft | **FOLDS INTO ITEM #2** | Achievable by treating the existing detail/manage page (readiness checklist + Publish button) as this step — same decision as the section grouping. |
+| Separate "Review and publish" step with 4-line summary + Publish/Keep as draft | **RESOLVED — NOT A NEW STEP (Founder Ruling #2)** | The existing detail/manage page (readiness checklist + Publish button) gets stronger visual emphasis; it is not replaced by a new page. |
 | Readiness stated on review, not as post-submit errors | ALREADY TRUE — no change needed | `ReadinessChecklist` already does exactly this. |
 
 ### 04 · Applications and status control
 
 | Design element | Classification | Notes |
 |---|---|---|
-| Needs review / Open / Decided groups | PARTIALLY IMPLEMENTABLE | Open/Decided: zero new queries. Needs review: blocked on Section 10 item #4 (additive RPC projection change). |
+| Needs review / Open / Decided groups | IMPLEMENTABLE — RESOLVED (Founder Ruling #6) | Open/Decided: zero new queries. Needs review: the additive `employer_seen_at` projection change is approved (kept, conditionally). |
 | Per-vacancy filter | ALREADY EXISTS | Reuse `?vacancy=`, add nothing new — design's own caution ("no per-vacancy filter unless it already exists cleanly") is satisfied by reuse. |
 | Discrete state-dependent action buttons (Start reviewing / Shortlist / Accept / Reject application) | IMPLEMENTABLE WITH EXISTING DATA | Same `allowedTransitions` array, same transition RPC — component restructure only. |
 | Confirmation dialogs on both terminal actions | IMPLEMENTABLE WITH EXISTING DATA | New UI state, no new RPC call. Copy must reflect verified email behavior (Global Constraints) and accepted≠hired. |
 | "Reject application" employer-facing wording | IMPLEMENTABLE AS-IS | New literal label on the existing reject transition; candidate-facing "Not selected" is untouched (already shipped, P2). |
-| Status history with dated transitions, seen state separated below a divider | IMPLEMENTABLE WITH EXISTING DATA (status history) / **NEW QUERY (item #3)** for "First opened" | History is already returned in full; `employer_seen_at` needs the additive projection change to appear on this page. |
-| "CV \| Attached" candidate field | **DROP — FABRICATED (Section 10, item #6)** | No CV/resume field exists anywhere in the product. |
+| Status history with dated transitions, seen state separated below a divider | IMPLEMENTABLE WITH EXISTING DATA (status history) / **RESOLVED (Founder Ruling #6)** for "First opened" | History is already returned in full; the additive `employer_seen_at` projection change on `get_current_employer_application` is approved. |
+| "CV \| Attached" candidate field | **RESOLVED — REMOVED (Founder Ruling #3)** | No CV/resume field exists anywhere in the product; not built. |
 | "German level \| A2", "Availability", "Work permission" fields | IMPLEMENTABLE AS-IS | Real fields, direct or near-direct remap (`german_comfort`, `shift_preferences`, `work_authorisation_declared`). |
 | Outcome-recording section (interview/hire events) | **NOT ADDRESSED BY DESIGN — KEEP AS-IS** | Real, separate feature; not shown in the mock at all; retained below the restyled status block. |
 
@@ -380,15 +514,15 @@ Every element from the design's seven numbered sections, classified.
 
 | Design's own classification | Verdict |
 |---|---|
-| RESTRUCTURE — Employer home | Confirmed correct scope, with the new-query caveat (item #5). |
+| RESTRUCTURE — Employer home | Confirmed correct scope, simplified per Founder Ruling #7 (no application-count figures). |
 | RESTYLE — Onboarding and readiness | Out of this plan's deep-dive; readiness component already matches the goal. |
 | COPY — Verification | Achievable, copy-only, not deep-dived this pass. |
-| RESTRUCTURE — Vacancies | Confirmed correct scope, plus the missing `withdrawn` state and the new-query caveat. |
-| RESTYLE — Create and edit | **Understated** — this is PRODUCT DECISION REQUIRED, not a pure restyle (item #2). |
-| RESTRUCTURE — Applications | Confirmed correct scope, plus two new-query carve-outs (items #3, #4) and the fabricated CV field (item #6). |
+| RESTRUCTURE — Vacancies | Confirmed correct scope, plus the `withdrawn` state (Founder Ruling #5) and the count-figure removal (Ruling #7). |
+| RESTYLE — Create and edit | **Corrected** — scoped down to a presentation-only restyle of the existing single page, not a new workflow, per Founder Ruling #2. |
+| RESTRUCTURE — Applications | Confirmed correct scope, plus the two approved additive projections (Ruling #6) and the removed CV field (Ruling #3). |
 | EMPTY — Six new empty states | Confirmed: 2 already exist (restyle only), 4 are genuinely new. |
-| KEEP — Navigation and IA: "Home, Vacancies, Applications, Account" | **DESIGN CORRECTION REQUIRED** — real nav is Home/Vacancies/Applications/Verification; Account is not a nav destination (item #7). |
-| KEEP — Account | Confirmed safe for content; the nav-item assumption is not. |
+| KEEP — Navigation and IA: "Home, Vacancies, Applications, Account" | **RESOLVED — design's classification rejected (Founder Ruling #4)** — real nav is Home/Vacancies/Applications/Verification; Account is not a nav destination, and no Account nav item is added. |
+| KEEP — Account | Confirmed safe for content; the nav-item assumption is rejected per Ruling #4. |
 
 ---
 
@@ -424,7 +558,8 @@ Every element from the design's seven numbered sections, classified.
   `german_requirement = 'none'` by RPC default and can't be changed through
   the product today. The design's proposed CEFR scale does not exist
   anywhere in the schema, the matching logic, or the candidate's own
-  onboarding vocabulary.
+  onboarding vocabulary. **Founder Ruling #1: build the missing control
+  around the real 4-value domain, never CEFR — see Task J.**
 - **Candidate data exposure** — real, narrow projection confirmed by direct
   query inspection: `matched_job_category, german_comfort, languages[],
   work_authorisation_declared, available_from, employment_types[],
@@ -445,8 +580,9 @@ Every element from the design's seven numbered sections, classified.
 
 **Decision: restyle existing route-specific components in place; add a
 small number of new, narrowly-scoped presentational components; make the two
-additive RPC-projection changes as the only backend edits; do not touch any
-transition/matching/readiness logic.**
+Founder-approved additive RPC-projection changes as the only backend edits;
+do not touch any transition/matching/readiness logic; do not add the
+deferred per-vacancy count query.**
 
 - **Applications list/detail:** restyle `ApplicationList`,
   `application-transition-form.tsx` (→ discrete buttons + confirm dialog),
@@ -456,17 +592,21 @@ transition/matching/readiness logic.**
 - **Vacancies list/home:** restyle `VacancyList`, add the `withdrawn`
   lifecycle-word entry to whatever mapping function backs the existing
   per-state label + consequence sentence (Task B). Home page attention slot
-  and side card are new composition over existing + one new count query
-  (Task F).
+  and side card are new composition purely over existing readiness data —
+  no new query (Task F, scoped down per Founder Ruling #7).
 - **Empty states:** two are copy/style-only restyles of existing components;
   four are new, small, presentational components following the existing
   `*EmptyState` pattern (`MatchesEmptyState`/`ApplicationsEmptyState`
   precedent from the candidate side).
-- **Create/edit form and German-level control:** intentionally **not**
-  designed at the component level in this document — both are blocked on
-  PRODUCT DECISION REQUIRED items #1 and #2. Once resolved, component design
-  happens in an amendment to this plan (matching how P2 required a Founder-
-  ruling amendment before Section 6 tasks were finalized).
+- **Create/edit form (Task K):** the existing 3 `<fieldset>` groups gain
+  visual section headings and an orientation aid within the same single
+  page — no new component wraps the whole form, no new page.
+- **German-requirement control (Task J):** one new small presentational +
+  form-wiring component, `GermanRequirementField`, a radio/segmented group
+  over the real 4 values, added inside the existing "Role details" fieldset
+  (or a 4th, still-single-page "Requirements" fieldset alongside the
+  language editor once a vacancy exists — exact placement decided at
+  implementation time against the real form's field order).
 
 ---
 
@@ -474,37 +614,51 @@ transition/matching/readiness logic.**
 
 **No schema, Auth, email, matching, or transactional-config changes.**
 
-**Backend changes (additive only, both are `SELECT`-list extensions to
-existing RPCs — read the full current function body before editing, diff
-against the original, and rerun the full RPC/e2e test suite; do not retype
-either function from memory or partial reads):**
+**Backend changes (both Founder-approved per Ruling #6, additive `SELECT`-list
+extensions to existing RPCs — read the full current function body before
+editing, diff against the original, and rerun the full RPC/e2e test suite;
+do not retype either function from memory or partial reads):**
 - `list_current_employer_applications` — add `employer_seen_at` to the
-  `RETURNS TABLE`/`SELECT` list (Section 10, item #4).
+  `RETURNS TABLE`/`SELECT` list (Section 10, item #5).
 - `get_current_employer_application` — add `employer_seen_at` to its jsonb
-  projection (Section 10, item #3).
-- New: one grouped-`COUNT` query (name TBD at implementation time, e.g.
-  `count_current_employer_applications_by_vacancy`) returning
-  `{ vacancy_id, total, open }[]` for the caller's own vacancies only
-  (Section 10, item #5) — additive, RLS-scoped identically to existing
-  employer RPCs, no fan-out (one grouped query, not one call per vacancy).
+  projection (Section 10, item #4).
+- **No per-vacancy `COUNT` query is added — deferred per Founder Ruling
+  #7.** No new RPC, no schema change, no migration for this item.
+- German-requirement control (Task J) calls the **existing**
+  `p_german_requirement` RPC parameter on the draft create/update RPCs
+  (already present, currently always called with its default/omitted) —
+  this is a new call-site passing a real value, not a new RPC parameter or
+  a migration.
 
 **Modified files (frontend):**
-- `src/app/employer/page.tsx` (attention slot, side card)
+- `src/app/employer/page.tsx` (attention slot — draft-incomplete reason
+  only; side card, no counts)
 - `src/components/employer-vacancies/vacancy-list.tsx`,
-  `employer-vacancies.module.scss` (grouping, withdrawn state, counts)
-- `src/lib/employer/vacancies/load-employer-drafts.ts` (consume the new
-  count query; add `withdrawn` wherever the lifecycle label/consequence
-  mapping currently lives)
+  `employer-vacancies.module.scss` (grouping, withdrawn state — no counts)
+- `src/lib/employer/vacancies/load-employer-drafts.ts` (add `withdrawn`
+  wherever the lifecycle label/consequence mapping currently lives — no
+  count field added)
 - `src/lib/employer/applications/load-employer-applications.ts`,
   `application-list.tsx`, `application-list.module.scss` (Needs
   review/Open/Decided grouping, once the additive RPC change lands)
 - `src/components/employer-applications/application-transition-form.tsx`
   (→ discrete buttons), `application-detail.tsx` (First opened row, once
-  the additive RPC change lands)
+  the additive RPC change lands; Availability/Work permission relabel; no
+  CV row)
 - `src/lib/employer/applications/status.ts` (add `"Reject application"`
   employer-facing action label; canonical status labels untouched)
 - `src/components/employer-vacancies/employer-vacancy-page-header.tsx`
-  (visual polish only — nav items unchanged, see item #7)
+  (visual polish only — real nav items unchanged, per Founder Ruling #4)
+- `src/components/employer-vacancies/vacancy-draft-form.tsx` (visual
+  section grouping within the existing single page; add the new German-
+  requirement field; existing field order/validation unchanged)
+- `src/lib/employer/vacancies/schemas.ts` (add a `germanRequirement` field
+  to `createDraftVacancyFormSchema`/`updateDraftVacancyFormSchema`,
+  constrained to the real 4 values)
+- `src/app/employer/vacancies/actions.ts` (thread the form's
+  `germanRequirement` value through to the existing
+  `p_german_requirement` RPC parameter — parameter already exists, this is
+  the first real caller)
 
 **New files:**
 - `src/lib/employer/applications/group-applications.ts` (+ `.test.ts`) —
@@ -513,26 +667,32 @@ either function from memory or partial reads):**
   (+ `.test.tsx`) — discrete buttons replacing the dropdown
 - `src/components/employer-applications/status-transition-confirm-dialog.tsx`
   (+ `.test.tsx`) — shared Accept/Reject confirmation
+- `src/components/employer-vacancies/german-requirement-field.tsx`
+  (+ `.test.tsx`) — radio/segmented control over the real 4 values
 - 4 new empty-state components under `src/components/employer-*` (exact
   home decided at implementation time, following the existing
   `*EmptyState` pattern)
 
 **Files deleted:** none.
 
-**Explicitly not touched in this plan's implementable scope (Tasks J, K —
-blocked, see Section 10):** `VacancyDraftForm`'s field structure, any new
-German-requirement form field, `LanguageRequirementsEditor`.
+**Explicitly not touched, per Founder ruling (not "blocked," ruled out):**
+`LanguageRequirementsEditor`'s decoupled-from-create architecture (Ruling
+#2 preserves it as-is), any CV field/component anywhere (Ruling #3), any
+new nav item (Ruling #4), any new per-vacancy count query or the tables/
+components that would have consumed it (Ruling #7).
 
 ---
 
 ## 6. Tasks
 
-> Tasks A–I are implementable now — logic tasks (A, part of F) get full
-> TDD-style signatures and tests; pure-restyle tasks (B, C's markup, G, H,
-> I) get concrete acceptance criteria with exact code deferred to
-> implementation time, matching P2's own convention for restyle-only work.
-> **Tasks J and K are written as blocked stubs only — do not implement
-> until Section 10 items #1 and #2 are resolved.**
+> All tasks A–K are now implementable — every PRODUCT DECISION REQUIRED item
+> is resolved (see Founder Rulings above) and scope is final. Logic tasks
+> (A, J, part of F) get full TDD-style signatures and tests; pure-restyle
+> tasks (B, C's markup, G, H, I, K) get concrete acceptance criteria with
+> exact code deferred to implementation time, matching P2's own convention
+> for restyle-only work. Task F is scoped down per Founder Ruling #7 (no
+> application counts); Task G drops its count-figure requirement for the
+> same reason.
 
 ### Task A: Applications list grouping (Needs review / Open / Decided)
 
@@ -808,31 +968,100 @@ hand-roll a duplicate formatter). No new field, no CV row added (Section
 
 ### Task F: Employer home — attention slot and vacancy side card
 
-**Depends on:** the new per-vacancy application-count query (Section 10,
-item #5) for the "N open applications" part of the side card only; the
-draft-missing-fields part does not depend on it (uses existing readiness
-data).
+**Scope, per Founder Ruling #7:** no per-vacancy application-count query is
+added. The side card ships with only the draft-with-missing-fields reason,
+built entirely from existing readiness data. The design's
+paused-with-N-open-applications reason is **not built** in P3 — see Section
+11.
 
 **Files:**
 - Modify: `src/app/employer/page.tsx`
 - Modify/create: `page.module.scss`
-- New: a small pure selector, e.g. `src/lib/employer/vacancies/select-attention-vacancies.ts`
-  (+ `.test.ts`) — given the vacancy list (with the new count field) and
-  readiness data, returns the subset needing action, in the design's stated
-  order (draft-with-missing-fields, then paused-with-open-applications)
+- New: `src/lib/employer/vacancies/select-attention-vacancies.ts`
+  (+ `.test.ts`) — given the vacancy list and its existing readiness data,
+  returns the subset needing action
 
-**Acceptance criteria for the pure selector (write this one with real TDD
-steps, same pattern as Task A):** input is the full `EmployerDraftListItem[]`
-(extended with the new count field); output is `{ vacancyId: string; title:
-string; reason: "draft_incomplete" | "paused_with_open" }[]`, `draft_incomplete`
-when `publicationState === "draft" && ready === false`, `paused_with_open`
-when `publicationState === "paused" && openApplicationCount > 0`; never
-includes a vacancy for both reasons even if both are technically true (a
-vacancy can only be in one lifecycle state at a time, so this is not
-actually reachable — note it as a documented invariant, not a runtime
-branch). Aggregate status totals are not computed anywhere in this file —
-their removal is enforced by the fact that no such value is ever read from
-the loaders in this task's scope.
+**Interfaces:**
+- Produces: `selectAttentionVacancies(drafts: EmployerDraftListItem[]): {
+  vacancyId: string; title: string; reason: "draft_incomplete" }[]` —
+  `draft_incomplete` when `publicationState === "draft" && ready === false`.
+  Single reason code today (not a union with a second, unbuilt case) —
+  adding `paused_with_open` is future work, tracked in Section 11, not a
+  stub in this signature.
+- Consumes: `EmployerDraftListItem` from
+  `@/lib/employer/vacancies/load-employer-drafts`.
+
+- [ ] **Step 1: Write the failing test**
+
+```ts
+import { describe, expect, it } from "vitest";
+
+import { selectAttentionVacancies } from "@/lib/employer/vacancies/select-attention-vacancies";
+import type { EmployerDraftListItem } from "@/lib/employer/vacancies/load-employer-drafts";
+
+function draft(overrides: Partial<EmployerDraftListItem>): EmployerDraftListItem {
+  return {
+    id: "v1",
+    title: "Glasreiniger",
+    jobCategory: "cleaning",
+    publicLocality: "Mitte",
+    employerType: "company",
+    companyName: "Hauswerk Berlin",
+    publicationState: "draft",
+    expiresAt: null,
+    isEffectivelyExpired: false,
+    updatedAt: "2026-08-15T00:00:00Z",
+    ready: false,
+    checklist: [],
+    ...overrides,
+  };
+}
+
+describe("selectAttentionVacancies", () => {
+  it("includes a not-ready draft as draft_incomplete", () => {
+    const result = selectAttentionVacancies([draft({ id: "v1", ready: false })]);
+    expect(result).toEqual([{ vacancyId: "v1", title: "Glasreiniger", reason: "draft_incomplete" }]);
+  });
+
+  it("excludes a ready draft and any non-draft vacancy", () => {
+    const result = selectAttentionVacancies([
+      draft({ id: "v1", ready: true }),
+      draft({ id: "v2", publicationState: "published", ready: null }),
+      draft({ id: "v3", publicationState: "paused", ready: null }),
+    ]);
+    expect(result).toEqual([]);
+  });
+});
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `npx vitest run src/lib/employer/vacancies/select-attention-vacancies.test.ts`
+Expected: FAIL — module does not exist.
+
+- [ ] **Step 3: Implement `selectAttentionVacancies`**
+
+```ts
+import type { EmployerDraftListItem } from "@/lib/employer/vacancies/load-employer-drafts";
+
+export function selectAttentionVacancies(drafts: EmployerDraftListItem[]) {
+  return drafts
+    .filter((d) => d.publicationState === "draft" && d.ready === false)
+    .map((d) => ({ vacancyId: d.id, title: d.title, reason: "draft_incomplete" as const }));
+}
+```
+
+- [ ] **Step 4: Run test to verify it passes; wire into `page.tsx`; commit**
+
+```bash
+npx vitest run src/lib/employer/vacancies/select-attention-vacancies.test.ts
+git add src/lib/employer/vacancies/select-attention-vacancies.ts src/lib/employer/vacancies/select-attention-vacancies.test.ts src/app/employer/page.tsx
+git commit -m "feat(employer-home): attention slot + draft-incomplete side card, no new queries"
+```
+
+Aggregate status totals are not computed anywhere in this file — their
+removal is enforced by the fact that no such value is ever read from the
+loaders in this task's scope.
 
 ### Task G: Vacancies list restyle (Live / Not live grouping)
 
@@ -841,9 +1070,9 @@ Acceptance criteria: two groups (`published`/`paused` under "Live",
 exact split against the design's "Live · 3" / "Not live · 3" example rows
 at implementation time, since `paused` counted toward "Live" there);
 lifecycle word + consequence sentence per row (Task B supplies `withdrawn`);
-application count per row once Section 10 item #5 lands; existing
-`vacancy-list.test.tsx` assertions for row content continue to pass,
-extended for the new grouping structure.
+**no per-row application count (dropped per Founder Ruling #7 — do not
+add one)**; existing `vacancy-list.test.tsx` assertions for row content
+continue to pass, extended for the new grouping structure.
 
 ### Task H: Empty states
 
@@ -877,17 +1106,105 @@ truncation via ellipsis anywhere in employer surfaces — wrap instead,
 matching the design's explicit "long German titles wrap rather than
 truncate" rule. No table scrolls sideways at any width.
 
-### Task J: German-level control — BLOCKED
+### Task J: German-requirement control (real 4-value domain, per Founder Ruling #1)
 
-**Do not implement.** Blocked on Section 10, item #1. This stub exists so
-the task list is complete; it is filled in only after the decision is
-returned.
+**Files:**
+- Create: `src/components/employer-vacancies/german-requirement-field.tsx`
+- Test: `german-requirement-field.test.tsx`
+- Modify: `src/lib/employer/vacancies/schemas.ts` (add `germanRequirement`
+  to `createDraftVacancyFormSchema`/`updateDraftVacancyFormSchema`)
+- Modify: `src/app/employer/vacancies/actions.ts` (pass the form's
+  `germanRequirement` through to the existing `p_german_requirement` RPC
+  parameter — first real caller, parameter itself is unchanged)
+- Modify: `src/components/employer-vacancies/vacancy-draft-form.tsx` (render
+  the new field)
 
-### Task K: Vacancy create/edit section grouping + review step — BLOCKED
+**Interfaces:**
+- Produces: `GermanRequirementField({ value: GermanRequirement, onChange:
+  (value: GermanRequirement) => void, name: string })` — a `role="radiogroup"`
+  of exactly 4 options, labelled with the existing
+  `GERMAN_REQUIREMENT_LABELS` copy (`none → "No German required"`, plus
+  `basic`/`conversational`/`comfortable`), in that fixed order. Never
+  renders a 5th, 6th, or 7th option; never renders a CEFR label.
+- Consumes: `GermanRequirement` (the real union type backing
+  `vacancies.german_requirement`'s CHECK constraint —
+  `"none" | "basic" | "conversational" | "comfortable"`),
+  `GERMAN_REQUIREMENT_LABELS` from `@/lib/matching/labels`.
+- Zod: `germanRequirementSchema = z.enum(["none", "basic", "conversational",
+  "comfortable"])`, added as a required field (default `"none"`, matching
+  the RPC's own default) on both draft form schemas.
 
-**Do not implement.** Blocked on Section 10, item #2. This stub exists so
-the task list is complete; it is filled in only after the decision is
-returned.
+- [ ] **Step 1: Write the failing test for `GermanRequirementField`**
+
+```tsx
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+
+import { GermanRequirementField } from "@/components/employer-vacancies/german-requirement-field";
+
+describe("GermanRequirementField", () => {
+  it("renders exactly the 4 real values, never a CEFR label", () => {
+    render(<GermanRequirementField value="none" onChange={vi.fn()} name="germanRequirement" />);
+    expect(screen.getByRole("radio", { name: "No German required" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: /basic/i })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /conversational/i })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /comfortable/i })).toBeInTheDocument();
+    expect(screen.getAllByRole("radio")).toHaveLength(4);
+    expect(screen.queryByText(/A1|A2|B1|B2|C1|C2/)).not.toBeInTheDocument();
+  });
+});
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `npx vitest run src/components/employer-vacancies/german-requirement-field.test.tsx`
+Expected: FAIL — module does not exist.
+
+- [ ] **Step 3: Implement `GermanRequirementField`** as a `radiogroup` of 4
+  labelled radio inputs sourced from
+  `Object.entries(GERMAN_REQUIREMENT_LABELS)` (never a hand-written list,
+  so the component structurally cannot drift from the real label source).
+
+- [ ] **Step 4: Run test to verify it passes**
+
+- [ ] **Step 5: Extend `schemas.ts` and `actions.ts`.** Write a failing
+  test asserting `createDraftVacancyFormSchema.parse({ ...validInput,
+  germanRequirement: "comfortable" })` succeeds and
+  `germanRequirement: "b1"` fails (proves the schema rejects CEFR values),
+  then implement.
+
+- [ ] **Step 6: Wire into `VacancyDraftForm`, run the existing form test
+  suite, then commit**
+
+```bash
+npx vitest run src/components/employer-vacancies src/lib/employer/vacancies
+git add src/components/employer-vacancies/german-requirement-field.tsx src/components/employer-vacancies/german-requirement-field.test.tsx src/lib/employer/vacancies/schemas.ts src/app/employer/vacancies/actions.ts src/components/employer-vacancies/vacancy-draft-form.tsx
+git commit -m "feat(employer-vacancies): add German-requirement control on the real 4-value domain"
+```
+
+### Task K: Vacancy create/edit — visual section grouping (single page, per Founder Ruling #2)
+
+**Files:**
+- Modify: `src/components/employer-vacancies/vacancy-draft-form.tsx`,
+  `vacancy-draft-form.module.scss` (or equivalent existing stylesheet)
+- Modify: `src/components/employer-vacancies/readiness-checklist.tsx` /
+  its detail-page container (stronger visual emphasis only)
+
+**Acceptance criteria:** the existing 3 fieldsets (Basics, Role details,
+Salary) plus the German-requirement field from Task J gain clear visual
+section headings and an orientation aid (e.g. a sticky in-page index
+linking to each section's heading) **within the same single page** —
+no new route, no new step, no `<form>` split into multiple submits, no
+change to field order or validation. `LanguageRequirementsEditor` remains
+exactly where and how it renders today (on the detail/manage page, after a
+vacancy exists) — it is not pulled into the create form. The
+detail/manage page's existing `ReadinessChecklist` and `Publish` button
+gain stronger visual treatment (matching the design's "review and publish"
+emphasis) without becoming a new page or step. Every existing
+`vacancy-draft-form.test.tsx` assertion about field presence, order, and
+validation continues to pass unmodified — this task changes markup/CSS
+structure around the fields, never the fields, their order, or their
+validation.
 
 ---
 
@@ -931,6 +1248,11 @@ horizontal scroll) at 360.
   fade) must respect `prefers-reduced-motion` per the existing global rule.
 - **Screen-reader names** — status-action button icons (if any) must be
   `aria-hidden` with adjacent real text, never the sole signal.
+- **German-requirement radio group (Task J)** — a real `role="radiogroup"`
+  with an accessible group name (e.g. via `aria-labelledby` pointing at the
+  field's own label, "Minimum German level"), each option a native radio
+  input with its own associated `<label>`, keyboard-operable via arrow keys
+  (native radio-group behavior, not simulated).
 
 ## 9. Testing
 
@@ -966,66 +1288,60 @@ additive RPC-projection changes each need their own migration test
 confirming the new field appears in the RPC's return shape without changing
 any existing returned field, plus a full rerun of every existing test that
 calls either RPC, per the SQL-reconstruction-risk discipline in Global
-Constraints.
+Constraints. `vacancy-draft-form.test.tsx` needs a new case confirming the
+German-requirement field defaults to `"none"` and rejects any non-real
+value; existing cases must keep passing unmodified (Task J adds a field, it
+does not touch existing ones).
 
-## 10. Product decisions required
+## 10. Product decisions — RESOLVED (Founder rulings applied 2026-08-18)
 
-Three genuine, blocking decisions. Everything else in this plan is
-implementable without further sign-off (subject to the additive-query
-call-outs below, which are flagged for awareness but are not blocking in
-the same sense).
+All three original PRODUCT DECISION REQUIRED items and both query/data
+flags are now resolved. Kept as a numbered list, unchanged numbering from
+the original discovery pass, so every earlier cross-reference in this
+document still resolves to the right item — each entry now states the
+ruling that settled it instead of the open options.
 
-1. **German-requirement control.** The design proposes a 7-value CEFR scale
-   (No German required/A1–C2). The real field is a 4-value non-CEFR scale
-   (none/basic/conversational/comfortable) already used identically by
-   matching and candidate onboarding, and **no employer-facing control for
-   it exists at all today** — every vacancy is silently created at `'none'`.
-   Options: **(a)** ship a real, small functional addition in P3 — a
-   radio/segmented control using the design's visual treatment but the
-   real 4 values and their existing labels (`GERMAN_REQUIREMENT_LABELS`),
-   wired to the existing (currently-unused) `p_german_requirement` RPC
-   parameter — no schema change, but genuinely new input capability, not
-   pure restyle; **(b)** defer entirely, leave every vacancy fixed at "No
-   German required" this pass, revisit as its own unit. Recommendation:
-   (a) — it's low-risk and purely additive, but flagged because it exceeds
-   "presentation polish" as literally scoped.
-2. **Vacancy create/edit section grouping + review step.** The design's
-   four-named-sections-plus-separate-review-step doesn't map 1:1 onto the
-   real single-page 3-fieldset form, the decoupled language editor (which
-   requires a saved vacancy first), or the 15-item readiness checklist vs.
-   a 4-line review summary. A presentation-only path exists (visually group
-   the existing fieldsets with a sticky index; treat the existing
-   detail/manage page as the review step) but reshapes create-flow page
-   boundaries and needs explicit confirmation before implementation.
-3. **"CV | Attached" field.** Fabricated — no CV/resume field or feature
-   exists anywhere in the product. Recommendation: drop entirely from P3;
-   building it would be new product capability (file upload + storage +
-   candidate-side capture), far outside presentation polish.
-
-**Non-blocking but flagged per the brief's explicit instruction to call out
-new query/data dependencies:**
-
-4. `employer_seen_at` added to `get_current_employer_application`'s
-   projection (for "First opened" on the detail page) — additive `SELECT`
-   change, no semantic change to unseen/read behavior.
-5. `employer_seen_at` added to `list_current_employer_applications`'s
-   projection (for the "Needs review" list grouping) — additive `SELECT`
-   change, same column, same semantics, just returned in one more place.
-6. A new grouped-`COUNT` query for per-vacancy application counts (home
-   mini-list, vacancies list rows, home side card's "N open applications").
-   Recommend proceeding — a single grouped `COUNT(*) ... GROUP BY vacancy_id`
-   query scoped to the caller's own vacancies, no N+1, no material fan-out
-   (the existing `loadEmployerDrafts` already accepts a comparable one-RPC-
-   per-draft-row cost for readiness, so this is not a new class of cost for
-   this codebase).
-7. Employer navigation reconciliation — design assumes Home/Vacancies/
-   Applications/Account; real nav is Home/Vacancies/Applications/
-   Verification, with Account reachable only via links at the bottom of the
-   home page. Recommendation: keep the real nav unchanged (per the brief's
-   hard constraint against IA changes without a concrete defect) — this is
-   a correction to apply, not a decision to make, but is called out
-   explicitly because it means the shipped nav will literally differ from
-   the mock's nav.
+1. **German-requirement control — RESOLVED (Founder Ruling #1): real
+   4-value domain only, never CEFR.** The design proposed a 7-value CEFR
+   scale; the real field is `none/basic/conversational/comfortable`,
+   already used identically by matching and candidate onboarding, with no
+   employer-facing control today. Built in Task J: a radio/segmented
+   control using the design's visual treatment, the real 4 values, the
+   existing `GERMAN_REQUIREMENT_LABELS` copy, wired to the existing
+   `p_german_requirement` RPC parameter. No schema change.
+2. **Vacancy create/edit section grouping + review step — RESOLVED
+   (Founder Ruling #2): single-page architecture preserved, no new
+   workflow.** The design's four-named-sections-plus-separate-review-step
+   is not built. Built in Task K instead: the real single-page 3-fieldset
+   form (plus Task J's field) gains visual section headings and an
+   orientation aid within that one page; the decoupled
+   `LanguageRequirementsEditor` stays exactly where it is; the existing
+   detail/manage page's `ReadinessChecklist` gets stronger visual emphasis
+   rather than being replaced by a new review page. No new route, step, or
+   form state.
+3. **"CV | Attached" field — RESOLVED (Founder Ruling #3): removed
+   entirely.** Confirmed fabricated — no CV/resume field or feature exists
+   anywhere in the product. Not built. No task in Section 6 adds it.
+4. **`employer_seen_at` added to `get_current_employer_application`'s
+   projection — RESOLVED (Founder Ruling #6): kept.** Satisfies the
+   Founder's three-part test (existing UI can't show per-application
+   unseen state without it; no new semantics; strictly plumbing for the
+   already-shipped N4 feature) — full justification and exact RPC/file
+   citations in "Query/data rulings" above. Additive `SELECT` change only.
+5. **`employer_seen_at` added to `list_current_employer_applications`'s
+   projection — RESOLVED (Founder Ruling #6): kept.** Same test, same
+   justification, same column — see "Query/data rulings" above.
+6. **New grouped-`COUNT` query for per-vacancy application counts —
+   RESOLVED (Founder Ruling #7): deferred, not built.** No new query is
+   added solely to power P3 presentation. The home mini-list, the
+   vacancies list rows, and the home side card's application-count figures
+   are dropped from scope; the UI is simplified rather than gaining new
+   query scope (see "Query/data rulings" above and Section 11).
+7. **Employer navigation reconciliation — RESOLVED (Founder Ruling #4):
+   ship the real nav.** The design's "Home, Vacancies, Applications,
+   Account" classification is rejected as factually wrong. Real nav
+   (Home/Vacancies/Applications/Verification) ships unchanged; no Account
+   nav item is added.
 
 ---
 
@@ -1041,8 +1357,17 @@ new query/data dependencies:**
   employer side).
 - Any change to Auth, transactional-email behavior, Production
   configuration, or anything touching Unit H/Sentry.
-- A CV/resume upload feature (item #3 above recommends dropping the design's
-  fabricated field, not building the real thing).
+- A CV/resume upload feature (Founder Ruling #3 removes the design's
+  fabricated field entirely; no real CV feature is proposed or built).
+- A new grouped-`COUNT` query for per-vacancy application counts, and
+  everything that would have consumed it: application-count figures on the
+  home mini-list, the vacancies list rows, and the home side card's
+  "N open applications" copy — deferred per Founder Ruling #7. If wanted
+  later, revisit as its own small unit (a single grouped `COUNT(*) ...
+  GROUP BY vacancy_id` query, no fan-out).
+- The home "needs your action" side card's paused-with-open-applications
+  reason — deferred alongside the count query above (Founder Ruling #7);
+  P3 ships only the draft-with-missing-fields reason.
 - Broadening employer access to candidate PII beyond the confirmed existing
   projection (no locality, no new fields).
 - Deep-dive restyle plans for `/employer/onboarding` and
