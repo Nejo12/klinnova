@@ -1,0 +1,209 @@
+@use "../../styles/breakpoints" as *;
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-10) var(--layout-gutter-mobile);
+  background-color: var(--color-bg-inverse);
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: var(--layout-content-max);
+  margin-inline: auto;
+  width: 100%;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-clay-500, var(--color-accent-warm));
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--type-heading-size);
+  line-height: var(--type-heading-line-height);
+  font-weight: var(--type-heading-weight);
+  color: var(--color-text-inverse);
+}
+
+.benefits {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-md);
+  color: var(--color-text-inverse);
+}
+
+.benefits li {
+  padding-left: var(--space-5);
+  position: relative;
+}
+
+.benefits li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--color-accent-warm);
+}
+
+.cta {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-target-min);
+  margin-top: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
+  color: var(--color-bg-inverse);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.cta:hover {
+  background-color: var(--color-bg-subtle);
+  color: var(--color-bg-inverse);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: var(--layout-content-max);
+  margin-inline: auto;
+  width: 100%;
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-surface);
+}
+
+.workflowStrip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0 0 var(--space-2);
+  padding: 0 0 var(--space-3);
+  border-bottom: var(--border-width-default) solid var(--color-border-default);
+  list-style: none;
+}
+
+.workflowStep {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.workflowArrow {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.workflowChip {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.applicantList {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.applicantRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-top: var(--border-width-default) solid var(--color-border-default);
+  font-size: var(--font-size-sm);
+}
+
+.applicantAvatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 50%;
+  background-color: var(--color-bg-subtle);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.applicantName {
+  flex: 1;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.applicantRole {
+  flex: 1;
+  color: var(--color-text-secondary);
+}
+
+.applicantStatus {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.illustrativeCaption {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+@media (min-width: $breakpoint-lg) {
+  .section {
+    flex-direction: row;
+    padding-inline: var(--layout-gutter-desktop);
+    align-items: center;
+  }
+
+  .copy,
+  .panel {
+    flex: 1;
+    margin-inline: 0;
+  }
+
+  .copy {
+    max-width: none;
+  }
+
+  .panel {
+    max-width: none;
+  }
+}
