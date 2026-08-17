@@ -1,6 +1,6 @@
 import { formatSubmittedAtUtc } from "@/lib/applications/application-confirmation";
+import { candidateStatusDisplayLabel } from "@/lib/applications/candidate-status-labels";
 import type { CandidateApplicationHistoryEntry } from "@/lib/applications/load-candidate-application-history";
-import { applicationStatusLabel } from "@/lib/applications/status";
 
 import styles from "./application-confirmation.module.scss";
 
@@ -39,7 +39,7 @@ export function ApplicationStatusTimeline({
               </span>
               <div className={styles.timelineContent}>
                 <p className={styles.timelineStatus}>
-                  {applicationStatusLabel(entry.to_status)}
+                  {candidateStatusDisplayLabel(entry.to_status)}
                 </p>
                 <time
                   className={styles.timelineTime}

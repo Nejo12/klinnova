@@ -44,7 +44,7 @@ export function OnboardingProgressNav({
                 aria-current={isCurrent ? "step" : undefined}
               >
                 <span className={styles.progressMarker}>{marker}</span>
-                <span>
+                <span className={styles.progressItemLabel}>
                   {index + 1}. {ONBOARDING_GROUP_LABELS[group]}
                 </span>
               </Link>

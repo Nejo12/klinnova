@@ -5,6 +5,7 @@ import {
   APPLICATION_STATUS_SUBMITTED_LABEL,
   buildApplicationConfirmation,
 } from "@/lib/applications/application-confirmation";
+import { applicationStatusLabel } from "@/lib/applications/status";
 import type {
   CandidateSnapshotV1,
   VacancySnapshotV1,
@@ -111,7 +112,23 @@ describe("buildApplicationConfirmation", () => {
         candidate,
         vacancy,
       })?.statusLabel,
-    ).toBe("Rejected");
+    ).toBe("Not selected");
+  });
+
+  it("renders rejected as the candidate-facing 'Not selected' label, distinct from the unchanged canonical label (regression: candidate detail/timeline consistency)", () => {
+    const rejected = buildApplicationConfirmation({
+      applicationId: APPLICATION_ID,
+      status: "rejected",
+      submittedAt: "2026-08-03T14:30:00.000Z",
+      candidate,
+      vacancy,
+    });
+
+    expect(rejected?.status).toBe("rejected");
+    expect(rejected?.statusLabel).toBe("Not selected");
+    // The canonical application-status enum and its own label function are
+    // untouched — "Not selected" is candidate-surface presentation only.
+    expect(applicationStatusLabel("rejected")).toBe("Rejected");
   });
 
   it("maps a real employer vacancy snapshot (source: employer, demo_label: null) — regression for the demo_label bug", () => {

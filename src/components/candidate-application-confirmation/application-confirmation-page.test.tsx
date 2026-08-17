@@ -184,7 +184,7 @@ describe("ApplicationConfirmationPage", () => {
         confirmation={{
           ...confirmation,
           status: "rejected",
-          statusLabel: "Rejected",
+          statusLabel: "Not selected",
         }}
         history={[
           {
@@ -220,7 +220,31 @@ describe("ApplicationConfirmationPage", () => {
     ).map((item) => item.textContent);
     expect(statuses[0]).toMatch(/Submitted/);
     expect(statuses[1]).toMatch(/In review/);
-    expect(statuses[2]).toMatch(/Rejected/);
+    expect(statuses[2]).toMatch(/Not selected/);
+    expect(statuses[2]).not.toMatch(/Rejected/);
+  });
+
+  it("shows 'Not selected' for a rejected application on both the status field and the timeline (regression: candidate detail/timeline consistency)", () => {
+    render(
+      <ApplicationConfirmationPage
+        status="ready"
+        showEmployerNav={false}
+        confirmation={{
+          ...confirmation,
+          status: "rejected",
+          statusLabel: "Not selected",
+        }}
+        history={[
+          {
+            to_status: "rejected",
+            occurred_at: "2026-08-05T09:00:00.000Z",
+          },
+        ]}
+        outcomes={[]}
+      />,
+    );
+    expect(screen.getAllByText("Not selected").length).toBeGreaterThan(0);
+    expect(screen.queryByText("Rejected")).toBeNull();
   });
 
   it("renders a generic unavailable state", () => {

@@ -1,12 +1,10 @@
+import { candidateStatusDisplayLabel } from "@/lib/applications/candidate-status-labels";
 import { NO_ADDITIONAL_LANGUAGE_REQUIREMENTS } from "@/lib/applications/messages";
 import type {
   CandidateLiveSnapshotV1,
   VacancySnapshotV1,
 } from "@/lib/applications/snapshot-schemas";
-import {
-  applicationStatusLabel,
-  type ApplicationStatus,
-} from "@/lib/applications/status";
+import type { ApplicationStatus } from "@/lib/applications/status";
 import {
   employmentTypeLabel,
   formatIsoCalendarDate,
@@ -157,7 +155,7 @@ export function buildApplicationConfirmation(input: {
   return {
     applicationId: input.applicationId,
     status: input.status,
-    statusLabel: applicationStatusLabel(input.status),
+    statusLabel: candidateStatusDisplayLabel(input.status),
     submittedAtIso: input.submittedAt,
     submittedAtLabel,
     vacancyId: input.vacancy.vacancy_id,
