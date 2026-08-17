@@ -75,15 +75,18 @@ If any of these deviations are unacceptable to the Founder, they must be called 
 **Interfaces:**
 - Produces: `ShellHeader` (no props) — unchanged public API, still exported from `@/components/shell-header`. Anchors it links to (`#for-candidates`, `#for-employers`) are `id`s that Task 4 (`CandidateJourney`) and Task 6 (`EmployerBand`) must set on their outermost `<section>`.
 
-- [ ] **Step 1: Create the branch**
+- [ ] **Step 1: Confirm the existing branch (do not recreate it)**
+
+The branch `feat/p1-homepage-presentation` already exists (it was created to hold this plan document's own commit) — do not run `git checkout -b` or reset it back to the base SHA, that would discard the plan commit. Just confirm you are on the right branch and starting point:
 
 ```bash
 git status --short
-git checkout -b feat/p1-homepage-presentation 9411217cb906bc6d4e8c76882f8af7bd6f8acc48
+git branch --show-current
 git rev-parse HEAD
+git log --oneline -1
 ```
 
-Expected: HEAD now equals `9411217cb906bc6d4e8c76882f8af7bd6f8acc48`, branch is `feat/p1-homepage-presentation`. The pre-existing uncommitted `next-env.d.ts` modification is a Next.js auto-generated file; leave it untouched (do not stage or revert it as part of this work).
+Expected: branch is `feat/p1-homepage-presentation`; `HEAD` is `58f9c045ef3c0ac942ca3f1ff6e305e3dc571bf1` (the "docs: add P1 homepage presentation implementation plan" commit); the underlying implementation base this branch was cut from remains `9411217cb906bc6d4e8c76882f8af7bd6f8acc48`. The pre-existing uncommitted `next-env.d.ts` modification is a Next.js auto-generated file; leave it untouched (do not stage or revert it as part of this work).
 
 - [ ] **Step 2: Write the failing test for the new nav/auth links**
 
@@ -2064,8 +2067,7 @@ export function FinalCta() {
           Working now, in Berlin first
         </h2>
         <p className={styles.body}>
-          Klinnova is live with an initial group of Berlin employers and
-          candidates.
+          Klinnova is working and starting in Berlin.
         </p>
       </div>
       <div className={styles.ctas}>
