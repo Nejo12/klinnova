@@ -61,7 +61,7 @@ test.describe("candidate application status journey", () => {
     ).toBeVisible();
     await expect(
       page.getByRole("heading", {
-        level: 2,
+        level: 3,
         name: `Morning host role ${stamp}`,
       }),
     ).toBeVisible();
@@ -249,7 +249,7 @@ test.describe("candidate application status journey", () => {
     await page.goto("/candidate/applications");
     await expect(
       page.getByRole("heading", {
-        level: 2,
+        level: 3,
         name: `Morning host role ${stamp}`,
       }),
     ).toBeVisible();
