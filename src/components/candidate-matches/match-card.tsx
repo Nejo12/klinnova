@@ -1,13 +1,9 @@
 import Link from "next/link";
 
+import { VacancyFactChips } from "@/components/public-jobs/vacancy-fact-chips";
 import { APPLIED_STATUS_LABEL } from "@/lib/applications/application-confirmation";
 import type { OwnedApplicationSummary } from "@/lib/applications/owned-application";
 import type { PublicVacancy } from "@/lib/public-jobs/domain";
-import {
-  jobCategoryLabel,
-  workFrequencyLabel,
-  workplaceTypeLabel,
-} from "@/lib/public-jobs/labels";
 import { DEMO_VACANCY_LABEL } from "@/lib/public-jobs/messages";
 
 import styles from "./candidate-matches.module.scss";
@@ -31,6 +27,9 @@ export function MatchCard({ vacancy, application }: MatchCardProps) {
           {vacancy.source === "seed" ? (
             <p className={styles.demoLabel}>{DEMO_VACANCY_LABEL}</p>
           ) : null}
+          {vacancy.source === "employer" ? (
+            <p className={styles.verifiedBadge}>Verified employer</p>
+          ) : null}
           {application !== null ? (
             <p className={styles.appliedLabel}>{APPLIED_STATUS_LABEL}</p>
           ) : null}
@@ -45,38 +44,7 @@ export function MatchCard({ vacancy, application }: MatchCardProps) {
         <p className={styles.summary}>{vacancy.description}</p>
       ) : null}
 
-      <dl className={styles.meta}>
-        <div className={styles.metaRow}>
-          <dt className={styles.metaLabel}>Category</dt>
-          <dd className={styles.metaValue}>
-            {jobCategoryLabel(vacancy.jobCategory)}
-          </dd>
-        </div>
-        {vacancy.publicLocality !== null ? (
-          <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Location</dt>
-            <dd className={styles.metaValue}>
-              {vacancy.publicLocality}, Berlin
-            </dd>
-          </div>
-        ) : null}
-        {vacancy.workplaceType !== null ? (
-          <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Workplace</dt>
-            <dd className={styles.metaValue}>
-              {workplaceTypeLabel(vacancy.workplaceType)}
-            </dd>
-          </div>
-        ) : null}
-        {vacancy.workFrequency !== null ? (
-          <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Frequency</dt>
-            <dd className={styles.metaValue}>
-              {workFrequencyLabel(vacancy.workFrequency)}
-            </dd>
-          </div>
-        ) : null}
-      </dl>
+      <VacancyFactChips vacancy={vacancy} />
 
       <div className={styles.cardActions}>
         <Link

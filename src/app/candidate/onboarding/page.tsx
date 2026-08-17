@@ -70,6 +70,8 @@ export default async function CandidateOnboardingPage({
           displayName={displayName}
           onboardingCompleted={onboardingCompleted}
           progress={progress}
+          profile={profile}
+          languages={languages}
         />
       ) : (
         <>

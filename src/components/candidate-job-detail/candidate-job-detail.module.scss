@@ -58,6 +58,32 @@
   text-transform: uppercase;
 }
 
+/* Neutral trust/verification signal for employer-sourced vacancies — never
+   shown alongside .demoLabel (source is a mutually exclusive two-value
+   union). Distinct from .demoLabel via a thinner border and a checkmark
+   glyph rather than a different colour family. */
+.verifiedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--space-6);
+  padding: var(--space-1) var(--space-3);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  line-height: var(--line-height-xs);
+  text-transform: uppercase;
+}
+
+.verifiedBadge::before {
+  content: "✓";
+  color: var(--color-text-muted);
+}
+
 .badgeGroup {
   display: flex;
   flex-wrap: wrap;
@@ -120,7 +146,7 @@
 
 .metaRow {
   display: grid;
-  grid-template-columns: minmax(7rem, 9rem) 1fr;
+  grid-template-columns: minmax(6rem, 8rem) 1fr;
   gap: var(--space-2) var(--space-3);
   margin: 0;
 }
@@ -155,6 +181,38 @@
   font-size: var(--type-body-supporting-size);
   line-height: var(--type-body-supporting-line-height);
   color: var(--color-text-primary);
+}
+
+.missingRequirementsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Neutral grey circle marker — deliberately not an alarm/status colour and
+   not a checkmark, so it never implies the requirement was met. */
+.missingRequirementItem {
+  position: relative;
+  margin: 0;
+  padding-left: var(--space-4);
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-supporting-line-height);
+  color: var(--color-text-primary);
+}
+
+.missingRequirementItem::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: 50%;
+  background-color: var(--color-text-muted);
+  transform: translateY(-50%);
 }
 
 .reasons {

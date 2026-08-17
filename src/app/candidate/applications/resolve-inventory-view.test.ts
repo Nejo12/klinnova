@@ -25,9 +25,44 @@ describe("resolveInventoryPageView", () => {
   });
 
   it("resolves success with the applications array unchanged", () => {
-    const applications = [{ id: "a" }] as never;
+    const applications = [{ id: "a", status: "submitted" }] as never;
     expect(resolveInventoryPageView({ status: "ready", applications })).toEqual(
-      { kind: "success", applications },
+      {
+        kind: "success",
+        applications,
+        active: applications,
+        closed: [],
+      },
+    );
+  });
+
+  it("splits mixed-status applications into active/closed, preserving true input order (not canonical status rank)", () => {
+    const submitted = { id: "a", status: "submitted" };
+    const reviewing = { id: "b", status: "reviewing" };
+    const shortlisted = { id: "c", status: "shortlisted" };
+    const accepted = { id: "d", status: "accepted" };
+    const rejected = { id: "e", status: "rejected" };
+    // Deliberately inverted relative to canonical status rank within each
+    // group (shortlisted before submitted/reviewing; rejected before
+    // accepted), so a buggy implementation that grouped by iterating
+    // ACTIVE_STATUSES/CLOSED in canonical order (rather than a true
+    // order-preserving filter over the input array) would produce a
+    // different, wrong result here.
+    const applications = [
+      shortlisted,
+      rejected,
+      submitted,
+      accepted,
+      reviewing,
+    ] as never;
+
+    expect(resolveInventoryPageView({ status: "ready", applications })).toEqual(
+      {
+        kind: "success",
+        applications,
+        active: [shortlisted, submitted, reviewing],
+        closed: [rejected, accepted],
+      },
     );
   });
 

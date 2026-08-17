@@ -20,9 +20,9 @@ export function MissingRequirementsList({
   labelledBy,
 }: MissingRequirementsListProps) {
   return (
-    <ul className={styles.languageList} aria-labelledby={labelledBy}>
+    <ul className={styles.missingRequirementsList} aria-labelledby={labelledBy}>
       {codes.map((code) => (
-        <li key={code} className={styles.languageItem}>
+        <li key={code} className={styles.missingRequirementItem}>
           {missingRequirementLabel(code)}
         </li>
       ))}

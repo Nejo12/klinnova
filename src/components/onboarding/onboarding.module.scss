@@ -40,18 +40,35 @@
 }
 
 .progressLabel {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-muted);
 }
 
 .progressList {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-2) 0;
   margin: 0;
-  padding: 0;
+  padding: var(--space-1) 0;
   list-style: none;
+}
+
+.progressList li {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  max-width: 100%;
+}
+
+.progressList li:not(:last-child)::after {
+  content: "";
+  flex: 0 0 auto;
+  width: var(--space-6);
+  height: var(--step-line-width);
+  background-color: var(--color-border-default);
+  margin: 0 var(--space-1);
 }
 
 .progressItem {
@@ -60,25 +77,53 @@
   gap: var(--space-2);
   min-height: var(--touch-target-min);
   padding: var(--space-2) var(--space-3);
-  border: var(--border-width-default) solid var(--color-border-default);
-  border-radius: var(--radius-md);
-  background-color: var(--color-bg-surface);
+  border-radius: var(--radius-pill);
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   text-decoration: none;
 }
 
+.progressItemLabel {
+  max-width: 10rem;
+  white-space: normal;
+  line-height: var(--line-height-sm);
+  overflow-wrap: break-word;
+}
+
+.progressItem::before {
+  content: "";
+  flex: 0 0 auto;
+  width: var(--step-size);
+  height: var(--step-size);
+  border-radius: 50%;
+  border: var(--step-line-width) solid var(--step-color-upcoming);
+  background-color: transparent;
+  transition:
+    width var(--duration-fast) var(--ease-standard),
+    height var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard);
+}
+
 .progressItem[data-state="complete"] {
-  border-color: var(--color-support-strong);
-  background-color: var(--color-support-subtle);
   color: var(--color-support-strong);
 }
 
+.progressItem[data-state="complete"]::before {
+  border-color: var(--step-color-complete);
+  background-color: var(--step-color-complete);
+}
+
 .progressItem[data-state="current"] {
-  border-color: var(--color-action-primary);
-  background-color: var(--color-action-subtle);
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
+}
+
+.progressItem[data-state="current"]::before {
+  width: calc(var(--step-size) * 1.6);
+  height: calc(var(--step-size) * 1.6);
+  border-color: var(--step-color-current);
+  background-color: var(--step-color-current);
 }
 
 .progressMarker {
@@ -86,6 +131,11 @@
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.progressItem[data-state="current"] .progressMarker {
+  color: inherit;
 }
 
 .form {
@@ -121,7 +171,7 @@
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
-  min-height: var(--touch-target-min);
+  min-height: var(--control-height-md);
   padding: var(--space-3);
   border: var(--border-width-default) solid var(--color-border-default);
   border-radius: var(--radius-md);
@@ -129,9 +179,9 @@
 }
 
 .option:has(input:checked) {
+  border-width: var(--border-width-strong);
   border-color: var(--color-action-primary);
   background-color: var(--color-action-subtle);
-  box-shadow: inset 0 0 0 1px var(--color-action-primary);
 }
 
 .option input {
@@ -271,4 +321,49 @@
   color: var(--color-text-secondary);
   font-size: var(--type-body-supporting-size);
   line-height: var(--type-body-supporting-line-height);
+}
+
+.reviewTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-5);
+}
+
+.reviewTableRow {
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.reviewTableHeaderCell {
+  padding: var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  vertical-align: top;
+  width: 30%;
+  text-align: left;
+}
+
+.reviewTableValueCell {
+  padding: var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  vertical-align: top;
+}
+
+.reviewTableActionCell {
+  padding: var(--space-4);
+  text-align: right;
+  vertical-align: top;
+}
+
+.reviewTableLink {
+  color: var(--color-text-link);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.reviewTableLink:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }

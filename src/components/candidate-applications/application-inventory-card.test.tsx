@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { ApplicationInventoryCard } from "@/components/candidate-applications/application-inventory-card";
+import styles from "@/components/candidate-matches/candidate-matches.module.scss";
 import type { ApplicationInventoryRow } from "@/lib/applications/snapshot-schemas";
 
 function buildRow(
@@ -29,6 +30,13 @@ function buildRow(
     },
     ...overrides,
   };
+}
+
+const cardReducedEmphasisClass = styles.cardReducedEmphasis;
+if (cardReducedEmphasisClass === undefined) {
+  throw new Error(
+    "cardReducedEmphasis class missing from candidate-matches.module.scss",
+  );
 }
 
 describe("ApplicationInventoryCard", () => {
@@ -61,7 +69,31 @@ describe("ApplicationInventoryCard", () => {
         application={buildRow({ status: "shortlisted" })}
       />,
     );
-    expect(screen.getByText("Shortlisted")).toBeInTheDocument();
+    // The status rail also renders a static "Shortlisted" node label for
+    // every card regardless of current status, so the live status value is
+    // scoped to its own element rather than a page-wide text query.
+    expect(screen.getByTestId("application-status-value")).toHaveTextContent(
+      "Shortlisted",
+    );
+  });
+
+  it('shows "Not selected" — not "Rejected" — for a rejected-status application', () => {
+    render(
+      <ApplicationInventoryCard
+        application={buildRow({ status: "rejected" })}
+      />,
+    );
+    expect(screen.getByTestId("application-status-value")).toHaveTextContent(
+      "Not selected",
+    );
+    expect(
+      screen.queryByTestId("application-status-value"),
+    ).not.toHaveTextContent("Rejected");
+  });
+
+  it("renders the application status rail", () => {
+    render(<ApplicationInventoryCard application={buildRow()} />);
+    expect(screen.getByRole("list")).toBeInTheDocument();
   });
 
   it("never renders internal vacancy id or candidate id", () => {
@@ -69,5 +101,19 @@ describe("ApplicationInventoryCard", () => {
     expect(
       screen.queryByText("22222222-2222-4222-8222-222222222222"),
     ).toBeNull();
+  });
+
+  it('applies the reduced-emphasis class when emphasis="reduced"', () => {
+    render(
+      <ApplicationInventoryCard application={buildRow()} emphasis="reduced" />,
+    );
+    expect(screen.getByRole("article")).toHaveClass(cardReducedEmphasisClass);
+  });
+
+  it("does not apply the reduced-emphasis class by default (no emphasis prop)", () => {
+    render(<ApplicationInventoryCard application={buildRow()} />);
+    expect(screen.getByRole("article")).not.toHaveClass(
+      cardReducedEmphasisClass,
+    );
   });
 });

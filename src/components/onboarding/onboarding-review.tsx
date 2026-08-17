@@ -1,12 +1,17 @@
 import Link from "next/link";
 
 import { CompleteOnboardingForm } from "@/components/onboarding/complete-onboarding-form";
+import { OnboardingReviewTable } from "@/components/onboarding/onboarding-review-table";
 import {
   ONBOARDING_GROUP_LABELS,
   type OnboardingGroupId,
 } from "@/lib/onboarding/allow-lists";
 import { onboardingGroupHref } from "@/lib/onboarding/navigation";
-import type { OnboardingProgress } from "@/lib/onboarding/progress";
+import type {
+  OnboardingProgress,
+  ProgressLanguage,
+  ProgressProfile,
+} from "@/lib/onboarding/progress";
 
 import styles from "./onboarding.module.scss";
 
@@ -14,12 +19,16 @@ type OnboardingReviewProps = {
   progress: OnboardingProgress;
   displayName: string;
   onboardingCompleted: boolean;
+  profile: ProgressProfile;
+  languages: readonly ProgressLanguage[];
 };
 
 export function OnboardingReview({
   progress,
   displayName,
   onboardingCompleted,
+  profile,
+  languages,
 }: OnboardingReviewProps) {
   if (onboardingCompleted) {
     return (
@@ -31,6 +40,7 @@ export function OnboardingReview({
           Your essential answers are complete. You can view jobs that match your
           saved preferences, or review your answers any time.
         </p>
+        <OnboardingReviewTable profile={profile} languages={languages} />
         <p className={styles.note}>
           Updating answers can clear completion when essentials are no longer
           met. Completion stays server-controlled.
@@ -60,6 +70,7 @@ export function OnboardingReview({
           Your answers are saved. Confirm when you are ready — the server checks
           your saved essentials before marking onboarding complete.
         </p>
+        <OnboardingReviewTable profile={profile} languages={languages} />
         <p className={styles.note}>
           After you confirm, you can view jobs that match your saved
           preferences.

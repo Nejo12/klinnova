@@ -88,6 +88,26 @@
   color: var(--color-text-primary);
 }
 
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.groupHeading {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
+  color: var(--color-text-primary);
+}
+
 .list {
   display: flex;
   flex-direction: column;
@@ -105,6 +125,19 @@
   border: var(--border-width-default) solid var(--color-border-default);
   border-radius: var(--radius-md);
   background-color: var(--color-bg-surface);
+}
+
+/* Closed-group rows: reduced visual emphasis via background surface + lighter
+   type weight (never color alone, never opacity — opacity composites every
+   descendant's color/link contrast against the card background, which drops
+   below WCAG AA). See plan Founder ruling on "never color alone" cues. */
+.cardReducedEmphasis {
+  background-color: var(--color-bg-subtle);
+}
+
+.cardReducedEmphasis .cardTitle,
+.cardReducedEmphasis .company {
+  font-weight: var(--font-weight-regular);
 }
 
 .cardHeader {
@@ -139,6 +172,32 @@
   letter-spacing: var(--letter-spacing-wide);
   line-height: var(--line-height-xs);
   text-transform: uppercase;
+}
+
+/* Neutral trust/verification signal for employer-sourced vacancies — never
+   shown alongside .demoLabel (source is a mutually exclusive two-value
+   union). Distinct from .demoLabel via a thinner border and a checkmark
+   glyph rather than a different colour family. */
+.verifiedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--space-6);
+  padding: var(--space-1) var(--space-3);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  line-height: var(--line-height-xs);
+  text-transform: uppercase;
+}
+
+.verifiedBadge::before {
+  content: "✓";
+  color: var(--color-text-muted);
 }
 
 .company {

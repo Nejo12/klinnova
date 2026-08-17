@@ -53,6 +53,7 @@ describe("CandidateMatchesPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Demo Berlin Work Co")).toBeInTheDocument();
     expect(screen.getByText("Demo vacancy")).toBeInTheDocument();
+    expect(screen.queryByText("Verified employer")).toBeNull();
     expect(screen.getByText("Mitte, Berlin")).toBeInTheDocument();
     expect(
       screen.getByText("Fictional demo hospitality role."),
@@ -249,5 +250,24 @@ describe("CandidateMatchesPage", () => {
     expect(document.body.textContent ?? "").not.toMatch(
       /gdpr|legally required|fully compliant|right to portability/i,
     );
+  });
+
+  it("shows a verified badge for an employer-sourced vacancy and never alongside the demo label", () => {
+    const vacancy = buildVacancy({
+      source: "employer",
+      employerDisplayName: "Real Berlin Employer",
+    });
+
+    render(
+      <CandidateMatchesPage
+        status="success"
+        vacancies={[vacancy]}
+        applicationsByVacancyId={new Map()}
+      />,
+    );
+
+    const card = screen.getByRole("article");
+    expect(within(card).getByText("Verified employer")).toBeInTheDocument();
+    expect(within(card).queryByText("Demo vacancy")).toBeNull();
   });
 });

@@ -3,20 +3,55 @@ import styles from "@/components/candidate-matches/candidate-matches.module.scss
 import type { ApplicationInventoryRow } from "@/lib/applications/snapshot-schemas";
 
 type ApplicationInventoryListProps = {
-  applications: ApplicationInventoryRow[];
+  active: ApplicationInventoryRow[];
+  closed: ApplicationInventoryRow[];
 };
 
-/** Renders rows in the database's own `submitted_at desc, id asc` order — never re-sorted. */
+/**
+ * Renders two groups — Active and Closed — each in the database's own
+ * `submitted_at desc, id asc` order (never re-sorted within a group). A
+ * group's heading and `<section>` are omitted entirely when that group is
+ * empty — an empty `active` array means no "Active" heading renders at all,
+ * not "Active (0)".
+ */
 export function ApplicationInventoryList({
-  applications,
+  active,
+  closed,
 }: ApplicationInventoryListProps) {
   return (
-    <ul className={styles.list}>
-      {applications.map((application) => (
-        <li key={application.id}>
-          <ApplicationInventoryCard application={application} />
-        </li>
-      ))}
-    </ul>
+    <div className={styles.groups}>
+      {active.length > 0 ? (
+        <section className={styles.group} aria-label="Active applications">
+          <h2 className={styles.groupHeading}>Active</h2>
+          <ul className={styles.list}>
+            {active.map((application) => (
+              <li key={application.id}>
+                <ApplicationInventoryCard
+                  application={application}
+                  headingLevel="h3"
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {closed.length > 0 ? (
+        <section className={styles.group} aria-label="Closed applications">
+          <h2 className={styles.groupHeading}>Closed</h2>
+          <ul className={styles.list}>
+            {closed.map((application) => (
+              <li key={application.id}>
+                <ApplicationInventoryCard
+                  application={application}
+                  emphasis="reduced"
+                  headingLevel="h3"
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+    </div>
   );
 }

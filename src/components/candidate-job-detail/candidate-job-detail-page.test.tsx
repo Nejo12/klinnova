@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/components/candidate-job-detail/application-submit-form", () => ({
@@ -56,6 +56,7 @@ describe("CandidateJobDetailPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Demo Berlin Work Co")).toBeInTheDocument();
     expect(screen.getByText("Demo vacancy")).toBeInTheDocument();
+    expect(screen.queryByText("Verified employer")).toBeNull();
     expect(screen.getByText(WORK_AUTHORISATION_NOTICE)).toBeInTheDocument();
     expect(screen.getByText("Mitte, Berlin")).toBeInTheDocument();
     expect(screen.getByText("Hospitality")).toBeInTheDocument();
@@ -100,6 +101,20 @@ describe("CandidateJobDetailPage", () => {
     expect(
       screen.getByRole("link", { name: "Review your saved preferences" }),
     ).toHaveAttribute("href", "/candidate/onboarding?group=review");
+
+    // All supplied codes render, in the exact supplied order, as an
+    // accessible labelled list — never the raw codes, and the neutral
+    // marker used to soften this state must not imply the requirement
+    // was met (no check/tick glyph here).
+    const missingList = screen.getByRole("list", {
+      name: /you don.t currently meet these requirements/i,
+    });
+    expect(
+      within(missingList)
+        .getAllByRole("listitem")
+        .map((item) => item.textContent),
+    ).toEqual(["Preferred job category", "German level"]);
+    expect(document.body.textContent ?? "").not.toContain("✓");
   });
 
   it("renders Applied state and View application instead of submit, even when ineligible", () => {
@@ -185,5 +200,25 @@ describe("CandidateJobDetailPage", () => {
       "href",
       "/candidate/account",
     );
+  });
+
+  it("shows a verified badge for an employer-sourced vacancy and never alongside the demo label", () => {
+    render(
+      <CandidateJobDetailPage
+        status="ready"
+        eligible={true}
+        missingRequirements={[]}
+        vacancy={{
+          ...vacancy,
+          source: "employer",
+          employerDisplayName: "Real Berlin Employer",
+        }}
+        languages={languages}
+        application={null}
+      />,
+    );
+
+    expect(screen.getByText("Verified employer")).toBeInTheDocument();
+    expect(screen.queryByText("Demo vacancy")).toBeNull();
   });
 });
