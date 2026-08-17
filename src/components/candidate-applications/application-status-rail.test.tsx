@@ -19,4 +19,11 @@ describe("ApplicationStatusRail", () => {
     expect(screen.getByText("Decision")).toBeInTheDocument();
     expect(screen.queryByText("Accepted")).not.toBeInTheDocument();
   });
+
+  it("also lights the 4th node for rejected status, with Decision as the node label", () => {
+    render(<ApplicationStatusRail status="rejected" />);
+    expect(screen.getByText("Decision")).toBeInTheDocument();
+    expect(screen.queryByText("Rejected")).not.toBeInTheDocument();
+    expect(screen.queryByText("Accepted")).not.toBeInTheDocument();
+  });
 });
