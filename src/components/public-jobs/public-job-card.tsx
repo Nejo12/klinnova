@@ -1,11 +1,9 @@
 import Link from "next/link";
 
+import { VacancyFactChips } from "@/components/public-jobs/vacancy-fact-chips";
 import {
-  jobCategoryLabel,
   languageLabel,
   languageProficiencyLabel,
-  workFrequencyLabel,
-  workplaceTypeLabel,
 } from "@/lib/public-jobs/labels";
 import type { PublicVacancyListItem } from "@/lib/public-jobs/load-public-vacancies";
 import { DEMO_VACANCY_LABEL } from "@/lib/public-jobs/messages";
@@ -49,38 +47,7 @@ export function PublicJobCard({
         {vacancy.companyName !== null ? ` · ${vacancy.companyName}` : ""}
       </p>
 
-      <dl className={styles.meta}>
-        <div className={styles.metaRow}>
-          <dt className={styles.metaLabel}>Category</dt>
-          <dd className={styles.metaValue}>
-            {jobCategoryLabel(vacancy.jobCategory)}
-          </dd>
-        </div>
-        {vacancy.publicLocality !== null ? (
-          <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Location</dt>
-            <dd className={styles.metaValue}>
-              {vacancy.publicLocality}, Berlin
-            </dd>
-          </div>
-        ) : null}
-        {vacancy.workplaceType !== null ? (
-          <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Workplace</dt>
-            <dd className={styles.metaValue}>
-              {workplaceTypeLabel(vacancy.workplaceType)}
-            </dd>
-          </div>
-        ) : null}
-        {vacancy.workFrequency !== null ? (
-          <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Frequency</dt>
-            <dd className={styles.metaValue}>
-              {workFrequencyLabel(vacancy.workFrequency)}
-            </dd>
-          </div>
-        ) : null}
-      </dl>
+      <VacancyFactChips vacancy={vacancy} />
 
       {languages.length > 0 ? (
         <ul className={styles.languageList}>

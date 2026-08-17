@@ -1,0 +1,29 @@
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.metaRow {
+  display: grid;
+  grid-template-columns: minmax(6rem, 8rem) 1fr;
+  gap: var(--space-2) var(--space-3);
+  margin: 0;
+}
+
+.metaLabel {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
+  color: var(--color-text-muted);
+}
+
+.metaValue {
+  margin: 0;
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-supporting-line-height);
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
