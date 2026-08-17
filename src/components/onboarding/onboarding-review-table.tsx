@@ -6,7 +6,10 @@ import {
   type OnboardingGroupId,
 } from "@/lib/onboarding/allow-lists";
 import { onboardingGroupHref } from "@/lib/onboarding/navigation";
-import type { ProgressLanguage, ProgressProfile } from "@/lib/onboarding/progress";
+import type {
+  ProgressLanguage,
+  ProgressProfile,
+} from "@/lib/onboarding/progress";
 
 import styles from "./onboarding.module.scss";
 
@@ -26,12 +29,15 @@ export function OnboardingReviewTable({
           const row = formatReviewRow(group, profile, languages);
           return (
             <tr key={group} className={styles.reviewTableRow}>
-              <td className={styles.reviewTableHeaderCell}>{row.label}</td>
+              <th scope="row" className={styles.reviewTableHeaderCell}>
+                {row.label}
+              </th>
               <td className={styles.reviewTableValueCell}>{row.value}</td>
               <td className={styles.reviewTableActionCell}>
                 <Link
                   href={onboardingGroupHref(group)}
                   className={styles.reviewTableLink}
+                  aria-label={`Edit ${row.label}`}
                 >
                   Edit
                 </Link>

@@ -2,7 +2,6 @@ import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { OnboardingReviewTable } from "@/components/onboarding/onboarding-review-table";
-import { ONBOARDING_GROUPS } from "@/lib/onboarding/allow-lists";
 
 const profile = {
   germanComfort: "basic",
@@ -19,14 +18,14 @@ describe("OnboardingReviewTable", () => {
   it("renders all 6 group labels including employment types and shifts", () => {
     render(<OnboardingReviewTable profile={profile} languages={[]} />);
 
-    expect(screen.getByText("Languages and German comfort")).toBeInTheDocument();
+    expect(
+      screen.getByText("Languages and German comfort"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Work authorisation")).toBeInTheDocument();
     expect(screen.getByText("Berlin and travel time")).toBeInTheDocument();
     expect(screen.getByText("Job categories")).toBeInTheDocument();
     expect(screen.getByText("Earliest availability")).toBeInTheDocument();
-    expect(
-      screen.getByText("Employment types and shifts"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Employment types and shifts")).toBeInTheDocument();
   });
 
   it("never renders a district — location value contains only Berlin", () => {
@@ -44,7 +43,7 @@ describe("OnboardingReviewTable", () => {
     render(<OnboardingReviewTable profile={profile} languages={[]} />);
 
     // Check specific hrefs for each group
-    const editLinks = screen.getAllByRole("link", { name: "Edit" });
+    const editLinks = screen.getAllByRole("link", { name: /^Edit /i });
     expect(editLinks.length).toBe(6);
 
     expect(editLinks[0]).toHaveAttribute(
@@ -71,5 +70,24 @@ describe("OnboardingReviewTable", () => {
       "href",
       "/candidate/onboarding?group=employment",
     );
+  });
+
+  it("gives each Edit link a distinguishing accessible name tied to its row", () => {
+    render(<OnboardingReviewTable profile={profile} languages={[]} />);
+
+    expect(
+      screen.getByRole("link", { name: "Edit Languages and German comfort" }),
+    ).toHaveAttribute("href", "/candidate/onboarding?group=languages");
+    expect(
+      screen.getByRole("link", { name: "Edit Work authorisation" }),
+    ).toHaveAttribute("href", "/candidate/onboarding?group=work_authorisation");
+  });
+
+  it("exposes each row label as a row header (th scope=row)", () => {
+    render(<OnboardingReviewTable profile={profile} languages={[]} />);
+
+    expect(
+      screen.getByRole("rowheader", { name: "Languages and German comfort" }),
+    ).toBeInTheDocument();
   });
 });

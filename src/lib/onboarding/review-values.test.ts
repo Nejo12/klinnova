@@ -58,4 +58,21 @@ describe("formatReviewRow", () => {
       value: "1 September 2026",
     });
   });
+
+  it("includes the candidate's saved languages, not just German comfort", () => {
+    const row = formatReviewRow("languages", profile, [
+      { languageCode: "en", proficiency: "native" },
+      { languageCode: "tr", proficiency: "conversational" },
+    ]);
+    expect(row.value).toContain("English (Native)");
+    expect(row.value).toContain("Turkish (Conversational)");
+    expect(row.value).toContain("I can understand and use some basic German");
+  });
+
+  it("falls back to comfort-only value when languages is empty, never Not answered if comfort is set", () => {
+    expect(formatReviewRow("languages", profile, [])).toEqual({
+      label: "Languages and German comfort",
+      value: "I can understand and use some basic German",
+    });
+  });
 });
