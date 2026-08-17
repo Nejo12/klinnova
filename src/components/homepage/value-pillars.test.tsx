@@ -21,7 +21,9 @@ describe("ValuePillars", () => {
       "Verified before publishing",
     ];
     for (const name of cardHeadings) {
-      expect(screen.getByRole("heading", { level: 3, name })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { level: 3, name }),
+      ).toBeInTheDocument();
     }
   });
 });

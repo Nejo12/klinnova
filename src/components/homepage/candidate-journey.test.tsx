@@ -25,9 +25,7 @@ describe("CandidateJourney", () => {
     expect(steps[2]).toHaveTextContent(
       "Apply, a CV only when a role needs one",
     );
-    expect(steps[3]).toHaveTextContent(
-      "Status you can see, updates by email",
-    );
+    expect(steps[3]).toHaveTextContent("Status you can see, updates by email");
   });
 
   it("renders an illustrative status timeline using canonical status labels", () => {

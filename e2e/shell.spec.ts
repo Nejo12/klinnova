@@ -47,7 +47,8 @@ test("homepage smoke: brand, hero, candidate/employer CTAs, jobs nav, legal foot
     "href",
     "/terms",
   );
-  await expect(
-    footer.getByRole("link", { name: "Impressum" }),
-  ).toHaveAttribute("href", "/impressum");
+  await expect(footer.getByRole("link", { name: "Impressum" })).toHaveAttribute(
+    "href",
+    "/impressum",
+  );
 });

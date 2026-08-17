@@ -33,7 +33,9 @@ describe("EmployerBand", () => {
   it("does not show fabricated applicant counts or conversion metrics", () => {
     render(<EmployerBand />);
 
-    expect(screen.queryByText(/\b\d+\s*(applicants|new|shortlisted)\b/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/\b\d+\s*(applicants|new|shortlisted)\b/i),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByText(
         "Illustrative example — sample data, not real Klinnova activity.",

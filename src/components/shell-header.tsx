@@ -45,9 +45,7 @@ export function ShellHeader() {
 
         <nav
           id={navId}
-          className={
-            menuOpen ? `${styles.nav} ${styles.navOpen}` : styles.nav
-          }
+          className={menuOpen ? `${styles.nav} ${styles.navOpen}` : styles.nav}
           aria-label="Site"
         >
           <div className={styles.navLinks}>

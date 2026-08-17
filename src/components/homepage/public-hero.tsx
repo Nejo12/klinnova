@@ -36,8 +36,8 @@ export function PublicHero() {
           <span className={styles.accent}>In Berlin.</span>
         </h1>
         <p className={styles.lead}>
-          Language level, availability and location — checked against what
-          each vacancy needs.
+          Language level, availability and location — checked against what each
+          vacancy needs.
         </p>
         <div className={styles.ctas}>
           <Link className={styles.primaryCta} href="/register">

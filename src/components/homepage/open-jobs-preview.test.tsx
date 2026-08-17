@@ -43,9 +43,14 @@ describe("OpenJobsPreview", () => {
     render(<OpenJobsPreview result={result} />);
 
     expect(
-      screen.getByRole("heading", { level: 2, name: "Open in Berlin right now" }),
+      screen.getByRole("heading", {
+        level: 2,
+        name: "Open in Berlin right now",
+      }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Küchenhilfe" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Küchenhilfe" }),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Lagermitarbeiter" }),
     ).toBeInTheDocument();
@@ -68,13 +73,19 @@ describe("OpenJobsPreview", () => {
       screen.getByText("No vacancies are open right now — check back soon."),
     ).toBeInTheDocument();
     expect(screen.queryByRole("article")).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "See all jobs" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "See all jobs" }),
+    ).toBeInTheDocument();
   });
 
   it("degrades gracefully on load failure without fabricating content", () => {
     render(<OpenJobsPreview result={{ ok: false }} />);
 
-    expect(screen.getByText("Jobs are temporarily unavailable.")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "See all jobs" })).toBeInTheDocument();
+    expect(
+      screen.getByText("Jobs are temporarily unavailable."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "See all jobs" }),
+    ).toBeInTheDocument();
   });
 });

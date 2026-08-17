@@ -23,7 +23,9 @@ describe("PublicHero", () => {
 
     expect(screen.queryByText(/€\/h/)).not.toBeInTheDocument();
     expect(screen.queryByText(/work permission/i)).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Apply" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Apply" }),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "Apply" }),
     ).not.toBeInTheDocument();
@@ -39,7 +41,11 @@ describe("PublicHero", () => {
   it("renders the illustrative match card using real match-reason copy", () => {
     render(<PublicHero />);
 
-    expect(screen.getByText("Illustrative example — sample data, not real Klinnova activity.")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Illustrative example — sample data, not real Klinnova activity.",
+      ),
+    ).toBeInTheDocument();
     const card = screen.getByRole("group", { name: /Reinigungskraft/ });
     expect(
       within(card).getByText("Your German level meets the requirement"),

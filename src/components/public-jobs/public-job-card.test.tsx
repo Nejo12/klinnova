@@ -102,8 +102,6 @@ describe("PublicJobCard", () => {
     expect(
       screen.getByRole("heading", { level: 3, name: "Evening cleaner" }),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("heading", { level: 2 }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { level: 2 })).not.toBeInTheDocument();
   });
 });

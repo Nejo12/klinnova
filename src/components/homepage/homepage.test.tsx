@@ -34,9 +34,7 @@ describe("Homepage", () => {
     render(<Homepage jobsResult={{ ok: true, vacancies: [] }} />);
 
     expect(screen.getByRole("banner")).toBeInTheDocument();
-    expect(
-      screen.getAllByRole("heading", { level: 1 }),
-    ).toHaveLength(1);
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
 
     const headingNames = screen
       .getAllByRole("heading", { level: 2 })
@@ -49,16 +47,14 @@ describe("Homepage", () => {
       "Working now, in Berlin first",
     ]);
 
-    expect(
-      screen.queryByText(/Candidate experience/),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByText(/Employer and admin/),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/Candidate experience/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Employer and admin/)).not.toBeInTheDocument();
     expect(
       screen.queryByText(/How progress will feel/),
     ).not.toBeInTheDocument();
-    expect(screen.queryByText(/View employer and admin/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/View employer and admin/),
+    ).not.toBeInTheDocument();
     expect(screen.queryByText(/Workspace layout/)).not.toBeInTheDocument();
     expect(
       screen.queryByText(/Desktop structure from the large breakpoint/),
@@ -106,10 +102,9 @@ describe("Homepage", () => {
     render(<Homepage jobsResult={{ ok: true, vacancies: [] }} />);
 
     const footer = screen.getByRole("contentinfo");
-    expect(within(footer).getByRole("link", { name: "Privacy" })).toHaveAttribute(
-      "href",
-      "/privacy",
-    );
+    expect(
+      within(footer).getByRole("link", { name: "Privacy" }),
+    ).toHaveAttribute("href", "/privacy");
     expect(within(footer).getByRole("link", { name: "Terms" })).toHaveAttribute(
       "href",
       "/terms",
