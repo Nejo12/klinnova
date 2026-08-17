@@ -127,7 +127,7 @@ test.describe("candidate application status journey", () => {
     await employerContext.close();
   });
 
-  test("candidate sees Rejected without the employer's reason or actor identity", async ({
+  test("candidate sees 'Not selected' (not the employer's reason or actor identity) while the employer still sees Rejected", async ({
     page,
   }) => {
     test.setTimeout(120_000);
@@ -148,12 +148,16 @@ test.describe("candidate application status journey", () => {
       "rejected",
       "Role filled internally.",
     );
+    // Employer/internal label is the unchanged canonical label.
     await expect(
       employerPage.getByText("Current status: Rejected"),
     ).toBeVisible({ timeout: 15_000 });
 
     await page.reload();
-    await expect(page.getByRole("definition").first()).toHaveText("Rejected");
+    // Candidate-facing label is the candidate-only display label.
+    await expect(page.getByRole("definition").first()).toHaveText(
+      "Not selected",
+    );
     await expect(page.getByText("Role filled internally.")).toHaveCount(0);
     await expect(page.getByText(/reason/i)).toHaveCount(0);
     await expect(page.getByText(/actor/i)).toHaveCount(0);
