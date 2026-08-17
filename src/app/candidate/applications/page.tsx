@@ -37,7 +37,7 @@ export default async function CandidateApplicationsRoutePage() {
       ) : view.applications.length === 0 ? (
         <ApplicationsEmptyState />
       ) : (
-        <ApplicationInventoryList applications={view.applications} />
+        <ApplicationInventoryList active={view.active} closed={view.closed} />
       )}
     </main>
   );

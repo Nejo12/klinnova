@@ -61,7 +61,31 @@ describe("ApplicationInventoryCard", () => {
         application={buildRow({ status: "shortlisted" })}
       />,
     );
-    expect(screen.getByText("Shortlisted")).toBeInTheDocument();
+    // The status rail also renders a static "Shortlisted" node label for
+    // every card regardless of current status, so the live status value is
+    // scoped to its own element rather than a page-wide text query.
+    expect(screen.getByTestId("application-status-value")).toHaveTextContent(
+      "Shortlisted",
+    );
+  });
+
+  it('shows "Not selected" — not "Rejected" — for a rejected-status application', () => {
+    render(
+      <ApplicationInventoryCard
+        application={buildRow({ status: "rejected" })}
+      />,
+    );
+    expect(screen.getByTestId("application-status-value")).toHaveTextContent(
+      "Not selected",
+    );
+    expect(
+      screen.queryByTestId("application-status-value"),
+    ).not.toHaveTextContent("Rejected");
+  });
+
+  it("renders the application status rail", () => {
+    render(<ApplicationInventoryCard application={buildRow()} />);
+    expect(screen.getByRole("list")).toBeInTheDocument();
   });
 
   it("never renders internal vacancy id or candidate id", () => {

@@ -1,22 +1,30 @@
 import Link from "next/link";
 
+import { ApplicationStatusRail } from "@/components/candidate-applications/application-status-rail";
 import styles from "@/components/candidate-matches/candidate-matches.module.scss";
 import { formatSubmittedAtUtc } from "@/lib/applications/application-confirmation";
+import { candidateStatusDisplayLabel } from "@/lib/applications/candidate-status-labels";
 import type { ApplicationInventoryRow } from "@/lib/applications/snapshot-schemas";
-import { applicationStatusLabel } from "@/lib/applications/status";
 
 type ApplicationInventoryCardProps = {
   application: ApplicationInventoryRow;
+  /** "reduced" de-emphasizes closed-group rows (opacity + typography weight, never color alone). */
+  emphasis?: "default" | "reduced";
 };
 
 export function ApplicationInventoryCard({
   application,
+  emphasis = "default",
 }: ApplicationInventoryCardProps) {
   const titleId = `application-title-${application.id}`;
   const submittedAtLabel = formatSubmittedAtUtc(application.submitted_at);
+  const cardClassName =
+    emphasis === "reduced"
+      ? `${styles.card} ${styles.cardReducedEmphasis}`
+      : styles.card;
 
   return (
-    <article className={styles.card} aria-labelledby={titleId}>
+    <article className={cardClassName} aria-labelledby={titleId}>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle} id={titleId}>
           {application.vacancy_snapshot.title}
@@ -27,6 +35,8 @@ export function ApplicationInventoryCard({
         {application.vacancy_snapshot.employer_display_name}
       </p>
 
+      <ApplicationStatusRail status={application.status} />
+
       <dl className={styles.meta}>
         <div className={styles.metaRow}>
           <dt className={styles.metaLabel}>Location</dt>
@@ -36,8 +46,11 @@ export function ApplicationInventoryCard({
         </div>
         <div className={styles.metaRow}>
           <dt className={styles.metaLabel}>Status</dt>
-          <dd className={styles.metaValue}>
-            {applicationStatusLabel(application.status)}
+          <dd
+            className={styles.metaValue}
+            data-testid="application-status-value"
+          >
+            {candidateStatusDisplayLabel(application.status)}
           </dd>
         </div>
         <div className={styles.metaRow}>
