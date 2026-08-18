@@ -19,6 +19,17 @@ export function ReadinessChecklist({
   checklist,
   available = true,
 }: ReadinessChecklistProps) {
+  // Missing items are what the employer needs to act on next, so surface
+  // them first — this only reorders the rendered `<li>`s (a stable sort on
+  // a copy of `checklist`); it never changes the checklist item set, the
+  // `complete` flags, or `readinessHeadline`.
+  const orderedChecklist = [...checklist].sort((a, b) => {
+    if (a.complete === b.complete) {
+      return 0;
+    }
+    return a.complete ? 1 : -1;
+  });
+
   return (
     <section className={styles.section} aria-labelledby="readiness-heading">
       <h2 id="readiness-heading" className={styles.sectionHeading}>
@@ -32,11 +43,15 @@ export function ReadinessChecklist({
         </p>
       ) : (
         <>
-          <p className={styles.readyBadge} role="status">
+          <p
+            className={styles.readyBadge}
+            data-ready={ready ? "true" : "false"}
+            role="status"
+          >
             {readinessHeadline(ready)}
           </p>
           <ul className={styles.checklist}>
-            {checklist.map((item) => (
+            {orderedChecklist.map((item) => (
               <li
                 key={item.id}
                 className={styles.checklistItem}
