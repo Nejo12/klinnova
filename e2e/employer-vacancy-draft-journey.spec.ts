@@ -205,10 +205,13 @@ test.describe("employer vacancy draft journeys", () => {
       .getByRole("button", { name: "Delete draft permanently" })
       .click();
     await expect(page).toHaveURL(/\/employer\/vacancies$/, { timeout: 15_000 });
-    // This employer never completes verification in this journey, so the
-    // zero-drafts empty state is the more specific "Verification not
-    // finished" variant (Task H), not the generic "No vacancies yet" one.
-    await expect(page.getByText(/verification not finished/i)).toBeVisible();
+    // Unlike the zero-drafts state at the top of this test, this employer
+    // completed verification earlier (lines above: requested, approved by
+    // the operator) before deleting their only draft — so the zero-drafts
+    // empty state here is correctly the generic "No vacancies yet" (Task
+    // H's "Verification not finished" variant only applies while
+    // verification is genuinely unfinished, which it no longer is here).
+    await expect(page.getByText(/no vacancies yet/i)).toBeVisible();
   });
 
   test("organisation employer draft shows derived company and no selector", async ({
