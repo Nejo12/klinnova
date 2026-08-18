@@ -152,6 +152,76 @@ describe("StatusTransitionConfirmDialog", () => {
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
+  it("traps Tab: from the last focusable element (confirm button) it wraps to the first (Cancel)", async () => {
+    const user = userEvent.setup();
+    renderInForm(
+      <StatusTransitionConfirmDialog
+        targetStatus="accepted"
+        pending={false}
+        onCancel={vi.fn()}
+      />,
+    );
+
+    const cancelButton = screen.getByRole("button", { name: "Cancel" });
+    const confirmButton = screen.getByRole("button", {
+      name: "Accept application",
+    });
+
+    confirmButton.focus();
+    expect(confirmButton).toHaveFocus();
+
+    await user.tab();
+
+    expect(cancelButton).toHaveFocus();
+  });
+
+  it("traps Shift+Tab: from the first focusable element (Cancel) it wraps to the last (confirm button)", async () => {
+    const user = userEvent.setup();
+    renderInForm(
+      <StatusTransitionConfirmDialog
+        targetStatus="accepted"
+        pending={false}
+        onCancel={vi.fn()}
+      />,
+    );
+
+    const cancelButton = screen.getByRole("button", { name: "Cancel" });
+    const confirmButton = screen.getByRole("button", {
+      name: "Accept application",
+    });
+
+    cancelButton.focus();
+    expect(cancelButton).toHaveFocus();
+
+    await user.tab({ shift: true });
+
+    expect(confirmButton).toHaveFocus();
+  });
+
+  it("traps Tab across the reason field for targetStatus='rejected': the reason textarea (first, DOM order) and confirm button (last) wrap to each other", async () => {
+    const user = userEvent.setup();
+    renderInForm(
+      <StatusTransitionConfirmDialog
+        targetStatus="rejected"
+        pending={false}
+        onCancel={vi.fn()}
+      />,
+    );
+
+    const confirmButton = screen.getByRole("button", {
+      name: "Reject application",
+    });
+    const reasonField = screen.getByLabelText(/reason/i);
+
+    // DOM order inside the panel: reason textarea -> Cancel -> confirm.
+    confirmButton.focus();
+    await user.tab();
+    expect(reasonField).toHaveFocus();
+
+    await user.tab({ shift: true });
+    expect(confirmButton).toHaveFocus();
+  });
+
   it("submits targetStatus=accepted (and no reason field) when confirmed, inside the enclosing form", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();

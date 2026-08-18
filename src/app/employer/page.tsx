@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { statusLabel } from "@/components/employer-vacancies/vacancy-list";
+import {
+  statusLabel,
+  summarizeMissingLabels,
+} from "@/components/employer-vacancies/vacancy-list";
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import {
@@ -29,7 +32,11 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 /**
  * Plain-words reason for a draft_incomplete attention-card row, built only
  * from real readiness-checklist data (Founder Ruling #7 — no fabricated
- * missing-field names, no application counts).
+ * missing-field names, no application counts). Reuses
+ * `summarizeMissingLabels` — the same 3-item truncation discipline
+ * `vacancy-list.tsx`'s `draftConsequence` uses — rather than joining every
+ * missing label with commas, since a brand-new draft's checklist can have
+ * ~13 missing items.
  */
 function draftIncompleteReason(
   draft: EmployerDraftListItem | undefined,
@@ -39,7 +46,7 @@ function draftIncompleteReason(
       .filter((item) => !item.complete)
       .map((item) => item.label) ?? [];
   return missingLabels.length > 0
-    ? `missing ${missingLabels.join(", ")}`
+    ? `missing ${summarizeMissingLabels(missingLabels)}`
     : "not yet ready to publish";
 }
 

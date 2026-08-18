@@ -51,7 +51,7 @@ export const employerApplicationListRowSchema = z.discriminatedUnion(
       current_status: applicationStatusSchema,
       submitted_at: z.string().min(1),
       updated_at: z.string().min(1),
-      employer_seen_at: z.string().nullable(),
+      employer_seen_at: z.string().min(1).nullable(),
     }),
     z.object({
       candidate_deleted: z.literal(true),
@@ -65,7 +65,7 @@ export const employerApplicationListRowSchema = z.discriminatedUnion(
       current_status: applicationStatusSchema,
       submitted_at: z.string().min(1),
       updated_at: z.string().min(1),
-      employer_seen_at: z.string().nullable(),
+      employer_seen_at: z.string().min(1).nullable(),
     }),
   ],
 );
@@ -136,7 +136,7 @@ const employerApplicationDetailReadyLiveSchema = z.object({
   shift_preferences: z.array(z.enum(SHIFT_PREFERENCE_CODES)),
   allowed_transitions: allowedTransitionsSchema,
   status_history: z.array(statusHistoryEntrySchema),
-  employer_seen_at: z.string().nullable(),
+  employer_seen_at: z.string().min(1).nullable(),
 });
 
 const employerApplicationDetailReadyDeletedSchema = z.object({
@@ -154,7 +154,7 @@ const employerApplicationDetailReadyDeletedSchema = z.object({
   // branch would.
   allowed_transitions: z.tuple([]),
   status_history: z.array(statusHistoryEntrySchema),
-  employer_seen_at: z.string().nullable(),
+  employer_seen_at: z.string().min(1).nullable(),
 });
 
 const employerApplicationDetailReadySchema = z.discriminatedUnion(

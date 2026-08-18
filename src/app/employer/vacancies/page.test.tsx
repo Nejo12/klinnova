@@ -111,4 +111,35 @@ describe("EmployerVacanciesPage empty states", () => {
 
     expect(screen.getByText(/You have no vacancies yet/)).toBeInTheDocument();
   });
+
+  it("does not call loadEmployerProfile when there are non-empty drafts (its result is only consumed by the zero-draft empty state)", async () => {
+    loadEmployerDrafts.mockResolvedValue({
+      ok: true,
+      drafts: [
+        {
+          id: "11111111-1111-4111-8111-111111111111",
+          title: "Glasreiniger",
+          jobCategory: "cleaning",
+          publicLocality: "Mitte",
+          employerType: "private" as const,
+          companyName: null,
+          publicationState: "draft" as const,
+          expiresAt: null,
+          isEffectivelyExpired: false,
+          updatedAt: "2026-08-15T00:00:00Z",
+          ready: false,
+          checklist: [],
+          pausedAt: null,
+          filledAt: null,
+          withdrawnAt: null,
+          expiredAt: null,
+        },
+      ],
+    });
+
+    render(await EmployerVacanciesPage());
+
+    expect(screen.getByText("Glasreiniger")).toBeInTheDocument();
+    expect(loadEmployerProfile).not.toHaveBeenCalled();
+  });
 });

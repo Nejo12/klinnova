@@ -40,10 +40,19 @@ export default async function EmployerVacanciesPage() {
   // `loadEmployerProfile` (already called by `/employer/page.tsx`), not a
   // new query pattern. Never gates or redirects: a failed load just leaves
   // `verificationState` null, and `VacancyList` falls back to its generic
-  // empty state in that case (see its own prop doc).
-  const profile = await loadEmployerProfile(supabase);
-  const verificationState =
-    profile.ok && profile.data !== null ? profile.data.verificationState : null;
+  // empty state in that case (see its own prop doc). Only loaded when
+  // `drafts.length === 0` — `VacancyList` only ever reads this value for
+  // its zero-draft empty state (see its own prop doc), so every employer
+  // with at least one vacancy would otherwise pay for a profile read whose
+  // result is discarded.
+  let verificationState: string | null = null;
+  if (loaded.drafts.length === 0) {
+    const profile = await loadEmployerProfile(supabase);
+    verificationState =
+      profile.ok && profile.data !== null
+        ? profile.data.verificationState
+        : null;
+  }
 
   return (
     <main className={styles.page}>

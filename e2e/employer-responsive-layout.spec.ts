@@ -396,6 +396,19 @@ test.describe("employer responsive layout (Task I)", () => {
           cardLayout.borderRadius,
           `vacancies@${width}: listItem should have a card border-radius at narrow widths`,
         ).not.toBe("0px");
+        // Confirms the card background is actually applied, not just its
+        // corners rounded (a fully transparent box would still pass the
+        // border-radius assertion above).
+        expect(
+          cardLayout.backgroundColor,
+          `vacancies@${width}: listItem should have a non-transparent card background at narrow widths`,
+        ).not.toBe("rgba(0, 0, 0, 0)");
+        // Confirms the card border is actually applied, not just declared
+        // with a zero width.
+        expect(
+          cardLayout.borderTopWidth,
+          `vacancies@${width}: listItem should have a visible card border at narrow widths`,
+        ).not.toBe("0px");
       }
 
       // --- Published vacancy detail: no horizontal scroll (readiness

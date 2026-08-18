@@ -11,6 +11,13 @@ type StatusTransitionConfirmDialogProps = {
   onCancel: () => void;
 };
 
+// Queried fresh on every Tab keypress (see the keydown handler below) rather
+// than cached, since the reason textarea only exists for
+// `targetStatus === "rejected"` — a cached list would go stale the moment
+// that field mounts/unmounts.
+const FOCUSABLE_SELECTOR =
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 const COPY = {
   accepted: {
     heading: "Accept this application?",
@@ -42,7 +49,9 @@ export function StatusTransitionConfirmDialog({
   onCancel,
 }: StatusTransitionConfirmDialogProps) {
   const headingId = useId();
+  const reasonId = `${headingId}-reason`;
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const copy = COPY[targetStatus];
 
   useEffect(() => {
@@ -53,6 +62,36 @@ export function StatusTransitionConfirmDialog({
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         onCancel();
+        return;
+      }
+
+      if (event.key === "Tab") {
+        const panel = panelRef.current;
+        if (panel === null) {
+          return;
+        }
+        // Queried at trap-time, not cached — the reason textarea only
+        // exists for targetStatus === "rejected".
+        const focusable = Array.from(
+          panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+        );
+        if (focusable.length === 0) {
+          return;
+        }
+        const first = focusable[0]!;
+        const activeIndex = focusable.indexOf(
+          document.activeElement as HTMLElement,
+        );
+
+        if (event.shiftKey) {
+          if (activeIndex <= 0) {
+            event.preventDefault();
+            focusable[focusable.length - 1]!.focus();
+          }
+        } else if (activeIndex === -1 || activeIndex === focusable.length - 1) {
+          event.preventDefault();
+          first.focus();
+        }
       }
     }
     document.addEventListener("keydown", handleKeyDown);
@@ -62,6 +101,7 @@ export function StatusTransitionConfirmDialog({
   return (
     <div className={styles.dialogOverlay}>
       <div
+        ref={panelRef}
         className={styles.dialogPanel}
         role="alertdialog"
         aria-modal="true"
@@ -80,11 +120,11 @@ export function StatusTransitionConfirmDialog({
 
         {targetStatus === "rejected" ? (
           <div className={styles.field}>
-            <label className={styles.label} htmlFor="reason">
+            <label className={styles.label} htmlFor={reasonId}>
               Reason (optional)
             </label>
             <textarea
-              id="reason"
+              id={reasonId}
               className={styles.textarea}
               name="reason"
               maxLength={APPLICATION_REASON_MAX_LENGTH}

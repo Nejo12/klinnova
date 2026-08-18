@@ -518,6 +518,12 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-4);
+  // Deliberate literal, not an untokenized oversight: rgb(33 26 27) is the
+  // same ink color as --color-ink-900 (src/styles/tokens.css, also used by
+  // --shadow-sm/--shadow-md), at 45% opacity for a dialog-backdrop scrim.
+  // No existing token represents "ink at 45% opacity" as a standalone
+  // value — --shadow-sm/--shadow-md are shadow definitions, not backdrop
+  // colors — so there is no token to reference here.
   background-color: rgb(33 26 27 / 0.45);
 }
 

@@ -242,6 +242,41 @@ describe("EmployerHomePage needs-your-action side card and vacancy mini-list", (
     ).toBeInTheDocument();
   });
 
+  it("truncates a long missing-field list to a count rather than a run-on comma list", async () => {
+    loadEmployerDrafts.mockResolvedValue({
+      ok: true,
+      drafts: [
+        draft({
+          id: "draft-1",
+          title: "Glasreiniger",
+          ready: false,
+          checklist: [
+            { id: "salary", label: "Salary (EUR gross)", complete: false },
+            { id: "frequency", label: "Work frequency", complete: false },
+            { id: "languages", label: "Languages", complete: false },
+            { id: "description", label: "Description", complete: false },
+            { id: "title", label: "Title", complete: true },
+          ],
+        }),
+      ],
+    });
+
+    render(await EmployerHomePage());
+
+    expect(
+      screen.getByText(
+        (_content, element) =>
+          element?.tagName.toLowerCase() === "p" &&
+          /Glasreiniger\s+is a draft, missing 4 required details/.test(
+            element.textContent ?? "",
+          ),
+      ),
+    ).toBeInTheDocument();
+    expect(document.body.textContent ?? "").not.toMatch(
+      /Salary \(EUR gross\), Work frequency, Languages, Description/,
+    );
+  });
+
   it("omits the side card when no draft is missing fields", async () => {
     loadEmployerDrafts.mockResolvedValue({
       ok: true,

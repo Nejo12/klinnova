@@ -30,6 +30,11 @@ export type EmployerDraftListItem = {
   // Per-transition timestamps written by `_transition_employer_vacancy`
   // (supabase/migrations/20260805110000_verification_and_vacancy_publication.sql).
   // Real data sources for row consequence sentences — never derived/guessed.
+  // Only `filledAt`/`expiredAt` are currently read (vacancy-list.tsx); the
+  // paused/withdrawn consequence sentences are static, dateless text.
+  // `pausedAt`/`withdrawnAt` are kept for symmetry across the four
+  // lifecycle timestamps and possible future use, but are not read
+  // anywhere yet.
   pausedAt: string | null;
   filledAt: string | null;
   withdrawnAt: string | null;

@@ -123,6 +123,22 @@ function formatMissingList(labels: string[]): string {
   return `${labels.slice(0, -1).join(", ")}, and ${labels[labels.length - 1]}`;
 }
 
+/**
+ * Shared truncation discipline: names each label when there are 3 or
+ * fewer, falls back to a bare count when there are more (a fresh draft's
+ * readiness checklist can have ~13 missing items — naming all of them
+ * would be an unreadable run-on). Used by `draftConsequence` below (row
+ * consequence sentence) and by the employer home page's attention-card
+ * reason (`draftIncompleteReason` in `src/app/employer/page.tsx`), so the
+ * two surfaces don't re-solve the same problem differently.
+ */
+export function summarizeMissingLabels(labels: string[]): string {
+  if (labels.length > 3) {
+    return `${labels.length} required details`;
+  }
+  return formatMissingList(labels);
+}
+
 const DRAFT_FALLBACK_CONSEQUENCE =
   "Missing required details before publishing.";
 
@@ -130,11 +146,11 @@ const DRAFT_FALLBACK_CONSEQUENCE =
  * Derived from an already-loaded readiness checklist — never a hardcoded
  * sentence. Falls back to a shorter, always-true statement when readiness
  * could not be computed (`checklist` empty) or when more than three fields
- * are missing (naming all of them would be an unreadable run-on). Takes
- * only `{ checklist }` (not the full `EmployerDraftListItem`) so it can
- * also be reused for a single-vacancy readiness lookup that isn't a full
- * list row — see `application-list.tsx`'s "This vacancy is a draft" empty
- * state.
+ * are missing (naming all of them would be an unreadable run-on — see
+ * `summarizeMissingLabels` above). Takes only `{ checklist }` (not the
+ * full `EmployerDraftListItem`) so it can also be reused for a
+ * single-vacancy readiness lookup that isn't a full list row — see
+ * `application-list.tsx`'s "This vacancy is a draft" empty state.
  */
 export function draftConsequence(draft: {
   checklist: ReadinessChecklistItem[];
@@ -146,10 +162,10 @@ export function draftConsequence(draft: {
   if (missing.length === 0) {
     return "Ready to publish.";
   }
-  if (missing.length > 3) {
-    return `${missing.length} required details missing before publishing.`;
-  }
-  return `${formatMissingList(missing.map((item) => item.label))} still needed before publishing.`;
+  const summary = summarizeMissingLabels(missing.map((item) => item.label));
+  return missing.length > 3
+    ? `${summary} missing before publishing.`
+    : `${summary} still needed before publishing.`;
 }
 
 /**
