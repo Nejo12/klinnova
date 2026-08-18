@@ -297,27 +297,32 @@ test.describe("employer applicant review journey", () => {
       page.getByText(/legally authorized|visa verified|work permit confirmed/i),
     ).toHaveCount(0);
 
-    // submitted -> reviewing. The transition form is remounted (keyed by
+    // submitted -> reviewing. The status actions are remounted (keyed by
     // current status) as soon as revalidatePath refetches the page, the
     // same way the vacancy-lifecycle actions unmount their own inline
     // success message — so this asserts on the resulting state, not the
     // transient "Status updated to…" banner.
-    await page.getByLabel("New status").selectOption("reviewing");
-    await page.getByRole("button", { name: "Update status" }).click();
+    await page.getByRole("button", { name: "Start reviewing" }).click();
     await expect(page.getByText("Current status: In review")).toBeVisible({
       timeout: 15_000,
     });
 
     // reviewing -> shortlisted
-    await page.getByLabel("New status").selectOption("shortlisted");
-    await page.getByRole("button", { name: "Update status" }).click();
+    await page.getByRole("button", { name: "Shortlist" }).click();
     await expect(page.getByText("Current status: Shortlisted")).toBeVisible({
       timeout: 15_000,
     });
 
-    // shortlisted -> accepted (terminal)
-    await page.getByLabel("New status").selectOption("accepted");
-    await page.getByRole("button", { name: "Update status" }).click();
+    // shortlisted -> accepted (terminal) — the trigger opens a confirm
+    // dialog; its own submit button is the real action.
+    await page.getByRole("button", { name: "Accept" }).click();
+    const acceptDialog = page.getByRole("alertdialog", {
+      name: "Accept this application?",
+    });
+    await expect(acceptDialog).toBeVisible();
+    await acceptDialog
+      .getByRole("button", { name: "Accept application" })
+      .click();
     await expect(page.getByText("Current status: Accepted")).toBeVisible({
       timeout: 15_000,
     });
@@ -374,10 +379,19 @@ test.describe("employer applicant review journey", () => {
       timeout: 15_000,
     });
 
-    await page.getByLabel("New status").selectOption("rejected");
-    await expect(page.getByLabel(/reason/i)).toBeVisible();
-    await page.getByLabel(/reason/i).fill("Role filled internally.");
-    await page.getByRole("button", { name: "Update status" }).click();
+    // "Reject application" trigger opens a confirm dialog; before it opens
+    // there is exactly one button with this accessible name, so this click
+    // is unambiguous. The dialog's own confirm button, of the same name,
+    // is queried scoped to the dialog below.
+    await page.getByRole("button", { name: "Reject application" }).click();
+    const rejectDialog = page.getByRole("alertdialog", {
+      name: "Reject this application?",
+    });
+    await expect(rejectDialog).toBeVisible();
+    await rejectDialog.getByLabel(/reason/i).fill("Role filled internally.");
+    await rejectDialog
+      .getByRole("button", { name: "Reject application" })
+      .click();
 
     await expect(page.getByText("Current status: Rejected")).toBeVisible({
       timeout: 15_000,
@@ -473,8 +487,7 @@ test.describe("employer applicant review journey", () => {
     await expect(page).toHaveURL(/\/employer\/applications\/[0-9a-f-]{36}$/, {
       timeout: 15_000,
     });
-    await page.getByLabel("New status").selectOption("reviewing");
-    await page.getByRole("button", { name: "Update status" }).click();
+    await page.getByRole("button", { name: "Start reviewing" }).click();
     await expect(page.getByText("Current status: In review")).toBeVisible({
       timeout: 15_000,
     });
@@ -509,8 +522,14 @@ test.describe("employer applicant review journey", () => {
     // view is now stale.
     const secondTab = await page.context().newPage();
     await secondTab.goto(applicationUrl);
-    await secondTab.getByLabel("New status").selectOption("accepted");
-    await secondTab.getByRole("button", { name: "Update status" }).click();
+    await secondTab.getByRole("button", { name: "Accept" }).click();
+    const secondTabAcceptDialog = secondTab.getByRole("alertdialog", {
+      name: "Accept this application?",
+    });
+    await expect(secondTabAcceptDialog).toBeVisible();
+    await secondTabAcceptDialog
+      .getByRole("button", { name: "Accept application" })
+      .click();
     await expect(secondTab.getByText("Current status: Accepted")).toBeVisible({
       timeout: 15_000,
     });
@@ -523,8 +542,7 @@ test.describe("employer applicant review journey", () => {
     // revalidatePath-triggered refresh that clears a real success message
     // elsewhere in this suite also replaces this stale form with the true
     // canonical (terminal, no-form) state — never a false "In review".
-    await page.getByLabel("New status").selectOption("reviewing");
-    await page.getByRole("button", { name: "Update status" }).click();
+    await page.getByRole("button", { name: "Start reviewing" }).click();
     await expect(page.getByText("Current status: Accepted")).toBeVisible({
       timeout: 15_000,
     });

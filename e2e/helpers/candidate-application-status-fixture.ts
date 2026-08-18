@@ -6,6 +6,10 @@ import {
   getLocalUserIdByEmail,
   provisionLocalVerificationOperator,
 } from "./local-operator-proof";
+import {
+  employerApplicationActionLabel,
+  type ApplicationStatus,
+} from "@/lib/employer/applications/status";
 
 export type PublishedVacancy = {
   vacancyId: string;
@@ -232,18 +236,52 @@ export async function registerAndApplyAsCandidate(
   return { candidateDisplayName, applicationUrl: page.url() };
 }
 
+const TERMINAL_TRANSITIONS = new Set(["accepted", "rejected"]);
+
 /**
- * Drives the PR 6.2 employer transition form on an already-open detail
- * page (`page` must already be at `/employer/applications/[applicationId]`).
+ * Drives the employer's discrete status-action buttons on an already-open
+ * detail page (`page` must already be at
+ * `/employer/applications/[applicationId]`). Ordinary transitions
+ * (`reviewing`/`shortlisted`) submit directly via their own button;
+ * terminal transitions (`accepted`/`rejected`) open
+ * `StatusTransitionConfirmDialog` first and submit via its scoped confirm
+ * button — `reason` is only meaningful for `rejected` and is filled inside
+ * that dialog before confirming.
  */
 export async function transitionApplicationStatusAsEmployer(
   employerPage: Page,
   targetStatus: string,
   reason?: string,
 ): Promise<void> {
-  await employerPage.getByLabel("New status").selectOption(targetStatus);
-  if (reason !== undefined) {
-    await employerPage.getByLabel(/reason/i).fill(reason);
+  const label = employerApplicationActionLabel(
+    targetStatus as ApplicationStatus,
+  );
+
+  if (!TERMINAL_TRANSITIONS.has(targetStatus)) {
+    await employerPage.getByRole("button", { name: label }).click();
+    return;
   }
-  await employerPage.getByRole("button", { name: "Update status" }).click();
+
+  // Click the trigger first (its accessible name is the action-verb
+  // label, e.g. "Accept" — not yet ambiguous, since the dialog doesn't
+  // exist yet), then scope every subsequent lookup to the now-open
+  // dialog. The dialog's own confirm-button copy is distinct from the
+  // trigger's for "accepted" ("Accept application" vs. "Accept") and
+  // happens to coincide for "rejected" (both "Reject application") — do
+  // not assume the two labels match.
+  await employerPage.getByRole("button", { name: label }).click();
+  const dialogHeading =
+    targetStatus === "accepted"
+      ? "Accept this application?"
+      : "Reject this application?";
+  const confirmLabel =
+    targetStatus === "accepted" ? "Accept application" : "Reject application";
+  const dialog = employerPage.getByRole("alertdialog", {
+    name: dialogHeading,
+  });
+  await expect(dialog).toBeVisible();
+  if (reason !== undefined) {
+    await dialog.getByLabel(/reason/i).fill(reason);
+  }
+  await dialog.getByRole("button", { name: confirmLabel }).click();
 }
