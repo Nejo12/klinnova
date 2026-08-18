@@ -283,9 +283,15 @@ test.describe("employer applicant review journey", () => {
         name: candidateDisplayName,
       }),
     ).toBeVisible();
-    await expect(page.getByText("Status: Submitted")).toBeVisible();
+    // Task A's applications list intentionally shows a row in more than one
+    // group when it's both unseen and open (needsReview/open are
+    // orthogonal axes, not exclusive buckets) — a freshly-submitted
+    // application is both, so both this text and the "Review" link below
+    // legitimately appear twice (identical content, identical href);
+    // .first() is the correct scoping, not a workaround.
+    await expect(page.getByText("Status: Submitted").first()).toBeVisible();
 
-    await page.getByRole("link", { name: "Review" }).click();
+    await page.getByRole("link", { name: "Review" }).first().click();
     await expect(page).toHaveURL(/\/employer\/applications\/[0-9a-f-]{36}$/, {
       timeout: 15_000,
     });
@@ -374,7 +380,7 @@ test.describe("employer applicant review journey", () => {
     await candidateContext.close();
 
     await page.goto("/employer/applications");
-    await page.getByRole("link", { name: "Review" }).click();
+    await page.getByRole("link", { name: "Review" }).first().click();
     await expect(page).toHaveURL(/\/employer\/applications\/[0-9a-f-]{36}$/, {
       timeout: 15_000,
     });
@@ -426,7 +432,7 @@ test.describe("employer applicant review journey", () => {
     await candidateContext.close();
 
     await page.goto("/employer/applications");
-    await page.getByRole("link", { name: "Review" }).click();
+    await page.getByRole("link", { name: "Review" }).first().click();
     await expect(page).toHaveURL(/\/employer\/applications\/[0-9a-f-]{36}$/, {
       timeout: 15_000,
     });
@@ -481,9 +487,11 @@ test.describe("employer applicant review journey", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "Applications" }),
     ).toBeVisible();
-    await expect(page.getByRole("link", { name: "Review" })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Review" }).first(),
+    ).toBeVisible();
 
-    await page.getByRole("link", { name: "Review" }).click();
+    await page.getByRole("link", { name: "Review" }).first().click();
     await expect(page).toHaveURL(/\/employer\/applications\/[0-9a-f-]{36}$/, {
       timeout: 15_000,
     });
@@ -511,7 +519,7 @@ test.describe("employer applicant review journey", () => {
     await candidateContext.close();
 
     await page.goto("/employer/applications");
-    await page.getByRole("link", { name: "Review" }).click();
+    await page.getByRole("link", { name: "Review" }).first().click();
     await expect(page).toHaveURL(/\/employer\/applications\/[0-9a-f-]{36}$/, {
       timeout: 15_000,
     });
