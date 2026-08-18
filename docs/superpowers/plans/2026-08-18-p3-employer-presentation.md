@@ -360,7 +360,7 @@ throughout this plan rather than re-derived from scratch.
   candidate_display_name, job_category, german_comfort, available_from,
   current_status, submitted_at, updated_at`. **`employer_seen_at` is not in
   this return list** (confirmed by reading the SQL directly) — Section 10,
-  item #4.
+  item #5.
 - **Filtering:** `?vacancy=` and `?status=` query-param filters **already
   exist and work today** (`application-list-filters.tsx`,
   `parse-list-filters.ts`, RPC params `p_vacancy_id`/`p_status`). The
@@ -370,7 +370,8 @@ throughout this plan rather than re-derived from scratch.
   "Open" (submitted/reviewing/shortlisted) and "Decided"
   (accepted/rejected) are derivable today from `current_status`, already
   loaded, zero new queries. "Needs review" (unseen) is **not** derivable
-  today — blocked on the additive RPC change in item #4.
+  today — blocked on the additive RPC change in item #5 (now RESOLVED —
+  kept, per Founder Ruling #6).
 
 ### `/employer/applications/[applicationId]`
 
@@ -398,7 +399,7 @@ throughout this plan rather than re-derived from scratch.
   15 August", "Reviewing 17 August").
 - **`employer_seen_at` / "First opened":** not currently included in this
   RPC's projection (confirmed: its `SELECT`/jsonb-build list has no
-  `employer_seen_at` key) — Section 10, item #3.
+  `employer_seen_at` key) — Section 10, item #4.
 - **Current status-action UI:** a **single `<select>` dropdown** populated
   only with `allowedTransitions` (so there is no dead/no-op option today) +
   one generic "Update status" submit button
@@ -697,7 +698,7 @@ components that would have consumed it (Ruling #7).
 ### Task A: Applications list grouping (Needs review / Open / Decided)
 
 **Depends on:** the additive `employer_seen_at` projection change to
-`list_current_employer_applications` (Section 10, item #4) landing first,
+`list_current_employer_applications` (Section 10, item #5) landing first,
 with its own migration diffed against the original function and the full
 RPC test suite passing before this task starts.
 
@@ -936,7 +937,7 @@ git commit -m "feat(employer-applications): discrete status-action buttons with 
 ### Task D: "First opened" on the application detail page
 
 **Depends on:** the additive `employer_seen_at` projection change to
-`get_current_employer_application` (Section 10, item #3) — read the full
+`get_current_employer_application` (Section 10, item #4) — read the full
 current function body first, diff, rerun the RPC/e2e suite before touching
 any frontend code.
 
