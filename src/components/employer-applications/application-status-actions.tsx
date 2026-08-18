@@ -3,18 +3,19 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 
 import { transitionEmployerApplicationAction } from "@/app/employer/applications/[applicationId]/transition-actions";
+import { StatusTransitionConfirmDialog } from "@/components/employer-applications/status-transition-confirm-dialog";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import {
   APPLICATION_ALREADY_IN_STATE,
   APPLICATION_GENERIC_FAILURE,
   APPLICATION_INCOMPLETE_EMPLOYER,
   APPLICATION_INVALID_TRANSITION,
-  APPLICATION_REASON_MAX_LENGTH,
   APPLICATION_TERMINAL_STATE,
   APPLICATION_UNAVAILABLE,
 } from "@/lib/employer/applications/messages";
 import {
   applicationStatusLabel,
+  employerApplicationActionLabel,
   type ApplicationStatus,
 } from "@/lib/employer/applications/status";
 import {
@@ -22,11 +23,24 @@ import {
   type TransitionApplicationActionState,
 } from "@/lib/employer/applications/transition-action-state";
 
-type ApplicationTransitionFormProps = {
+type ApplicationStatusActionsProps = {
   applicationId: string;
   currentStatus: ApplicationStatus;
   allowedTransitions: ApplicationStatus[];
 };
+
+type TerminalTransition = "accepted" | "rejected";
+
+const TERMINAL_TRANSITIONS = new Set<ApplicationStatus>([
+  "accepted",
+  "rejected",
+]);
+
+function isTerminalTransition(
+  status: ApplicationStatus,
+): status is TerminalTransition {
+  return TERMINAL_TRANSITIONS.has(status);
+}
 
 function renderFeedback(state: TransitionApplicationActionState) {
   switch (state.kind) {
@@ -75,31 +89,48 @@ function renderFeedback(state: TransitionApplicationActionState) {
 /**
  * Renders only the statuses the database's `allowed_transitions` already
  * approved (D-070) — this component never recomputes the transition
- * matrix. The rejection-reason field is shown only while the selected
- * target is "rejected" and is cleared whenever the target changes away
- * from it, so a stale reason is never carried into an unrelated
- * transition.
+ * matrix. Ordinary transitions submit the shared form directly; the two
+ * terminal transitions (`accepted`/`rejected`) open
+ * `StatusTransitionConfirmDialog` first, whose own confirm button is the
+ * real submit control for the same form (see that component's doc
+ * comment for why it renders no `<form>` of its own).
  */
-export function ApplicationTransitionForm({
+export function ApplicationStatusActions({
   applicationId,
   currentStatus,
   allowedTransitions,
-}: ApplicationTransitionFormProps) {
+}: ApplicationStatusActionsProps) {
   const [state, formAction, pending] = useActionState(
     transitionEmployerApplicationAction,
     initialTransitionActionState,
   );
-  const [targetStatus, setTargetStatus] = useState<ApplicationStatus | "">(
-    allowedTransitions[0] ?? "",
-  );
-  const [reason, setReason] = useState("");
+  const [pendingTerminal, setPendingTerminal] =
+    useState<TerminalTransition | null>(null);
   const feedbackRef = useRef<HTMLDivElement>(null);
+  const openerRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (state.kind !== "idle") {
       feedbackRef.current?.focus();
     }
   }, [state]);
+
+  // Auto-close the dialog once its submission resolves (pending goes from
+  // true back to false) — the dialog otherwise has no signal that its own
+  // submit already completed.
+  const wasPending = useRef(pending);
+  useEffect(() => {
+    if (wasPending.current && !pending) {
+      setPendingTerminal(null);
+    }
+    wasPending.current = pending;
+  }, [pending]);
+
+  useEffect(() => {
+    if (pendingTerminal === null) {
+      openerRef.current?.focus();
+    }
+  }, [pendingTerminal]);
 
   if (allowedTransitions.length === 0) {
     return (
@@ -115,12 +146,11 @@ export function ApplicationTransitionForm({
     );
   }
 
-  function handleTargetChange(value: string) {
-    setTargetStatus(value as ApplicationStatus);
-    if (value !== "rejected") {
-      setReason("");
-    }
-  }
+  const ordinaryTransitions = allowedTransitions.filter(
+    (status) => !isTerminalTransition(status),
+  );
+  const terminalTransitions = allowedTransitions.filter(isTerminalTransition);
+  const dialogOpen = pendingTerminal !== null;
 
   return (
     <section className={styles.section} aria-labelledby="transition-heading">
@@ -133,56 +163,57 @@ export function ApplicationTransitionForm({
 
       <form className={styles.form} action={formAction} noValidate>
         <input type="hidden" name="applicationId" value={applicationId} />
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="target-status">
-            New status
-          </label>
-          <select
-            id="target-status"
-            className={styles.select}
-            name="targetStatus"
-            value={targetStatus}
-            onChange={(event) => handleTargetChange(event.target.value)}
-            disabled={pending}
-          >
-            {allowedTransitions.map((status) => (
-              <option key={status} value={status}>
-                {applicationStatusLabel(status)}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {targetStatus === "rejected" ? (
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="reason">
-              Reason (optional)
-            </label>
-            <textarea
-              id="reason"
-              className={styles.textarea}
-              name="reason"
-              maxLength={APPLICATION_REASON_MAX_LENGTH}
-              value={reason}
-              onChange={(event) => setReason(event.target.value)}
-              disabled={pending}
-            />
-          </div>
-        ) : null}
 
         <div ref={feedbackRef} tabIndex={-1}>
           {renderFeedback(state)}
         </div>
 
-        <div className={styles.actions}>
-          <button
-            className={styles.button}
-            type="submit"
-            disabled={pending || targetStatus === ""}
-          >
-            {pending ? "Updating…" : "Update status"}
-          </button>
+        <div className={`${styles.actions} ${styles.statusActionsGroup}`}>
+          {ordinaryTransitions.map((status) => (
+            <button
+              key={status}
+              type="submit"
+              name="targetStatus"
+              value={status}
+              className={styles.button}
+              disabled={pending || dialogOpen}
+            >
+              {employerApplicationActionLabel(status)}
+            </button>
+          ))}
         </div>
+
+        {terminalTransitions.length > 0 ? (
+          <>
+            <hr className={styles.divider} />
+            <div className={`${styles.actions} ${styles.statusActionsGroup}`}>
+              {terminalTransitions.map((status) => (
+                <button
+                  key={status}
+                  type="button"
+                  className={
+                    status === "rejected" ? styles.buttonDanger : styles.button
+                  }
+                  disabled={pending || dialogOpen}
+                  onClick={(event) => {
+                    openerRef.current = event.currentTarget;
+                    setPendingTerminal(status);
+                  }}
+                >
+                  {employerApplicationActionLabel(status)}
+                </button>
+              ))}
+            </div>
+          </>
+        ) : null}
+
+        {pendingTerminal !== null ? (
+          <StatusTransitionConfirmDialog
+            targetStatus={pendingTerminal}
+            pending={pending}
+            onCancel={() => setPendingTerminal(null)}
+          />
+        ) : null}
       </form>
     </section>
   );

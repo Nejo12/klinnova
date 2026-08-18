@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 import { ApplicationOutcomeHistory } from "@/components/employer-applications/application-outcome-history";
+import { ApplicationStatusActions } from "@/components/employer-applications/application-status-actions";
 import { ApplicationStatusHistory } from "@/components/employer-applications/application-status-history";
-import { ApplicationTransitionForm } from "@/components/employer-applications/application-transition-form";
 import { RecordOutcomeForm } from "@/components/employer-applications/record-outcome-form";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import { formatApplicationTimestamp } from "@/lib/employer/applications/format-timestamp";
@@ -83,7 +83,7 @@ export function ApplicationDetail({
               </dd>
             </div>
             <div>
-              <dt>Work authorisation</dt>
+              <dt>Work permission</dt>
               <dd>
                 {application.work_authorisation_declared
                   ? "Declared"
@@ -99,22 +99,22 @@ export function ApplicationDetail({
               </dd>
             </div>
             <div>
+              <dt>Availability</dt>
+              <dd>
+                {application.shift_preferences.length === 0
+                  ? "None declared"
+                  : application.shift_preferences
+                      .map((code) => shiftLabel(code))
+                      .join(", ")}
+              </dd>
+            </div>
+            <div>
               <dt>Employment types</dt>
               <dd>
                 {application.employment_types.length === 0
                   ? "None declared"
                   : application.employment_types
                       .map((code) => employmentTypeLabel(code))
-                      .join(", ")}
-              </dd>
-            </div>
-            <div>
-              <dt>Shift preferences</dt>
-              <dd>
-                {application.shift_preferences.length === 0
-                  ? "None declared"
-                  : application.shift_preferences
-                      .map((code) => shiftLabel(code))
                       .join(", ")}
               </dd>
             </div>
@@ -144,7 +144,14 @@ export function ApplicationDetail({
 
       <ApplicationStatusHistory entries={application.status_history} />
 
-      <ApplicationTransitionForm
+      {application.employer_seen_at !== null ? (
+        <p className={styles.support}>
+          First opened{" "}
+          {formatApplicationTimestamp(application.employer_seen_at)}
+        </p>
+      ) : null}
+
+      <ApplicationStatusActions
         key={`${application.application_id}-${application.current_status}`}
         applicationId={application.application_id}
         currentStatus={application.current_status}

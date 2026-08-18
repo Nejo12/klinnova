@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(242);
+select plan(246);
 
 -- ---------------------------------------------------------------------------
 -- Fixtures
@@ -1112,6 +1112,41 @@ select is(
   jsonb_array_length(public.get_current_employer_application('a3000000-0000-4000-8000-0000000000a1') -> 'status_history'),
   2,
   'employer X''s applicant detail still returns the full preserved status history for a deleted candidate'
+);
+select is(
+  (select employer_seen_at from public.list_current_employer_applications() where application_id = 'a3000000-0000-4000-8000-0000000000a1'),
+  null,
+  'employer X''s applicant list projects employer_seen_at as null for the deleted candidate''s row, before the employer has ever opened it'
+);
+select is(
+  (public.get_current_employer_application('a3000000-0000-4000-8000-0000000000a1') ->> 'employer_seen_at'),
+  null,
+  'employer X''s applicant detail projects employer_seen_at as null for a deleted candidate''s application, before the employer has ever opened it'
+);
+
+reset role;
+
+-- Direct fixture mutation (superuser context, outside RLS — this file's own
+-- convention, e.g. the raw table reads elsewhere in this section) to prove
+-- both RPCs project a real employer_seen_at timestamp, not just null, even
+-- for a deleted candidate's preserved application.
+update public.applications
+set employer_seen_at = '2026-08-10T09:30:00+00'::timestamptz
+where id = 'a3000000-0000-4000-8000-0000000000a1';
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub','a3000000-0000-4000-8000-000000000005',true);
+select set_config('request.jwt.claims','{"sub":"a3000000-0000-4000-8000-000000000005","role":"authenticated"}',true);
+
+select is(
+  (select employer_seen_at from public.list_current_employer_applications() where application_id = 'a3000000-0000-4000-8000-0000000000a1'),
+  '2026-08-10T09:30:00+00'::timestamptz,
+  'employer X''s applicant list projects the real employer_seen_at timestamp once set, even for a deleted candidate''s row'
+);
+select is(
+  (public.get_current_employer_application('a3000000-0000-4000-8000-0000000000a1') ->> 'employer_seen_at')::timestamptz,
+  '2026-08-10T09:30:00+00'::timestamptz,
+  'employer X''s applicant detail projects the real employer_seen_at timestamp once set, even for a deleted candidate''s application'
 );
 
 reset role;

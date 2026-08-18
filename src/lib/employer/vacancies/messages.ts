@@ -28,6 +28,17 @@ export const VACANCY_PRIVATE_HOME_WARNING =
 export const VACANCY_EMPTY_LIST =
   "You have no vacancies yet. Create a private draft to start describing a role.";
 
+// ---------------------------------------------------------------------------
+// P3 employer presentation — vacancies-list empty states (Task H).
+// ---------------------------------------------------------------------------
+
+export const VACANCY_VERIFICATION_EMPTY_HEADING = "Verification not finished";
+
+export const VACANCY_VERIFICATION_EMPTY_SUPPORT =
+  "You can prepare and save vacancies now. Publishing opens once your company is verified.";
+
+export const VACANCY_VERIFICATION_EMPTY_ACTION = "Continue verification";
+
 export const VACANCY_LIST_LEAD =
   "Create private vacancy drafts, then publish once verified. Manage the full lifecycle — pause, resume, mark filled, or withdraw — from here.";
 

@@ -59,6 +59,7 @@ const readyPayload = {
       occurred_at: "2026-08-01T00:00:00Z",
     },
   ],
+  employer_seen_at: null,
 };
 
 describe("loadEmployerApplication", () => {
@@ -204,6 +205,7 @@ describe("loadEmployerApplication", () => {
             occurred_at: "2026-08-01T00:00:00Z",
           },
         ],
+        employer_seen_at: null,
       },
       error: null,
     });

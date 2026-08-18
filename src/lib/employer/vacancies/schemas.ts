@@ -10,6 +10,7 @@ import {
 import { eurStringToCents } from "@/lib/employer/vacancies/salary";
 import {
   EMPLOYMENT_TYPE_CODES,
+  GERMAN_COMFORT_CODES,
   JOB_CATEGORY_CODES,
   LANGUAGE_CODES,
   LANGUAGE_PROFICIENCY_CODES,
@@ -60,6 +61,26 @@ const optionalEnum = <T extends string>(codes: readonly [T, ...T[]]) =>
       }
       return value as T;
     });
+
+/**
+ * A radio group's "no value chosen yet" state is an empty string (missing
+ * FormData key) or `undefined` (key omitted from a direct object, as in
+ * tests) — never a legitimate "unset" domain value, since every real radio
+ * group always has a default-checked option. Both collapse to `fallback`,
+ * matching the RPC's own server-side default.
+ */
+const enumWithDefault = <T extends string>(
+  codes: readonly [T, ...T[]],
+  fallback: T,
+) =>
+  z
+    .string()
+    .optional()
+    .transform((value) => {
+      const trimmed = (value ?? "").trim();
+      return trimmed.length === 0 ? fallback : trimmed;
+    })
+    .pipe(z.enum(codes));
 
 const optionalUniqueArrayEnum = <T extends string>(
   codes: readonly [T, ...T[]],
@@ -210,6 +231,7 @@ export const createDraftVacancyFormSchema = z.object({
   workFrequency: optionalEnum(WORK_FREQUENCY_CODES),
   availableFrom: optionalIsoDate,
   experienceNotes: optionalTrimmed(2000),
+  germanRequirement: enumWithDefault(GERMAN_COMFORT_CODES, "none"),
   cvRequired: optionalBooleanFromForm,
   interviewEnglishOk: optionalBooleanFromForm,
   employmentTypes: optionalUniqueArrayEnum(EMPLOYMENT_TYPE_CODES),
@@ -232,6 +254,7 @@ export const updateDraftVacancyFormSchema = z.object({
   availableFrom: optionalIsoDate,
   clearAvailableFrom: z.boolean().default(false),
   experienceNotes: optionalTrimmed(2000),
+  germanRequirement: enumWithDefault(GERMAN_COMFORT_CODES, "none"),
   cvRequired: booleanFromForm,
   interviewEnglishOk: booleanFromForm,
   employmentTypes: optionalUniqueArrayEnum(EMPLOYMENT_TYPE_CODES),

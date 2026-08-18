@@ -36,3 +36,18 @@ export const EMPLOYER_RESTRICTED_VERIFICATION =
 
 export const EMPLOYER_VACANCY_HIDDEN_WHILE_RESTRICTED =
   "Hidden while account is restricted";
+
+// ---------------------------------------------------------------------------
+// P3 employer home — attention slot, "needs your action" side card, mini-list
+// ---------------------------------------------------------------------------
+
+/** Attention-slot heading when there are unopened applications. Precedence:
+ * unseen applications beat the readiness/verification card (Task F). */
+export function unseenApplicationsHeading(count: number): string {
+  const noun = count === 1 ? "application" : "applications";
+  return `${count} ${noun} you have not opened`;
+}
+
+export const EMPLOYER_ATTENTION_VACANCIES_HEADING = "Needs your action";
+
+export const EMPLOYER_VACANCIES_MINI_LIST_HEADING = "Your vacancies";

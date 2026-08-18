@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock(
@@ -55,6 +55,7 @@ function buildApplication(overrides: Partial<LiveDetail> = {}): LiveDetail {
         occurred_at: "2026-08-01T00:00:00Z",
       },
     ],
+    employer_seen_at: null,
     ...overrides,
   };
 }
@@ -80,6 +81,7 @@ function buildDeletedApplication(
         occurred_at: "2026-08-01T00:00:00Z",
       },
     ],
+    employer_seen_at: null,
     ...overrides,
   };
 }
@@ -140,6 +142,30 @@ describe("ApplicationDetail", () => {
     ).toBeNull();
   });
 
+  it("renders discrete status-action buttons (not a dropdown) for an application with allowed transitions", () => {
+    render(
+      <ApplicationDetail
+        application={buildApplication()}
+        outcomes={[]}
+        todayIso={TODAY_ISO}
+      />,
+    );
+    const statusSection = screen
+      .getByRole("heading", { level: 2, name: "Status" })
+      .closest("section");
+    expect(statusSection?.querySelector("select")).toBeNull();
+    expect(
+      within(statusSection as HTMLElement).getByRole("button", {
+        name: "Start reviewing",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(statusSection as HTMLElement).getByRole("button", {
+        name: "Reject application",
+      }),
+    ).toBeInTheDocument();
+  });
+
   it("renders a terminal message with no transition form when there are no allowed transitions", () => {
     render(
       <ApplicationDetail
@@ -161,6 +187,30 @@ describe("ApplicationDetail", () => {
     expect(statusSection?.querySelector("select")).toBeNull();
   });
 
+  it("renders 'First opened' with a formatted date when employer_seen_at is set", () => {
+    render(
+      <ApplicationDetail
+        application={buildApplication({
+          employer_seen_at: "2026-08-15T09:30:00Z",
+        })}
+        outcomes={[]}
+        todayIso={TODAY_ISO}
+      />,
+    );
+    expect(screen.getByText(/First opened/)).toBeInTheDocument();
+  });
+
+  it("renders no 'First opened' text when employer_seen_at is null", () => {
+    render(
+      <ApplicationDetail
+        application={buildApplication({ employer_seen_at: null })}
+        outcomes={[]}
+        todayIso={TODAY_ISO}
+      />,
+    );
+    expect(screen.queryByText(/First opened/)).toBeNull();
+  });
+
   it("shows a neutral deleted-candidate state with no fabricated attributes", () => {
     render(
       <ApplicationDetail
@@ -176,9 +226,9 @@ describe("ApplicationDetail", () => {
     expect(screen.queryByText("Matched category")).toBeNull();
     expect(screen.queryByText("German comfort")).toBeNull();
     expect(screen.queryByText("Languages")).toBeNull();
-    expect(screen.queryByText("Work authorisation")).toBeNull();
+    expect(screen.queryByText("Work permission")).toBeNull();
     expect(screen.queryByText("Employment types")).toBeNull();
-    expect(screen.queryByText("Shift preferences")).toBeNull();
+    expect(screen.queryByText("Availability")).toBeNull();
   });
 
   it("still renders the vacancy section and status history for a deleted candidate's preserved application", () => {

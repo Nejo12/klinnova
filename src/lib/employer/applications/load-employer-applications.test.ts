@@ -44,6 +44,7 @@ const row = {
   current_status: "submitted",
   submitted_at: "2026-08-01T00:00:00Z",
   updated_at: "2026-08-01T00:00:00Z",
+  employer_seen_at: null,
 };
 
 describe("loadEmployerApplications", () => {
@@ -167,6 +168,7 @@ describe("loadEmployerApplications", () => {
       current_status: "submitted",
       submitted_at: "2026-08-01T00:00:00Z",
       updated_at: "2026-08-01T00:00:00Z",
+      employer_seen_at: null,
     };
     rpc.mockResolvedValue({ data: [deletedRow], error: null });
 

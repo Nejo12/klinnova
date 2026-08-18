@@ -26,6 +26,7 @@ export type EmployerDraftDetail = {
   workFrequency: string | null;
   availableFrom: string | null;
   experienceNotes: string | null;
+  germanRequirement: string;
   cvRequired: boolean | null;
   interviewEnglishOk: boolean | null;
   employmentTypes: string[];
@@ -94,6 +95,7 @@ export async function loadEmployerDraft(
       work_frequency,
       available_from,
       experience_notes,
+      german_requirement,
       cv_required,
       interview_english_ok,
       employment_types,
@@ -185,6 +187,7 @@ export async function loadEmployerDraft(
       workFrequency: row.work_frequency,
       availableFrom: row.available_from,
       experienceNotes: row.experience_notes,
+      germanRequirement: row.german_requirement,
       cvRequired: row.cv_required,
       interviewEnglishOk: row.interview_english_ok,
       employmentTypes: row.employment_types,

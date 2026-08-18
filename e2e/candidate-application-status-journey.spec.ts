@@ -14,7 +14,12 @@ async function openEmployerApplicationDetail(
   employerPage: import("@playwright/test").Page,
 ) {
   await employerPage.goto("/employer/applications");
-  await employerPage.getByRole("link", { name: "Review" }).click();
+  // Task A's applications list intentionally shows a row in more than one
+  // group when it's both unseen and open (needsReview/open are orthogonal
+  // axes, not exclusive buckets) — a freshly-submitted application is
+  // both, so this identical "Review" link (same href) legitimately
+  // appears twice; .first() is the correct scoping.
+  await employerPage.getByRole("link", { name: "Review" }).first().click();
   await expect(employerPage).toHaveURL(
     /\/employer\/applications\/[0-9a-f-]{36}$/,
     { timeout: 15_000 },

@@ -32,6 +32,28 @@ export function applicationStatusLabel(status: ApplicationStatus): string {
   return APPLICATION_STATUS_LABELS[status];
 }
 
+/**
+ * Target-status -> action-verb label for the discrete status-action
+ * buttons (distinct from `applicationStatusLabel`, which is a status ->
+ * noun label). `submitted` never appears as a real transition target —
+ * the database's transition-matrix helper never returns it — so its
+ * entry here is dead code required only to satisfy the `Record`'s
+ * exhaustiveness.
+ */
+const APPLICATION_ACTION_LABELS: Record<ApplicationStatus, string> = {
+  submitted: "Reset to submitted",
+  reviewing: "Start reviewing",
+  shortlisted: "Shortlist",
+  accepted: "Accept",
+  rejected: "Reject application",
+};
+
+export function employerApplicationActionLabel(
+  status: ApplicationStatus,
+): string {
+  return APPLICATION_ACTION_LABELS[status];
+}
+
 export function isApplicationStatus(value: string): value is ApplicationStatus {
   return (APPLICATION_STATUS_CODES as readonly string[]).includes(value);
 }

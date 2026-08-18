@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(90);
+select plan(92);
 
 -- ---------------------------------------------------------------------------
 -- Fixtures
@@ -398,9 +398,31 @@ select ok(
   'detail projection never includes candidate_id'
 );
 select is(
+  (public.get_current_employer_application((select id from app_ids where label = 'app_one'))->>'employer_seen_at'),
+  null,
+  'detail projects employer_seen_at as null before the employer has ever opened the application'
+);
+select is(
   (public.get_current_employer_application('00000000-0000-4000-8000-000000000000')->>'status'),
   'unavailable',
   'unknown application id is unavailable'
+);
+reset role;
+
+-- Direct fixture mutation (superuser context, outside RLS — mirrors this
+-- file's existing direct-table-access convention elsewhere) to prove
+-- get_current_employer_application projects a real employer_seen_at
+-- timestamp, not just null, once the column is actually set.
+update public.applications
+set employer_seen_at = '2026-08-15T10:00:00+00'::timestamptz
+where id = (select id from app_ids where label = 'app_one');
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub','c6100000-0000-4000-8000-000000000001',true);
+select is(
+  (public.get_current_employer_application((select id from app_ids where label = 'app_one'))->>'employer_seen_at')::timestamptz,
+  '2026-08-15T10:00:00+00'::timestamptz,
+  'detail projects employer_seen_at as the real timestamp once the employer has opened it'
 );
 reset role;
 

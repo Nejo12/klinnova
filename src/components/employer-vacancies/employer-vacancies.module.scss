@@ -152,13 +152,62 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  scroll-margin-top: 4.5rem;
+}
+
+.fieldset + .fieldset {
+  margin-top: var(--space-3);
+  padding-top: var(--space-6);
+  border-top: var(--border-width-default) solid var(--color-border-default);
 }
 
 .legend {
-  margin: 0 0 var(--space-2);
+  margin: 0 0 var(--space-3);
   padding: 0;
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--type-heading-tracking);
+  color: var(--color-text-primary);
+}
+
+.sectionNav {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  padding: var(--space-2) 0;
+  background-color: var(--color-bg-page);
+  border-bottom: var(--border-width-default) solid var(--color-border-default);
+}
+
+.sectionNavList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sectionNavLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--color-action-subtle);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.sectionNavLink:hover {
+  color: var(--color-text-primary);
+}
+
+.sectionNavLink:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
   color: var(--color-text-primary);
 }
 
@@ -240,6 +289,27 @@
   cursor: not-allowed;
 }
 
+// D-017 (Task I): a handful of call sites apply `.buttonSecondary` /
+// `.buttonDanger` on their own, without also combining `.button` (unlike
+// most usages, which do `${styles.button} ${styles.buttonSecondary}`) —
+// e.g. `StatusTransitionConfirmDialog`'s Cancel button and
+// `ApplicationStatusActions`'s terminal-reject button. Without `.button`'s
+// own min-height/padding/border-radius, those buttons fall back to the
+// browser's default ~28px button box, well under `--touch-target-min`.
+// Duplicating the base box model here (identical values to `.button`, so
+// combined usages render unchanged) makes both classes self-sufficient —
+// required for the narrow-width full-width-stacked treatment below to
+// actually meet the touch-target minimum.
+.buttonSecondary,
+.buttonDanger {
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
 .buttonSecondary {
   background-color: transparent;
   color: var(--color-text-primary);
@@ -249,6 +319,7 @@
 .buttonDanger {
   background-color: var(--color-status-danger);
   color: var(--color-action-primary-text);
+  border: none;
 }
 
 .linkButton {
@@ -345,6 +416,16 @@
   gap: var(--space-3);
 }
 
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
+}
+
 .sectionHeading {
   margin: 0;
   font-size: var(--font-size-md);
@@ -359,6 +440,32 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
+}
+
+// Readiness-checklist-specific badge (Task K) — deliberately a distinct
+// class from .readyBadge above, which vacancy-lifecycle-status.tsx's
+// unrelated Status pill also uses; sharing one class here previously leaked
+// this pill/color-coded styling into that pill without either component
+// intending it.
+.readinessStatusBadge {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.readinessStatusBadge[data-ready="true"] {
+  background-color: var(--color-status-success-bg);
+  color: var(--color-status-success);
+}
+
+.readinessStatusBadge[data-ready="false"] {
+  background-color: var(--color-status-warning-bg);
+  color: var(--color-status-warning);
 }
 
 .input:focus-visible,
@@ -394,4 +501,111 @@
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+
+.divider {
+  width: 100%;
+  margin: 0;
+  border: none;
+  border-top: var(--border-width-default) solid var(--color-border-default);
+}
+
+.dialogOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  // Deliberate literal, not an untokenized oversight: rgb(33 26 27) is the
+  // same ink color as --color-ink-900 (src/styles/tokens.css, also used by
+  // --shadow-sm/--shadow-md), at 45% opacity for a dialog-backdrop scrim.
+  // No existing token represents "ink at 45% opacity" as a standalone
+  // value — --shadow-sm/--shadow-md are shadow definitions, not backdrop
+  // colors — so there is no token to reference here.
+  background-color: rgb(33 26 27 / 0.45);
+}
+
+.dialogPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 28rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.dialogHeading {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.dialogHeading:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+// Modifier applied alongside `.actions` only on the two
+// `ApplicationStatusActions` button groups (ordinary transitions,
+// terminal transitions) and `StatusTransitionConfirmDialog`'s
+// Cancel/Confirm row — never on `.actions` generally, which also renders
+// plain link-style row actions (vacancy/application list Manage/Edit/
+// Delete/Review) and single-button wrappers that already read fine
+// unstacked at every required width. Scoping the narrow-width
+// full-width-stack treatment to this modifier keeps those other `.actions`
+// call sites untouched.
+@media (max-width: $breakpoint-sm) {
+  .statusActionsGroup {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .statusActionsGroup > * {
+    width: 100%;
+  }
+}
+
+// Task I — narrow-width (< $breakpoint-sm) treatments. Required widths
+// 360/390/430 all fall below $breakpoint-sm (480px); 768/1280/1440 do not,
+// so none of this applies at the desktop/tablet widths.
+@media (max-width: $breakpoint-sm) {
+  // `.listItem` is shared by the vacancy list, application list, and the
+  // employer-home mini-lists (all render `<ul class="list"><li
+  // class="listItem">`) — a single narrow-width card treatment covers all
+  // three surfaces without touching their markup. Replaces the desktop
+  // top-border-only row with a full bordered, padded card so each vacancy/
+  // application reads as a distinct stacked card, per Task I's per-surface
+  // brief for vacancy-list.tsx and application-list.tsx.
+  .listItem {
+    padding: var(--space-4);
+    border: var(--border-width-default) solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-surface);
+  }
+
+  // Bottom sheet: `StatusTransitionConfirmDialog`'s panel repositions to
+  // the bottom of the viewport instead of the centered modal.
+  // `.dialogOverlay` is untouched (still a full-viewport dimmed backdrop);
+  // taking `.dialogPanel` out of its centered-flex layout via `position:
+  // fixed` is sufficient on its own. CSS-only — no change to the
+  // component's focus handling, Escape-key listener, or DOM structure.
+  .dialogPanel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
 }

@@ -188,6 +188,29 @@ describe("vacancy draft schemas", () => {
     expect(parsed.success).toBe(true);
   });
 
+  it("accepts the real 4-value German requirement domain and rejects CEFR values", () => {
+    expect(
+      createDraftVacancyFormSchema.safeParse({
+        ...minimalCreatePayload,
+        germanRequirement: "comfortable",
+      }).success,
+    ).toBe(true);
+    expect(
+      createDraftVacancyFormSchema.safeParse({
+        ...minimalCreatePayload,
+        germanRequirement: "b1",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("defaults germanRequirement to 'none' when omitted, matching the RPC's own default", () => {
+    const parsed = createDraftVacancyFormSchema.safeParse(minimalCreatePayload);
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.germanRequirement).toBe("none");
+    }
+  });
+
   it("accepts update with UUID and required fields", () => {
     const parsed = updateDraftVacancyFormSchema.safeParse({
       vacancyId: "22222222-2222-4222-8222-222222222201",

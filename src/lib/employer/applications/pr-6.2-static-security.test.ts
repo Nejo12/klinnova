@@ -22,7 +22,8 @@ const EMPLOYER_APPLICATION_REVIEW_FILES = [
   "src/components/employer-applications/application-list-filters.tsx",
   "src/components/employer-applications/application-detail.tsx",
   "src/components/employer-applications/application-status-history.tsx",
-  "src/components/employer-applications/application-transition-form.tsx",
+  "src/components/employer-applications/application-status-actions.tsx",
+  "src/components/employer-applications/status-transition-confirm-dialog.tsx",
   "src/components/employer-applications/application-unavailable.tsx",
 ] as const;
 
