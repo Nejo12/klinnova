@@ -15,15 +15,17 @@ type VacancyListProps = {
   drafts: EmployerDraftListItem[];
 };
 
-const STATE_LABELS: Record<EmployerDraftListItem["publicationState"], string> =
-  {
-    draft: "Private draft",
-    published: "Published",
-    paused: "Paused",
-    filled: "Filled",
-    expired: "Expired",
-    withdrawn: "Withdrawn",
-  };
+export const STATE_LABELS: Record<
+  EmployerDraftListItem["publicationState"],
+  string
+> = {
+  draft: "Private draft",
+  published: "Published",
+  paused: "Paused",
+  filled: "Filled",
+  expired: "Expired",
+  withdrawn: "Withdrawn",
+};
 
 function formatUpdatedAt(value: string): string {
   const date = new Date(value);
@@ -47,7 +49,7 @@ function formatExpiresAt(value: string | null): string | null {
   return new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" }).format(date);
 }
 
-function statusLabel(draft: EmployerDraftListItem): string {
+export function statusLabel(draft: EmployerDraftListItem): string {
   const base = STATE_LABELS[draft.publicationState];
   if (draft.publicationState === "published" && draft.isEffectivelyExpired) {
     return `${base} — effectively expired`;
