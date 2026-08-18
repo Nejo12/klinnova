@@ -27,7 +27,7 @@ export function EmployerEmptyState({
 }: EmployerEmptyStateProps) {
   return (
     <section className={styles.empty} aria-labelledby={headingId} role="status">
-      <h2 className={styles.emptyHeading} id={headingId}>
+      <h2 className={styles.sectionHeading} id={headingId}>
         {heading}
       </h2>
       {support !== undefined ? (
