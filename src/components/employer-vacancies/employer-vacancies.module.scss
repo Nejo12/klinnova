@@ -413,6 +413,20 @@
 
 .readyBadge {
   display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+// Readiness-checklist-specific badge (Task K) — deliberately a distinct
+// class from .readyBadge above, which vacancy-lifecycle-status.tsx's
+// unrelated Status pill also uses; sharing one class here previously leaked
+// this pill/color-coded styling into that pill without either component
+// intending it.
+.readinessStatusBadge {
+  display: inline-flex;
   align-self: flex-start;
   align-items: center;
   min-height: var(--touch-target-min);
@@ -422,12 +436,12 @@
   font-weight: var(--font-weight-semibold);
 }
 
-.readyBadge[data-ready="true"] {
+.readinessStatusBadge[data-ready="true"] {
   background-color: var(--color-status-success-bg);
   color: var(--color-status-success);
 }
 
-.readyBadge[data-ready="false"] {
+.readinessStatusBadge[data-ready="false"] {
   background-color: var(--color-status-warning-bg);
   color: var(--color-status-warning);
 }

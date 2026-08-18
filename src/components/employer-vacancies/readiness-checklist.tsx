@@ -44,7 +44,7 @@ export function ReadinessChecklist({
       ) : (
         <>
           <p
-            className={styles.readyBadge}
+            className={styles.readinessStatusBadge}
             data-ready={ready ? "true" : "false"}
             role="status"
           >
