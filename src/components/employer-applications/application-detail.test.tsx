@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock(
@@ -138,6 +138,30 @@ describe("ApplicationDetail", () => {
     expect(
       screen.queryByText("11111111-1111-4111-8111-111111111111"),
     ).toBeNull();
+  });
+
+  it("renders discrete status-action buttons (not a dropdown) for an application with allowed transitions", () => {
+    render(
+      <ApplicationDetail
+        application={buildApplication()}
+        outcomes={[]}
+        todayIso={TODAY_ISO}
+      />,
+    );
+    const statusSection = screen
+      .getByRole("heading", { level: 2, name: "Status" })
+      .closest("section");
+    expect(statusSection?.querySelector("select")).toBeNull();
+    expect(
+      within(statusSection as HTMLElement).getByRole("button", {
+        name: "Start reviewing",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(statusSection as HTMLElement).getByRole("button", {
+        name: "Reject application",
+      }),
+    ).toBeInTheDocument();
   });
 
   it("renders a terminal message with no transition form when there are no allowed transitions", () => {

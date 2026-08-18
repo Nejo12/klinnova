@@ -4,6 +4,7 @@ import {
   APPLICATION_STATUS_CODES,
   applicationStatusLabel,
   applicationStatusSchema,
+  employerApplicationActionLabel,
   isApplicationStatus,
 } from "@/lib/employer/applications/status";
 
@@ -47,5 +48,21 @@ describe("application status contract", () => {
   it("isApplicationStatus narrows only known statuses", () => {
     expect(isApplicationStatus("accepted")).toBe(true);
     expect(isApplicationStatus("withdrawn")).toBe(false);
+  });
+});
+
+describe("employerApplicationActionLabel", () => {
+  it("labels each real target status with its action verb, distinct from the noun label", () => {
+    expect(employerApplicationActionLabel("reviewing")).toBe("Start reviewing");
+    expect(employerApplicationActionLabel("shortlisted")).toBe("Shortlist");
+    expect(employerApplicationActionLabel("accepted")).toBe("Accept");
+    expect(employerApplicationActionLabel("rejected")).toBe(
+      "Reject application",
+    );
+  });
+
+  it("does not mutate applicationStatusLabel's mapping", () => {
+    expect(applicationStatusLabel("shortlisted")).toBe("Shortlisted");
+    expect(applicationStatusLabel("rejected")).toBe("Rejected");
   });
 });
