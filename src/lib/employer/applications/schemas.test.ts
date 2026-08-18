@@ -29,6 +29,7 @@ describe("employerApplicationListRowSchema", () => {
     current_status: "submitted",
     submitted_at: "2026-08-01T00:00:00Z",
     updated_at: "2026-08-01T00:00:00Z",
+    employer_seen_at: null,
   };
 
   it("accepts a live-candidate row with every real attribute", () => {
@@ -50,6 +51,7 @@ describe("employerApplicationListRowSchema", () => {
       current_status: "submitted",
       submitted_at: "2026-08-01T00:00:00Z",
       updated_at: "2026-08-01T00:00:00Z",
+      employer_seen_at: null,
     };
     const parsed = employerApplicationListRowSchema.safeParse(deletedRow);
     expect(parsed.success).toBe(true);
@@ -71,6 +73,7 @@ describe("employerApplicationListRowSchema", () => {
       current_status: "submitted",
       submitted_at: "2026-08-01T00:00:00Z",
       updated_at: "2026-08-01T00:00:00Z",
+      employer_seen_at: null,
     });
     expect(parsed.success).toBe(false);
   });
@@ -82,6 +85,64 @@ describe("employerApplicationListRowSchema", () => {
       employerApplicationListRowSchema.safeParse(withoutJobCategory).success,
     ).toBe(false);
   });
+
+  it.each([["live", false] as const, ["deleted", true] as const])(
+    "accepts and round-trips a null employer_seen_at on the %s branch",
+    (_label, candidateDeleted) => {
+      const base = candidateDeleted
+        ? {
+            candidate_deleted: true,
+            application_id: applicationId,
+            vacancy_id: vacancyId,
+            vacancy_title: "Morning kitchen support",
+            candidate_display_name: "Deleted candidate",
+            job_category: null,
+            german_comfort: null,
+            available_from: null,
+            current_status: "submitted",
+            submitted_at: "2026-08-01T00:00:00Z",
+            updated_at: "2026-08-01T00:00:00Z",
+          }
+        : liveRow;
+      const parsed = employerApplicationListRowSchema.safeParse({
+        ...base,
+        employer_seen_at: null,
+      });
+      expect(parsed.success).toBe(true);
+      if (parsed.success) {
+        expect(parsed.data.employer_seen_at).toBeNull();
+      }
+    },
+  );
+
+  it.each([["live", false] as const, ["deleted", true] as const])(
+    "accepts and round-trips a real ISO timestamp employer_seen_at on the %s branch",
+    (_label, candidateDeleted) => {
+      const base = candidateDeleted
+        ? {
+            candidate_deleted: true,
+            application_id: applicationId,
+            vacancy_id: vacancyId,
+            vacancy_title: "Morning kitchen support",
+            candidate_display_name: "Deleted candidate",
+            job_category: null,
+            german_comfort: null,
+            available_from: null,
+            current_status: "submitted",
+            submitted_at: "2026-08-01T00:00:00Z",
+            updated_at: "2026-08-01T00:00:00Z",
+          }
+        : liveRow;
+      const parsed = employerApplicationListRowSchema.safeParse({
+        ...base,
+        employer_seen_at: "2026-08-10T09:00:00Z",
+      });
+      expect(parsed.success).toBe(true);
+      if (parsed.success) {
+        expect(parsed.data.employer_seen_at).toBe("2026-08-10T09:00:00Z");
+      }
+    },
+  );
 });
 
 describe("employerApplicationDetailSchema", () => {

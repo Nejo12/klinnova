@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import { groupEmployerApplications } from "@/lib/employer/applications/group-applications";
 import { APPLICATION_EMPTY_LIST } from "@/lib/employer/applications/messages";
 import { formatApplicationTimestamp } from "@/lib/employer/applications/format-timestamp";
 import type { EmployerApplicationListRow } from "@/lib/employer/applications/schemas";
@@ -15,9 +16,18 @@ type ApplicationListProps = {
   applications: EmployerApplicationListRow[];
 };
 
+type ApplicationListGroupProps = {
+  headingId: string;
+  heading: string;
+  rows: EmployerApplicationListRow[];
+};
+
 /**
  * Renders `list_current_employer_applications` rows in the RPC's own
  * `submitted_at desc, application_id asc` order — never re-sorted here.
+ * Rows are split into three groups (Needs review / Open / Decided) by
+ * `groupEmployerApplications`. A row can legitimately render in both
+ * "Needs review" and its status group — see that function's own doc.
  */
 export function ApplicationList({ applications }: ApplicationListProps) {
   if (applications.length === 0) {
@@ -28,49 +38,94 @@ export function ApplicationList({ applications }: ApplicationListProps) {
     );
   }
 
+  const { needsReview, open, decided } =
+    groupEmployerApplications(applications);
+
   return (
-    <ul className={styles.list}>
-      {applications.map((application) => (
-        <li key={application.application_id} className={styles.listItem}>
-          <h2 className={styles.listTitle}>
-            {application.candidate_display_name}
-          </h2>
-          <ul className={styles.meta}>
-            <li>Vacancy: {application.vacancy_title}</li>
-            {application.candidate_deleted ? null : (
-              <>
-                <li>
-                  Matched category: {jobCategoryLabel(application.job_category)}
-                </li>
-                <li>
-                  German comfort:{" "}
-                  {germanRequirementLabel(application.german_comfort)}
-                </li>
-                <li>
-                  Available from:{" "}
-                  {application.available_from === null
-                    ? "Not set"
-                    : formatIsoCalendarDate(application.available_from)}
-                </li>
-              </>
-            )}
+    <>
+      <ApplicationListGroup
+        headingId="needs-review-heading"
+        heading={`Needs review (${needsReview.length})`}
+        rows={needsReview}
+      />
+      <ApplicationListGroup
+        headingId="open-heading"
+        heading={`Open (${open.length})`}
+        rows={open}
+      />
+      <ApplicationListGroup
+        headingId="decided-heading"
+        heading={`Decided (${decided.length})`}
+        rows={decided}
+      />
+    </>
+  );
+}
+
+function ApplicationListGroup({
+  headingId,
+  heading,
+  rows,
+}: ApplicationListGroupProps) {
+  return (
+    <section className={styles.section} aria-labelledby={headingId}>
+      <h2 id={headingId} className={styles.sectionHeading}>
+        {heading}
+      </h2>
+      {rows.length > 0 ? (
+        <ul className={styles.list}>
+          {rows.map((application) => (
+            <ApplicationListRow
+              key={application.application_id}
+              application={application}
+            />
+          ))}
+        </ul>
+      ) : null}
+    </section>
+  );
+}
+
+function ApplicationListRow({
+  application,
+}: {
+  application: EmployerApplicationListRow;
+}) {
+  return (
+    <li className={styles.listItem}>
+      <h3 className={styles.listTitle}>{application.candidate_display_name}</h3>
+      <ul className={styles.meta}>
+        <li>Vacancy: {application.vacancy_title}</li>
+        {application.candidate_deleted ? null : (
+          <>
             <li>
-              Status: {applicationStatusLabel(application.current_status)}
+              Matched category: {jobCategoryLabel(application.job_category)}
             </li>
             <li>
-              Submitted: {formatApplicationTimestamp(application.submitted_at)}
+              German comfort:{" "}
+              {germanRequirementLabel(application.german_comfort)}
             </li>
-          </ul>
-          <div className={styles.actions}>
-            <Link
-              className={styles.linkButton}
-              href={`/employer/applications/${application.application_id}`}
-            >
-              Review
-            </Link>
-          </div>
+            <li>
+              Available from:{" "}
+              {application.available_from === null
+                ? "Not set"
+                : formatIsoCalendarDate(application.available_from)}
+            </li>
+          </>
+        )}
+        <li>Status: {applicationStatusLabel(application.current_status)}</li>
+        <li>
+          Submitted: {formatApplicationTimestamp(application.submitted_at)}
         </li>
-      ))}
-    </ul>
+      </ul>
+      <div className={styles.actions}>
+        <Link
+          className={styles.linkButton}
+          href={`/employer/applications/${application.application_id}`}
+        >
+          Review
+        </Link>
+      </div>
+    </li>
   );
 }

@@ -51,6 +51,7 @@ export const employerApplicationListRowSchema = z.discriminatedUnion(
       current_status: applicationStatusSchema,
       submitted_at: z.string().min(1),
       updated_at: z.string().min(1),
+      employer_seen_at: z.string().nullable(),
     }),
     z.object({
       candidate_deleted: z.literal(true),
@@ -64,6 +65,7 @@ export const employerApplicationListRowSchema = z.discriminatedUnion(
       current_status: applicationStatusSchema,
       submitted_at: z.string().min(1),
       updated_at: z.string().min(1),
+      employer_seen_at: z.string().nullable(),
     }),
   ],
 );

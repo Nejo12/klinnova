@@ -270,8 +270,18 @@ test.describe("employer applicant review journey", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "Applications" }),
     ).toBeVisible();
+    // A freshly-submitted application is unseen, so its card renders in
+    // both the "Needs review" and "Open" groups (grouping is two
+    // independent axes, not four exclusive buckets) — scope to the
+    // "Needs review" section to assert on a single, unambiguous match.
+    const needsReviewSection = page
+      .getByRole("heading", { level: 2, name: /Needs review/ })
+      .locator("..");
     await expect(
-      page.getByRole("heading", { level: 2, name: candidateDisplayName }),
+      needsReviewSection.getByRole("heading", {
+        level: 3,
+        name: candidateDisplayName,
+      }),
     ).toBeVisible();
     await expect(page.getByText("Status: Submitted")).toBeVisible();
 
