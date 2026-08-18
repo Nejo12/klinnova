@@ -83,7 +83,7 @@ export function ApplicationDetail({
               </dd>
             </div>
             <div>
-              <dt>Work authorisation</dt>
+              <dt>Work permission</dt>
               <dd>
                 {application.work_authorisation_declared
                   ? "Declared"
@@ -99,22 +99,22 @@ export function ApplicationDetail({
               </dd>
             </div>
             <div>
+              <dt>Availability</dt>
+              <dd>
+                {application.shift_preferences.length === 0
+                  ? "None declared"
+                  : application.shift_preferences
+                      .map((code) => shiftLabel(code))
+                      .join(", ")}
+              </dd>
+            </div>
+            <div>
               <dt>Employment types</dt>
               <dd>
                 {application.employment_types.length === 0
                   ? "None declared"
                   : application.employment_types
                       .map((code) => employmentTypeLabel(code))
-                      .join(", ")}
-              </dd>
-            </div>
-            <div>
-              <dt>Shift preferences</dt>
-              <dd>
-                {application.shift_preferences.length === 0
-                  ? "None declared"
-                  : application.shift_preferences
-                      .map((code) => shiftLabel(code))
                       .join(", ")}
               </dd>
             </div>

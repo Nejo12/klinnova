@@ -176,9 +176,9 @@ describe("ApplicationDetail", () => {
     expect(screen.queryByText("Matched category")).toBeNull();
     expect(screen.queryByText("German comfort")).toBeNull();
     expect(screen.queryByText("Languages")).toBeNull();
-    expect(screen.queryByText("Work authorisation")).toBeNull();
+    expect(screen.queryByText("Work permission")).toBeNull();
     expect(screen.queryByText("Employment types")).toBeNull();
-    expect(screen.queryByText("Shift preferences")).toBeNull();
+    expect(screen.queryByText("Availability")).toBeNull();
   });
 
   it("still renders the vacancy section and status history for a deleted candidate's preserved application", () => {
