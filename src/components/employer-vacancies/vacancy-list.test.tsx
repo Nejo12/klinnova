@@ -67,6 +67,69 @@ describe("VacancyList", () => {
     expect(screen.getByText(VACANCY_EMPTY_LIST)).toBeInTheDocument();
   });
 
+  it("shows the generic empty state (not verification copy) when verified with no vacancies", () => {
+    render(<VacancyList drafts={[]} verificationState="verified" />);
+    expect(screen.getByText(VACANCY_EMPTY_LIST)).toBeInTheDocument();
+    expect(
+      screen.queryByText("Verification not finished"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows the verification-not-finished empty state when unverified with no vacancies", () => {
+    render(<VacancyList drafts={[]} verificationState="unverified" />);
+    expect(
+      screen.getByRole("heading", {
+        level: 2,
+        name: "Verification not finished",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "You can prepare and save vacancies now. Publishing opens once your company is verified.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Continue verification" }),
+    ).toHaveAttribute("href", "/employer/verification");
+    expect(screen.queryByText(VACANCY_EMPTY_LIST)).not.toBeInTheDocument();
+  });
+
+  it("shows the verification-not-finished empty state for pending/rejected/revoked, not only unverified", () => {
+    render(<VacancyList drafts={[]} verificationState="pending" />);
+    expect(
+      screen.getByRole("heading", {
+        level: 2,
+        name: "Verification not finished",
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("falls back to the generic empty state when verificationState was never loaded", () => {
+    render(<VacancyList drafts={[]} />);
+    expect(
+      screen.queryByText("Verification not finished"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("never shows the verification empty state once there is at least one vacancy", () => {
+    render(
+      <VacancyList
+        drafts={[buildDraft({ publicationState: "draft" })]}
+        verificationState="unverified"
+      />,
+    );
+    expect(
+      screen.queryByText("Verification not finished"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("renders exactly one 'Create draft' link when the vacancy list is empty", () => {
+    render(<VacancyList drafts={[]} />);
+    expect(screen.getAllByRole("link", { name: "Create draft" })).toHaveLength(
+      1,
+    );
+  });
+
   it("renders the two group headings with their own counts", () => {
     render(
       <VacancyList

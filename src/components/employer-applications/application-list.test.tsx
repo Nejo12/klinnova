@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { ApplicationList } from "@/components/employer-applications/application-list";
@@ -54,6 +54,167 @@ describe("ApplicationList", () => {
   it("shows an empty-state message when there are no applications", () => {
     render(<ApplicationList applications={[]} />);
     expect(screen.getByText(APPLICATION_EMPTY_LIST)).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "View vacancies" }),
+    ).toHaveAttribute("href", "/employer/vacancies");
+  });
+
+  it("shows the filtered-empty state with the vacancy's title when a vacancy filter has zero results", () => {
+    render(
+      <ApplicationList
+        applications={[]}
+        filteredVacancy={{
+          id: "vac-1",
+          title: "Morning kitchen support",
+          publicationState: "published",
+          checklist: [],
+        }}
+      />,
+    );
+    expect(
+      screen.getByRole("heading", {
+        level: 2,
+        name: "No applications for Morning kitchen support",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(APPLICATION_EMPTY_LIST)).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "View vacancy" })).toHaveAttribute(
+      "href",
+      "/employer/vacancies/vac-1",
+    );
+  });
+
+  it("falls back to a titleless filtered-empty heading when the vacancy lookup failed", () => {
+    render(
+      <ApplicationList
+        applications={[]}
+        filteredVacancy={{
+          id: "vac-1",
+          title: null,
+          publicationState: null,
+          checklist: [],
+        }}
+      />,
+    );
+    expect(
+      screen.getByRole("heading", {
+        level: 2,
+        name: "No applications for this vacancy",
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows the draft-specific filtered-empty state, deriving the reason from the real readiness checklist", () => {
+    render(
+      <ApplicationList
+        applications={[]}
+        filteredVacancy={{
+          id: "vac-1",
+          title: "Morning kitchen support",
+          publicationState: "draft",
+          checklist: [
+            { id: "salary", label: "Salary (EUR gross)", complete: false },
+            { id: "title", label: "Title", complete: true },
+          ],
+        }}
+      />,
+    );
+    expect(
+      screen.getByRole("heading", {
+        level: 2,
+        name: "This vacancy is a draft",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Salary (EUR gross) still needed before publishing. Nothing is visible to candidates until you publish.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Finish this vacancy" }),
+    ).toHaveAttribute("href", "/employer/vacancies/vac-1/edit");
+  });
+
+  it("falls back to the generic draft reason when readiness is unavailable for the filtered draft", () => {
+    render(
+      <ApplicationList
+        applications={[]}
+        filteredVacancy={{
+          id: "vac-1",
+          title: "Morning kitchen support",
+          publicationState: "draft",
+          checklist: [],
+        }}
+      />,
+    );
+    expect(
+      screen.getByText(
+        "Missing required details before publishing. Nothing is visible to candidates until you publish.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("shows 'Everything reviewed' inside Needs review when nothing is unseen but applications are still open", () => {
+    render(
+      <ApplicationList
+        applications={[
+          buildRow({
+            application_id: "11111111-1111-4111-8111-111111111111",
+            current_status: "submitted",
+            employer_seen_at: "2026-08-01T00:00:00Z",
+          }),
+          buildRow({
+            application_id: "22222222-2222-4222-8222-222222222222",
+            current_status: "shortlisted",
+            employer_seen_at: "2026-08-01T00:00:00Z",
+          }),
+        ]}
+      />,
+    );
+
+    const needsReviewSection = screen
+      .getByRole("heading", { level: 2, name: "Needs review (0)" })
+      .closest("section");
+    expect(needsReviewSection).not.toBeNull();
+    expect(
+      within(needsReviewSection as HTMLElement).getByText(
+        "Nothing needs first review right now. 2 applications are still open.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("uses singular phrasing for exactly one open application in the 'Everything reviewed' state", () => {
+    render(
+      <ApplicationList
+        applications={[
+          buildRow({
+            current_status: "reviewing",
+            employer_seen_at: "2026-08-01T00:00:00Z",
+          }),
+        ]}
+      />,
+    );
+    expect(
+      screen.getByText(
+        "Nothing needs first review right now. 1 application is still open.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("does not show the 'Everything reviewed' state when Needs review is empty because nothing is open either", () => {
+    render(
+      <ApplicationList
+        applications={[
+          buildRow({
+            current_status: "accepted",
+            employer_seen_at: "2026-08-01T00:00:00Z",
+          }),
+        ]}
+      />,
+    );
+    expect(
+      screen.queryByText(/Nothing needs first review right now/),
+    ).not.toBeInTheDocument();
   });
 
   it("renders every row in the order it was given, without re-sorting, within its group", () => {

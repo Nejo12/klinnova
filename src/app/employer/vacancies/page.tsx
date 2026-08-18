@@ -6,6 +6,7 @@ import styles from "@/components/employer-vacancies/employer-vacancies.module.sc
 import { VacancyList } from "@/components/employer-vacancies/vacancy-list";
 import { loadUnseenApplicationsCount } from "@/lib/employer/applications/load-unseen-applications-count";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
+import { loadEmployerProfile } from "@/lib/employer/load-employer";
 import { loadCurrentEmployerSuspensionStatus } from "@/lib/employer/suspension-guard";
 import { loadEmployerDrafts } from "@/lib/employer/vacancies/load-employer-drafts";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -35,6 +36,15 @@ export default async function EmployerVacanciesPage() {
   const suspension = await loadCurrentEmployerSuspensionStatus(supabase);
   const suspended = suspension.ok && suspension.suspended;
 
+  // Single additional own-profile read, verification state only — reuses
+  // `loadEmployerProfile` (already called by `/employer/page.tsx`), not a
+  // new query pattern. Never gates or redirects: a failed load just leaves
+  // `verificationState` null, and `VacancyList` falls back to its generic
+  // empty state in that case (see its own prop doc).
+  const profile = await loadEmployerProfile(supabase);
+  const verificationState =
+    profile.ok && profile.data !== null ? profile.data.verificationState : null;
+
   return (
     <main className={styles.page}>
       <EmployerVacancyPageHeader
@@ -45,7 +55,10 @@ export default async function EmployerVacanciesPage() {
       />
       <h1 className={styles.heading}>Vacancies</h1>
       {suspended ? <EmployerRestrictedNotice /> : null}
-      <VacancyList drafts={loaded.drafts} />
+      <VacancyList
+        drafts={loaded.drafts}
+        verificationState={verificationState}
+      />
     </main>
   );
 }

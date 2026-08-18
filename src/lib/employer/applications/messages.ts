@@ -11,6 +11,23 @@ export const APPLICATION_INCOMPLETE_EMPLOYER =
 
 export const APPLICATION_EMPTY_LIST = "No applications yet.";
 
+export const APPLICATION_EMPTY_LIST_SUPPORT =
+  "Check whether your vacancies are published from the vacancies page.";
+
+// ---------------------------------------------------------------------------
+// P3 employer presentation — applications-list empty states (Task H).
+// ---------------------------------------------------------------------------
+
+export const APPLICATION_NO_REVIEW_HEADING =
+  "Nothing needs first review right now.";
+
+export const APPLICATION_DRAFT_VACANCY_HEADING = "This vacancy is a draft";
+
+export const APPLICATION_DRAFT_VACANCY_VISIBILITY_NOTE =
+  "Nothing is visible to candidates until you publish.";
+
+export const APPLICATION_DRAFT_VACANCY_ACTION = "Finish this vacancy";
+
 export const APPLICATION_LIST_LEAD =
   "Review applicants for your vacancies and update their status.";
 

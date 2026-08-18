@@ -1,20 +1,34 @@
 import Link from "next/link";
 
+import { EmployerEmptyState } from "@/components/employer-shared/employer-empty-state";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import type {
   EmployerDraftListItem,
   VacancyLifecycleState,
 } from "@/lib/employer/vacancies/load-employer-drafts";
+import type { ReadinessChecklistItem } from "@/lib/employer/vacancies/readiness";
 import {
   VACANCY_EMPTY_LIST,
   VACANCY_LIST_LEAD,
   VACANCY_PRIVATE_NOTICE,
+  VACANCY_VERIFICATION_EMPTY_ACTION,
+  VACANCY_VERIFICATION_EMPTY_HEADING,
+  VACANCY_VERIFICATION_EMPTY_SUPPORT,
 } from "@/lib/employer/vacancies/messages";
 import { jobCategoryLabel } from "@/lib/matching/labels";
 import type { JobCategoryCode } from "@/lib/onboarding/allow-lists";
 
 type VacancyListProps = {
   drafts: EmployerDraftListItem[];
+  /**
+   * Own-profile `verification_state` ('unverified' | 'pending' | 'verified'
+   * | 'rejected' | 'revoked'), loaded once by the page via
+   * `loadEmployerProfile`. `null` means the caller didn't load it (or the
+   * load failed) — treated the same as "not verified" would be wrong, so
+   * callers that omit it simply never see the verification-specific empty
+   * state, falling back to the generic one.
+   */
+  verificationState?: string | null;
 };
 
 export const STATE_LABELS: Record<
@@ -113,13 +127,18 @@ const DRAFT_FALLBACK_CONSEQUENCE =
   "Missing required details before publishing.";
 
 /**
- * Derived from this row's already-loaded readiness checklist — never a
- * hardcoded sentence. Falls back to a shorter, always-true statement when
- * readiness could not be computed for this row (`checklist` empty) or when
- * more than three fields are missing (naming all of them would be an
- * unreadable run-on).
+ * Derived from an already-loaded readiness checklist — never a hardcoded
+ * sentence. Falls back to a shorter, always-true statement when readiness
+ * could not be computed (`checklist` empty) or when more than three fields
+ * are missing (naming all of them would be an unreadable run-on). Takes
+ * only `{ checklist }` (not the full `EmployerDraftListItem`) so it can
+ * also be reused for a single-vacancy readiness lookup that isn't a full
+ * list row — see `application-list.tsx`'s "This vacancy is a draft" empty
+ * state.
  */
-function draftConsequence(draft: EmployerDraftListItem): string {
+export function draftConsequence(draft: {
+  checklist: ReadinessChecklistItem[];
+}): string {
   if (draft.checklist.length === 0) {
     return DRAFT_FALLBACK_CONSEQUENCE;
   }
@@ -171,8 +190,19 @@ function consequenceSentence(draft: EmployerDraftListItem): string | null {
   }
 }
 
-export function VacancyList({ drafts }: VacancyListProps) {
+export function VacancyList({
+  drafts,
+  verificationState = null,
+}: VacancyListProps) {
   const { live, notLive } = groupVacancies(drafts);
+
+  // A zero-draft employer who isn't verified yet isn't blocked by "forgot
+  // to create a draft" — they're blocked by verification. More specific
+  // and more useful than the generic empty state in that situation.
+  const showVerificationEmptyState =
+    drafts.length === 0 &&
+    verificationState !== null &&
+    verificationState !== "verified";
 
   return (
     <>
@@ -185,9 +215,23 @@ export function VacancyList({ drafts }: VacancyListProps) {
       </p>
 
       {drafts.length === 0 ? (
-        <p className={styles.support} role="status">
-          {VACANCY_EMPTY_LIST}
-        </p>
+        showVerificationEmptyState ? (
+          <EmployerEmptyState
+            headingId="vacancies-verification-empty-heading"
+            heading={VACANCY_VERIFICATION_EMPTY_HEADING}
+            support={VACANCY_VERIFICATION_EMPTY_SUPPORT}
+            actionHref="/employer/verification"
+            actionLabel={VACANCY_VERIFICATION_EMPTY_ACTION}
+          />
+        ) : (
+          // No action link here: the "Create draft" button immediately
+          // above already is the one action this state would otherwise
+          // repeat with identical text/href.
+          <EmployerEmptyState
+            headingId="vacancies-empty-heading"
+            heading={VACANCY_EMPTY_LIST}
+          />
+        )
       ) : (
         <>
           <VacancyListGroup
