@@ -136,6 +136,7 @@ const employerApplicationDetailReadyLiveSchema = z.object({
   shift_preferences: z.array(z.enum(SHIFT_PREFERENCE_CODES)),
   allowed_transitions: allowedTransitionsSchema,
   status_history: z.array(statusHistoryEntrySchema),
+  employer_seen_at: z.string().nullable(),
 });
 
 const employerApplicationDetailReadyDeletedSchema = z.object({
@@ -153,6 +154,7 @@ const employerApplicationDetailReadyDeletedSchema = z.object({
   // branch would.
   allowed_transitions: z.tuple([]),
   status_history: z.array(statusHistoryEntrySchema),
+  employer_seen_at: z.string().nullable(),
 });
 
 const employerApplicationDetailReadySchema = z.discriminatedUnion(

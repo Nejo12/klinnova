@@ -144,6 +144,13 @@ export function ApplicationDetail({
 
       <ApplicationStatusHistory entries={application.status_history} />
 
+      {application.employer_seen_at !== null ? (
+        <p className={styles.support}>
+          First opened{" "}
+          {formatApplicationTimestamp(application.employer_seen_at)}
+        </p>
+      ) : null}
+
       <ApplicationStatusActions
         key={`${application.application_id}-${application.current_status}`}
         applicationId={application.application_id}

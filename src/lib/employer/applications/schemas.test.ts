@@ -164,6 +164,7 @@ describe("employerApplicationDetailSchema", () => {
     shift_preferences: ["morning"],
     allowed_transitions: ["reviewing", "shortlisted", "accepted", "rejected"],
     status_history: [],
+    employer_seen_at: null,
   };
 
   it("accepts a live-candidate ready detail", () => {
@@ -184,6 +185,7 @@ describe("employerApplicationDetailSchema", () => {
       candidate_display_name: "Deleted candidate",
       allowed_transitions: [],
       status_history: [],
+      employer_seen_at: null,
     };
     const parsed = employerApplicationDetailSchema.safeParse(deletedReady);
     expect(parsed.success).toBe(true);

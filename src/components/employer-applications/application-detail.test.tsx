@@ -55,6 +55,7 @@ function buildApplication(overrides: Partial<LiveDetail> = {}): LiveDetail {
         occurred_at: "2026-08-01T00:00:00Z",
       },
     ],
+    employer_seen_at: null,
     ...overrides,
   };
 }
@@ -80,6 +81,7 @@ function buildDeletedApplication(
         occurred_at: "2026-08-01T00:00:00Z",
       },
     ],
+    employer_seen_at: null,
     ...overrides,
   };
 }
@@ -183,6 +185,30 @@ describe("ApplicationDetail", () => {
       .getByRole("heading", { level: 2, name: "Status" })
       .closest("section");
     expect(statusSection?.querySelector("select")).toBeNull();
+  });
+
+  it("renders 'First opened' with a formatted date when employer_seen_at is set", () => {
+    render(
+      <ApplicationDetail
+        application={buildApplication({
+          employer_seen_at: "2026-08-15T09:30:00Z",
+        })}
+        outcomes={[]}
+        todayIso={TODAY_ISO}
+      />,
+    );
+    expect(screen.getByText(/First opened/)).toBeInTheDocument();
+  });
+
+  it("renders no 'First opened' text when employer_seen_at is null", () => {
+    render(
+      <ApplicationDetail
+        application={buildApplication({ employer_seen_at: null })}
+        outcomes={[]}
+        todayIso={TODAY_ISO}
+      />,
+    );
+    expect(screen.queryByText(/First opened/)).toBeNull();
   });
 
   it("shows a neutral deleted-candidate state with no fabricated attributes", () => {
