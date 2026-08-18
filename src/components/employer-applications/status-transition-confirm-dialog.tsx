@@ -93,7 +93,7 @@ export function StatusTransitionConfirmDialog({
           </div>
         ) : null}
 
-        <div className={styles.actions}>
+        <div className={`${styles.actions} ${styles.statusActionsGroup}`}>
           <button
             type="button"
             className={styles.buttonSecondary}

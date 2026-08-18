@@ -168,7 +168,7 @@ export function ApplicationStatusActions({
           {renderFeedback(state)}
         </div>
 
-        <div className={styles.actions}>
+        <div className={`${styles.actions} ${styles.statusActionsGroup}`}>
           {ordinaryTransitions.map((status) => (
             <button
               key={status}
@@ -186,7 +186,7 @@ export function ApplicationStatusActions({
         {terminalTransitions.length > 0 ? (
           <>
             <hr className={styles.divider} />
-            <div className={styles.actions}>
+            <div className={`${styles.actions} ${styles.statusActionsGroup}`}>
               {terminalTransitions.map((status) => (
                 <button
                   key={status}
