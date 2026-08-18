@@ -27,6 +27,13 @@ export type EmployerDraftListItem = {
   updatedAt: string;
   ready: boolean | null;
   checklist: ReadinessChecklistItem[];
+  // Per-transition timestamps written by `_transition_employer_vacancy`
+  // (supabase/migrations/20260805110000_verification_and_vacancy_publication.sql).
+  // Real data sources for row consequence sentences — never derived/guessed.
+  pausedAt: string | null;
+  filledAt: string | null;
+  withdrawnAt: string | null;
+  expiredAt: string | null;
 };
 
 export type LoadEmployerDraftsResult =
@@ -61,7 +68,7 @@ export async function loadEmployerDrafts(
   const { data: rows, error } = await gate.supabase
     .from("vacancies")
     .select(
-      "id, title, job_category, public_locality, updated_at, source, publication_state, expires_at, employer_profile_id, company_id, companies(name)",
+      "id, title, job_category, public_locality, updated_at, source, publication_state, expires_at, paused_at, filled_at, withdrawn_at, expired_at, employer_profile_id, company_id, companies(name)",
     )
     .eq("source", "employer")
     .eq("employer_profile_id", gate.userId)
@@ -126,6 +133,10 @@ export async function loadEmployerDrafts(
       updatedAt: row.updated_at,
       ready,
       checklist,
+      pausedAt: row.paused_at,
+      filledAt: row.filled_at,
+      withdrawnAt: row.withdrawn_at,
+      expiredAt: row.expired_at,
     });
   }
 

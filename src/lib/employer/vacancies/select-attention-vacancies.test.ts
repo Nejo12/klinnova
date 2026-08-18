@@ -19,6 +19,10 @@ function draft(
     updatedAt: "2026-08-15T00:00:00Z",
     ready: false,
     checklist: [],
+    pausedAt: null,
+    filledAt: null,
+    withdrawnAt: null,
+    expiredAt: null,
     ...overrides,
   };
 }
