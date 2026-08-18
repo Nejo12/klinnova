@@ -91,6 +91,9 @@ $$;
 revoke all on function public.list_current_employer_applications(uuid, text) from public, anon;
 grant execute on function public.list_current_employer_applications(uuid, text) to authenticated;
 
+comment on function public.list_current_employer_applications(uuid, text) is
+  'Employer-owned applicant inventory (D-070, suspension-gated per D-072). Identity from auth.uid(); completed employer profile required, and not currently suspended; current verification not required. Ownership proven via vacancies.employer_profile_id, never a caller-supplied id. Optional vacancy/status filters; an unrecognised status filter or a suspended employer yields zero rows, not an error.';
+
 create or replace function public.get_current_employer_application(p_application_id uuid)
 returns jsonb
 language plpgsql
