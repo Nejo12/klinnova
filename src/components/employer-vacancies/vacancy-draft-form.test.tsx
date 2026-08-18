@@ -34,6 +34,7 @@ const baseDraft: EmployerDraftDetail = {
   workFrequency: null,
   availableFrom: null,
   experienceNotes: null,
+  germanRequirement: "none",
   cvRequired: null,
   interviewEnglishOk: null,
   employmentTypes: ["full_time"],

@@ -157,6 +157,7 @@ describe("loadEmployerDraft", () => {
         work_frequency: null,
         available_from: null,
         experience_notes: null,
+        german_requirement: "basic",
         cv_required: null,
         interview_english_ok: null,
         employment_types: ["full_time"],
@@ -193,6 +194,7 @@ describe("loadEmployerDraft", () => {
       return;
     }
     expect(result.draft.title).toBe("Cleaner");
+    expect(result.draft.germanRequirement).toBe("basic");
     expect(result.draft.languages).toEqual([
       { languageCode: "en", minProficiency: "basic" },
     ]);
@@ -234,6 +236,7 @@ describe("loadEmployerDraft", () => {
         work_frequency: null,
         available_from: null,
         experience_notes: null,
+        german_requirement: "basic",
         cv_required: null,
         interview_english_ok: null,
         employment_types: ["full_time"],

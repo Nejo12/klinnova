@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import {
   createEmployerVacancyDraftAction,
@@ -8,6 +8,7 @@ import {
   type EmployerVacancyActionState,
 } from "@/app/employer/vacancies/actions";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import { GermanRequirementField } from "@/components/employer-vacancies/german-requirement-field";
 import {
   SALARY_PERIOD_OPTIONS,
   SHIFT_REQUIREMENT_OPTIONS,
@@ -22,8 +23,23 @@ import { centsToEurString } from "@/lib/employer/vacancies/salary";
 import type { EmployerDraftDetail } from "@/lib/employer/vacancies/load-employer-draft";
 import {
   EMPLOYMENT_TYPE_OPTIONS,
+  GERMAN_COMFORT_CODES,
   JOB_CATEGORY_OPTIONS,
+  type GermanComfortCode,
 } from "@/lib/onboarding/allow-lists";
+
+/**
+ * A draft's persisted `germanRequirement` always satisfies the DB CHECK
+ * constraint (one of the real 4 codes), but its TS type is a plain
+ * `string` like the other draft enum fields (`jobCategory`, etc.) — narrow
+ * defensively rather than asserting, so a corrupt/foreign value can never
+ * flow a CEFR-shaped or otherwise invalid string into the radio group.
+ */
+function toGermanComfortCode(value: string | undefined): GermanComfortCode {
+  return (GERMAN_COMFORT_CODES as readonly string[]).includes(value ?? "")
+    ? (value as GermanComfortCode)
+    : "none";
+}
 
 type VacancyDraftFormProps =
   | { mode: "create"; draft?: undefined }
@@ -48,6 +64,9 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
       : updateEmployerVacancyDraftAction;
   const [state, formAction, pending] = useActionState(action, initialState);
   const draft = props.mode === "edit" ? props.draft : null;
+  const [germanRequirement, setGermanRequirement] = useState<GermanComfortCode>(
+    toGermanComfortCode(draft?.germanRequirement),
+  );
   const salaryDefault =
     draft?.salaryAmountCents !== null && draft?.salaryAmountCents !== undefined
       ? centsToEurString(draft.salaryAmountCents)
@@ -292,6 +311,12 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
           />
           <span>Interview can be in English</span>
         </label>
+
+        <GermanRequirementField
+          name="germanRequirement"
+          value={germanRequirement}
+          onChange={setGermanRequirement}
+        />
       </fieldset>
 
       <fieldset className={styles.fieldset}>

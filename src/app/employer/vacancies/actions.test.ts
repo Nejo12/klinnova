@@ -134,6 +134,7 @@ describe("employer vacancy actions", () => {
         p_title: "Cleaner",
         p_job_category: "cleaning",
         p_public_locality: "Mitte",
+        p_german_requirement: "none",
       }),
     );
 
@@ -166,6 +167,7 @@ describe("employer vacancy actions", () => {
         clearSalary: "true",
         cvRequired: "true",
         interviewEnglishOk: "false",
+        germanRequirement: "conversational",
       }),
     );
 
@@ -175,6 +177,7 @@ describe("employer vacancy actions", () => {
       expect.objectContaining({
         p_vacancy_id: "22222222-2222-4222-8222-222222222299",
         p_clear_salary: true,
+        p_german_requirement: "conversational",
       }),
     );
   });
