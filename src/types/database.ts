@@ -1086,6 +1086,7 @@ export type Database = {
           candidate_deleted: boolean
           candidate_display_name: string
           current_status: string
+          employer_seen_at: string
           german_comfort: string
           job_category: string
           submitted_at: string
