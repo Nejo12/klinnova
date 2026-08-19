@@ -331,8 +331,19 @@
 // `.button`/`.buttonDanger`/`.buttonSecondary` base classes above, which
 // are reused by many other buttons in this stylesheet whose labels never
 // change and shouldn't be widened by this.
+//
+// Task F (P3.6) re-audit: 17ch's floor (~132px, measured against
+// `--font-family-ui`/`--font-size-sm`/600 weight) was narrower than the
+// "reviewing" pair actually renders — "Start reviewing" -> "Starting
+// review…" is a real, visually-confirmed ~14px width jump on click,
+// because the pending label is longer than the idle one it replaces and
+// both exceeded the old floor. 21ch (~163px) covers the widest pair
+// ("Starting review…") with headroom for cross-platform font-metric
+// variance in the `--font-family-ui` stack, while the other two ordinary
+// pairs ("Shortlist"/"Shortlisting…", "Reset to submitted"/"Resetting…")
+// stay well within it either way.
 .statusActionButton {
-  min-width: 17ch;
+  min-width: 21ch;
 }
 
 .statusConfirmButton {

@@ -4,6 +4,11 @@ import {
   SkeletonRegion,
 } from "@/components/shared/skeleton";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import {
+  VACANCY_LIST_HEADING,
+  VACANCY_LIST_LEAD,
+  VACANCY_PRIVATE_NOTICE,
+} from "@/lib/employer/vacancies/messages";
 
 // Representative counts, not a claim about how many vacancies exist in
 // either group — the real split (and whether the list is empty altogether,
@@ -52,9 +57,22 @@ function VacancyRowSkeleton() {
 }
 
 /**
- * Route-loading state for /employer/vacancies. Skeletons `VacancyList`'s
- * lead/notice text and the Live/Not-live row groups at their real
+ * Route-loading state for /employer/vacancies. Renders the static
+ * heading/lead/note for real (imported straight from the same sources
+ * `EmployerVacanciesPage`/`VacancyList` use) and skeletons only the
+ * genuinely data-driven Live/Not-live row groups, at their real
  * `.listItem`/`.meta` geometry.
+ *
+ * `VacancyList` renders its lead/note (and the "Create draft" actions row)
+ * unconditionally, before branching on `drafts.length` — none of the three
+ * depend on `loadEmployerDrafts`'s outcome — so rendering the heading/lead/
+ * note here for real means they never pop in above the row-group skeletons
+ * on swap, and this copy can't drift out of sync with the real page since
+ * it's the same imported constants (the same fix already applied to
+ * `src/app/jobs/loading.tsx`; Task F re-audit, P3.6).
+ *
+ * The "Create draft" actions row is left as a skeleton bar below — also
+ * static, but out of this fix's assigned scope (heading/lead/note only).
  *
  * Left out entirely because their structure is data-dependent:
  * - `EmployerRestrictedNotice` (only for suspended employers)
@@ -76,13 +94,9 @@ function VacancyRowSkeleton() {
 export default function Loading() {
   return (
     <main className={styles.page}>
-      <DelayedReveal>
-        <SkeletonRegion label="Loading vacancies">
-          <Skeleton height="2.25rem" width="40%" radius="sm" />
-          <Skeleton height="1rem" width="65%" radius="sm" />
-          <Skeleton height="0.875rem" width="50%" radius="sm" />
-        </SkeletonRegion>
-      </DelayedReveal>
+      <h1 className={styles.heading}>{VACANCY_LIST_HEADING}</h1>
+      <p className={styles.lead}>{VACANCY_LIST_LEAD}</p>
+      <p className={styles.note}>{VACANCY_PRIVATE_NOTICE}</p>
 
       <DelayedReveal>
         <SkeletonRegion label="Loading actions">

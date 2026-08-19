@@ -1,3 +1,11 @@
+// Shared with `employer/verification/loading.tsx` (P3.6 Task F) — that
+// route's loading fallback renders this directly, unwrapped by any
+// skeleton, since it's the one piece of page copy that's identical across
+// all five `view.status` branches and never depends on `loadEmployerProfile`
+// resolving. Importing the same constant both places means the two can't
+// drift out of sync.
+export const VERIFICATION_PAGE_HEADING = "Verification";
+
 export const VERIFICATION_GENERIC_FAILURE =
   "Something went wrong with verification. Please try again.";
 

@@ -3,21 +3,27 @@ import { describe, expect, it } from "vitest";
 
 import Loading from "@/app/employer/verification/loading";
 import styles from "@/components/employer-verification/employer-verification.module.scss";
+import { VERIFICATION_PAGE_HEADING } from "@/lib/employer/verification/messages";
 
 describe("employer verification Loading", () => {
-  it("announces busy status regions, including 'Loading verification status'", () => {
+  it("announces a busy 'Loading verification status' region", () => {
     render(<Loading />);
 
     const regions = screen.getAllByRole("status");
-    expect(regions.length).toBeGreaterThan(1);
-    for (const region of regions) {
-      expect(region).toHaveAttribute("aria-busy", "true");
-    }
+    expect(regions).toHaveLength(1);
+    expect(regions[0]).toHaveAttribute("aria-busy", "true");
+    expect(regions[0]).toHaveTextContent("Loading verification status");
+  });
+
+  it("renders the real static page heading directly, not as a skeleton", () => {
+    render(<Loading />);
+
     expect(
-      regions.some(
-        (region) => region.textContent === "Loading verification status",
-      ),
-    ).toBe(true);
+      screen.getByRole("heading", {
+        level: 1,
+        name: VERIFICATION_PAGE_HEADING,
+      }),
+    ).toBeInTheDocument();
   });
 
   it("renders one panel with a representative detail-row count", () => {

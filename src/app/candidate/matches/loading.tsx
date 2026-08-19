@@ -4,6 +4,10 @@ import {
   SkeletonRegion,
 } from "@/components/shared/skeleton";
 import styles from "@/components/candidate-matches/candidate-matches.module.scss";
+import {
+  CANDIDATE_MATCHES_HEADING,
+  CANDIDATE_MATCHES_LEAD,
+} from "@/lib/candidate-matches/messages";
 
 // A representative count, not a claim about how many matches actually
 // exist — the real count is exactly the thing that's unknown here.
@@ -28,15 +32,35 @@ function MetaRowSkeleton({
 }
 
 /**
- * Route-loading state for /candidate/matches. Per the P3.6 brief, this
- * skeletons the match-card list only — the page's header/heading/lead/
- * work-authorisation notice are static chrome the real page renders
- * regardless of the vacancies query's outcome, so they're left out here
- * rather than duplicated.
+ * Route-loading state for /candidate/matches. Renders the static heading/
+ * lead for real (imported straight from the same source
+ * `CandidateMatchesPage` uses) and skeletons only the genuinely
+ * data-driven match-card list.
+ *
+ * `CandidateMatchesPage` renders its `h1`/lead identically across both the
+ * `success` and `failure` branches (the lead's presence is nominally tied
+ * to `success`, but the string itself never depends on the vacancies
+ * data — see that component), so rendering them here unconditionally
+ * means the real h1 never pops in above the match-card list on swap, and
+ * this copy can't drift out of sync with the real page since it's the
+ * same imported constants — the same fix already applied to
+ * `src/app/jobs/loading.tsx` (Task F re-audit, P3.6).
+ *
+ * Still left out:
+ * - `CandidateAppHeader` — genuinely static chrome, but not implicated in
+ *   the heading/lead content-relocation finding this fix addresses (same
+ *   boundary `jobs/loading.tsx` draws around its own brand-link header).
+ * - `WorkAuthorisationNotice` — static chrome too, but out of this fix's
+ *   assigned scope (heading/lead only); its appearance at the swap still
+ *   shifts the list down by its own height.
+ * - the match-card list itself, genuinely data-dependent.
  */
 export default function Loading() {
   return (
     <main className={styles.page}>
+      <h1 className={styles.heading}>{CANDIDATE_MATCHES_HEADING}</h1>
+      <p className={styles.lead}>{CANDIDATE_MATCHES_LEAD}</p>
+
       <DelayedReveal>
         <SkeletonRegion label="Loading matches">
           <ul className={styles.list}>
