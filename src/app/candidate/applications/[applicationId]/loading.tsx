@@ -100,24 +100,17 @@ export default function Loading() {
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="8rem" radius="sm" />
             <ul className={styles.timeline}>
-              {Array.from(
-                { length: STATUS_TIMELINE_ROW_COUNT },
-                (_, index) => (
-                  <li key={index} className={styles.timelineItem}>
-                    <span className={styles.timelineRail} aria-hidden="true">
-                      <Skeleton
-                        radius="pill"
-                        width="0.75rem"
-                        height="0.75rem"
-                      />
-                    </span>
-                    <div className={styles.timelineContent}>
-                      <Skeleton height="0.875rem" width="6rem" radius="sm" />
-                      <Skeleton height="0.75rem" width="8rem" radius="sm" />
-                    </div>
-                  </li>
-                ),
-              )}
+              {Array.from({ length: STATUS_TIMELINE_ROW_COUNT }, (_, index) => (
+                <li key={index} className={styles.timelineItem}>
+                  <span className={styles.timelineRail} aria-hidden="true">
+                    <Skeleton radius="pill" width="0.75rem" height="0.75rem" />
+                  </span>
+                  <div className={styles.timelineContent}>
+                    <Skeleton height="0.875rem" width="6rem" radius="sm" />
+                    <Skeleton height="0.75rem" width="8rem" radius="sm" />
+                  </div>
+                </li>
+              ))}
             </ul>
           </div>
         </SkeletonRegion>

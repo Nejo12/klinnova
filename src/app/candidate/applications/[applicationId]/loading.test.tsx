@@ -32,9 +32,7 @@ describe("candidate application confirmation Loading", () => {
   it("renders status timeline rows as a list, not fabricated event text", () => {
     const { container } = render(<Loading />);
 
-    const timelineItems = container.querySelectorAll(
-      `.${styles.timelineItem}`,
-    );
+    const timelineItems = container.querySelectorAll(`.${styles.timelineItem}`);
     expect(timelineItems.length).toBeGreaterThan(0);
   });
 
