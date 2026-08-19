@@ -327,7 +327,9 @@ describe("ApplicationStatusActions", () => {
     });
     expect(pendingButton).toBeDisabled();
     expect(pendingButton).toHaveAttribute("aria-busy", "true");
-    expect(screen.queryByRole("button", { name: "Start reviewing" })).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: "Start reviewing" }),
+    ).toBeNull();
 
     finish?.({ kind: "updated", currentStatus: "reviewing" });
 
@@ -370,9 +372,7 @@ describe("ApplicationStatusActions", () => {
     const siblingButton = screen.getByRole("button", { name: "Shortlist" });
     expect(siblingButton).toBeDisabled();
     expect(siblingButton).not.toHaveAttribute("aria-busy", "true");
-    expect(
-      screen.queryByRole("button", { name: "Shortlisting…" }),
-    ).toBeNull();
+    expect(screen.queryByRole("button", { name: "Shortlisting…" })).toBeNull();
 
     finish?.({ kind: "updated", currentStatus: "reviewing" });
     await screen.findByRole("status");

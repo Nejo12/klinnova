@@ -15,9 +15,7 @@ describe("candidate application confirmation Loading", () => {
     });
 
     expect(screen.getByText("Loading application title")).toBeInTheDocument();
-    expect(
-      screen.getByText("Loading application summary"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Loading application summary")).toBeInTheDocument();
     expect(screen.getByText("Loading application status")).toBeInTheDocument();
     expect(screen.getByText("Loading job details")).toBeInTheDocument();
     expect(
