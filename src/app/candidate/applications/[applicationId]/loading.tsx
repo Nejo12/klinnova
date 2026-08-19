@@ -49,22 +49,45 @@ function MetaRowSkeleton({
  *   "no additional languages" sentence or a list — which one is data)
  * - the outcomes timeline (only renders when outcomes are non-empty; most
  *   applications have none)
+ *
+ * The real page (ApplicationConfirmationPage) has six distinct top-level
+ * children under `<main className={styles.page}>` for the fields
+ * skeletoned here — the title row, the lead line, the status/submitted
+ * meta list, the "Job details" section, the "Your submitted profile"
+ * section, and the status timeline — each individually gapped by
+ * `.page`'s `gap: var(--space-5)`/`var(--space-6)`. A single
+ * DelayedReveal/SkeletonRegion pair around all six (as this file used to
+ * have) makes them one child of `.page`, so that gap never applies between
+ * them. One pair per genuinely distinct region restores it.
  */
 export default function Loading() {
   return (
     <main className={styles.page}>
       <DelayedReveal>
-        <SkeletonRegion label="Loading application">
+        <SkeletonRegion label="Loading application title">
           <div className={styles.titleRow}>
             <Skeleton height="2.25rem" width="55%" radius="sm" />
           </div>
-          <Skeleton height="1.125rem" width="70%" radius="sm" />
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading application summary">
+          <Skeleton height="1.125rem" width="70%" radius="sm" />
+        </SkeletonRegion>
+      </DelayedReveal>
+
+      <DelayedReveal>
+        <SkeletonRegion label="Loading application status">
           <div className={styles.meta}>
             <MetaRowSkeleton labelWidth="5rem" valueWidth="8rem" />
             <MetaRowSkeleton labelWidth="6rem" valueWidth="10rem" />
           </div>
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading job details">
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="9rem" radius="sm" />
             <div className={styles.meta}>
@@ -80,7 +103,11 @@ export default function Loading() {
               )}
             </div>
           </div>
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading your submitted profile">
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="11rem" radius="sm" />
             <div className={styles.meta}>
@@ -96,7 +123,11 @@ export default function Loading() {
               )}
             </div>
           </div>
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading status timeline">
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="8rem" radius="sm" />
             <ul className={styles.timeline}>

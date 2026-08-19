@@ -5,12 +5,25 @@ import Loading from "@/app/candidate/applications/[applicationId]/loading";
 import styles from "@/components/candidate-application-confirmation/application-confirmation.module.scss";
 
 describe("candidate application confirmation Loading", () => {
-  it("announces a busy 'Loading application' status region", () => {
+  it("announces a busy status region for each top-level section", () => {
     render(<Loading />);
 
-    const region = screen.getByRole("status");
-    expect(region).toHaveAttribute("aria-busy", "true");
-    expect(region).toHaveTextContent("Loading application");
+    const regions = screen.getAllByRole("status");
+    expect(regions).toHaveLength(6);
+    regions.forEach((region) => {
+      expect(region).toHaveAttribute("aria-busy", "true");
+    });
+
+    expect(screen.getByText("Loading application title")).toBeInTheDocument();
+    expect(
+      screen.getByText("Loading application summary"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Loading application status")).toBeInTheDocument();
+    expect(screen.getByText("Loading job details")).toBeInTheDocument();
+    expect(
+      screen.getByText("Loading your submitted profile"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Loading status timeline")).toBeInTheDocument();
   });
 
   it("renders the fixed job-details and candidate-profile meta row counts", () => {
