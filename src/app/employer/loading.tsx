@@ -85,13 +85,11 @@ export default function Loading() {
             </div>
           </div>
 
-          <div className={styles.section}>
-            <Skeleton height="1.5rem" width="8rem" radius="sm" />
-            <Skeleton height="1rem" width="85%" radius="sm" />
-            <div className={styles.actions}>
-              <Skeleton height="2.75rem" width="9rem" radius="sm" />
-              <Skeleton height="2.75rem" width="8rem" radius="sm" />
-            </div>
+          <Skeleton height="1.5rem" width="8rem" radius="sm" />
+          <Skeleton height="1rem" width="85%" radius="sm" />
+          <div className={styles.actions}>
+            <Skeleton height="2.75rem" width="9rem" radius="sm" />
+            <Skeleton height="2.75rem" width="8rem" radius="sm" />
           </div>
         </SkeletonRegion>
       </DelayedReveal>
