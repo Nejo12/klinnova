@@ -16,6 +16,7 @@ import {
 import {
   applicationStatusLabel,
   employerApplicationActionLabel,
+  employerApplicationActionPendingLabel,
   type ApplicationStatus,
 } from "@/lib/employer/applications/status";
 import {
@@ -106,6 +107,13 @@ export function ApplicationStatusActions({
   );
   const [pendingTerminal, setPendingTerminal] =
     useState<TerminalTransition | null>(null);
+  // Tracks which ordinary-transition button was pressed, so only that
+  // button (not its disabled siblings) shows a pending label while the
+  // shared `pending` boolean is true. Cleared alongside `pendingTerminal`
+  // below once the request resolves.
+  const [pressedStatus, setPressedStatus] = useState<ApplicationStatus | null>(
+    null,
+  );
   const feedbackRef = useRef<HTMLDivElement>(null);
   const openerRef = useRef<HTMLButtonElement | null>(null);
 
@@ -117,11 +125,15 @@ export function ApplicationStatusActions({
 
   // Auto-close the dialog once its submission resolves (pending goes from
   // true back to false) — the dialog otherwise has no signal that its own
-  // submit already completed.
+  // submit already completed. The same transition also clears
+  // `pressedStatus`, since an ordinary-transition submission has resolved
+  // by the same signal (whichever of the two was actually in flight; the
+  // other is already null and this is a no-op for it).
   const wasPending = useRef(pending);
   useEffect(() => {
     if (wasPending.current && !pending) {
       setPendingTerminal(null);
+      setPressedStatus(null);
     }
     wasPending.current = pending;
   }, [pending]);
@@ -169,18 +181,25 @@ export function ApplicationStatusActions({
         </div>
 
         <div className={`${styles.actions} ${styles.statusActionsGroup}`}>
-          {ordinaryTransitions.map((status) => (
-            <button
-              key={status}
-              type="submit"
-              name="targetStatus"
-              value={status}
-              className={styles.button}
-              disabled={pending || dialogOpen}
-            >
-              {employerApplicationActionLabel(status)}
-            </button>
-          ))}
+          {ordinaryTransitions.map((status) => {
+            const isPressed = pending && pressedStatus === status;
+            return (
+              <button
+                key={status}
+                type="submit"
+                name="targetStatus"
+                value={status}
+                className={`${styles.button} ${styles.statusActionButton}`}
+                disabled={pending || dialogOpen}
+                aria-busy={isPressed}
+                onClick={() => setPressedStatus(status)}
+              >
+                {isPressed
+                  ? employerApplicationActionPendingLabel(status)
+                  : employerApplicationActionLabel(status)}
+              </button>
+            );
+          })}
         </div>
 
         {terminalTransitions.length > 0 ? (

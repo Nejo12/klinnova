@@ -146,12 +146,13 @@ export function StatusTransitionConfirmDialog({
             type="submit"
             name="targetStatus"
             value={targetStatus}
-            className={
+            className={`${
               targetStatus === "rejected" ? styles.buttonDanger : styles.button
-            }
+            } ${styles.statusConfirmButton}`}
             disabled={pending}
+            aria-busy={pending}
           >
-            {copy.confirmLabel}
+            {pending ? "Recording…" : copy.confirmLabel}
           </button>
         </div>
       </div>

@@ -322,6 +322,23 @@
   border: none;
 }
 
+// Task E (P3.6): width reservation for the pending-label swap on
+// `ApplicationStatusActions`'s ordinary-transition buttons (e.g.
+// "Shortlist" -> "Shortlisting…") and `StatusTransitionConfirmDialog`'s
+// confirm button (e.g. "Accept application" -> "Recording…"), so the
+// control doesn't visibly resize mid-request. Deliberately new,
+// narrowly-scoped classes rather than a `min-width` added to the shared
+// `.button`/`.buttonDanger`/`.buttonSecondary` base classes above, which
+// are reused by many other buttons in this stylesheet whose labels never
+// change and shouldn't be widened by this.
+.statusActionButton {
+  min-width: 17ch;
+}
+
+.statusConfirmButton {
+  min-width: 19ch;
+}
+
 .linkButton {
   display: inline-flex;
   align-items: center;

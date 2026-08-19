@@ -101,7 +101,7 @@ describe("StatusTransitionConfirmDialog", () => {
     ).toHaveFocus();
   });
 
-  it("disables both buttons and the reason field while pending", () => {
+  it("disables both buttons and the reason field while pending, and swaps the confirm label to the pending copy with aria-busy set", () => {
     renderInForm(
       <StatusTransitionConfirmDialog
         targetStatus="rejected"
@@ -111,10 +111,43 @@ describe("StatusTransitionConfirmDialog", () => {
     );
 
     expect(
-      screen.getByRole("button", { name: "Reject application" }),
-    ).toBeDisabled();
+      screen.queryByRole("button", { name: "Reject application" }),
+    ).toBeNull();
+    const confirmButton = screen.getByRole("button", { name: "Recording…" });
+    expect(confirmButton).toBeDisabled();
+    expect(confirmButton).toHaveAttribute("aria-busy", "true");
     expect(screen.getByRole("button", { name: "Cancel" })).toBeDisabled();
     expect(screen.getByLabelText(/reason/i)).toBeDisabled();
+  });
+
+  it("shows the accept confirm label (not the pending copy) and no aria-busy when not pending", () => {
+    renderInForm(
+      <StatusTransitionConfirmDialog
+        targetStatus="accepted"
+        pending={false}
+        onCancel={vi.fn()}
+      />,
+    );
+
+    const confirmButton = screen.getByRole("button", {
+      name: "Accept application",
+    });
+    expect(confirmButton).not.toBeDisabled();
+    expect(confirmButton).not.toHaveAttribute("aria-busy", "true");
+  });
+
+  it("shows 'Recording…' as the pending confirm label for targetStatus='accepted' too", () => {
+    renderInForm(
+      <StatusTransitionConfirmDialog
+        targetStatus="accepted"
+        pending={true}
+        onCancel={vi.fn()}
+      />,
+    );
+
+    const confirmButton = screen.getByRole("button", { name: "Recording…" });
+    expect(confirmButton).toBeDisabled();
+    expect(confirmButton).toHaveAttribute("aria-busy", "true");
   });
 
   it("calls onCancel and does not submit when Cancel is clicked", async () => {

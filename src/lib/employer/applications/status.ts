@@ -54,6 +54,30 @@ export function employerApplicationActionLabel(
   return APPLICATION_ACTION_LABELS[status];
 }
 
+/**
+ * Pending form of `employerApplicationActionLabel`, shown on the specific
+ * status-transition button that was pressed while its request is in
+ * flight (Task E / P3.6 — gray-and-silent regression fix). Scoped to just
+ * the ordinary (non-terminal) transitions `ApplicationStatusActions`
+ * renders as discrete buttons; `accepted`/`rejected` entries exist only
+ * for the `Record`'s exhaustiveness (those two are never label-swapped
+ * here — `StatusTransitionConfirmDialog` owns their pending copy) and are
+ * set to "Recording…" for consistency with that dialog's own convention.
+ */
+const APPLICATION_ACTION_PENDING_LABELS: Record<ApplicationStatus, string> = {
+  submitted: "Resetting…",
+  reviewing: "Starting review…",
+  shortlisted: "Shortlisting…",
+  accepted: "Recording…",
+  rejected: "Recording…",
+};
+
+export function employerApplicationActionPendingLabel(
+  status: ApplicationStatus,
+): string {
+  return APPLICATION_ACTION_PENDING_LABELS[status];
+}
+
 export function isApplicationStatus(value: string): value is ApplicationStatus {
   return (APPLICATION_STATUS_CODES as readonly string[]).includes(value);
 }
