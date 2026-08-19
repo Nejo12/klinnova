@@ -5,6 +5,10 @@ import {
 } from "@/components/shared/skeleton";
 import factStyles from "@/components/public-jobs/vacancy-fact-chips.module.scss";
 import styles from "@/components/public-jobs/public-jobs.module.scss";
+import {
+  PUBLIC_JOBS_HEADING,
+  PUBLIC_JOBS_LEAD,
+} from "@/lib/public-jobs/messages";
 
 // Representative count, not a claim about how many vacancies actually
 // exist — the real count is exactly what's unknown until
@@ -32,17 +36,23 @@ function MetaRowSkeleton({
 }
 
 /**
- * Route-loading state for /jobs. Skeletons only the genuinely data-driven
- * part of the page: the result count and the vacancy card list.
+ * Route-loading state for /jobs. Renders the static heading/lead for real
+ * (imported straight from the same source PublicJobsPage uses) and
+ * skeletons only the genuinely data-driven part of the page: the result
+ * count and the vacancy card list.
  *
- * Left out entirely:
- * - the brand-link header, and the page heading/lead ("Jobs in Berlin that
- *   don't require fluent German" copy) — static text the real page renders
- *   identically regardless of loadPublicVacancies' outcome. Per the same
- *   call made in candidate/matches/loading.tsx ("static chrome the real
- *   page renders regardless of the vacancies query's outcome"), it's left
- *   out rather than re-typed verbatim into a second file that would then
- *   need to be kept in sync with the real copy.
+ * Next.js wraps the whole /jobs page.tsx subtree in a single Suspense
+ * boundary — there is no nested Suspense inside PublicJobsPage — so this
+ * fallback and the real tree swap atomically, in one shot. PUBLIC_JOBS_
+ * HEADING/PUBLIC_JOBS_LEAD never depend on loadPublicVacancies' outcome,
+ * so rendering them here (rather than skeletoning or omitting them) means
+ * the real h1/lead never pops in above the count/list on swap, and this
+ * copy can't drift out of sync with the real page since it's the same
+ * imported constants.
+ *
+ * Still left out:
+ * - the brand-link header — genuinely static chrome, but not implicated in
+ *   the heading/lead content-relocation finding this fix addresses.
  * - which of the three mutually-exclusive states (failure / empty / list)
  *   actually resolves — unknown pre-load. This skeletons the populated-list
  *   guess, matching the precedent set by the matches/vacancies loading
@@ -62,6 +72,9 @@ function MetaRowSkeleton({
 export default function Loading() {
   return (
     <main className={styles.page}>
+      <h1 className={styles.heading}>{PUBLIC_JOBS_HEADING}</h1>
+      <p className={styles.lead}>{PUBLIC_JOBS_LEAD}</p>
+
       <DelayedReveal>
         <SkeletonRegion label="Loading job count">
           <Skeleton height="1.125rem" width="9rem" radius="sm" />
