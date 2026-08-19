@@ -26,7 +26,7 @@ describe("candidate application confirmation Loading", () => {
     ).toHaveLength(8);
     expect(
       candidateProfileSection?.querySelectorAll(`.${styles.metaRow}`),
-    ).toHaveLength(7);
+    ).toHaveLength(6);
   });
 
   it("renders status timeline rows as a list, not fabricated event text", () => {

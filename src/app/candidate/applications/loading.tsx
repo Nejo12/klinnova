@@ -12,6 +12,25 @@ import railStyles from "@/components/candidate-applications/application-status-r
 export const APPLICATION_CARD_SKELETON_COUNT = 3;
 const STATUS_RAIL_NODE_COUNT = 4;
 
+// Paired label+value skeleton matching the two-column `.metaRow` grid that
+// ApplicationInventoryCard actually renders (src/components/
+// candidate-applications/application-inventory-card.tsx), rather than a
+// single full-width bar.
+function MetaRowSkeleton({
+  labelWidth,
+  valueWidth,
+}: {
+  labelWidth: string;
+  valueWidth: string;
+}) {
+  return (
+    <div className={styles.metaRow}>
+      <Skeleton height="0.875rem" width={labelWidth} radius="sm" />
+      <Skeleton height="1rem" width={valueWidth} radius="sm" />
+    </div>
+  );
+}
+
 /**
  * Route-loading state for /candidate/applications. Skeletons the row list
  * only, matching ApplicationInventoryCard's real shape (title, employer
@@ -52,9 +71,9 @@ export default function Loading() {
                       )}
                     </ol>
                     <div className={styles.meta}>
-                      <Skeleton height="1rem" width="70%" radius="sm" />
-                      <Skeleton height="1rem" width="55%" radius="sm" />
-                      <Skeleton height="1rem" width="60%" radius="sm" />
+                      <MetaRowSkeleton labelWidth="5rem" valueWidth="70%" />
+                      <MetaRowSkeleton labelWidth="4rem" valueWidth="55%" />
+                      <MetaRowSkeleton labelWidth="5.5rem" valueWidth="60%" />
                     </div>
                     <div className={styles.cardActions}>
                       <Skeleton height="1.25rem" width="6.5rem" radius="sm" />

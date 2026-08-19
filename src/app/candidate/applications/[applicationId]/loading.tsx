@@ -12,7 +12,7 @@ import styles from "@/components/candidate-application-confirmation/application-
 // one genuinely conditional row ("Available from") is deliberately not
 // represented here.
 const JOB_DETAILS_META_ROW_COUNT = 8;
-const CANDIDATE_PROFILE_META_ROW_COUNT = 7;
+const CANDIDATE_PROFILE_META_ROW_COUNT = 6;
 // A representative count for the status timeline — every application has
 // at least one "Submitted" event, but the real count is unknown until the
 // history query resolves.

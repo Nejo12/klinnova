@@ -5,6 +5,25 @@ import {
 } from "@/components/shared/skeleton";
 import styles from "@/components/candidate-job-detail/candidate-job-detail.module.scss";
 
+// Paired label+value skeleton matching the two-column `.metaRow` grid that
+// VacancyFactChips and the "Job details" `<dl>` actually render
+// (src/components/public-jobs/vacancy-fact-chips.tsx and
+// candidate-job-detail-page.tsx), rather than a single full-width bar.
+function MetaRowSkeleton({
+  labelWidth,
+  valueWidth,
+}: {
+  labelWidth: string;
+  valueWidth: string;
+}) {
+  return (
+    <div className={styles.metaRow}>
+      <Skeleton height="0.875rem" width={labelWidth} radius="sm" />
+      <Skeleton height="1rem" width={valueWidth} radius="sm" />
+    </div>
+  );
+}
+
 /**
  * Route-loading state for /candidate/jobs/[vacancyId]. Skeletons the
  * job-detail fields that are genuinely data-driven — title, source badge,
@@ -33,9 +52,9 @@ export default function Loading() {
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="9rem" radius="sm" />
             <div className={styles.meta}>
-              <Skeleton height="1rem" width="80%" radius="sm" />
-              <Skeleton height="1rem" width="65%" radius="sm" />
-              <Skeleton height="1rem" width="70%" radius="sm" />
+              <MetaRowSkeleton labelWidth="5.5rem" valueWidth="80%" />
+              <MetaRowSkeleton labelWidth="5rem" valueWidth="65%" />
+              <MetaRowSkeleton labelWidth="4.5rem" valueWidth="70%" />
             </div>
           </div>
 

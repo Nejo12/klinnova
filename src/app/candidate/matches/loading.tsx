@@ -9,6 +9,24 @@ import styles from "@/components/candidate-matches/candidate-matches.module.scss
 // exist — the real count is exactly the thing that's unknown here.
 export const MATCH_CARD_SKELETON_COUNT = 3;
 
+// Paired label+value skeleton matching the two-column `.metaRow` grid that
+// VacancyFactChips actually renders (src/components/public-jobs/
+// vacancy-fact-chips.tsx), rather than a single full-width bar.
+function MetaRowSkeleton({
+  labelWidth,
+  valueWidth,
+}: {
+  labelWidth: string;
+  valueWidth: string;
+}) {
+  return (
+    <div className={styles.metaRow}>
+      <Skeleton height="0.875rem" width={labelWidth} radius="sm" />
+      <Skeleton height="1rem" width={valueWidth} radius="sm" />
+    </div>
+  );
+}
+
 /**
  * Route-loading state for /candidate/matches. Per the P3.6 brief, this
  * skeletons the match-card list only — the page's header/heading/lead/
@@ -34,8 +52,8 @@ export default function Loading() {
                   <Skeleton height="1.125rem" width="40%" radius="sm" />
                   <Skeleton height="1rem" width="92%" radius="sm" />
                   <div className={styles.meta}>
-                    <Skeleton height="1rem" width="70%" radius="sm" />
-                    <Skeleton height="1rem" width="55%" radius="sm" />
+                    <MetaRowSkeleton labelWidth="4.5rem" valueWidth="70%" />
+                    <MetaRowSkeleton labelWidth="5rem" valueWidth="55%" />
                   </div>
                   <div className={styles.cardActions}>
                     <Skeleton height="1.25rem" width="5.5rem" radius="sm" />
