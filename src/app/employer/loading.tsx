@@ -34,6 +34,18 @@ const VACANCY_MINI_LIST_SKELETON_COUNT = 2;
  * convention (see the P3.6 Task C report for why there's no shared layout
  * to preserve it across the swap).
  */
+// This route's real content region (src/app/employer/page.tsx) is a
+// flat run of `<main className={styles.page}>` direct children — `.page`
+// is `display: flex; flex-direction: column; gap: var(--space-6)`, and
+// that gap only applies BETWEEN direct children. Wrapping the whole
+// content run in one DelayedReveal/SkeletonRegion pair (as this file used
+// to) makes it a single child of `.page`, so the gap never reaches the
+// sections inside it. Splitting into one pair per genuinely distinct
+// top-level region — matching the real page's own grouping — restores
+// that spacing. Each region keeps its own aria-busy announcement; see
+// SkeletonRegion's doc for why that's an acceptable trade (this page's
+// load is atomically sequential, but announcing per-region is still
+// accurate, just more granular than strictly necessary).
 export default function Loading() {
   return (
     <main className={styles.page}>
@@ -53,13 +65,21 @@ export default function Loading() {
               <Skeleton height="0.875rem" width="9rem" radius="sm" />
             </li>
           </ul>
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading actions">
           <div className={styles.actions}>
             <Skeleton height="2.75rem" width="7rem" radius="sm" />
             <Skeleton height="2.75rem" width="7rem" radius="sm" />
             <Skeleton height="2.75rem" width="7rem" radius="sm" />
           </div>
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading vacancies">
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="10rem" radius="sm" />
             <ul className={styles.list}>
@@ -84,7 +104,11 @@ export default function Loading() {
               <Skeleton height="2.75rem" width="7rem" radius="sm" />
             </div>
           </div>
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading account data">
           <Skeleton height="1.5rem" width="8rem" radius="sm" />
           <Skeleton height="1rem" width="85%" radius="sm" />
           <div className={styles.actions}>

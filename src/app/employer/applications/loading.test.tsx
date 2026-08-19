@@ -5,12 +5,17 @@ import Loading from "@/app/employer/applications/loading";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 
 describe("employer applications list Loading", () => {
-  it("announces a busy 'Loading applications' status region", () => {
+  it("announces busy status regions, including 'Loading applications'", () => {
     render(<Loading />);
 
-    const region = screen.getByRole("status");
-    expect(region).toHaveAttribute("aria-busy", "true");
-    expect(region).toHaveTextContent("Loading applications");
+    const regions = screen.getAllByRole("status");
+    expect(regions.length).toBeGreaterThan(1);
+    for (const region of regions) {
+      expect(region).toHaveAttribute("aria-busy", "true");
+    }
+    expect(
+      regions.some((region) => region.textContent === "Loading applications"),
+    ).toBe(true);
   });
 
   it("renders representative Needs review / Open / Decided row counts", () => {

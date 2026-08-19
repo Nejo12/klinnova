@@ -69,6 +69,14 @@ function ApplicationRowSkeleton() {
  *   `candidate_deleted` is true — unknown per-row until the request
  *   resolves, so the typical (non-deleted) row shape is skeletoned instead
  */
+// The real page (src/app/employer/applications/page.tsx, via
+// ApplicationList) has five distinct top-level children under
+// `<main className={styles.page}>`: heading, lead, and the Needs
+// review / Open / Decided groups — each individually gapped by `.page`'s
+// `gap: var(--space-6)`. A single DelayedReveal/SkeletonRegion pair around
+// all of it (as this file used to have) makes them one child of `.page`,
+// so that gap never applies between them. One pair per genuinely distinct
+// region restores it.
 export default function Loading() {
   return (
     <main className={styles.page}>
@@ -76,7 +84,11 @@ export default function Loading() {
         <SkeletonRegion label="Loading applications">
           <Skeleton height="2.25rem" width="45%" radius="sm" />
           <Skeleton height="1rem" width="70%" radius="sm" />
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading applications needing review">
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="9rem" radius="sm" />
             <ul className={styles.list}>
@@ -88,7 +100,11 @@ export default function Loading() {
               )}
             </ul>
           </div>
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading open applications">
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="5rem" radius="sm" />
             <ul className={styles.list}>
@@ -97,7 +113,11 @@ export default function Loading() {
               ))}
             </ul>
           </div>
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading decided applications">
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="6rem" radius="sm" />
             <ul className={styles.list}>

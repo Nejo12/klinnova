@@ -31,13 +31,24 @@ const DETAIL_ROW_SKELETON_COUNT = 2;
  *   interactive controls a skeleton must never fabricate)
  * - the revoked-only "no resubmit" warning
  */
+// The real page (src/app/employer/verification/page.tsx) has two distinct
+// top-level children under `<main className={styles.page}>`: the heading
+// and whichever one of the five mutually-exclusive status panels renders —
+// each individually gapped by `.page`'s `gap: var(--space-6)`. A single
+// DelayedReveal/SkeletonRegion pair around both (as this file used to
+// have) makes them one child of `.page`, so that gap never applies between
+// them. One pair per genuinely distinct region restores it.
 export default function Loading() {
   return (
     <main className={styles.page}>
       <DelayedReveal>
-        <SkeletonRegion label="Loading verification status">
+        <SkeletonRegion label="Loading verification">
           <Skeleton height="2.25rem" width="45%" radius="sm" />
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading verification status">
           <div className={styles.panel}>
             <Skeleton height="1.25rem" width="9rem" radius="sm" />
             <Skeleton height="1rem" width="90%" radius="sm" />

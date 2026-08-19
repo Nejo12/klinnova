@@ -5,12 +5,19 @@ import Loading from "@/app/employer/verification/loading";
 import styles from "@/components/employer-verification/employer-verification.module.scss";
 
 describe("employer verification Loading", () => {
-  it("announces a busy 'Loading verification status' status region", () => {
+  it("announces busy status regions, including 'Loading verification status'", () => {
     render(<Loading />);
 
-    const region = screen.getByRole("status");
-    expect(region).toHaveAttribute("aria-busy", "true");
-    expect(region).toHaveTextContent("Loading verification status");
+    const regions = screen.getAllByRole("status");
+    expect(regions.length).toBeGreaterThan(1);
+    for (const region of regions) {
+      expect(region).toHaveAttribute("aria-busy", "true");
+    }
+    expect(
+      regions.some(
+        (region) => region.textContent === "Loading verification status",
+      ),
+    ).toBe(true);
   });
 
   it("renders one panel with a representative detail-row count", () => {

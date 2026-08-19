@@ -76,13 +76,25 @@ function DetailRowSkeleton({
  * mounts, using plain blocks rather than any real `<select>`/`<input>`/
  * `<button>`.
  */
+// The real page (src/app/employer/applications/[applicationId]/page.tsx,
+// via ApplicationDetail) has five distinct top-level children under
+// `<main className={styles.page}>`: the heading, the Applicant section,
+// the Vacancy section, the Status history section, and RecordOutcomeForm
+// — each individually gapped by `.page`'s `gap: var(--space-6)`. A single
+// DelayedReveal/SkeletonRegion pair around all of it (as this file used to
+// have) makes them one child of `.page`, so that gap never applies between
+// them. One pair per genuinely distinct region restores it.
 export default function Loading() {
   return (
     <main className={styles.page}>
       <DelayedReveal>
         <SkeletonRegion label="Loading application">
           <Skeleton height="2.25rem" width="50%" radius="sm" />
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading applicant details">
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="6rem" radius="sm" />
             <div className={styles.detailList}>
@@ -95,7 +107,11 @@ export default function Loading() {
               ))}
             </div>
           </div>
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading vacancy details">
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="6rem" radius="sm" />
             <div className={styles.detailList}>
@@ -108,7 +124,11 @@ export default function Loading() {
               ))}
             </div>
           </div>
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading status history">
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="9rem" radius="sm" />
             <ul className={styles.list}>
@@ -124,7 +144,11 @@ export default function Loading() {
               ))}
             </ul>
           </div>
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading outcome form">
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="10rem" radius="sm" />
             <div className={styles.field}>

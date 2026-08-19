@@ -65,6 +65,14 @@ function VacancyRowSkeleton() {
  *   depend on `publicationState`, unknown per-row until the request
  *   resolves
  */
+// The real page (src/app/employer/vacancies/page.tsx, via VacancyList) has
+// six distinct top-level children under `<main className={styles.page}>`:
+// heading, lead, note, the top actions row, the Live group, and the
+// Not-live group — each individually gapped by `.page`'s
+// `gap: var(--space-6)`. A single DelayedReveal/SkeletonRegion pair around
+// all of it (as this file used to have) makes them one child of `.page`,
+// so that gap never applies between them. One pair per genuinely distinct
+// region restores it.
 export default function Loading() {
   return (
     <main className={styles.page}>
@@ -73,10 +81,19 @@ export default function Loading() {
           <Skeleton height="2.25rem" width="40%" radius="sm" />
           <Skeleton height="1rem" width="65%" radius="sm" />
           <Skeleton height="0.875rem" width="50%" radius="sm" />
+        </SkeletonRegion>
+      </DelayedReveal>
+
+      <DelayedReveal>
+        <SkeletonRegion label="Loading actions">
           <div className={styles.actions}>
             <Skeleton height="2.75rem" width="8rem" radius="sm" />
           </div>
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading live vacancies">
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="6rem" radius="sm" />
             <ul className={styles.list}>
@@ -85,7 +102,11 @@ export default function Loading() {
               ))}
             </ul>
           </div>
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading not-live vacancies">
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="7rem" radius="sm" />
             <ul className={styles.list}>

@@ -57,22 +57,42 @@ function DetailRowSkeleton({
  *   never fabricate)
  * - `DeleteDraftForm` (draft vacancies only)
  */
+// The real page (src/app/employer/vacancies/[vacancyId]/page.tsx, via
+// VacancyDetail) has four distinct top-level children under
+// `<main className={styles.page}>`: the heading, VacancyLifecycleStatus's
+// section, the actions row, and the detail list — each individually
+// gapped by `.page`'s `gap: var(--space-6)`. A single DelayedReveal/
+// SkeletonRegion pair around all of it (as this file used to have) makes
+// them one child of `.page`, so that gap never applies between them. One
+// pair per genuinely distinct region restores it.
 export default function Loading() {
   return (
     <main className={styles.page}>
       <DelayedReveal>
         <SkeletonRegion label="Loading vacancy">
           <Skeleton height="2.25rem" width="60%" radius="sm" />
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading vacancy status">
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="5rem" radius="sm" />
             <Skeleton height="1.5rem" width="8rem" radius="sm" />
           </div>
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading actions">
           <div className={styles.actions}>
             <Skeleton height="2.75rem" width="8rem" radius="sm" />
           </div>
+        </SkeletonRegion>
+      </DelayedReveal>
 
+      <DelayedReveal>
+        <SkeletonRegion label="Loading vacancy details">
           <div className={styles.detailList}>
             {Array.from({ length: VACANCY_DETAIL_ROW_COUNT }, (_, index) => (
               <DetailRowSkeleton
