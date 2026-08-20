@@ -192,6 +192,7 @@ describe("recordApplicationOutcomeAction", () => {
 
     expect(state).toEqual({
       kind: "recorded",
+      outcomeEventId,
       outcomeType: "hired",
       occurredAt: "2026-08-10T10:00:00.000Z",
     });

@@ -89,9 +89,9 @@ export function RecordOutcomeForm({
   }, [state]);
 
   // Uncontrolled inputs, reset to their defaults after a successful record
-  // by remounting the form (keyed on the just-recorded instant) rather than
+  // by remounting the form (keyed on the just-recorded event) rather than
   // imperatively resetting state from an effect.
-  const formKey = state.kind === "recorded" ? state.occurredAt : "form";
+  const formKey = state.kind === "recorded" ? state.outcomeEventId : "form";
 
   return (
     <section
