@@ -1,0 +1,6 @@
+interface:
+  display_name: "Klinnova PR Readiness"
+  short_description: "Final branch checks before PR review"
+  default_prompt: "Use $klinnova-pr-readiness to prepare this Klinnova branch for Founder review."
+policy:
+  allow_implicit_invocation: true

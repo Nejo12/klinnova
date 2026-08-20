@@ -1,0 +1,6 @@
+interface:
+  display_name: "Klinnova UI Verification"
+  short_description: "Live responsive and accessibility proof"
+  default_prompt: "Use $klinnova-ui-verification to verify this Klinnova UI change live."
+policy:
+  allow_implicit_invocation: true

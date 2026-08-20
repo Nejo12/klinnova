@@ -1,71 +1,79 @@
-# Stint Agent Instructions
+# Klinnova Agent Instructions
 
-Solo-founder workflow. One active vertical slice at a time. Product docs define scope; this file defines how to work.
+Klinnova is the public product and brand name. This repository may retain historical `stint` paths, package names, project names, domains, migrations, and documentation; do not rename them indiscriminately.
 
-## Source of truth
+## Source Of Truth
 
-Read before proposing or implementing work:
+- GitHub `main` after merge is authoritative for repository state.
+- Durable approved plans, decision records, and closure documents are authoritative for scoped work.
+- Current execution/readiness state lives in `docs/14-founder-dashboard.md` and especially `docs/53-m5.1-beta-readiness-closure.md` when later execution evidence supersedes older summaries.
+- Before proposing or changing code, read the relevant current plan plus `docs/04-mvp.md`, `docs/13-implementation-plan.md`, `docs/14-founder-dashboard.md`, and `NOT_NOW.md`.
+- When evidence conflicts and no document defines precedence, stop and report the conflict instead of inventing a resolution.
 
-1. `docs/04-mvp.md` — scope boundary
-2. `docs/13-implementation-plan.md` — slice order and exit criteria
-3. `docs/14-founder-dashboard.md` — current focus
-4. `NOT_NOW.md` — deferred ideas (do not implement)
-5. Active slice build plan when present (e.g. `docs/16-slice-1-build-plan.md` for Slice 1; `docs/15-slice-0-build-plan.md` is historical)
-6. Active schema proposal when present (e.g. `docs/17-slice-1-schema-proposal.md` before Slice 1 migrations)
-7. Supporting docs as needed: vision, principles, features, design system, architecture, non-functional, anti-goals, terminology
+## Founder-Controlled Workflow
 
-When documents conflict, stop and report the conflict. Do not invent a resolution.
+Default workflow for substantial changes:
 
-## Working mode
+1. Discovery/proposal.
+2. Founder review.
+3. Explicit implementation authorization for that exact scope.
+4. Implementation.
+5. Local verification.
+6. Branch review.
+7. Push only when authorized.
+8. PR only when authorized.
+9. Exact-head CI and hosted proof where applicable.
+10. Stop before merge.
+11. Founder manually approves and performs the merge.
+12. Post-merge verification.
 
-- Plan the active slice, then edit.
-- Ship vertical slices (UI + data + authz + tests), not layered micro-tasks.
-- Keep one open slice; finish or park it before starting another.
-- Prefer the simplest implementation that meets the slice exit criteria.
-- Do not redesign product, brand, architecture, or terminology unless asked.
-- Do not implement items in `NOT_NOW.md` or other deferred scope.
-- Do not add dependencies without explaining why the current stack is insufficient.
-- Do not create speculative abstractions or agent personas.
+Never merge automatically. Never infer Founder approval from a prior task, a plan, a branch name, or a nearby conversation.
 
-## Engineering rules
+## Scope Discipline
+
+- Do not implement deferred work from `NOT_NOW.md` or superseded/historical plans.
+- Do not continue interrupted work unless the current task explicitly authorizes it.
+- Do not silently widen scope, add product semantics, add statuses, alter pricing, change workflows, or make legal/compliance claims.
+- Do not perform unrelated cleanup, refactors, dependency changes, or design-system rewrites.
+- Preserve existing product truth unless an approved plan explicitly changes it.
+
+## Git Safety
+
+Without explicit authorization: no `reset --hard`, destructive clean, force push, branch deletion, history rewrite, merge, release/tag, or destructive stash/drop behavior.
+
+Preserve interrupted and in-progress work. If the worktree is dirty, identify the dirty files before editing and avoid unrelated changes.
+
+## External Systems
+
+No Production, Preview, database, hosting, email, domain, GitHub, Vercel, Supabase, Sentry, Figma, or other external-service mutation unless the specific task explicitly authorizes that system and action.
+
+Repository edits do not imply hosted-configuration authorization.
+
+## Engineering Rules
 
 - Strict TypeScript; no `any`.
 - Absolute imports; lowercase directories; one React component per file; minimal barrels.
 - Server Components by default; Client Components only for required interactivity.
-- SCSS Modules and CSS custom properties; no Tailwind.
+- SCSS Modules and existing Klinnova/Stint design tokens; no Tailwind.
 - Semantic HTML and accessible primitives.
-- Responsive web only: candidate flows mobile-first; employer and admin flows desktop-first with functional mobile fallback. No native apps until post-beta evidence.
+- Responsive web only: candidate flows mobile-first; employer/admin flows desktop-first with functional mobile fallback.
 - Validate external input with Zod.
-- Authorize server-side and via Supabase RLS; never trust client-supplied role, ownership, verification, or application status.
-- Keep candidate documents private; expose only via short-lived signed URLs.
+- Authorize server-side and through Supabase RLS; never trust client-supplied role, ownership, verification, or application status.
+- Keep candidate documents private; expose only through approved short-lived signed URLs.
 
-## Tests
+## Product Language
 
-Vitest, Testing Library, MSW, and Playwright for critical journeys.
-
-Require tests for: authorization, onboarding persistence, matching rules, application uniqueness, employer verification gates, vacancy publication state, candidate document privacy, account deletion.
-
-## Product language
-
-- Plain, respectful, concise candidate copy.
+- Use plain, respectful, concise candidate copy.
 - Never define people by what they lack.
-- Use `candidate`, `employer`, `vacancy` / `job`, `application`, and `match` per `docs/12-terminology.md`.
+- Use `candidate`, `employer`, `vacancy` / `job`, `application`, and `match` according to `docs/12-terminology.md`.
 - Frame automation as outcomes, not AI features.
-- Every interaction should reduce uncertainty or move someone one step closer.
 
-## Definition of done
+## Verification
 
-A slice (or PR) is done only when:
+Use the smallest relevant local test loop during iteration. Vitest, Testing Library, MSW, and Playwright cover critical journeys. Before PR/final verification, run the plan-required checks. Do not weaken or delete tests to get green output.
 
-- slice exit criteria / acceptance criteria are met
-- lint, type-check, relevant tests, and production build pass
-- accessibility, security, and privacy implications were checked
-- docs updated when necessary
-- `main` remains deployable
-- no unrelated changes
+Required scrutiny: authorization, onboarding persistence, matching rules, application uniqueness, employer verification gates, vacancy publication state, candidate document privacy, account deletion, accessibility, privacy, deployability, and no unrelated changes.
 
-## Review checklist
+## Agent Support
 
-Before merge, scan: product scope, UI quality, data integrity/authz, accessibility, privacy, edge cases, deployability.
-
-Repository rules in this file take priority over generic agent workflows.
+Repository-specific Codex setup lives in `docs/agent/`. Use project-local Klinnova skills from `.agents/skills` when their trigger matches the task. Keep this file compact; put repeatable workflow detail in skills or `docs/agent/`.

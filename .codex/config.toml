@@ -1,0 +1,19 @@
+# Project-local Codex configuration for Klinnova.
+# Keep machine-specific provider/auth/notification/plugin settings in ~/.codex/config.toml.
+
+model_reasoning_effort = "medium"
+personality = "pragmatic"
+
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+approvals_reviewer = "user"
+
+[sandbox_workspace_write]
+network_access = false
+
+[features]
+multi_agent = true
+
+[apps._default]
+default_tools_approval_mode = "writes"
+destructive_enabled = false
