@@ -252,31 +252,6 @@ function isRealNavigationRequest(
 }
 
 /**
- * Delays the real navigation request whose URL matches `urlGlob` by
- * `delayMs` before letting it continue to the real server (prefetch
- * requests to the same URL pass through immediately — see
- * `isRealNavigationRequest`). Returns an unroute function.
- */
-async function delayRoute(
-  page: Page,
-  urlGlob: string,
-  delayMs: number,
-): Promise<() => Promise<void>> {
-  const handler = async (
-    route: Parameters<Parameters<Page["route"]>[1]>[0],
-  ) => {
-    if (!isRealNavigationRequest(route)) {
-      await route.continue();
-      return;
-    }
-    await new Promise((resolve) => setTimeout(resolve, delayMs));
-    await route.continue();
-  };
-  await page.route(urlGlob, handler);
-  return () => page.unroute(urlGlob, handler);
-}
-
-/**
  * Same as `delayRoute`, except matching prefetches are aborted instead of
  * passed through. Use for hard "slow path must show skeleton" assertions:
  * if a matching prefetch has already warmed the RSC payload, the later click
