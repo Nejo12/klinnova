@@ -191,7 +191,7 @@ export function ApplicationStatusActions({
                 value={status}
                 className={`${styles.button} ${styles.statusActionButton}`}
                 disabled={pending || dialogOpen}
-                aria-busy={isPressed}
+                aria-busy={isPressed ? true : undefined}
                 onClick={() => setPressedStatus(status)}
               >
                 {isPressed

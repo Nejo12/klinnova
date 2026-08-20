@@ -341,7 +341,7 @@ describe("ApplicationStatusActions", () => {
       name: "Start reviewing",
     });
     expect(revertedButton).not.toBeDisabled();
-    expect(revertedButton).not.toHaveAttribute("aria-busy", "true");
+    expect(revertedButton).not.toHaveAttribute("aria-busy");
   });
 
   it("shows only the pressed button's pending label while a disabled sibling keeps its ordinary label and gains no aria-busy", async () => {
@@ -371,7 +371,7 @@ describe("ApplicationStatusActions", () => {
 
     const siblingButton = screen.getByRole("button", { name: "Shortlist" });
     expect(siblingButton).toBeDisabled();
-    expect(siblingButton).not.toHaveAttribute("aria-busy", "true");
+    expect(siblingButton).not.toHaveAttribute("aria-busy");
     expect(screen.queryByRole("button", { name: "Shortlisting…" })).toBeNull();
 
     finish?.({ kind: "updated", currentStatus: "reviewing" });

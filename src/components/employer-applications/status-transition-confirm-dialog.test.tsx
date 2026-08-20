@@ -133,7 +133,7 @@ describe("StatusTransitionConfirmDialog", () => {
       name: "Accept application",
     });
     expect(confirmButton).not.toBeDisabled();
-    expect(confirmButton).not.toHaveAttribute("aria-busy", "true");
+    expect(confirmButton).not.toHaveAttribute("aria-busy");
   });
 
   it("shows 'Recording…' as the pending confirm label for targetStatus='accepted' too", () => {
@@ -183,6 +183,23 @@ describe("StatusTransitionConfirmDialog", () => {
     await user.keyboard("{Escape}");
 
     expect(onCancel).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not cancel with Escape while pending", async () => {
+    const user = userEvent.setup();
+    const onCancel = vi.fn();
+    renderInForm(
+      <StatusTransitionConfirmDialog
+        targetStatus="accepted"
+        pending={true}
+        onCancel={onCancel}
+      />,
+    );
+
+    await user.keyboard("{Escape}");
+
+    expect(onCancel).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Recording…" })).toBeDisabled();
   });
 
   it("traps Tab: from the last focusable element (confirm button) it wraps to the first (Cancel)", async () => {
