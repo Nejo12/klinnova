@@ -366,3 +366,50 @@ Discovery validation:
 - Temporary instrumentation files and the temporary Playwright measurement spec were removed.
 - `git status --short` returned clean before this documentation edit.
 - No product, schema, migration, CI, build-tooling, or test files are intended in the final branch diff.
+
+### P3.7-C1 - Request-Level Employer Profile Deduplication
+
+Implementation base: `origin/main` at `bd5dceaacee9021b22922906f23ef1e816982878`, the merge commit for PR #129 (`docs(p37): cross-navigation performance discovery`). PR #127 remained open, draft, and unmerged during this work.
+
+Memoization mechanism: `loadEmployerProfile` now stores its in-flight/resolved `LoadEmployerResult` promise on the per-request Supabase server client instance using a private module-local `unique symbol`. This deliberately avoids a global `Map`, `unstable_cache`, persistent client state, shared layouts, browser storage, or cross-navigation caching. Current employer route renders create one Supabase server client and pass that same instance through route loaders, `requireCompletedEmployer`, and `loadUnseenApplicationsCount`, so equivalent same-render profile gates share one underlying auth/profile/company load. A fresh server client on the next request/navigation loads fresh state.
+
+What is deduped:
+
+- `loadEmployerProfile` underlying `auth.getUser`;
+- `employer_profiles` select;
+- `companies` select when an employer profile exists;
+- repeated `requireCompletedEmployer` gates that share the same server Supabase client during one render.
+
+What remains fresh and uncached:
+
+- unseen application count;
+- employer suspension state;
+- account capabilities;
+- application mark-seen behavior;
+- route-specific application/vacancy data;
+- all future navigations, router refreshes, and server actions that create a fresh server Supabase client.
+
+Production-mode measurement after implementation used the same local Supabase + webpack production-build measurement discipline as P3.7-C. Temporary metrics hooks and the temporary Playwright spec were removed afterward. The timing numbers remain secondary because local absolute times are already small; the primary result is structural same-request deduplication.
+
+| Route | Before profile-scope calls | After profile-scope calls | After underlying profile loads | Before serverMs | After serverMs |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `/employer` | 3 | 3 | 1 | 5.1 | 10.7 |
+| `/employer/vacancies` | 2 | 2 | 1 | 6.9 | 7.2 |
+| `/employer/applications` | 2 | 2 | 1 | 8.7 | 6.4 |
+| `/employer/vacancies/[id]` | 2 | 2 | 1 | 6.7 | 6.4 |
+| `/employer/applications/[id]` | 3 | 3 | 1 | 10.5 | 11.0 |
+
+After-measurement query proof for every measured route: `profileAuth=1`, `profileTable=1`, `companyTable=1`. The unchanged profile-scope call count is expected: callers still invoke their existing contracts, but duplicate calls now share the same underlying result for that request.
+
+Security/freshness boundary:
+
+- Authenticated user resolution and RLS context still come from the supplied Supabase server client.
+- Structured result contracts are unchanged for unauthenticated, missing/incomplete employer, profile query failure, company query failure, and completed employer.
+- No route redirects moved into the memoized loader; caller-owned redirect behavior remains in place.
+- The cache is attached only to the server client object used by the current request. It does not survive a newly created server client and therefore does not claim cross-navigation improvement.
+
+Validation:
+
+- Focused loader tests prove two and three same-client calls dedupe to one underlying load.
+- Focused tests prove a fresh server client reloads fresh employer state.
+- Focused `requireCompletedEmployer` tests prove repeated gates dedupe while preserving unauthenticated, incomplete, completed, and profile-failure contracts.
