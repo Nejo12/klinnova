@@ -214,3 +214,42 @@ This discovery pass intentionally changed only this plan document. During discov
 - The temporary Playwright measurement spec was deleted.
 - No product, schema, RPC, CI, or build-tooling files were modified.
 - No P3.7 implementation work was performed.
+
+## 13. Implementation Records
+
+### P3.7-A1 - Employer Application Detail Parallelization
+
+PR #127 remains an open draft and unmerged. The implementation was technically valid, but local before/after measurement classified it as **C. NO MATERIAL CHANGE**:
+
+| State | Median serverMs | Median totalMs |
+| --- | ---: | ---: |
+| Before | 6.9 | 76.3 |
+| After | 8.3 | 75.0 |
+
+Do not continue mechanically into broad P3.7-A2 `Promise.all` conversions from that result.
+
+### P3.7-B - Vacancy Readiness N+1
+
+Current behavior was confirmed in `loadEmployerDrafts`: the loader first fetches owned employer vacancy rows, then calls `employer_vacancy_draft_readiness` once for each row whose `publication_state` is `draft`. The route consumers are `/employer/vacancies` and `/employer`; rendered readiness state is derived from `ready` plus the mapped missing-field checklist.
+
+Instrumented loader proof before implementation:
+
+| Draft count | Readiness RPC calls | Instrumented loaderMs |
+| ---: | ---: | ---: |
+| 1 | 1 | 2.2 |
+| 5 | 5 | 6.2 |
+| 10 | 10 | 11.2 |
+| 20 | 20 | 23.3 |
+
+Selected solution: an additive, set-based bulk RPC, `employer_vacancy_drafts_readiness(uuid[])`, with the same SQL-owned readiness rules as the single-vacancy RPC. Unauthorized requested IDs are omitted rather than surfaced, so cross-employer vacancy existence/readiness does not leak. Duplicate IDs collapse deterministically to one result row ordered by first input occurrence. Empty input returns no rows.
+
+Instrumented loader proof after implementation:
+
+| Draft count | Readiness RPC calls | Instrumented loaderMs |
+| ---: | ---: | ---: |
+| 1 | 1 | 2.4 |
+| 5 | 1 | 1.7 |
+| 10 | 1 | 1.8 |
+| 20 | 1 | 1.4 |
+
+The primary P3.7-B result is structural: readiness loading changes from O(N) client/database RPC calls to one bounded bulk readiness operation for the draft IDs already authorized by `loadEmployerDrafts`. Database tests prove readiness equivalence with the existing single RPC for controlled incomplete and complete drafts, empty-input behavior, duplicate-ID behavior, caller ownership, and non-leakage for another employer's vacancy.

@@ -981,6 +981,14 @@ export type Database = {
         Args: { p_vacancy_id: string }
         Returns: Json
       }
+      employer_vacancy_drafts_readiness: {
+        Args: { p_vacancy_ids: string[] }
+        Returns: {
+          missing: string[]
+          ready: boolean
+          vacancy_id: string
+        }[]
+      }
       fill_employer_vacancy: { Args: { p_vacancy_id: string }; Returns: Json }
       get_current_employer_application: {
         Args: { p_application_id: string }

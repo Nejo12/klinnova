@@ -331,6 +331,14 @@ export const readinessRpcResultSchema = z.discriminatedUnion("status", [
   z.object({ status: z.literal("unavailable") }),
 ]);
 
+export const bulkReadinessRpcRowSchema = z.object({
+  vacancy_id: vacancyIdSchema,
+  ready: z.boolean(),
+  missing: z.array(z.string()),
+});
+
+export const bulkReadinessRpcResultSchema = z.array(bulkReadinessRpcRowSchema);
+
 export type LanguageRequirementRow = z.infer<
   typeof languageRequirementRowSchema
 >;

@@ -7,7 +7,7 @@ import {
   type ReadinessChecklistItem,
 } from "@/lib/employer/vacancies/readiness";
 import { requireCompletedEmployer } from "@/lib/employer/vacancies/require-completed-employer";
-import { readinessRpcResultSchema } from "@/lib/employer/vacancies/schemas";
+import { bulkReadinessRpcResultSchema } from "@/lib/employer/vacancies/schemas";
 import type { EmployerType } from "@/lib/employer/schemas";
 import type { Database } from "@/types/database";
 
@@ -57,10 +57,10 @@ type EmployerClient = SupabaseClient<Database>;
  * filter so the list also shows published/paused/filled/expired/withdrawn
  * rows, not only drafts.
  *
- * Readiness uses the per-draft RPC (PR 4.3) and is only meaningful — and
- * only fetched — for rows still in `draft`. There is no bulk readiness
- * interface yet; list pages call readiness once per draft row. Acceptable
- * for early employer draft counts; revisit if lists grow large.
+ * Readiness is only meaningful — and only fetched — for rows still in
+ * `draft`. P3.7-B uses one set-based readiness RPC for every draft row in
+ * this list so employer home/vacancy-list rendering no longer performs one
+ * readiness round trip per draft.
  */
 export async function loadEmployerDrafts(
   supabase: EmployerClient,
@@ -89,6 +89,33 @@ export async function loadEmployerDrafts(
   }
 
   const now = Date.now();
+  const draftRowIds = rows
+    .filter((row) => row.publication_state === "draft")
+    .map((row) => row.id);
+  const readinessByVacancyId = new Map<
+    string,
+    { ready: boolean; missing: string[] }
+  >();
+
+  if (draftRowIds.length > 0) {
+    const readiness = await gate.supabase.rpc(
+      "employer_vacancy_drafts_readiness",
+      { p_vacancy_ids: draftRowIds },
+    );
+
+    if (readiness.error === null) {
+      const parsed = bulkReadinessRpcResultSchema.safeParse(readiness.data);
+      if (parsed.success) {
+        for (const row of parsed.data) {
+          readinessByVacancyId.set(row.vacancy_id, {
+            ready: row.ready,
+            missing: row.missing,
+          });
+        }
+      }
+    }
+  }
+
   const drafts: EmployerDraftListItem[] = [];
 
   for (const row of rows) {
@@ -96,17 +123,10 @@ export async function loadEmployerDrafts(
     let checklist: ReadinessChecklistItem[] = [];
 
     if (row.publication_state === "draft") {
-      const readiness = await gate.supabase.rpc(
-        "employer_vacancy_draft_readiness",
-        { p_vacancy_id: row.id },
-      );
-
-      if (readiness.error === null) {
-        const parsed = readinessRpcResultSchema.safeParse(readiness.data);
-        if (parsed.success && parsed.data.status === "ok") {
-          ready = parsed.data.ready;
-          checklist = mapReadinessChecklist(parsed.data.missing);
-        }
+      const readiness = readinessByVacancyId.get(row.id);
+      if (readiness !== undefined) {
+        ready = readiness.ready;
+        checklist = mapReadinessChecklist(readiness.missing);
       }
     }
 
