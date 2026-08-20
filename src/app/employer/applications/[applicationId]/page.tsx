@@ -80,21 +80,23 @@ export default async function EmployerApplicationDetailPage({
   // loaded this application's detail — the intended seen-acknowledgement
   // event. Never lets a failure here affect the page render; the detail
   // below is already loaded and must display regardless.
-  try {
-    await markEmployerApplicationSeen(supabase, applicationId);
-  } catch (error) {
+  const markSeenPromise = markEmployerApplicationSeen(
+    supabase,
+    applicationId,
+  ).catch((error: unknown) => {
     console.error("[applications] mark-seen threw unexpectedly", {
       applicationId,
       error: String(error),
     });
-  }
+    return { ok: false as const };
+  });
 
-  const capabilities = await loadAccountCapabilities(supabase);
+  const [capabilities, outcomesResult] = await Promise.all([
+    loadAccountCapabilities(supabase),
+    loadEmployerApplicationOutcomes(supabase, applicationId),
+    markSeenPromise,
+  ]);
   const unseenApplicationsCount = await loadUnseenApplicationsCount(supabase);
-  const outcomesResult = await loadEmployerApplicationOutcomes(
-    supabase,
-    applicationId,
-  );
 
   return (
     <main className={styles.page}>
