@@ -253,3 +253,116 @@ Instrumented loader proof after implementation:
 | 20 | 1 | 1.4 |
 
 The primary P3.7-B result is structural: readiness loading changes from O(N) client/database RPC calls to one bounded bulk readiness operation for the draft IDs already authorized by `loadEmployerDrafts`. Database tests prove readiness equivalence with the existing single RPC for controlled incomplete and complete drafts, empty-input behavior, duplicate-ID behavior, caller ownership, and non-leakage for another employer's vacancy.
+
+### P3.7-C - Cross-Navigation Authenticated Data Loading Discovery
+
+Discovery base: `origin/main` at `55e5f3067b30e81c2a9c207d052eaff9af4bb757`, the merge commit for PR #128 (`perf(p37): remove vacancy readiness n+1`). PR #128 is merged. PR #127 (`perf(p37): parallelize employer application detail loads`) remains open, draft, and unmerged at `c6dcdf6b0babdd5230dc8c782c3199d8b442e5a8`.
+
+Installed framework version: Next.js `16.2.12` with React `19.2.4`. The current App Router tree has only `src/app/layout.tsx` and `src/app/internal/layout.tsx`; there is no `src/app/employer/layout.tsx` and no `src/app/candidate/layout.tsx`. Authenticated candidate/employer pages are individually dynamic via `export const dynamic = "force-dynamic"`; account export route handlers under `/candidate/account/export` and `/employer/account/export` are also authenticated but are not navigation-shell pages.
+
+Route/load inventory summary:
+
+| Surface | Routes | Shared layout? | Common shell/header loads | Route-specific gate/data |
+| --- | --- | --- | --- | --- |
+| Employer dashboard | `/employer` | No | capabilities, unseen count | `loadEmployerProfile`, `loadEmployerDrafts` |
+| Employer vacancies | `/employer/vacancies`, `/employer/vacancies/new`, `/employer/vacancies/[vacancyId]`, `/employer/vacancies/[vacancyId]/edit` | No | capabilities, unseen count; suspension on list/detail | draft/list/detail/create gates, P3.7-B bulk readiness on list/home |
+| Employer applications | `/employer/applications`, `/employer/applications/[applicationId]` | No | capabilities, unseen count, suspension | application list/detail, mark-seen on detail, outcomes on detail |
+| Employer onboarding/verification/account | `/employer/onboarding`, `/employer/verification`, `/employer/account/delete` | No | capabilities; unseen/suspension on verification | profile gate, verification state, delete auth gate |
+| Candidate dashboard/profile/account | `/candidate`, `/candidate/onboarding`, `/candidate/account`, `/candidate/account/delete` | No | capabilities for dual-account nav | candidate onboarding/profile/auth gate |
+| Candidate jobs/matches/applications | `/candidate/matches`, `/candidate/jobs/[vacancyId]`, `/candidate/applications`, `/candidate/applications/[applicationId]` | No | capabilities for dual-account nav | match/detail/application inventory, confirmation/history/outcomes |
+
+Repeated loader caller counts, excluding tests:
+
+| Loader | Current route/module callers | DB/Auth shape | Redirects? | Fail-soft? | Freshness |
+| --- | ---: | --- | --- | --- | --- |
+| `loadAccountCapabilities` | 18 candidate/employer page callers plus auth/confirm | `auth.getUser` + candidate profile probe + employer profile probe, profile probes already parallel | No | Returns `null` on auth/query failure | Changes after candidate/employer profile creation, deletion, account recovery/deletion |
+| `loadUnseenApplicationsCount` | 8 employer page callers | `requireCompletedEmployer` then `count_unseen_current_employer_applications` RPC | No | Returns `0` on gate/RPC/parse failure | Must refresh after application detail marks seen and when new applications arrive |
+| `loadEmployerProfile` / `requireCompletedEmployer` | Direct page callers plus many employer route loaders/actions | `auth.getUser`, employer profile select, company select | Callers redirect based on result | No; returns structured failure | Changes after onboarding, verification/profile edits, deletion/tombstone paths |
+| `loadCurrentEmployerSuspensionStatus` | 6 employer page callers plus update helper | `auth.getUser` + `is_current_employer_suspended` RPC | No | Unknown/failure result; RLS/RPC remains authority | Suspension/reinstatement is safety-sensitive and should be fresh per navigation |
+| Candidate profile/view loaders | candidate home/onboarding/matches/applications/jobs | `auth.getUser` plus candidate profile/languages or candidate-owned RPC/query | Callers redirect based on result | Mostly no; outcomes are fail-soft on detail | Private candidate state; request-scoped only if cached |
+
+Problem distinction:
+
+- **Problem A - same-request duplicate work exists.** Employer pages commonly call equivalent employer-profile work more than once in one server render. Measured examples: `/employer/vacancies`, `/employer/applications`, and vacancy detail each invoked employer-profile scope twice; `/employer` and employer application detail invoked it three times. This comes from route gates plus nested gates inside unseen count or detail/list loaders.
+- **Problem B - cross-navigation repeated work also exists, but is mostly expected navigation-level revalidation.** Every independent navigation reloads capabilities and, on employer pages, unseen/suspension/profile state. Absolute measured server timings stayed small: employer route samples were roughly `5.1-10.5ms` server time and `54.2-87.6ms` total; candidate route samples were roughly `5.3-9.0ms` server time and `52.2-97.8ms` total. This does not currently justify a broad persistent-shell data cache.
+
+Temporary production-mode measurement used local Supabase after reset, a webpack production build, real authenticated fixtures (verified employer, published vacancy, matching candidate, submitted application), and env-gated server instrumentation removed after measurement. Direct route navigations were used to capture clean `PerformanceNavigationTiming`; therefore these numbers represent per-route server renders, not a claim that client-side `<Link>` transitions would refetch persisted layouts.
+
+Employer measurement:
+
+| Navigation | Capabilities | Unseen | Profile/View | Suspension | Route-specific | Total relevant calls | serverMs | totalMs |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `/employer` | 2 | 1 | 3 | 0 | 4 | 24 | 6.7 | 68.4 |
+| `/employer/vacancies` | 1 | 1 | 2 | 1 | 1 | 14 | 6.9 | 68.5 |
+| `/employer/applications` | 1 | 1 | 2 | 1 | 1 | 14 | 8.7 | 69.9 |
+| `/employer` repeat | 1 | 1 | 3 | 0 | 1 | 15 | 5.1 | 58.7 |
+| `/employer/vacancies` | 1 | 1 | 2 | 1 | 1 | 14 | 7.6 | 68.8 |
+| `/employer/vacancies/[id]` | 1 | 1 | 2 | 1 | 2 | 15 | 6.7 | 67.4 |
+| `/employer/vacancies/[id]/edit` | 0 | 0 | 1 | 0 | 1 | 5 | 8.4 | 54.2 |
+| `/employer/vacancies` repeat | 1 | 1 | 2 | 1 | 1 | 14 | 6.0 | 59.1 |
+| `/employer/applications` | 1 | 1 | 2 | 1 | 1 | 14 | 6.3 | 58.4 |
+| `/employer/applications/[id]` | 1 | 1 | 3 | 1 | 3 | 19 | 10.5 | 87.6 |
+| `/employer/applications` repeat | 1 | 1 | 2 | 1 | 1 | 14 | 7.5 | 60.1 |
+
+Candidate measurement:
+
+| Navigation | Capabilities | Unseen | Profile/View | Suspension | Route-specific | Total relevant calls | serverMs | totalMs |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `/candidate` | 1 | 0 | 2 | 0 | 2 | 14 | 5.3 | 97.8 |
+| `/candidate/matches` | 1 | 0 | 1 | 0 | 2 | 8 | 5.8 | 52.2 |
+| `/candidate/applications` | 1 | 0 | 1 | 0 | 1 | 7 | 6.1 | 53.0 |
+| `/candidate/matches` repeat | 1 | 0 | 1 | 0 | 2 | 8 | 9.0 | 59.7 |
+| `/candidate/jobs/[id]` | 1 | 0 | 0 | 0 | 5 | 9 | 5.3 | 68.0 |
+| `/candidate/matches` repeat | 1 | 0 | 1 | 0 | 2 | 8 | 7.3 | 52.7 |
+
+Notes on the count columns: `Capabilities`, `Unseen`, `Profile/View`, and `Suspension` are loader invocations. `Route-specific` and `Total relevant calls` are instrumentation counts of Supabase client/auth/query/RPC starts outside or across those scopes. The first `/employer` sample included an extra capabilities/profile footprint likely from production prefetch/background work; the repeat sample is a cleaner steady-state comparison.
+
+Next/App Router findings:
+
+- Current local build output marks all authenticated candidate/employer pages dynamic (`ƒ`).
+- Layouts under a route segment would share UI across sibling pages and, per current Next App Router behavior, preserve state and avoid re-render on client-side navigation. That is useful for static shell structure, but it also means dynamic private shell data placed in a persistent layout can become stale unless explicit refresh/invalidation is designed.
+- Root `src/app/layout.tsx` only asserts server env and renders `<html><body>`. `src/app/internal/layout.tsx` is a static operator nav shell with no auth data. No current layout owns candidate/employer auth, capabilities, unseen count, profile, or suspension state.
+- `loading.tsx` exists for candidate matches/applications/job detail and employer home/vacancies/applications/verification. Adding nested layouts would change which loading boundary appears on sibling transitions and needs UI verification before implementation.
+- React `cache()` is request-scoped: it can dedupe equivalent work within one server request, but it does not solve cross-navigation repeated work. It is a good fit for Problem A only.
+- Existing Supabase calls are not automatically deduped by Next `fetch` memoization because they go through `@supabase/ssr` client methods, not identical framework-level `fetch()` calls owned by the same component tree.
+
+Freshness/security findings:
+
+- Employer unseen count should not live in long-lived client or persistent layout state without explicit invalidation. The application-detail page marks an application seen and then the next list/detail render must show the updated count; new applications also need fresh visibility.
+- Employer suspension is safety-sensitive. A cached `not suspended` shell must not weaken route/RPC enforcement. Current loader is explicitly a UX helper, with RLS/RPC-level checks remaining authoritative; keep suspension fresh per navigation unless an implementation proves invalidation.
+- Capabilities change when candidate/employer profiles are created/deleted or account deletion/recovery state changes. Cross-navigation caching risks stale role-switch UI after onboarding or deletion.
+- Profile completion and verification state affect immediate redirects after onboarding/verification mutations. Persistent shell profile state would need precise `router.refresh()` / server-action revalidation semantics.
+- Candidate private data must never be cached across users. Request-level memoization is acceptable only when scoped to the current request/session client.
+
+Options matrix:
+
+| Option | Expected DB-call reduction | Cross-navigation benefit | Freshness risk | Auth/privacy risk | Complexity | Recommendation |
+| --- | --- | --- | --- | --- | --- | --- |
+| A. Shared `/employer` and/or `/candidate` server layouts | Medium for shell UI if data is moved; uncertain for current direct-request measurements | Possible on client-side sibling navigation | High for unseen/suspension/capabilities unless invalidated | Medium-high because private auth state moves into persistent shell | High | Do not implement now |
+| B. React `cache()` / request-level memoization | Medium for same-request employer-profile duplicates | None | Low; cache dies after request | Low if keyed by current request/client only | Low-medium | **Recommended smallest slice** |
+| C. Explicit per-request `loadEmployerShellContext()` | Medium if it centralizes existing calls | None by itself | Medium; can accidentally bundle freshness-sensitive data | Medium | Medium | Defer unless B is insufficient |
+| D. Database/RPC aggregation | Medium-high for one route render | None by itself | Medium; couples shell concerns to SQL | Medium; RLS/security-definer review needed | High | Not justified by current timings |
+| E. Client-side persisted shell state | High apparent reduction | High | High | High for private/stale auth state | High | Reject for this scope |
+| F. Leave architecture unchanged | None | None | None | None | None | Valid if no implementation is authorized |
+
+Classification: **B. IMPLEMENT REQUEST-LEVEL DEDUPLICATION ONLY**. P3.7-C should not implement shared candidate/employer layouts, persistent shell state, broad route architecture changes, schema/RPC aggregation, or cross-navigation caching from current evidence. The actual safe opportunity is Problem A: duplicate employer-profile/completed-employer work within a single server render.
+
+Smallest next slice proposal:
+
+**P3.7-C1 - request-level memoization for employer profile/completed-employer gate**
+
+- Likely files: `src/lib/employer/load-employer.ts`, `src/lib/employer/vacancies/require-completed-employer.ts`, focused tests for repeated same-request calls.
+- Exact change: wrap the current employer-profile load and/or completed-employer gate in request-scoped memoization without moving redirects, changing SQL/RPC, changing route layouts, or caching across requests.
+- Data ownership: remains server-side, current authenticated Supabase/RLS context only.
+- Invalidation: none across requests; server actions and later navigations naturally re-run.
+- Routes affected: employer home, vacancies list/detail/edit/new, applications list/detail, verification, onboarding paths that already call these loaders.
+- Expected measurable result: employer pages with repeated profile gates should reduce duplicate employer-profile Auth/table probes during one render; cross-navigation call counts should remain intentionally fresh.
+- Tests required: unit tests proving duplicate same-client calls are deduped, unauthenticated/failure behavior unchanged, and callers preserve redirect/fail-soft semantics; existing employer page tests; targeted production measurement repeat.
+- Rollback: revert the memoization wrapper only.
+- Explicit exclusions: no shared `/employer` or `/candidate` layout, no unseen-count caching, no suspension caching, no client persisted shell state, no schema/RPC/build-tooling changes, no P3.7-A2 continuation.
+
+Discovery validation:
+
+- Temporary instrumentation files and the temporary Playwright measurement spec were removed.
+- `git status --short` returned clean before this documentation edit.
+- No product, schema, migration, CI, build-tooling, or test files are intended in the final branch diff.
