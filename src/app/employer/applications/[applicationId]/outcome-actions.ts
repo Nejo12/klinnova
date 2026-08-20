@@ -96,6 +96,7 @@ export async function recordApplicationOutcomeAction(
     revalidatePath(detailPath);
     return {
       kind: "recorded",
+      outcomeEventId: rpc.data.outcome_event_id,
       outcomeType: rpc.data.outcome_type,
       occurredAt: rpc.data.occurred_at,
     };

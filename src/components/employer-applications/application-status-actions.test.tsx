@@ -295,11 +295,87 @@ describe("ApplicationStatusActions", () => {
 
     await user.click(screen.getByRole("button", { name: "Start reviewing" }));
     expect(
-      await screen.findByRole("button", { name: "Start reviewing" }),
+      await screen.findByRole("button", { name: "Starting review…" }),
     ).toBeDisabled();
 
     finish?.({ kind: "updated", currentStatus: "reviewing" });
     expect(await screen.findByRole("status")).toHaveTextContent(/in review/i);
+  });
+
+  it("shows the pressed button's pending label and aria-busy while its request is in flight, reverting once it resolves", async () => {
+    const user = userEvent.setup();
+    let finish: ((value: TransitionApplicationActionState) => void) | undefined;
+    actionMock.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+
+    render(
+      <ApplicationStatusActions
+        applicationId={applicationId}
+        currentStatus="submitted"
+        allowedTransitions={["reviewing"]}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Start reviewing" }));
+
+    const pendingButton = await screen.findByRole("button", {
+      name: "Starting review…",
+    });
+    expect(pendingButton).toBeDisabled();
+    expect(pendingButton).toHaveAttribute("aria-busy", "true");
+    expect(
+      screen.queryByRole("button", { name: "Start reviewing" }),
+    ).toBeNull();
+
+    finish?.({ kind: "updated", currentStatus: "reviewing" });
+
+    expect(await screen.findByRole("status")).toHaveTextContent(/in review/i);
+    // `allowedTransitions` is caller-controlled and unchanged by this
+    // resolution in the test, so the button reappears, enabled, with its
+    // ordinary (non-pending) label and no aria-busy.
+    const revertedButton = await screen.findByRole("button", {
+      name: "Start reviewing",
+    });
+    expect(revertedButton).not.toBeDisabled();
+    expect(revertedButton).not.toHaveAttribute("aria-busy");
+  });
+
+  it("shows only the pressed button's pending label while a disabled sibling keeps its ordinary label and gains no aria-busy", async () => {
+    const user = userEvent.setup();
+    let finish: ((value: TransitionApplicationActionState) => void) | undefined;
+    actionMock.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+
+    render(
+      <ApplicationStatusActions
+        applicationId={applicationId}
+        currentStatus="submitted"
+        allowedTransitions={["reviewing", "shortlisted"]}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Start reviewing" }));
+
+    const pressedButton = await screen.findByRole("button", {
+      name: "Starting review…",
+    });
+    expect(pressedButton).toHaveAttribute("aria-busy", "true");
+
+    const siblingButton = screen.getByRole("button", { name: "Shortlist" });
+    expect(siblingButton).toBeDisabled();
+    expect(siblingButton).not.toHaveAttribute("aria-busy");
+    expect(screen.queryByRole("button", { name: "Shortlisting…" })).toBeNull();
+
+    finish?.({ kind: "updated", currentStatus: "reviewing" });
+    await screen.findByRole("status");
   });
 
   it("shows a stable already_in_state message, not a generic failure", async () => {

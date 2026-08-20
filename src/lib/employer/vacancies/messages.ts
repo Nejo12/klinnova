@@ -39,6 +39,13 @@ export const VACANCY_VERIFICATION_EMPTY_SUPPORT =
 
 export const VACANCY_VERIFICATION_EMPTY_ACTION = "Continue verification";
 
+// Shared with `employer/vacancies/loading.tsx` (P3.6 Task F) — that
+// route's loading fallback renders this directly, unwrapped by any
+// skeleton, since it's static chrome that never depends on
+// `loadEmployerDrafts`'s outcome. Importing the same constant both places
+// means the two can't drift out of sync.
+export const VACANCY_LIST_HEADING = "Vacancies";
+
 export const VACANCY_LIST_LEAD =
   "Create private vacancy drafts, then publish once verified. Manage the full lifecycle — pause, resume, mark filled, or withdraw — from here.";
 

@@ -61,6 +61,10 @@ export function StatusTransitionConfirmDialog({
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
+        if (pending) {
+          event.preventDefault();
+          return;
+        }
         onCancel();
         return;
       }
@@ -96,7 +100,7 @@ export function StatusTransitionConfirmDialog({
     }
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onCancel]);
+  }, [onCancel, pending]);
 
   return (
     <div className={styles.dialogOverlay}>
@@ -146,12 +150,13 @@ export function StatusTransitionConfirmDialog({
             type="submit"
             name="targetStatus"
             value={targetStatus}
-            className={
+            className={`${
               targetStatus === "rejected" ? styles.buttonDanger : styles.button
-            }
+            } ${styles.statusConfirmButton}`}
             disabled={pending}
+            aria-busy={pending ? true : undefined}
           >
-            {copy.confirmLabel}
+            {pending ? "Recording…" : copy.confirmLabel}
           </button>
         </div>
       </div>

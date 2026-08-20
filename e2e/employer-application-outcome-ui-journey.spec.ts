@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 import {
   publishEligibleEmployerVacancy,
@@ -9,6 +9,38 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const runAuthJourney = process.env.E2E_AUTH_JOURNEY === "1";
 const hasServiceRoleKey =
   (process.env.SUPABASE_SERVICE_ROLE_KEY ?? "").length > 0;
+const actionSubmitTimeoutMs = 15_000;
+
+async function submitEmployerApplicationAction(
+  page: Page,
+  employerApplicationPath: string,
+  submit: () => Promise<void>,
+) {
+  const responsePromise = page.waitForResponse(
+    (response) => {
+      if (response.request().method() !== "POST") {
+        return false;
+      }
+
+      return new URL(response.url()).pathname === employerApplicationPath;
+    },
+    { timeout: actionSubmitTimeoutMs },
+  );
+
+  await submit();
+
+  const response = await responsePromise;
+  expect(response.status()).toBeLessThan(400);
+}
+
+async function submitEmployerApplicationActionAndReload(
+  page: Page,
+  employerApplicationPath: string,
+  submit: () => Promise<void>,
+) {
+  await submitEmployerApplicationAction(page, employerApplicationPath, submit);
+  await page.reload();
+}
 
 /**
  * M5.1 Unit E — the real UI on top of Unit D's outcome-events RPCs. This is
@@ -52,6 +84,12 @@ test.describe("employer application outcome UI journey (M5.1 Unit E)", () => {
       "/employer/applications/",
     );
     await page.goto(employerApplicationPath);
+    const historySection = page
+      .getByRole("heading", {
+        level: 2,
+        name: "Interview and hire history",
+      })
+      .locator("..");
     await expect(
       page.getByText("No interview or hire events recorded yet."),
     ).toBeVisible();
@@ -61,87 +99,99 @@ test.describe("employer application outcome UI journey (M5.1 Unit E)", () => {
     await page
       .getByLabel("Outcome", { exact: true })
       .selectOption("interview_completed");
-    await page.getByRole("button", { name: "Record outcome" }).click();
-    await expect(page.getByText("Interview completed recorded.")).toBeVisible({
-      timeout: 15_000,
-    });
+    await submitEmployerApplicationActionAndReload(
+      page,
+      employerApplicationPath,
+      async () => {
+        await page.getByRole("button", { name: "Record outcome" }).click();
+      },
+    );
     await expect(
-      page
-        .getByRole("heading", { level: 2, name: "Interview and hire history" })
-        .locator("..")
-        .getByText("Interview completed", { exact: true }),
-    ).toHaveCount(1);
+      historySection.getByText("Interview completed", { exact: true }),
+    ).toHaveCount(1, { timeout: actionSubmitTimeoutMs });
 
     // A second interview_completed is allowed (founder contract 2:
     // multiplicity) and does not collapse into the first row.
     await page
       .getByLabel("Outcome", { exact: true })
       .selectOption("interview_completed");
-    await page.getByRole("button", { name: "Record outcome" }).click();
-    await expect(page.getByText("Interview completed recorded.")).toBeVisible({
-      timeout: 15_000,
-    });
+    await submitEmployerApplicationActionAndReload(
+      page,
+      employerApplicationPath,
+      async () => {
+        await page.getByRole("button", { name: "Record outcome" }).click();
+      },
+    );
     await expect(
-      page
-        .getByRole("heading", { level: 2, name: "Interview and hire history" })
-        .locator("..")
-        .getByText("Interview completed", { exact: true }),
-    ).toHaveCount(2);
+      historySection.getByText("Interview completed", { exact: true }),
+    ).toHaveCount(2, { timeout: actionSubmitTimeoutMs });
 
     // Record hired.
     await page.getByLabel("Outcome", { exact: true }).selectOption("hired");
-    await page.getByRole("button", { name: "Record outcome" }).click();
-    await expect(page.getByText("Hired recorded.")).toBeVisible({
-      timeout: 15_000,
-    });
+    await submitEmployerApplicationActionAndReload(
+      page,
+      employerApplicationPath,
+      async () => {
+        await page.getByRole("button", { name: "Record outcome" }).click();
+      },
+    );
 
     // A second active hired attempt fails safely through the real form —
     // never a silent success, never a generic error.
     await page.getByLabel("Outcome", { exact: true }).selectOption("hired");
-    await page.getByRole("button", { name: "Record outcome" }).click();
+    await submitEmployerApplicationAction(
+      page,
+      employerApplicationPath,
+      async () => {
+        await page.getByRole("button", { name: "Record outcome" }).click();
+      },
+    );
     await expect(
       page.getByText(
         "This application already has an active hired record. Void it first if it was recorded in error.",
       ),
-    ).toBeVisible({ timeout: 15_000 });
+    ).toBeVisible({ timeout: actionSubmitTimeoutMs });
 
     // Void the hired event through its own inline control. Void buttons
     // render for every *active* event regardless of outcome type (2
     // interview_completed + 1 hired at this point) — so the hired row's
     // list item, not "any Void button," is the correct target.
-    const historySection = page
-      .getByRole("heading", {
-        level: 2,
-        name: "Interview and hire history",
-      })
-      .locator("..");
     const activeHiredRow = page
       .getByRole("listitem")
       .filter({ hasText: "Hired" })
       .filter({ hasNotText: "Voided" });
     await expect(activeHiredRow).toHaveCount(1);
-    await activeHiredRow.getByRole("button", { name: "Void" }).click();
+    await submitEmployerApplicationActionAndReload(
+      page,
+      employerApplicationPath,
+      async () => {
+        await activeHiredRow.getByRole("button", { name: "Void" }).click();
+      },
+    );
     await expect(historySection.getByText(/Hired.*Voided/)).toBeVisible({
-      timeout: 15_000,
+      timeout: actionSubmitTimeoutMs,
     });
     // The two interview_completed rows are still active and still each
     // carry their own void control — voiding hired must not touch them.
     await expect(
       historySection.getByRole("button", { name: "Void" }),
-    ).toHaveCount(2);
+    ).toHaveCount(2, { timeout: actionSubmitTimeoutMs });
 
     // Record a genuine replacement hired event.
     await page.getByLabel("Outcome", { exact: true }).selectOption("hired");
-    await page.getByRole("button", { name: "Record outcome" }).click();
-    await expect(page.getByText("Hired recorded.")).toBeVisible({
-      timeout: 15_000,
-    });
+    await submitEmployerApplicationActionAndReload(
+      page,
+      employerApplicationPath,
+      async () => {
+        await page.getByRole("button", { name: "Record outcome" }).click();
+      },
+    );
     await expect(
       page
         .getByRole("listitem")
         .filter({ hasText: "Hired" })
         .filter({ hasNotText: "Voided" }),
-    ).toHaveCount(1);
+    ).toHaveCount(1, { timeout: actionSubmitTimeoutMs });
 
     // applications.status was never touched by any of the above — recording
     // hired is not the same as the employer's separate accept/reject
@@ -162,10 +212,10 @@ test.describe("employer application outcome UI journey (M5.1 Unit E)", () => {
       candidateOutcomeSection.getByText("Interview completed", {
         exact: true,
       }),
-    ).toHaveCount(2);
+    ).toHaveCount(2, { timeout: actionSubmitTimeoutMs });
     await expect(
       candidateOutcomeSection.getByText("Hired", { exact: true }),
-    ).toHaveCount(1);
+    ).toHaveCount(1, { timeout: actionSubmitTimeoutMs });
     await expect(
       candidatePage.getByText(/interview set|scheduled|invitation/i),
     ).toHaveCount(0);
@@ -257,10 +307,13 @@ test.describe("employer application outcome UI journey (M5.1 Unit E)", () => {
     await page
       .getByLabel("Outcome", { exact: true })
       .selectOption("interview_completed");
-    await page.getByRole("button", { name: "Record outcome" }).click();
-    await expect(page.getByText("Interview completed recorded.")).toBeVisible({
-      timeout: 15_000,
-    });
+    await submitEmployerApplicationActionAndReload(
+      page,
+      applicationPath,
+      async () => {
+        await page.getByRole("button", { name: "Record outcome" }).click();
+      },
+    );
 
     // Candidate self-deletes their whole Klinnova account through the existing
     // Slice 8 self-service UI flow — no new service-role path.
@@ -291,10 +344,12 @@ test.describe("employer application outcome UI journey (M5.1 Unit E)", () => {
     // one bounded unavailable message — never a more specific discriminant.
     await page.reload();
     await page.getByLabel("Outcome", { exact: true }).selectOption("hired");
-    await page.getByRole("button", { name: "Record outcome" }).click();
+    await submitEmployerApplicationAction(page, applicationPath, async () => {
+      await page.getByRole("button", { name: "Record outcome" }).click();
+    });
     await expect(
       page.getByText("This application is not available."),
-    ).toBeVisible({ timeout: 15_000 });
+    ).toBeVisible({ timeout: actionSubmitTimeoutMs });
 
     // The pre-deletion historical event is still visible in the employer's
     // own history list.

@@ -13,7 +13,12 @@ import type { OutcomeType } from "@/lib/applications/outcome-type";
  */
 export type RecordOutcomeActionState =
   | { kind: "idle" }
-  | { kind: "recorded"; outcomeType: OutcomeType; occurredAt: string }
+  | {
+      kind: "recorded";
+      outcomeEventId: string;
+      outcomeType: OutcomeType;
+      occurredAt: string;
+    }
   | { kind: "already_hired" }
   | { kind: "invalid_occurred_at" }
   | { kind: "unavailable" }

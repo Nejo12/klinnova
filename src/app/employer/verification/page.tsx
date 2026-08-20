@@ -11,6 +11,7 @@ import { loadEmployerProfile } from "@/lib/employer/load-employer";
 import { EMPLOYER_RESTRICTED_VERIFICATION } from "@/lib/employer/messages";
 import { loadCurrentEmployerSuspensionStatus } from "@/lib/employer/suspension-guard";
 import {
+  VERIFICATION_PAGE_HEADING,
   VERIFICATION_PENDING_LEAD,
   VERIFICATION_REJECTED_LEAD,
   VERIFICATION_REVOKED_LEAD,
@@ -84,7 +85,7 @@ export default async function EmployerVerificationPage() {
         unseenApplicationsCount={unseenApplicationsCount}
       />
 
-      <h1 className={styles.heading}>Verification</h1>
+      <h1 className={styles.heading}>{VERIFICATION_PAGE_HEADING}</h1>
 
       {suspended ? (
         <EmployerRestrictedNotice message={EMPLOYER_RESTRICTED_VERIFICATION} />

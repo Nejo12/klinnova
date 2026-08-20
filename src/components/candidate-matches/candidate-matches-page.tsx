@@ -5,6 +5,10 @@ import { MatchesEmptyState } from "@/components/candidate-matches/matches-empty-
 import { MatchesErrorState } from "@/components/candidate-matches/matches-error-state";
 import { WorkAuthorisationNotice } from "@/components/candidate-matches/work-authorisation-notice";
 import type { OwnedApplicationSummary } from "@/lib/applications/owned-application";
+import {
+  CANDIDATE_MATCHES_HEADING,
+  CANDIDATE_MATCHES_LEAD,
+} from "@/lib/candidate-matches/messages";
 import type { PublicVacancy } from "@/lib/public-jobs/domain";
 
 import styles from "./candidate-matches.module.scss";
@@ -32,16 +36,13 @@ export function CandidateMatchesPage(props: CandidateMatchesPageProps) {
 
       {props.status === "failure" ? (
         <>
-          <h1 className={styles.heading}>Jobs that match your preferences</h1>
+          <h1 className={styles.heading}>{CANDIDATE_MATCHES_HEADING}</h1>
           <MatchesErrorState />
         </>
       ) : (
         <>
-          <h1 className={styles.heading}>Jobs that match your preferences</h1>
-          <p className={styles.lead}>
-            These jobs match all of the preferences currently saved in your
-            profile.
-          </p>
+          <h1 className={styles.heading}>{CANDIDATE_MATCHES_HEADING}</h1>
+          <p className={styles.lead}>{CANDIDATE_MATCHES_LEAD}</p>
           <WorkAuthorisationNotice />
           {props.vacancies.length === 0 ? (
             <MatchesEmptyState />

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page, type Response } from "@playwright/test";
 
 import { registerAndConfirm } from "./helpers/auth";
 import {
@@ -43,6 +43,64 @@ async function registerAndOnboardPrivateEmployer(
   await expect(page).toHaveURL(/\/employer$/, { timeout: 15_000 });
 
   return { email, displayName };
+}
+
+function waitForVacancyEditPost(page: Page): Promise<Response> {
+  return page.waitForResponse(
+    (candidate) =>
+      candidate.url().includes("/edit") &&
+      candidate.request().method() === "POST",
+  );
+}
+
+async function readinessRow(page: Page, label: string) {
+  return page
+    .getByLabel("Publication readiness")
+    .getByText(label, { exact: true })
+    .locator("..");
+}
+
+async function saveDraftAndReload(page: Page): Promise<void> {
+  const [response] = await Promise.all([
+    waitForVacancyEditPost(page),
+    page.getByRole("button", { name: "Save draft" }).click(),
+  ]);
+  expect(response.status()).toBe(200);
+  await page.reload();
+}
+
+async function saveLanguagesAndReload(page: Page): Promise<void> {
+  const [response] = await Promise.all([
+    waitForVacancyEditPost(page),
+    page.getByRole("button", { name: "Save languages" }).click(),
+  ]);
+  expect(response.status()).toBe(200);
+  await page.reload();
+}
+
+async function expectReadyDraftFieldsPersisted(page: Page): Promise<void> {
+  await expect(page.getByLabel("Description")).toHaveValue(
+    "Cleaning role, small office.",
+  );
+  await expect(page.getByLabel("Workplace type")).toHaveValue("office");
+  await expect(page.getByLabel("Work frequency")).toHaveValue("recurring");
+  await expect(
+    page.getByRole("checkbox", { name: "CV required" }),
+  ).toBeChecked();
+  await expect(
+    page.getByRole("checkbox", { name: "Interview can be in English" }),
+  ).toBeChecked();
+  await expect(page.getByRole("checkbox", { name: "Full time" })).toBeChecked();
+  await expect(page.getByRole("checkbox", { name: "Morning" })).toBeChecked();
+  await expect(page.getByLabel("Amount in EUR")).toHaveValue("16.00");
+  await expect(page.getByLabel("Period")).toHaveValue("hourly");
+}
+
+async function expectBasicEnglishRequirementPersisted(
+  page: Page,
+): Promise<void> {
+  await expect(page.getByLabel(/Language 1/i)).toHaveValue("en");
+  await expect(page.getByLabel(/Minimum proficiency 1/i)).toHaveValue("basic");
 }
 
 test.describe("publication readiness and matching integrity (D-M5-19)", () => {
@@ -99,23 +157,21 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     await page.getByRole("checkbox", { name: "Morning" }).check();
     await page.getByLabel("Amount in EUR").fill("16.00");
     await page.getByLabel("Period").selectOption("hourly");
-    await page.getByRole("button", { name: "Save draft" }).click();
-    await expect(page.getByText("Draft changes saved.")).toBeVisible({
-      timeout: 15_000,
-    });
+    await saveDraftAndReload(page);
+    await expectReadyDraftFieldsPersisted(page);
 
-    // --- Negative proof, inverted: readiness reflects the save immediately,
-    // with no reload required (the stale-readiness bug this unit also
-    // fixes). workplace_type is now correctly "Complete".
-    await expect(workplaceTypeRow).toHaveAttribute("data-complete", "true");
+    // --- Negative proof, inverted: readiness reflects the durably saved
+    // draft fields. workplace_type is now correctly "Complete".
+    await expect(await readinessRow(page, "Workplace type")).toHaveAttribute(
+      "data-complete",
+      "true",
+    );
 
     await page.getByRole("button", { name: "Add language" }).click();
     await page.getByLabel(/Language 1/i).selectOption("en");
     await page.getByLabel(/Minimum proficiency 1/i).selectOption("basic");
-    await page.getByRole("button", { name: "Save languages" }).click();
-    await expect(page.getByText("Language requirements saved.")).toBeVisible({
-      timeout: 15_000,
-    });
+    await saveLanguagesAndReload(page);
+    await expectBasicEnglishRequirementPersisted(page);
 
     // Still not ready: employer is not yet verified. Readiness must not
     // claim otherwise merely because every vacancy field is complete.
@@ -323,18 +379,14 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     await page.getByRole("checkbox", { name: "Morning" }).check();
     await page.getByLabel("Amount in EUR").fill("16.00");
     await page.getByLabel("Period").selectOption("hourly");
-    await page.getByRole("button", { name: "Save draft" }).click();
-    await expect(page.getByText("Draft changes saved.")).toBeVisible({
-      timeout: 15_000,
-    });
+    await saveDraftAndReload(page);
+    await expectReadyDraftFieldsPersisted(page);
 
     await page.getByRole("button", { name: "Add language" }).click();
     await page.getByLabel(/Language 1/i).selectOption("en");
     await page.getByLabel(/Minimum proficiency 1/i).selectOption("basic");
-    await page.getByRole("button", { name: "Save languages" }).click();
-    await expect(page.getByText("Language requirements saved.")).toBeVisible({
-      timeout: 15_000,
-    });
+    await saveLanguagesAndReload(page);
+    await expectBasicEnglishRequirementPersisted(page);
 
     await page.goto("/employer/verification");
     await page

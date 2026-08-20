@@ -9,6 +9,7 @@ import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadEmployerProfile } from "@/lib/employer/load-employer";
 import { loadCurrentEmployerSuspensionStatus } from "@/lib/employer/suspension-guard";
 import { loadEmployerDrafts } from "@/lib/employer/vacancies/load-employer-drafts";
+import { VACANCY_LIST_HEADING } from "@/lib/employer/vacancies/messages";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -62,7 +63,7 @@ export default async function EmployerVacanciesPage() {
         currentPath="vacancies"
         unseenApplicationsCount={unseenApplicationsCount}
       />
-      <h1 className={styles.heading}>Vacancies</h1>
+      <h1 className={styles.heading}>{VACANCY_LIST_HEADING}</h1>
       {suspended ? <EmployerRestrictedNotice /> : null}
       <VacancyList
         drafts={loaded.drafts}

@@ -1,0 +1,57 @@
+.skeleton {
+  display: block;
+  background: var(--color-bg-subtle);
+}
+
+.radiusSm {
+  border-radius: var(--radius-sm);
+}
+
+.radiusMd {
+  border-radius: var(--radius-md);
+}
+
+.radiusPill {
+  border-radius: var(--radius-pill);
+}
+
+// Visually-hidden but still available to assistive tech. No such utility
+// exists elsewhere in the repo (confirmed by grep) — kept local to this
+// module rather than promoted to a global class.
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Content stays at opacity: 0 until --duration-standard has elapsed (the
+// route-loading display threshold, Global Constraint 3), then fades in over
+// --duration-fast. Pure CSS, no JS timer: if the real content replaces this
+// tree before the delay elapses, React unmounts it and the animation never
+// gets the chance to run — the skeleton never visually appears, satisfying
+// Global Constraint 2 (no artificial waits). The global reduced-motion rule
+// (src/styles/globals.scss) forces animation-duration to 0.01ms !important,
+// collapsing the fade to instant while leaving the display-delay intact.
+@keyframes delayedRevealFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.delayedReveal {
+  animation-name: delayedRevealFadeIn;
+  animation-duration: var(--duration-fast);
+  animation-delay: var(--duration-standard);
+  animation-timing-function: var(--ease-standard);
+  animation-fill-mode: both;
+}
