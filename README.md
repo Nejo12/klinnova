@@ -201,6 +201,10 @@ Core source-of-truth documents:
 
 Historical slice-specific discovery/build-plan/proposal/closure files remain in `docs/` and should be used when auditing an accepted implementation contract.
 
+## Agent development
+
+Repository agent governance starts in [AGENTS.md](AGENTS.md). Codex project setup, reusable Klinnova skills, and the Founder-controlled workflow are documented in [docs/agent/README.md](docs/agent/README.md).
+
 ## Engineering baseline at M4 closure
 
 - migrations: **16**

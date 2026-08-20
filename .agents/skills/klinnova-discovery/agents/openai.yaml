@@ -1,0 +1,6 @@
+interface:
+  display_name: "Klinnova Discovery"
+  short_description: "Research and plan without implementation"
+  default_prompt: "Use $klinnova-discovery to investigate the Klinnova change before implementation."
+policy:
+  allow_implicit_invocation: true

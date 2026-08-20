@@ -1,0 +1,6 @@
+interface:
+  display_name: "Klinnova Review"
+  short_description: "Independent branch and diff review"
+  default_prompt: "Use $klinnova-review to review this Klinnova branch before merge."
+policy:
+  allow_implicit_invocation: true
