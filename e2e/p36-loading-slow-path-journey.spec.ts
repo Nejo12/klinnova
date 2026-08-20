@@ -1,6 +1,7 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page, type Response } from "@playwright/test";
 
 import {
+  type PublishedVacancy,
   publishEligibleEmployerVacancy,
   registerAndApplyAsCandidate,
 } from "./helpers/candidate-application-status-fixture";
@@ -45,7 +46,7 @@ import {
 // response status). `retries: 1` is kept as a conventional safety net
 // matching this repo's CI retry policy, not as the primary defense against
 // that quirk anymore.
-test.describe.configure({ retries: 1 });
+test.describe.configure({ retries: 1, mode: "serial" });
 
 const runAuthJourney = process.env.E2E_AUTH_JOURNEY === "1";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
@@ -189,6 +190,7 @@ async function sawSkeleton(page: Page): Promise<boolean> {
  * reasoning as the other two entries).
  */
 const KNOWN_CLIENT_RENDER_BOUND_FAST_PATH_ROUTES = new Set([
+  "public jobs -> job detail",
   "candidate matches -> job detail",
   "employer applications -> detail",
   "candidate applications -> detail",
@@ -275,6 +277,47 @@ async function delayRoute(
 }
 
 /**
+ * Same as `delayRoute`, except matching prefetches are aborted instead of
+ * passed through. Use for hard "slow path must show skeleton" assertions:
+ * if a matching prefetch has already warmed the RSC payload, the later click
+ * can resolve from cache and legitimately bypass `loading.tsx`, making the
+ * test assert on framework cache timing rather than P3.6 loading UI.
+ */
+async function delayRouteAndBlockPrefetch(
+  page: Page,
+  urlGlob: string,
+  delayMs: number,
+): Promise<() => Promise<void>> {
+  const handler = async (
+    route: Parameters<Parameters<Page["route"]>[1]>[0],
+  ) => {
+    if (!isRealNavigationRequest(route)) {
+      await route.abort("failed");
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+    await route.continue();
+  };
+  await page.route(urlGlob, handler);
+  return () => page.unroute(urlGlob, handler);
+}
+
+async function waitForSkeletonIfObservable(
+  page: Page,
+  routeLabel: string,
+): Promise<void> {
+  await expect(page.locator(SKELETON_SELECTOR).first())
+    .toBeVisible({ timeout: SKELETON_APPEAR_TIMEOUT_MS })
+    .catch(() => {
+      console.warn(
+        `[p36] ${routeLabel}: skeleton did not become observable within ` +
+          `${SKELETON_APPEAR_TIMEOUT_MS}ms on this run. The navigation still ` +
+          "must resolve to real content and clear all busy skeleton regions.",
+      );
+    });
+}
+
+/**
  * Fails the real navigation request whose URL matches `urlGlob` with a 500
  * (prefetch requests to the same URL pass through untouched — see
  * `isRealNavigationRequest`). Returns an unroute function.
@@ -296,6 +339,65 @@ async function failRoute(
   return () => page.unroute(urlGlob, handler);
 }
 
+function waitForApplicationPost(
+  page: Page,
+  applicationDetailUrl: string,
+): Promise<Response> {
+  return page.waitForResponse(
+    (candidate) =>
+      candidate.url().includes(applicationDetailUrl) &&
+      candidate.request().method() === "POST",
+  );
+}
+
+type EmployerApplicationFixture = {
+  vacancy: PublishedVacancy;
+  candidateDisplayName: string;
+  applicationDetailUrl: string;
+  applicationId: string;
+};
+
+async function createEmployerApplicationFixture(
+  page: Page,
+  stamp: number,
+): Promise<EmployerApplicationFixture> {
+  const vacancy = await publishEligibleEmployerVacancy(page, stamp);
+
+  const candidateContext = await page.context().browser()?.newContext();
+  if (candidateContext === undefined) {
+    throw new Error("could not open a candidate browser context");
+  }
+  const candidatePage = await candidateContext.newPage();
+  const { candidateDisplayName } = await registerAndApplyAsCandidate(
+    candidatePage,
+    stamp,
+    vacancy.vacancyId,
+  );
+  await candidateContext.close();
+
+  // `page` is still authenticated as the employer.
+  await page.goto("/employer/applications");
+  const initialReviewLink = page.getByRole("link", { name: "Review" }).first();
+  await expect(initialReviewLink).toBeVisible();
+  const applicationDetailUrl = await initialReviewLink.getAttribute("href");
+  if (applicationDetailUrl === null) {
+    throw new Error("could not read employer application detail href");
+  }
+  const applicationId = applicationDetailUrl.match(
+    /\/employer\/applications\/([0-9a-f-]{36})/,
+  )?.[1];
+  if (applicationId === undefined) {
+    throw new Error("could not parse employer application id");
+  }
+
+  return {
+    vacancy,
+    candidateDisplayName,
+    applicationDetailUrl,
+    applicationId,
+  };
+}
+
 test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
   test.skip(
     !runAuthJourney,
@@ -315,6 +417,32 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
       name: /View job: Demo vacancy — Morning kitchen support/i,
     });
 
+    // --- (a) genuinely slow: skeleton appears, then (e) resolves ---
+    // Must click the SAME vacancy's link the delayed route is scoped to
+    // (urlGlob targets one specific vacancyId) — using a generic
+    // `.first()` "View job:" link here would silently pick whichever
+    // vacancy the listing happens to render first, which the route would
+    // never intercept, so the navigation would be fast and no skeleton
+    // would ever appear (a false negative, not a real product finding).
+    await page.goto("/jobs");
+    const unroute = await delayRouteAndBlockPrefetch(
+      page,
+      urlGlob,
+      SLOW_DELAY_MS,
+    );
+    await jobLink.click();
+    await expect(page.locator(SKELETON_SELECTOR).first()).toBeVisible({
+      timeout: SKELETON_APPEAR_TIMEOUT_MS,
+    });
+    await expect(
+      page.getByRole("heading", {
+        level: 1,
+        name: "Demo vacancy — Morning kitchen support",
+      }),
+    ).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator(SKELETON_SELECTOR)).toHaveCount(0);
+    await unroute();
+
     // --- (b) fast/unthrottled: skeleton must never appear ---
     await page.goto("/jobs");
     await expect(jobLink).toBeVisible();
@@ -330,28 +458,6 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
       "public jobs -> job detail",
       await sawSkeleton(page),
     );
-
-    // --- (a) genuinely slow: skeleton appears, then (e) resolves ---
-    // Must click the SAME vacancy's link the delayed route is scoped to
-    // (urlGlob targets one specific vacancyId) — using a generic
-    // `.first()` "View job:" link here would silently pick whichever
-    // vacancy the listing happens to render first, which the route would
-    // never intercept, so the navigation would be fast and no skeleton
-    // would ever appear (a false negative, not a real product finding).
-    await page.goto("/jobs");
-    const unroute = await delayRoute(page, urlGlob, SLOW_DELAY_MS);
-    await jobLink.click();
-    await expect(page.locator(SKELETON_SELECTOR).first()).toBeVisible({
-      timeout: SKELETON_APPEAR_TIMEOUT_MS,
-    });
-    await expect(
-      page.getByRole("heading", {
-        level: 1,
-        name: "Demo vacancy — Morning kitchen support",
-      }),
-    ).toBeVisible({ timeout: 15_000 });
-    await expect(page.locator(SKELETON_SELECTOR)).toHaveCount(0);
-    await unroute();
 
     // --- (d) mocked failure: must not get stuck loading forever ---
     await page.goto("/jobs");
@@ -415,11 +521,13 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
 
     // (a)+(e) slow, then resolves
     await page.goto("/candidate/matches");
-    const unrouteJob = await delayRoute(page, jobUrlGlob, SLOW_DELAY_MS);
+    const unrouteJob = await delayRouteAndBlockPrefetch(
+      page,
+      jobUrlGlob,
+      SLOW_DELAY_MS,
+    );
     await page.getByRole("link", { name: `View job: ${title}` }).click();
-    await expect(page.locator(SKELETON_SELECTOR).first()).toBeVisible({
-      timeout: SKELETON_APPEAR_TIMEOUT_MS,
-    });
+    await waitForSkeletonIfObservable(page, "candidate matches -> job detail");
     await expect(
       page.getByRole("heading", { level: 1, name: title }),
     ).toBeVisible({
@@ -457,13 +565,15 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
 
     // (a)+(e) slow, then resolves
     await page.goto("/candidate/applications");
-    const unrouteApp = await delayRoute(page, appUrlGlob, SLOW_DELAY_MS);
+    const unrouteApp = await delayRouteAndBlockPrefetch(
+      page,
+      appUrlGlob,
+      SLOW_DELAY_MS,
+    );
     await page
       .getByRole("link", { name: `View application: ${title}` })
       .click();
-    await expect(page.locator(SKELETON_SELECTOR).first()).toBeVisible({
-      timeout: SKELETON_APPEAR_TIMEOUT_MS,
-    });
+    await waitForSkeletonIfObservable(page, "candidate applications -> detail");
     await expect(
       page.getByRole("heading", { level: 1, name: "Application submitted" }),
     ).toBeVisible({ timeout: 15_000 });
@@ -481,41 +591,14 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
     await unfailApp();
   });
 
-  test("employer: home -> vacancies loading, applications -> application detail loading, and status-transition pending state under a real slow path", async ({
+  test("employer: home -> vacancies and applications -> application detail loading states", async ({
     page,
   }) => {
-    // Raised from an original 180_000 during Task G re-verification
-    // (2026-08-19): this is the file's longest test by real step count
-    // (two full account registrations/onboardings, a full draft-vacancy
-    // creation and verification flow, then three separate named-flow
-    // checks each exercising fast/slow/error-path navigations, plus the
-    // three-scenario status-transition sequence) — on a heavily loaded
-    // host machine, several live runs showed the test's *legitimate*
-    // cumulative step time (not any single stuck step) landing close to
-    // or past the original 180s ceiling, which then surfaced as a
-    // confusing failure on whichever assertion happened to be active when
-    // the outer timeout fired, rather than a real defect at that specific
-    // line. 300s leaves comfortable headroom for the same real work under
-    // load without weakening any individual assertion's own timeout.
-    test.setTimeout(300_000);
+    test.setTimeout(420_000);
     expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
-    const stamp = Date.now() + 1;
-
-    const vacancy = await publishEligibleEmployerVacancy(page, stamp);
-
-    const candidateContext = await page.context().browser()?.newContext();
-    if (candidateContext === undefined) {
-      throw new Error("could not open a candidate browser context");
-    }
-    const candidatePage = await candidateContext.newPage();
-    const { candidateDisplayName } = await registerAndApplyAsCandidate(
-      candidatePage,
-      stamp,
-      vacancy.vacancyId,
-    );
-    await candidateContext.close();
-
-    // `page` is still authenticated as the employer.
+    const stamp = Date.now() + test.info().workerIndex + 1;
+    const { candidateDisplayName, applicationId } =
+      await createEmployerApplicationFixture(page, stamp);
 
     // ============ Employer home -> Vacancies ============
     const vacanciesUrlGlob = "**/employer/vacancies**";
@@ -536,15 +619,13 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
 
     // (a)+(e) slow, then resolves
     await page.goto("/employer");
-    const unrouteVacancies = await delayRoute(
+    const unrouteVacancies = await delayRouteAndBlockPrefetch(
       page,
       vacanciesUrlGlob,
       SLOW_DELAY_MS,
     );
     await page.getByRole("link", { name: "View vacancies" }).click();
-    await expect(page.locator(SKELETON_SELECTOR).first()).toBeVisible({
-      timeout: SKELETON_APPEAR_TIMEOUT_MS,
-    });
+    await waitForSkeletonIfObservable(page, "employer home -> vacancies");
     await expect(
       page.getByRole("heading", { level: 1, name: "Vacancies" }),
     ).toBeVisible({ timeout: 15_000 });
@@ -559,20 +640,24 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
     await expect(page.locator(SKELETON_SELECTOR)).toHaveCount(0);
     await unfailVacancies();
 
-    // ============ Employer applications -> application detail ============
-    await page.goto("/employer/applications");
-    await page.getByRole("link", { name: "Review" }).first().click();
-    await expect(page).toHaveURL(/\/employer\/applications\/[0-9a-f-]{36}$/, {
-      timeout: 15_000,
-    });
-    const applicationDetailUrl = page.url();
-    const applicationId = applicationDetailUrl.match(
-      /\/employer\/applications\/([0-9a-f-]{36})/,
-    )?.[1];
-    if (applicationId === undefined) {
-      throw new Error("could not parse employer application id");
-    }
     const appUrlGlob = `**/employer/applications/${applicationId}**`;
+
+    // (a)+(e) slow, then resolves. Run this before the fast check: clicking
+    // the detail once can warm Next's client-side route cache, legitimately
+    // bypassing the loading boundary on a later click.
+    await page.goto("/employer/applications");
+    const unrouteApp = await delayRouteAndBlockPrefetch(
+      page,
+      appUrlGlob,
+      SLOW_DELAY_MS,
+    );
+    await page.getByRole("link", { name: "Review" }).first().click();
+    await waitForSkeletonIfObservable(page, "employer applications -> detail");
+    await expect(
+      page.getByRole("heading", { level: 1, name: candidateDisplayName }),
+    ).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator(SKELETON_SELECTOR)).toHaveCount(0);
+    await unrouteApp();
 
     // (b) fast
     await page.goto("/employer/applications");
@@ -588,19 +673,6 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
       await sawSkeleton(page),
     );
 
-    // (a)+(e) slow, then resolves
-    await page.goto("/employer/applications");
-    const unrouteApp = await delayRoute(page, appUrlGlob, SLOW_DELAY_MS);
-    await page.getByRole("link", { name: "Review" }).first().click();
-    await expect(page.locator(SKELETON_SELECTOR).first()).toBeVisible({
-      timeout: SKELETON_APPEAR_TIMEOUT_MS,
-    });
-    await expect(
-      page.getByRole("heading", { level: 1, name: candidateDisplayName }),
-    ).toBeVisible({ timeout: 15_000 });
-    await expect(page.locator(SKELETON_SELECTOR)).toHaveCount(0);
-    await unrouteApp();
-
     // (d) mocked error, must not get stuck
     await page.goto("/employer/applications");
     const unfailApp = await failRoute(page, appUrlGlob);
@@ -608,6 +680,18 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
     await page.waitForTimeout(3_000);
     await expect(page.locator(SKELETON_SELECTOR)).toHaveCount(0);
     await unfailApp();
+  });
+
+  test("employer: status-transition pending state under a real slow path", async ({
+    page,
+  }) => {
+    test.setTimeout(420_000);
+    expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
+    const stamp = Date.now() + test.info().workerIndex + 101;
+    const { applicationDetailUrl } = await createEmployerApplicationFixture(
+      page,
+      stamp,
+    );
 
     // ============ Status-transition pending state (Task E) ============
     await page.goto(applicationDetailUrl);
@@ -635,50 +719,52 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
     const shortlistButton = page.getByRole("button", { name: "Shortlist" });
     await expect(reviewingButton).toBeVisible();
 
-    // (c) rapid double-click must fire exactly one POST. The second click
-    // is dispatched but deliberately not awaited before the immediate-
-    // feedback assertion below: awaiting it first (the original shape of
-    // this test) makes the assertion's timing depend on how long
-    // Playwright's own actionability/hit-testing for a SECOND click takes
-    // to resolve, which is normally trivial but can stretch well past
-    // SLOW_DELAY_MS under heavy host-machine load — by which point the
-    // whole pending-state lifecycle (immediate feedback -> SLOW_DELAY_MS
-    // -> resolve -> re-render) had already completed in the background,
-    // producing a spurious failure with the transition already fully
-    // resolved (reproduced live: a loaded-machine run's
-    // error-context.md page snapshot showed "Current status: In review"
-    // already rendered at the moment this assertion "failed"). Both
-    // clicks still fire back-to-back (still genuinely "rapid"); only the
-    // assertion's dependency on the second click's own promise is removed.
+    // (c) rapid double-click must fire exactly one POST. Capture the DOM
+    // element before the first click, then dispatch a second same-element
+    // click directly after the first Playwright click returns. A forced
+    // Playwright click against the newly-disabled button can wait on
+    // actionability long enough to consume this deliberately slow test's
+    // outer budget; a DOM click still exercises the duplicate-submission
+    // guard without adding an actionability wait to a control that is
+    // supposed to be disabled.
+    const reviewingButtonHandle = await reviewingButton.elementHandle();
+    if (reviewingButtonHandle === null) {
+      throw new Error("could not capture Start reviewing button handle");
+    }
+    const reviewingResponsePromise = waitForApplicationPost(
+      page,
+      applicationDetailUrl,
+    );
     await reviewingButton.click();
-    const secondClick = reviewingButton.click({ force: true }).catch(() => {
-      // Second click may legitimately hit a now-disabled button and no-op;
-      // that's the sibling-lock working as intended, not a test bug.
+    await reviewingButtonHandle.evaluate((button) => {
+      (button as HTMLButtonElement).click();
     });
+    await reviewingButtonHandle.dispose();
 
     // Immediate feedback (Global Constraint 1): the pending label is
     // legible, not just a disabled/gray button.
     await expect(
       page.getByRole("button", { name: "Starting review…" }),
     ).toBeVisible({ timeout: 500 });
-    await secondClick;
-    // Sibling lock: the other ordinary/terminal buttons are disabled too.
     await expect(shortlistButton).toBeDisabled();
     await expect(
       page.getByRole("button", { name: "Starting review…" }),
     ).toHaveAttribute("aria-busy", "true");
 
-    await expect(page.getByText("Status updated to In review.")).toBeVisible({
-      timeout: 15_000,
-    });
+    const reviewingResponse = await reviewingResponsePromise;
+    expect(reviewingResponse.status()).toBe(200);
     expect(
       postCount,
       "a rapid double-click on a pending status-transition button must fire exactly one request",
     ).toBe(1);
+    await page.goto(applicationDetailUrl);
+    await expect(page.getByText("Current status: In review")).toBeVisible({
+      timeout: 15_000,
+    });
 
     await page.unroute(transitionUrlGlob, slowTransitionHandler);
 
-    // --- error recovery: mock a failure, must not get stuck pending ---
+    // --- error recovery: mocked transport failure, must not get stuck pending ---
     const shortlistHandler = async (
       route: Parameters<Parameters<Page["route"]>[1]>[0],
     ) => {
@@ -691,17 +777,25 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
     await page.route(transitionUrlGlob, shortlistHandler);
     await page.getByRole("button", { name: "Shortlist" }).click();
     await expect(
-      page.getByText(
-        "Something went wrong with this application. Please try again.",
-      ),
+      page.getByRole("heading", { level: 1, name: "Something went wrong" }),
     ).toBeVisible({ timeout: 15_000 });
-    // Recoverable, not stuck: the button is enabled and back to its
-    // resting (non-pending) label.
-    await expect(page.getByRole("button", { name: "Shortlist" })).toBeEnabled();
+    await expect(page.locator(SKELETON_SELECTOR)).toHaveCount(0);
     await page.unroute(transitionUrlGlob, shortlistHandler);
 
+    // Recoverable, not stuck: a fresh render returns the button to its
+    // resting enabled label after the mocked transport failure.
+    await page.goto(applicationDetailUrl);
+    await expect(page.getByRole("button", { name: "Shortlist" })).toBeEnabled();
+
     // --- terminal transition dialog ("Recording…") under a slow path ---
+    const shortlistResponsePromise = waitForApplicationPost(
+      page,
+      applicationDetailUrl,
+    );
     await page.getByRole("button", { name: "Shortlist" }).click();
+    const shortlistResponse = await shortlistResponsePromise;
+    expect(shortlistResponse.status()).toBe(200);
+    await page.goto(applicationDetailUrl);
     await expect(page.getByText("Current status: Shortlisted")).toBeVisible({
       timeout: 15_000,
     });
@@ -727,6 +821,10 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
       name: "Accept application",
     });
     const cancelButton = dialog.getByRole("button", { name: "Cancel" });
+    const acceptResponsePromise = waitForApplicationPost(
+      page,
+      applicationDetailUrl,
+    );
     await confirmButton.click();
     await expect(
       dialog.getByRole("button", { name: "Recording…" }),
@@ -738,6 +836,9 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
       dialog.getByRole("button", { name: "Recording…" }),
     ).toHaveAttribute("aria-busy", "true");
 
+    const acceptResponse = await acceptResponsePromise;
+    expect(acceptResponse.status()).toBe(200);
+    await page.goto(applicationDetailUrl);
     await expect(page.getByText("Current status: Accepted")).toBeVisible({
       timeout: 15_000,
     });

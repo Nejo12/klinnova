@@ -68,6 +68,33 @@ async function delayRoute(
   return () => page.unroute(urlGlob, handler);
 }
 
+/**
+ * Same as `delayRoute`, except matching prefetches are aborted instead of
+ * passed through. Use only for tests that must observe the actual loading
+ * fallback: if a prefetch warms the RSC payload before the route handler is
+ * installed, the later click can resolve from cache and legitimately skip the
+ * loading boundary, which makes a reduced-motion skeleton parity assertion
+ * race the framework cache instead of the UI under test.
+ */
+async function delayRouteAndBlockPrefetch(
+  page: Page,
+  urlGlob: string,
+  delayMs: number,
+): Promise<() => Promise<void>> {
+  const handler = async (
+    route: Parameters<Parameters<Page["route"]>[1]>[0],
+  ) => {
+    if (!isRealNavigationRequest(route)) {
+      await route.abort("failed");
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+    await route.continue();
+  };
+  await page.route(urlGlob, handler);
+  return () => page.unroute(urlGlob, handler);
+}
+
 async function assertNoHorizontalOverflow(
   page: Page,
   label: string,
@@ -723,9 +750,13 @@ test.describe("reduced-motion verification (Task G / P3.6)", () => {
     const REVEAL_DELAY_MS = 8_000;
 
     await page.emulateMedia({ reducedMotion: "no-preference" });
+    let unroute = await delayRouteAndBlockPrefetch(
+      page,
+      urlGlob,
+      REVEAL_DELAY_MS,
+    );
     await page.goto("/jobs");
     await expect(jobLink).toBeVisible();
-    let unroute = await delayRoute(page, urlGlob, REVEAL_DELAY_MS);
     await jobLink.click();
     // Bug fixed during Task G re-verification: this previously used the
     // file-level `SKELETON_TIMEOUT_MS` (derived from the *other* tests'
@@ -751,9 +782,9 @@ test.describe("reduced-motion verification (Task G / P3.6)", () => {
     await unroute();
 
     await page.emulateMedia({ reducedMotion: "reduce" });
+    unroute = await delayRouteAndBlockPrefetch(page, urlGlob, REVEAL_DELAY_MS);
     await page.goto("/jobs");
     await expect(jobLink).toBeVisible();
-    unroute = await delayRoute(page, urlGlob, REVEAL_DELAY_MS);
     await jobLink.click();
     // Bug fixed during Task G re-verification: this previously used the
     // file-level `SKELETON_TIMEOUT_MS` (derived from the *other* tests'
