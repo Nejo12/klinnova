@@ -1,0 +1,6 @@
+interface:
+  display_name: "Klinnova Implementation"
+  short_description: "Implement an approved bounded plan"
+  default_prompt: "Use $klinnova-implementation to execute the approved Klinnova plan."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Klinnova Merge Verification"
+  short_description: "Post-Founder-merge verification"
+  default_prompt: "Use $klinnova-merge-verification to verify the merged Klinnova PR."
+policy:
+  allow_implicit_invocation: true
