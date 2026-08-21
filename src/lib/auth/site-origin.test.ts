@@ -9,10 +9,10 @@ describe("resolveSiteOrigin", () => {
   it("prefers configured site URL", () => {
     expect(
       resolveSiteOrigin({
-        siteUrl: "https://stint.company/",
+        siteUrl: "https://klinnova.com/",
         vercelUrl: "preview.vercel.app",
       }),
-    ).toBe("https://stint.company");
+    ).toBe("https://klinnova.com");
   });
 
   it("uses Vercel URL for Preview when site URL is absent", () => {
@@ -34,7 +34,7 @@ describe("resolveRedirectOrigin", () => {
     expect(
       resolveRedirectOrigin({
         hostHeader: "127.0.0.1:3000",
-        siteUrl: "https://stint.company",
+        siteUrl: "https://klinnova.com",
       }),
     ).toBe("http://127.0.0.1:3000");
   });
@@ -43,8 +43,8 @@ describe("resolveRedirectOrigin", () => {
     expect(
       resolveRedirectOrigin({
         hostHeader: "evil.example",
-        siteUrl: "https://stint.company",
+        siteUrl: "https://klinnova.com",
       }),
-    ).toBe("https://stint.company");
+    ).toBe("https://klinnova.com");
   });
 });

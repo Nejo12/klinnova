@@ -20,7 +20,7 @@ vi.mock("@/lib/env/public", () => ({
   getPublicEnv: () => ({
     NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "test-key",
-    NEXT_PUBLIC_SITE_URL: "https://stint.company",
+    NEXT_PUBLIC_SITE_URL: "https://klinnova.com",
   }),
 }));
 
@@ -76,7 +76,7 @@ describe("notifyEmployerOfNewApplication", () => {
     );
     expect(sentMessage.text).toContain("Morning kitchen support");
     expect(sentMessage.text).toContain(
-      `https://stint.company/employer/applications/${applicationIdA}`,
+      `https://klinnova.com/employer/applications/${applicationIdA}`,
     );
   });
 

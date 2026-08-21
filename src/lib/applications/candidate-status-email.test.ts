@@ -7,7 +7,7 @@ import {
   type NotifiableApplicationStatus,
 } from "@/lib/applications/candidate-status-email";
 
-const applicationUrl = "https://stint.company/candidate/applications/abc-123";
+const applicationUrl = "https://klinnova.com/candidate/applications/abc-123";
 const vacancyTitle = "Morning kitchen support";
 
 describe("NOTIFIABLE_APPLICATION_STATUSES / isNotifiableApplicationStatus", () => {

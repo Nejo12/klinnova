@@ -111,12 +111,15 @@ resolved fallback origin.
 commands from Production by hardcoding:
 
 ```text
+klinnova.com
+www.klinnova.com
 stint.company
 www.stint.company
 ```
 
-That guard must recognize Klinnova Production at the exact moment Production's
-canonical origin changes.
+K6-2 updated the guard before hosted cutover so local proof refuses both the
+future canonical Klinnova Production hosts and the temporary/coexistence Stint
+Production hosts.
 
 ### Current Hosted/Readiness State
 
@@ -131,7 +134,7 @@ canonical origin changes.
 - `klinnova.com` apex is not yet Production.
 - `preview.klinnova.com` remains a custom Preview host and is a retirement
   target after K6 proof.
-- Production `NEXT_PUBLIC_SITE_URL` has not been cut over.
+- Production `NEXT_PUBLIC_SITE_URL` hosted value has not been cut over.
 - Production Supabase Auth settings were not changed by this discovery.
 - Production Sentry remains OFF/unwired by deliberate Founder decision.
 - N1-N3 business transactional mail has unresolved configuration evidence, but
@@ -160,21 +163,30 @@ work belongs at the relevant K6 execution step and must be authorized there.
 
 ### K6-2 - Repository Production-host Conversion
 
-Later bounded implementation unit. Expected repository-side changes:
+Bounded repository implementation unit. It makes repository/source-test/docs
+state recognize the future canonical Production origin while preserving
+coexistence safety for the current Stint Production origin.
+
+K6-2 repository changes:
 
 - update `src/lib/proof/local-environment-guard.ts` so `PRODUCTION_HOSTS`
   includes `klinnova.com` and `www.klinnova.com` while retaining
   `stint.company` and `www.stint.company` during coexistence;
-- update the corresponding local-environment-guard tests;
+- update the corresponding local-environment-guard tests to reject all four
+  Production/coexistence hosts during local proof;
 - update `.env.example` comments so Production examples name
   `https://klinnova.com`;
 - update auth/site-origin tests and transactional-email URL tests where their
   fixture value intentionally represents the canonical Production origin;
-- update or add focused K6 verification/runbook documentation for the exact
-  hosted acceptance flow.
+- update this K6 runbook/readiness documentation to distinguish the repository
+  K6-2 conversion from later hosted K6-3/K6-4 work.
 
 No schema, RLS, product workflow, pricing, matching, application-status,
 account-deletion, or design-system change is expected for K6-2.
+
+K6-2 does not perform hosted Production, Preview, DNS, Vercel, Supabase,
+Resend, Sentry, domain, environment-variable, or deployment mutation. The
+hosted Production `NEXT_PUBLIC_SITE_URL` flip remains a K6-3 execution step.
 
 ### K6-3 - Hosted Production Cutover
 

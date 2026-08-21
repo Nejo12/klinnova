@@ -41,12 +41,12 @@ describe("getPublicEnv", () => {
   it("accepts optional NEXT_PUBLIC_SITE_URL", async () => {
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", validUrl);
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", validKey);
-    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://stint.company");
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://klinnova.com");
 
     const { getPublicEnv } = await loadPublicEnvModule();
     const env = getPublicEnv();
 
-    expect(env.NEXT_PUBLIC_SITE_URL).toBe("https://stint.company");
+    expect(env.NEXT_PUBLIC_SITE_URL).toBe("https://klinnova.com");
   });
 
   it("fails when the URL is missing and names the variable", async () => {

@@ -12,7 +12,7 @@ vi.mock("@/lib/env/public", () => ({
   getPublicEnv: () => ({
     NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "key",
-    NEXT_PUBLIC_SITE_URL: "https://stint.company",
+    NEXT_PUBLIC_SITE_URL: "https://klinnova.com",
   }),
 }));
 
@@ -49,7 +49,7 @@ describe("requestPasswordResetAction (M5.1 Unit C)", () => {
       form({ email: "ada@example.com" }),
     );
     expect(resetPasswordForEmail).toHaveBeenCalledWith("ada@example.com", {
-      redirectTo: "https://stint.company/auth/confirm?intent=recovery",
+      redirectTo: "https://klinnova.com/auth/confirm?intent=recovery",
     });
   });
 

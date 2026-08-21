@@ -28,10 +28,15 @@ describe("local environment guard", () => {
     }
   });
 
-  it("rejects Production site URL during local proof", () => {
+  it.each([
+    "https://klinnova.com",
+    "https://www.klinnova.com",
+    "https://stint.company",
+    "https://www.stint.company",
+  ])("rejects Production site URL %s during local proof", (siteUrl) => {
     const result = assertLocalProofEnvironment({
       NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321",
-      NEXT_PUBLIC_SITE_URL: "https://stint.company",
+      NEXT_PUBLIC_SITE_URL: siteUrl,
     });
     expect(result.ok).toBe(false);
     if (!result.ok) {
