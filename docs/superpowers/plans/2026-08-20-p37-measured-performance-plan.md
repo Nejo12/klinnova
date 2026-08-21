@@ -539,3 +539,227 @@ Discovery validation:
 - Temporary measurement file removed after use.
 - No product, schema, migration, CI, build-tooling, or test files are intended in the final branch diff.
 - Final branch diff should contain only this plan update.
+
+### P3.7-E - Authenticated Dynamic Rendering And Caching Discovery
+
+Discovery base: `origin/main` at `823274786d9aaefe086c3700c2d77391ae2203a4`, the merge commit for PR #131 (`docs(p37): application notification critical-path discovery`). PR #131 and PR #130 were verified merged; PR #127 was verified closed and unmerged.
+
+P3.7 reconciliation:
+
+- P3.7-A1: technically valid but closed unmerged because measured gain was not material.
+- P3.7-A2: intentionally skipped after A1 did not justify broad `Promise.all` conversion.
+- P3.7-B: merged; vacancy draft readiness moved from N+1 single-RPC calls to one bulk readiness RPC.
+- P3.7-C: discovery complete; shared authenticated layouts and persistent shell state rejected.
+- P3.7-C1: merged; employer profile/completed-employer duplicate work is deduped per request/Supabase server client.
+- P3.7-D: discovery complete; no notification implementation now.
+- P3.7-E: this final dynamic-rendering/caching audit.
+
+Rendering directive inventory:
+
+| Group | Routes/files | Current mode | Auth/private data | Dynamic cause | Cacheability |
+| --- | --- | --- | --- | --- | --- |
+| Public pages | `/`, `/jobs`, `/jobs/[vacancyId]` | explicit `force-dynamic`, build `ƒ` | Public vacancy data; `/jobs/[vacancyId]` also reads session to choose authenticated CTA copy | `createServerSupabaseClient()` awaits `cookies()`; detail also uses React `cache()` only within one render | Public vacancy data is cacheable in principle, but current route modules are session-aware and current vacancy mutations do not invalidate public paths |
+| Static public/legal pages | `/forgot-password`, `/impressum`, `/privacy`, `/terms`, icons | build `○` or `●` | None | No request-time data | Already static/prerendered; no E work needed |
+| Auth/session pages | `/login`, `/register`, `/employer/register`, `/reset-password`, `/account/choose`, `/auth/confirm`, `/auth/error` | build `ƒ`, except `/forgot-password` static | Session, redirect intent, or query-specific interstitial state | Supabase server client/cookies on login/register/reset/account; `searchParams` on confirm/error | Mostly not worth caching; redirect/session correctness matters more |
+| Candidate authenticated pages | `/candidate`, `/candidate/onboarding`, `/candidate/matches`, `/candidate/jobs/[vacancyId]`, `/candidate/applications`, `/candidate/applications/[applicationId]`, `/candidate/account`, `/candidate/account/delete` | explicit `force-dynamic`, build `ƒ` | Candidate profile, onboarding answers, matches, applications, outcomes, account/delete state, capability nav | Supabase server client awaits `cookies()` and RLS/session auth; redirects depend on current state | Cross-request caching rejected; request freshness is required |
+| Employer authenticated pages | `/employer`, `/employer/onboarding`, `/employer/verification`, `/employer/vacancies`, `/employer/vacancies/new`, `/employer/vacancies/[vacancyId]`, `/employer/vacancies/[vacancyId]/edit`, `/employer/applications`, `/employer/applications/[applicationId]`, `/employer/account/delete` | explicit `force-dynamic`, build `ƒ` | Employer profile, company, verification, suspension, vacancy state/readiness, application data, unseen count, outcomes, account/delete state | Supabase server client awaits `cookies()` and RLS/session auth; redirects and restricted states depend on current state | Cross-request caching rejected; P3.7-C1 already handles safe same-request duplicate profile work |
+| Internal/operator pages | `/internal/verification`, `/internal/verification/[employerProfileId]`, `/internal/employers`, `/internal/employers/[employerProfileId]`, `/internal/employers/[employerProfileId]/vacancies/[vacancyId]` | explicit `force-dynamic`, build `ƒ` | Operator-only queues, employer moderation, suspension, vacancy moderation | Supabase server client awaits `cookies()`; operator gate RPCs | Cross-request caching rejected; operator state and moderation actions must be fresh |
+| Route handlers/export routes | `/candidate/account/export`, `/employer/account/export` | explicit `force-dynamic`, build `ƒ` | Full account export payloads | Supabase server client awaits `cookies()`; export response sets `Cache-Control: no-store` | Must never be cached |
+| Server Actions | auth, onboarding, vacancy lifecycle, verification, status/outcome, account deletion | request-time only | Mutations under current session/RLS/RPC gates | Supabase server client awaits `cookies()`; actions call `revalidatePath` where relevant | Not page caches; any future cache would require explicit invalidation coverage |
+
+`force-dynamic` redundancy assessment:
+
+| Surface | Assessment |
+| --- | --- |
+| Authenticated candidate/employer/internal pages | **B. Redundant but harmless.** Every page creates the Supabase server client, which awaits `cookies()`. Next 16.2.12 docs classify `cookies()` as a request-time API that opts the route into dynamic rendering. Keeping `force-dynamic` is still a useful explicit privacy signal. |
+| Account export route handlers | **B. Redundant but harmless.** Route Handlers are not cached by default in the installed docs, the handlers read cookies through Supabase, and export responses explicitly set `Cache-Control: no-store`. |
+| Public homepage/jobs list/detail | **C. Removing it alone would not create safe static/ISR semantics.** The modules still create the cookie-backed Supabase server client. Public detail is also intentionally session-aware. A real public-cache change would need a loader/client split plus public-path invalidation. |
+| `/reset-password` | **B. Redundant but harmless.** It reads current auth session from Supabase/cookies. |
+| `/auth/confirm` and `/auth/error` | No explicit `force-dynamic`, but build output marks them dynamic because they depend on `searchParams`. |
+| Static legal/help pages | No `force-dynamic`; already static. |
+
+Next.js `16.2.12` behavior findings from installed docs:
+
+- This repository does **not** enable `cacheComponents` in `next.config.ts`, so it uses the "previous model" caching guide rather than the new opt-in Cache Components model.
+- `cookies()` and `headers()` are async request-time APIs. Using either in a layout or page opts the route into dynamic rendering.
+- Server Component data fetching can use `fetch` or database clients. `fetch` requests are not cached by default in the current getting-started guide; the previous-model guide also explains explicit opt-in through `cache: "force-cache"`, `next.revalidate`, route `revalidate`, or `unstable_cache`.
+- `dynamic = "force-dynamic"` forces per-user request-time rendering and is equivalent to forcing no-store behavior for `fetch()` in that segment.
+- `revalidate = 0` also ensures dynamic rendering and changes the default for unspecified `fetch` requests to no-store; no route currently exports `revalidate`.
+- `unstable_cache` persists non-`fetch` async results across requests/deployments until time/tag/path invalidation. It cannot access `cookies()` or `headers()` inside the cache scope.
+- React `cache()` deduplicates non-`fetch` data access within a server render/request scope only. It is not a cross-request cache.
+- `use cache` / Cache Components require `cacheComponents: true`; this repo does not enable that flag, and no source file uses a `"use cache"` directive.
+- Server Action cache invalidation exists through `revalidatePath`; this repo already uses path revalidation on vacancy, verification, moderation, transition, and outcome mutations, but there is no persistent private data cache for those calls to invalidate today.
+- `router.refresh` / action-driven refresh can clear client-side route cache, but relying on it for private cross-request cache correctness would require systematic mutation coverage.
+
+Supabase SSR caching findings:
+
+- `src/lib/supabase/server.ts` calls `await cookies()` before creating the `@supabase/ssr` server client, so every route that creates this client is naturally request-time dynamic.
+- The Supabase server client receives all request cookies through `cookieStore.getAll()` and may attempt cookie writes through `setAll()`; writes no-op when called from immutable Server Component contexts.
+- `src/proxy.ts` refreshes Supabase auth cookies on all non-static/image paths and protects candidate/employer/internal areas at the session level using `getClaims()`.
+- The app uses `auth.getUser()`, RLS-protected table queries, and RPCs under the current session for ordinary private routes. Service-role clients are limited to explicit privileged paths such as account-deletion processing and notification recipient lookup; they are not used by public vacancy rendering.
+- Supabase SDK calls should not be treated as safe Next data-cache entries. They carry session cookies/auth context, may use POST/RPC requests, are not tagged with application invalidation keys, and are not automatically deduped as equivalent app-owned `fetch()` calls across components.
+- Cross-request caching of Supabase results would need explicit cache keys and invalidation. A cache key based only on user id is not sufficient for suspension, account deletion/recovery, role/capability changes, verification changes, vacancy lifecycle, and application status/seen/outcome updates.
+- Cross-user leakage risk is unacceptable for candidate applications, employer application detail, account exports, operator queues, and profile/onboarding data. No private loader should use `unstable_cache`, route ISR, or shared layout state without a separate security design.
+
+Data sensitivity tiers:
+
+| Tier | Data/loaders | Reason |
+| --- | --- | --- |
+| Tier 1 - security-critical / must be fresh | auth identity, account deletion/tombstone state, operator gate, employer suspension, ownership gates, account export, moderation gates | Stale data can grant access, hide restriction, or leak private/operator-only data |
+| Tier 2 - workflow-critical / refresh per navigation/action | unseen applications, application status/history/outcomes, mark-seen state, vacancy publication/readiness/expiry/moderation state, onboarding completion, verification state | Stale data misdirects users or displays wrong operational status |
+| Tier 3 - stable but private | employer display/profile/company details, candidate profile fields, capability nav booleans | Less volatile, but still private and role-sensitive; request-level only is safe |
+| Tier 4 - public/stable | public effective vacancy list/detail/languages and static legal/marketing content | Cacheable only when detached from auth/session and backed by correct vacancy lifecycle invalidation |
+
+Public-route audit:
+
+- Static legal/help routes are already prerendered and need no work.
+- `/`, `/jobs`, and `/jobs/[vacancyId]` are dynamic today. They use public vacancy RPCs, but they create the cookie-backed Supabase server client, and public job detail additionally reads `auth.getUser()` to decide the CTA state.
+- Public vacancy content is the safest potential future cache target, but not an obvious E implementation now. Publication, pause, fill, withdraw, expiry materialization, moderation, employer suspension, and verification revocation can all change whether a vacancy is public. Current employer lifecycle `revalidatePath()` calls cover employer paths only, not `/`, `/jobs`, or `/jobs/[vacancyId]`.
+- ISR for public vacancies would require a split between anonymous public data and session-aware CTA data, public path/tag invalidation for every vacancy visibility mutation, and stale-window acceptance for withdrawn/expired/suspended vacancies. That is more than a cleanup.
+
+Authenticated-route audit:
+
+- Candidate and employer routes remain locally fast after P3.7-B/C1. The representative measurement below showed authenticated server timings mostly around `6-10ms`, with one cold candidate applications sample at `25.1ms`.
+- Private cross-request caching would risk stale role/capability state, stale onboarding/verification redirects, stale suspension restrictions, stale unseen counts, stale application status/outcome data, and stale account-deletion state.
+- Same-request duplicate employer profile work was already addressed by P3.7-C1. No remaining authenticated caching opportunity meets the cost/benefit threshold.
+
+Cache-key and user-isolation findings:
+
+- Public vacancy data would need keys by vacancy/list scope plus visibility/version dimensions and invalidation on every lifecycle/moderation/verification/suspension transition that changes effective-public eligibility.
+- Candidate private data would need user id, deletion/account-state version, onboarding/profile version, application/status/outcome versions, and route-specific ownership dimensions. This is not justified for current timings.
+- Employer private data would need employer id, suspension version, verification/profile/company versions, vacancy state/readiness versions, application seen/status/outcome versions, and dual-capability dimensions. This is not justified for current timings.
+- Internal/operator data would need operator authorization state plus moderation queue/entity versions. It is operationally safer to keep it uncached.
+- User id alone is never sufficient for safe private cross-request caching because account deletion, suspension, verification, and role changes are security/workflow state, not just identity state.
+
+Production-mode measurement:
+
+Build command:
+
+```bash
+pnpm exec next build --webpack
+```
+
+Build result: PASS. The default local Turbopack build blocker remains a previously classified local tooling issue; this measurement used the documented webpack production-build fallback.
+
+Temporary measurement command:
+
+```bash
+E2E_AUTH_JOURNEY=1 pnpm exec playwright test e2e/p37e-dynamic-caching-measure.spec.ts --workers=1 --reporter=list
+```
+
+Result: 1 file / 1 test passed. The temporary spec was removed afterward.
+
+| Route | Sample | status | serverMs | totalMs | Cache-Control | Next cache headers |
+| --- | --- | ---: | ---: | ---: | --- | --- |
+| `/` | cold | 200 | 34.3 | 101.8 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/` | warm | 200 | 78.1 | 94.5 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/jobs` | cold | 200 | 13.6 | 62.5 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/jobs` | warm | 200 | 5.1 | 37.7 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/jobs/[vacancyId]` | cold | 200 | 11.6 | 25.2 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/jobs/[vacancyId]` | warm | 200 | 12.4 | 26.1 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/candidate` -> `/candidate/matches` | cold | 200 | 7.7 | 99.7 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/candidate` -> `/candidate/matches` | warm | 200 | 8.2 | 94.2 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/candidate/matches` | cold | 200 | 6.3 | 54.5 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/candidate/matches` | warm | 200 | 7.3 | 58.0 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/candidate/applications` | cold | 200 | 25.1 | 75.6 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/candidate/applications` | warm | 200 | 6.6 | 48.0 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/employer` | cold | 200 | 7.5 | 59.6 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/employer` | warm | 200 | 6.2 | 57.7 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/employer/vacancies` | cold | 200 | 9.4 | 66.0 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/employer/vacancies` | warm | 200 | 7.6 | 62.5 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/employer/applications` | cold | 200 | 9.6 | 91.2 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+| `/employer/applications` | warm | 200 | 7.8 | 57.5 | `private, no-cache, no-store, max-age=0, must-revalidate` | none |
+
+Build route classification:
+
+| Build marker | Routes |
+| --- | --- |
+| `○` static | `/_not-found`, `/apple-icon`, `/forgot-password`, `/impressum`, `/privacy`, `/terms` |
+| `●` SSG | `/icon/[__metadata_id__]` with `/icon/16` and `/icon/32` |
+| `ƒ` dynamic pages/routes | `/`, `/account/choose`, `/auth/confirm`, `/auth/error`, all candidate pages and export route, all employer pages and export route, all internal pages, `/jobs`, `/jobs/[vacancyId]`, `/login`, `/register`, `/reset-password` |
+| `ƒ` Proxy | `src/proxy.ts`, all non-static/image paths except the configured exclusions |
+
+Security/privacy threat review:
+
+- Candidate A receiving candidate B data: rejected by keeping candidate pages uncached and RLS/session-bound per request.
+- Employer A receiving employer B application/vacancy data: rejected by keeping employer pages uncached and using ownership/RPC gates per request.
+- Suspended employer retaining cached access: rejected by not caching suspension-dependent routes; current suspension loader is fresh per navigation and RPC/RLS gates remain authoritative.
+- Deleted account seeing stale private content: rejected by not caching account/profile/application exports or private page data across requests.
+- Role switch UI staying stale: accepted only for one current render; not cached across navigation.
+- Unseen badge stale: not cached; still refreshed per employer navigation.
+- Withdrawn/expired/moderated/suspended public vacancy remains visible: possible under any future ISR/public cache unless every visibility mutation invalidates public list/detail keys; this is why no public cache implementation is recommended now.
+- Private application outcome in shared cache: rejected by not using `unstable_cache`, ISR, or shared cache for application data.
+
+Invalidation map:
+
+| Mutation/source | Would need invalidation if cached |
+| --- | --- |
+| Candidate onboarding/profile updates | candidate home/onboarding/matches/jobs/applications, capabilities, account state |
+| Candidate application submit | candidate applications/detail, candidate job detail application state, employer applications/unseen count, public CTA if personalized |
+| Candidate account deletion/cancel/confirm | every candidate private page, account export, capabilities, proxy/session assumptions |
+| Employer onboarding/profile/company updates | employer home/onboarding/verification/vacancy create/edit, capabilities, public company/vacancy display if public cache exists |
+| Employer verification request/review/revoke | employer verification/home/vacancies, public vacancy list/detail for effective-public eligibility |
+| Vacancy create/edit/publish/pause/resume/fill/withdraw/renew/expiry | employer vacancy pages, employer applications filters, public `/`, `/jobs`, `/jobs/[vacancyId]` if public cache exists |
+| Application status/outcome changes | employer/candidate application list/detail, public metrics only if future public surfacing exists |
+| Mark seen | employer unseen count and application detail/list |
+| Employer suspension/reinstatement | employer restricted states, public vacancy list/detail, candidate matches/job detail |
+| Internal moderation | internal queue/detail, public vacancy list/detail, candidate matches/job detail |
+| Account recovery/session changes | auth redirects, capability nav, protected-route access |
+
+Options matrix:
+
+| Option | Expected performance gain | Freshness risk | Cross-user privacy risk | Invalidation complexity | Implementation complexity | Recommendation |
+| --- | --- | --- | --- | --- | --- | --- |
+| A. Leave authenticated routes `force-dynamic` | No new gain; preserves current fast baseline | Low | Low | None | None | Keep |
+| B. Remove redundant `force-dynamic` declarations only | No material performance gain because `cookies()` still makes routes dynamic | Low-medium; cleanup can obscure intentional privacy posture | Low if behavior truly unchanged | Test every affected route/build output | Medium for little value | Do not implement now |
+| C. Cache selected private loaders cross-request | Possible DB reduction, but current timings do not need it | High | High | High/fragile | High | Reject |
+| D. Cache public route data with ISR/revalidation | Possible public DB reduction at scale | Medium for vacancy freshness | Low if fully detached from auth | Medium-high; all visibility mutations must invalidate public paths/tags | Medium-high | Defer until hosted scale evidence |
+| E. Cache immutable/static marketing/legal content | None; already static where applicable | Low | Low | None | None | Already done by framework |
+| F. No P3.7-E implementation | No new gain | Low | Low | None | None | **Recommended** |
+
+Final P3.7-E classification: **E. NO MATERIAL OPPORTUNITY - KEEP CURRENT RENDERING**.
+
+E1 recommendation: **No E1 is justified now**.
+
+Rationale:
+
+- Authenticated route server timings are already low after P3.7-B/C1.
+- Removing `force-dynamic` alone would be cleanup, not a measured performance improvement, because the same routes still call the cookie-backed Supabase server client.
+- Private cross-request caching would add disproportionate privacy, security, and invalidation risk.
+- Public vacancy caching is the only plausible future area, but current measured timings are not a blocker and safe implementation requires route/client splitting plus public-path invalidation not currently present.
+
+P3.7 closure status: **P3.7 COMPLETE**.
+
+Implemented or merged P3.7 slices:
+
+- P3.7-B vacancy readiness N+1 removal.
+- P3.7-C1 request-level employer profile/completed-employer deduplication.
+
+Rejected, skipped, or deferred:
+
+- P3.7-A1 closed unmerged due no material measured gain.
+- P3.7-A2 skipped.
+- P3.7-C shared layouts/persistent shell state rejected.
+- P3.7-D no implementation now; durable notification outbox remains an operational decision only if later authorized.
+- P3.7-E no implementation now.
+
+Remaining performance risks:
+
+- Public vacancy list still has one language RPC per public vacancy; this was not material in current measurement but could become a later scale target if public listings grow.
+- Public routes are no-store today, so they do not reduce DB load through HTTP/ISR caching.
+- Private routes intentionally pay fresh session/RLS reads per request for safety.
+- Local absolute timings are not a hosted Production latency guarantee; hosted measurement should be repeated only if beta evidence shows actual user-facing delay.
+
+Repository-verified roadmap handoff:
+
+- Current durable next M5.1 unit remains **Unit H - legal/support readiness finalization**.
+- Cohort A readiness remains **BLOCKED**.
+- K6 Production/public-domain cutover remains later and separately gated.
+- KDS-TM typography/motion discovery is recorded as a non-blocking separate design-system track and is not authorized by P3.7 closure.
+- No next milestone implementation is begun by this branch.
+
+Discovery validation:
+
+- Temporary Playwright measurement spec removed.
+- No application source, test, schema/migration, CI, or build-tooling files are intended in the final branch diff.
+- Final branch diff should contain only this plan update.
