@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import PrivacyPage from "@/app/privacy/page";
 
 describe("PrivacyPage", () => {
-  it("renders one h1 and the shared draft/legal-review-required warning", () => {
+  it("renders one h1 and the shared founder-verification notice", () => {
     render(<PrivacyPage />);
 
     expect(
@@ -12,15 +12,19 @@ describe("PrivacyPage", () => {
     ).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(
-      screen.getByText("Draft — legal review required"),
+      screen.getByText("Draft — founder verification required"),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Privacy Policy/)).toBeInTheDocument();
+    expect(screen.getByText(/Privacy Notice/)).toBeInTheDocument();
   });
 
-  it("does not claim GDPR compliance, legal approval, or regulatory compliance", () => {
+  it("discloses Preview Sentry and Production unwired status without compliance claims", () => {
     render(<PrivacyPage />);
     const text = document.body.textContent ?? "";
 
+    expect(text).toMatch(/Sentry/i);
+    expect(text).toMatch(/Preview/i);
+    expect(text).toMatch(/Production/i);
+    expect(text).toContain("support@klinnova.com");
     expect(text).not.toMatch(/GDPR[- ]compliant/i);
     expect(text).not.toMatch(/legally approved/i);
     expect(text).not.toMatch(/reviewed by (our|an) attorney/i);
