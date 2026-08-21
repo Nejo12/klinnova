@@ -413,3 +413,129 @@ Validation:
 - Focused loader tests prove two and three same-client calls dedupe to one underlying load.
 - Focused tests prove a fresh server client reloads fresh employer state.
 - Focused `requireCompletedEmployer` tests prove repeated gates dedupe while preserving unauthenticated, incomplete, completed, and profile-failure contracts.
+
+### P3.7-D - Candidate Application Notification Critical-Path Discovery
+
+Discovery base: `origin/main` at `515292611a5f7ce7fa6778f867cb65b9695323c7`, the merge commit for PR #130 (`perf(p37): dedupe employer profile loads per request`). PR #127 was verified closed and unmerged before this branch was created.
+
+Current flow:
+
+1. `submitCandidateApplicationAction` validates the submitted `vacancyId`.
+2. The action creates the request Supabase server client and rechecks the authenticated user.
+3. The action calls the authoritative `submit_candidate_application` RPC.
+4. The RPC performs the application mutation transactionally: profile/vacancy checks, duplicate guard, eligibility checks, `applications` insert, and `application_status_history` insert.
+5. For a new `"submitted"` result only, the action awaits `notifyEmployerOfNewApplication({ applicationId, vacancyId })`.
+6. The action redirects to `/candidate/applications/<applicationId>` after the notification attempt settles. `"already_applied"` redirects without a new notification attempt.
+
+The awaited notification is intentionally fail-soft. Notification errors or provider rejection do not roll back the persisted application and do not return a candidate-facing submission failure. The cost is that mail lookup and provider latency are on the candidate redirect critical path.
+
+Files inspected:
+
+- `src/app/candidate/jobs/[vacancyId]/actions.ts`
+- `src/lib/applications/notify-employer-new-application.ts`
+- `src/lib/applications/employer-new-application-email.ts`
+- `src/lib/applications/privileged-employer-recipient-lookup.ts`
+- `src/lib/mail/send-transactional-email.ts`
+- `src/lib/mail/providers/resend-transport.ts`
+- `src/lib/mail/env.ts`
+- `src/app/candidate/jobs/[vacancyId]/actions.test.ts`
+- `src/lib/applications/notify-employer-new-application.test.ts`
+- `src/lib/mail/send-transactional-email.test.ts`
+- `src/lib/mail/providers/resend-transport.test.ts`
+- `supabase/migrations/20260807220000_account_deletion_tombstone_and_request_contract.sql`
+- `supabase/tests/database/11_applications_schema_test.sql`
+- `package.json`
+- `next.config.ts`
+- `vercel.json`
+- `src/instrumentation.ts`
+- `docs/53-m5.1-beta-readiness-closure.md`
+
+Mutation and idempotency findings:
+
+- `submit_candidate_application(uuid)` is the authoritative mutation boundary. It runs as a security-definer RPC, uses the current `auth.uid()`, locks the candidate profile and vacancy rows during checks, inserts the application and status history in the database function, and catches duplicate-submit `unique_violation` by returning `"already_applied"` for the existing row.
+- The database has an `applications_candidate_vacancy_key` unique constraint. Duplicate submit attempts do not create duplicate application rows.
+- Employer notification is not part of the database transaction. It is a TypeScript side effect after the RPC returns `"submitted"`.
+- Notification idempotency currently relies on Resend's `Idempotency-Key` header with deterministic event id `application-submitted:<applicationId>`.
+- Resend documents idempotency for `POST /emails` and `POST /emails/batch` as duplicate-send protection for the same key within 24 hours: <https://resend.com/docs/dashboard/emails/idempotency-keys>.
+- There is no local delivery ledger, durable outbox, retry worker, or database record that says a given application notification was attempted, sent, rejected, retried, or permanently failed.
+
+Runtime and deployment findings:
+
+- The installed framework version is Next `16.2.12`.
+- The app uses default App Router Server Actions on the Node runtime. No candidate application route exports `runtime = "edge"` or `maxDuration`.
+- `vercel.json` sets the framework only; it does not configure function duration.
+- The installed Next docs state that `after()` can be used in Server Functions, including Server Actions, and runs after the response or prerender finishes. They also state that it runs for the platform default or configured max duration, with `maxDuration` configurable at the page level for Server Actions.
+- Vercel documents `waitUntil` as extending the lifetime of a request handler for a promise, and recommends the built-in Next `after()` helper for Next.js 15.1 and later: <https://vercel.com/docs/functions/functions-api-reference/vercel-functions-package>.
+- Vercel also warns that unawaited fire-and-forget work can produce inconsistent logs or incomplete work; helpers such as `waitUntil`/`after` still run inside the function duration boundary: <https://vercel.com/kb/guide/troubleshooting-inconsistent-logs-in-vercel-functions>.
+- Production beta readiness docs currently classify transactional business mail N1-N3 as not production-ready. Production still needs `RESEND_API_KEY`, `MAIL_FROM_ADDRESS`, `MAIL_TRANSPORT`, and Resend domain verification for the intended sender before notification delivery can be trusted in production.
+
+Controlled action-level timing measurement:
+
+Temporary Vitest instrumentation used the real `submitCandidateApplicationAction` control flow with mocked Supabase auth/RPC and mocked notification outcomes. The RPC delay was fixed at roughly 5 ms to represent a completed persisted application result; notification latency was varied to isolate candidate redirect wait. The temporary measurement file was removed after the run.
+
+Command:
+
+```bash
+pnpm exec vitest run 'src/app/candidate/jobs/[vacancyId]/p37d-critical-path-measure.test.ts' --reporter=verbose
+```
+
+Result: 1 file / 1 test passed.
+
+| Scenario | Persistence/RPC ms | Notification ms | Post-persistence wait ms | Redirect wait ms | Persisted application |
+| --- | ---: | ---: | ---: | ---: | --- |
+| recipient unresolved | 5.8 | 1.2 | 2.1 | 8.9 | yes |
+| fast provider success | 6.0 | 1.2 | 1.4 | 7.6 | yes |
+| provider delay 100 ms | 5.9 | 100.6 | 100.8 | 107.0 | yes |
+| provider delay 500 ms | 6.0 | 501.2 | 501.8 | 507.9 | yes |
+| provider delay 1500 ms | 5.4 | 1501.4 | 1502.2 | 1508.5 | yes |
+| provider rejected | 6.4 | 1.4 | 1.9 | 9.1 | yes |
+
+Interpretation:
+
+- The current implementation adds notification duration almost one-for-one to candidate redirect wait after the application has already been persisted.
+- Provider rejection is fail-soft for the candidate, but the candidate still waits for the rejected provider response.
+- Recipient lookup failure is also fail-soft and fast in the mocked action-level measurement.
+- The measurement does not claim absolute hosted production latency; it proves the structural critical-path relationship in the current action.
+
+Options matrix:
+
+| Option | Candidate redirect impact | Delivery reliability | Duplicate-send control | Freshness/security risk | Complexity | Recommendation |
+| --- | --- | --- | --- | --- | --- | --- |
+| A. Keep current awaited fail-soft notification | Provider/lookup latency remains on critical path | Best current attempt guarantee inside request lifecycle | Resend 24h idempotency only | Low; no new async boundary | None | Acceptable interim state |
+| B. Plain fire-and-forget `void notifyEmployerOfNewApplication(...)` | Removes wait from redirect | Weak; work can disappear when invocation ends | Resend key only if the call actually reaches provider | Medium; harder observability and error handling | Low | Reject |
+| C. Next `after()` / Vercel `waitUntil` | Removes wait from response while function remains alive | Better than untracked fire-and-forget, but not durable and still bounded by max duration | Resend key only, no local ledger | Low-medium | Low-medium | Do not implement as the reliability answer |
+| D. Database notification outbox plus worker/cron processing | Removes provider wait from candidate action after enqueue | Strongest; durable attempt, retry, status, replay, observability | Can combine DB unique key plus provider idempotency | Low if service-role worker is narrow and audited | High | Right architecture if reliability and latency both matter |
+| E. Third-party queue/job platform | Removes provider wait | Strong if configured correctly | Depends on provider plus local keys | Medium; new operational dependency | Medium-high | Not justified before beta operations are settled |
+
+Classification: **E. NO IMPLEMENTATION YET - operational decision required**.
+
+Rationale:
+
+- The current awaited path is measurably on the candidate critical path, but it is also the only current mechanism that ensures a notification attempt happens before the request lifecycle ends.
+- A casual fire-and-forget change would improve redirect timing while making notification loss easier and less visible. That violates the notification reliability concern.
+- `after()` is supported by the installed Next/Vercel stack and is a legitimate latency tool for non-critical side effects, but it is not a durable queue. It does not add retry state, a delivery ledger, or exactly-once semantics, and it remains bounded by function duration.
+- A durable outbox is the smallest architecture that satisfies both goals: remove provider latency from the candidate redirect and avoid silent loss by recording an intended notification transactionally with the application mutation. It is larger than a performance micro-optimization because it touches schema, worker/runtime, retry policy, observability, service-role scope, and operational runbooks.
+- Production transactional mail is not yet ready, so implementing asynchronous delivery mechanics now would outrun the operational foundation.
+
+Recommended next decision:
+
+Keep the current awaited fail-soft implementation for the immediate beta path unless candidate submit latency becomes a measured hosted problem. Before implementing P3.7-D1, decide whether employer new-application email is product-critical enough to require durable retry and operator visibility.
+
+If implementation is authorized later, the smallest coherent slice should be:
+
+**P3.7-D1 - durable employer-application-notification outbox**
+
+- Insert a notification-outbox row transactionally with the new application or immediately after the RPC through a narrowly reviewed server-side path.
+- Add a unique event key such as `application-submitted:<applicationId>` at the database layer.
+- Process pending rows through a service-role Route Handler, cron job, or approved worker path.
+- Preserve the current privacy-minimal email body.
+- Record attempt status, provider message id, error class, retry count, and timestamps without storing recipient/body secrets in logs.
+- Keep Resend `Idempotency-Key` as provider-side duplicate protection, but treat it as secondary to the local event ledger.
+- Preserve candidate success semantics: application persistence remains authoritative, and notification failures do not convert a submitted application into a candidate-facing failure.
+- Exclude generic notification infrastructure, inbox notifications, candidate emails, cross-provider abstractions, marketing mail, shared layouts, and unrelated P3.7 work.
+
+Discovery validation:
+
+- Temporary measurement file removed after use.
+- No product, schema, migration, CI, build-tooling, or test files are intended in the final branch diff.
+- Final branch diff should contain only this plan update.
