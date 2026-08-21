@@ -18,16 +18,16 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 | Active milestone | **M5 — Berlin private beta** |
 | Previous milestone | **M4 — Complete** (Slices 7–8 closed; PR #73 merged) |
 | Product boundary | Merged M4 implementation under D-M5-1 feature freeze |
-| Active work unit | **M5.1 Unit H — legal/support readiness finalization; NOT STARTED**. Units A→A1→B→C→D→E→F/F2→G1/G2 are complete. Unit I has baseline investigation evidence but is not formally closed. See `docs/53-m5.1-beta-readiness-closure.md`. |
+| Active work unit | **K6-0/K6-1 Production-cutover decision/discovery — draft PR only; no hosted mutation.** Unit H remains not complete and not bypassed. See `docs/53-m5.1-beta-readiness-closure.md` and `docs/55-k6-production-cutover-discovery.md`. |
 | PR | Current recovery/closure PR only; Unit H is not authorized by it |
 | Product/schema implementation | M5.1 work proceeds only through explicitly approved bounded units; Production changes remain separately authorized |
 | Preview | Provisioned **2026-08-11** — persistent, isolated Supabase project (`stint-preview`); see `docs/52-preview-environment-runbook.md` |
 | Monitoring | **Preview Sentry complete through G1/G2** — repository integration merged, hosted Preview client/server/source-map/privacy verification passed. **Production Sentry remains intentionally unwired** pending separate legal/privacy/activation approval. |
 | Production | Existing production remains live; no Unit G2 Production activation occurred |
-| Cohort A readiness | **BLOCKED** — legal/support, Production Sentry decision, Unit I closure, demo-fixture obligation, and operational preparation remain open |
+| Cohort A readiness | **BLOCKED** — Unit H/legal-support, Production Sentry decision, N1-N3 transactional-mail disposition, K6 execution/Production verification, and operational preparation remain open |
 | Hosted destructive proof | Not authorized / not run |
 | Demo fixture deadline | Remove or explicitly re-authorize retained Production Demo fixtures by **2026-09-02** |
-| Legal readiness | Founder-owned qualified German legal review/finalization gate before intentional Cohort A external traffic; Unit H is the exact current next unit |
+| Legal readiness | Founder-owned qualified German legal review/finalization gate before intentional Cohort A external traffic; Unit H remains incomplete and is not resolved by K6 discovery |
 
 ## M5 targets and approved definitions
 
@@ -143,6 +143,11 @@ Before intentional external Cohort A traffic:
 - Unit I device/browser/accessibility/readiness proof closed or explicitly dispositioned;
 - demo-fixture cleanup deadline tracked and satisfied/re-authorized as required;
 - Cohort A employer/candidate acquisition and founder-assisted onboarding preparation ready.
+- K6 Production/public-domain cutover completed and verified after separate
+  authorization; K6-0/K6-1 decision/discovery is recorded in
+  `docs/55-k6-production-cutover-discovery.md` but does not itself authorize
+  Production, Preview, DNS, Vercel, Supabase, Resend, Sentry, or domain
+  mutation.
 
 **Current verdict: BLOCKED.** See `docs/53-m5.1-beta-readiness-closure.md`.
 

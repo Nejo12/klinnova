@@ -1597,3 +1597,71 @@ Do not say "Klinnova is free forever," "there will never be fees," or "all futur
 **Consequences:** `docs/54-cohort-a-employer-acquisition-playbook.md`'s outreach templates, call script, and objection handling are updated to state this policy directly instead of deferring the question. This decision does not authorize, imply, or require any product/billing implementation work — no payment feature exists or is being built, and none is proposed by this decision.
 
 **Acceptance note:** Accepted 2026-08-13 by repository owner (founder) as part of M5.1 Klinnova readiness coordination.
+
+## D-093 — K6 Production/public-domain cutover decision lock
+
+**Status:** Accepted
+
+**Accepted:** 2026-08-21
+
+**Must accept before:** K6 Production/public-domain cutover implementation
+
+**Context:** K0-K5 Klinnova public-identity readiness, KDS, Unit I, and
+Production schema catch-up are complete, but K6 has remained separately gated.
+Current Production still serves through `stint.company`; `klinnova.com` is the
+future public identity established by K3/K4/K5; Production `NEXT_PUBLIC_SITE_URL`
+has not been cut over; `src/lib/proof/local-environment-guard.ts` still lists
+only `stint.company` / `www.stint.company` as Production application hosts.
+Unit H legal/support readiness remains incomplete, Production Sentry remains
+disabled/unwired, and N1-N3 business transactional mail remains not
+Production-ready.
+
+**Decision:** Lock K6 as a later, separately authorized, additive-first
+Production/public-domain cutover to canonical origin `https://klinnova.com`.
+K6 must keep `stint.company` and `www.stint.company` available through the
+initial cutover window unless a separate old-domain disposition explicitly
+authorizes redirect, decommissioning, or removal. K6 must not rename internal
+Stint infrastructure identifiers, historical documents, Supabase project names
+or refs, Vercel project name, Sentry organization/project names, package name,
+repository name, migration history, or Git history merely because the public
+domain changes.
+
+The repository-side K6 implementation must include the `NEXT_PUBLIC_SITE_URL`
+Production-origin flip and the `PRODUCTION_HOSTS` safety-guard update as one
+coordinated change. `PRODUCTION_HOSTS` must include the Klinnova Production
+hosts while retaining Stint Production hosts during coexistence, so local proof
+guards continue to fail closed for every active Production hostname.
+
+K6 does not itself authorize Production Sentry activation, N1-N3 Resend
+transactional-mail configuration, auth-sender-domain migration away from
+`auth.stint.company`, legal drafting, schema/RLS changes, product feature work,
+old-domain decommissioning, Preview rebuilding, or Cohort A traffic. Those
+remain independently gated unless a future authorization explicitly includes
+them.
+
+**Execution order:** future K6 implementation must be additive before canonical:
+verify exact head and current hosted state; add/verify Klinnova Production
+domain in Vercel while retaining Stint domains; add/verify Supabase Auth
+Klinnova redirect allowance while retaining Stint/Auth allowances; update the
+repository safety guard and related canonical-origin fixtures; flip Production
+`NEXT_PUBLIC_SITE_URL` to `https://klinnova.com`; redeploy; run Production
+verification; then stop for founder GO/NO-GO. Old-domain redirection or
+decommissioning is a separate decision after accepted coexistence evidence.
+
+**Verification boundary:** K6 acceptance requires real Production verification
+of canonical Klinnova serving, `www` behavior, old-domain coexistence behavior,
+signup confirmation, login/logout/re-login, password recovery/reset,
+candidate journey, employer journey including approved verification procedure
+and vacancy publication, application review/outcome recording, account export,
+legal/support navigation, metadata/favicon/Klinnova branding, stale
+user-visible Stint scan, approved Production Sentry state, approved
+transactional-mail state, and no Preview degradation. K6 completion still does
+not start Cohort A; explicit founder GO/NO-GO remains required afterward.
+
+**Consequences:** `docs/55-k6-production-cutover-discovery.md` becomes the
+durable K6 discovery/runbook source for the later implementation unit. Current
+documentation may classify K6 as decision locked but not ready to execute until
+Unit H/legal-support state, Production Sentry disposition, and transactional
+mail disposition are resolved or explicitly accepted as K6 exclusions. This
+decision records no hosted mutation and authorizes no Production/Preview/DNS/
+Vercel/Supabase/Resend/Sentry/domain change.
