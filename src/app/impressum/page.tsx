@@ -6,7 +6,8 @@ import { PublicFooter } from "@/components/public-shared/public-footer";
 
 export const metadata = {
   title: "Impressum · Klinnova",
-  description: "Draft Impressum placeholder — legal review required.",
+  description:
+    "Provider identification for Klinnova under § 5 DDG — founder verification pending.",
   robots: { index: false, follow: false },
 };
 
@@ -20,31 +21,94 @@ export default function ImpressumPage() {
 
       <DraftNotice documentName="Impressum" />
 
-      <section className={styles.section} aria-labelledby="impressum-details">
-        <h2 className={styles.sectionHeading} id="impressum-details">
-          Service operator details
+      <section className={styles.section} aria-labelledby="impressum-ddg">
+        <h2 className={styles.sectionHeading} id="impressum-ddg">
+          Information according to § 5 DDG
         </h2>
+        <p className={styles.body}>
+          Provider identification for the Klinnova digital service under § 5 of
+          the Digitale-Dienste-Gesetz (DDG). Personal identity fields marked{" "}
+          <code>[FOUNDER-FILL]</code> are completed at publication from the
+          founder&apos;s private checklist and are not fabricated in this
+          repository.
+        </p>
         <dl className={styles.fieldList}>
-          <dt>Service operator / legal entity</dt>
-          <dd>[TO COMPLETE]</dd>
+          <dt>Service operator / legal person</dt>
+          <dd>[FOUNDER-FILL: full legal name], trading as Klinnova</dd>
 
           <dt>Legal form</dt>
-          <dd>[TO COMPLETE]</dd>
+          <dd>
+            Sole trader / nicht eingetragenes Einzelunternehmen (Nebenerwerb)
+          </dd>
 
-          <dt>Address</dt>
-          <dd>[TO COMPLETE]</dd>
+          <dt>Service address</dt>
+          <dd>
+            [FOUNDER-FILL: street and house number], [FOUNDER-FILL: PLZ] Berlin,
+            Germany
+          </dd>
 
           <dt>Responsible representative</dt>
-          <dd>[TO COMPLETE]</dd>
+          <dd>[FOUNDER-FILL: full legal name]</dd>
 
           <dt>Contact email</dt>
-          <dd>[TO COMPLETE]</dd>
+          <dd>
+            <a className={styles.backLink} href="mailto:support@klinnova.com">
+              support@klinnova.com
+            </a>
+          </dd>
 
-          <dt>Register / registration number</dt>
+          <dt>Phone</dt>
           <dd>[IF APPLICABLE]</dd>
 
-          <dt>VAT ID</dt>
+          <dt>Commercial register</dt>
+          <dd>Not applicable — not entered in the commercial register</dd>
+
+          <dt>VAT ID (USt-IdNr)</dt>
+          <dd>[IF APPLICABLE — otherwise not issued]</dd>
+
+          <dt>Trade authority (informational)</dt>
+          <dd>
+            Bezirksamt Treptow-Köpenick von Berlin / Ordnungsamt.
+            Gewerbeanmeldung submitted 2026-08-14; official confirmation pending
+            as of this draft. Registered commencement date on file: 2026-09-01.
+          </dd>
+        </dl>
+      </section>
+
+      <section className={styles.section} aria-labelledby="impressum-de">
+        <h2 className={styles.sectionHeading} id="impressum-de">
+          Angaben gemäß § 5 DDG
+        </h2>
+        <dl className={styles.fieldList}>
+          <dt>Diensteanbieter</dt>
+          <dd>[FOUNDER-FILL: Vor- und Nachname]</dd>
+
+          <dt>Geschäftsbezeichnung</dt>
+          <dd>Klinnova</dd>
+
+          <dt>Rechtsform</dt>
+          <dd>Nicht eingetragenes Einzelunternehmen (Nebenerwerb)</dd>
+
+          <dt>Anschrift</dt>
+          <dd>[FOUNDER-FILL: Straße Hausnr.], [FOUNDER-FILL: PLZ] Berlin</dd>
+
+          <dt>E-Mail</dt>
+          <dd>
+            <a className={styles.backLink} href="mailto:support@klinnova.com">
+              support@klinnova.com
+            </a>
+          </dd>
+
+          <dt>Telefon</dt>
           <dd>[IF APPLICABLE]</dd>
+
+          <dt>Handelsregister</dt>
+          <dd>Nicht eingetragen / entfällt</dd>
+
+          <dt>Umsatzsteuer-ID</dt>
+          <dd>
+            [IF APPLICABLE — derzeit nicht erteilt, falls keine ID vorliegt]
+          </dd>
         </dl>
       </section>
 
