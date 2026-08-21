@@ -63,7 +63,12 @@ function hasTokenSequence(
   return false;
 }
 
-const PRODUCTION_HOSTS = new Set(["stint.company", "www.stint.company"]);
+const PRODUCTION_HOSTS = new Set([
+  "klinnova.com",
+  "www.klinnova.com",
+  "stint.company",
+  "www.stint.company",
+]);
 
 function hostnameLooksLocal(hostname: string): boolean {
   const normalized = hostname.toLowerCase();

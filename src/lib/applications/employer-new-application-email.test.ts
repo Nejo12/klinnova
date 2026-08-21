@@ -4,7 +4,7 @@ import { buildEmployerNewApplicationEmail } from "@/lib/applications/employer-ne
 
 const input = {
   vacancyTitle: "Morning kitchen support",
-  reviewUrl: "https://stint.company/employer/applications/abc-123",
+  reviewUrl: "https://klinnova.com/employer/applications/abc-123",
 };
 
 describe("buildEmployerNewApplicationEmail", () => {
@@ -21,7 +21,7 @@ describe("buildEmployerNewApplicationEmail", () => {
         "",
         "Sign in to Klinnova to review the application.",
         "",
-        "https://stint.company/employer/applications/abc-123",
+        "https://klinnova.com/employer/applications/abc-123",
       ].join("\n"),
     );
   });
@@ -41,7 +41,7 @@ describe("buildEmployerNewApplicationEmail", () => {
   it("does not include any candidate-identifying field name or value", () => {
     const content = buildEmployerNewApplicationEmail({
       vacancyTitle: "Evening cleaning",
-      reviewUrl: "https://stint.company/employer/applications/xyz-789",
+      reviewUrl: "https://klinnova.com/employer/applications/xyz-789",
     });
     const combined = `${content.subject}\n${content.text}`;
     expect(combined).not.toMatch(/candidate/i);

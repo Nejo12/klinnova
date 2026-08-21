@@ -18,8 +18,8 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 | Active milestone | **M5 — Berlin private beta** |
 | Previous milestone | **M4 — Complete** (Slices 7–8 closed; PR #73 merged) |
 | Product boundary | Merged M4 implementation under D-M5-1 feature freeze |
-| Active work unit | **K6-0/K6-1 Production-cutover decision/discovery — PR #135; no hosted mutation.** K6 is now the primary execution track. After PR #135 is merged and verified, K6-2 becomes the next implementation unit subject to normal bounded approval. See `docs/53-m5.1-beta-readiness-closure.md` and `docs/55-k6-production-cutover-discovery.md`. |
-| PR | PR #135 — K6 decision/discovery only; do not merge without Founder action |
+| Active work unit | **K6-2 repository Production-host conversion — implementation PR only; no hosted mutation.** K6 is now the primary execution track. K6-2 updates repository guard/tests/docs for canonical `https://klinnova.com`; K6-3 hosted Production cutover remains separately authorized. See `docs/53-m5.1-beta-readiness-closure.md` and `docs/55-k6-production-cutover-discovery.md`. |
+| PR | K6-2 implementation PR — repository-only; do not merge without Founder action |
 | Product/schema implementation | M5.1 work proceeds only through explicitly approved bounded units; Production changes remain separately authorized |
 | Preview | Provisioned **2026-08-11** — persistent, isolated Supabase project (`stint-preview`); see `docs/52-preview-environment-runbook.md` |
 | Monitoring | **Preview Sentry complete through G1/G2**. **Production Sentry remains OFF/unwired by deliberate Founder decision for Cohort A and is not a K6 blocker.** Do not activate it in K6. |

@@ -33,7 +33,7 @@ vi.mock("@/lib/env/public", () => ({
   getPublicEnv: () => ({
     NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "key",
-    NEXT_PUBLIC_SITE_URL: "https://stint.company",
+    NEXT_PUBLIC_SITE_URL: "https://klinnova.com",
   }),
 }));
 
@@ -91,7 +91,7 @@ describe("registerAction", () => {
       password: "password123",
       options: {
         data: { display_name: "Ada" },
-        emailRedirectTo: "https://stint.company/auth/confirm?next=",
+        emailRedirectTo: "https://klinnova.com/auth/confirm?next=",
       },
     });
     expect(state).toEqual({ error: null, message: AUTH_CHECK_EMAIL });
@@ -118,7 +118,7 @@ describe("registerAction", () => {
       expect.objectContaining({
         options: expect.objectContaining({
           emailRedirectTo:
-            "https://stint.company/auth/confirm?next=%2Femployer%2Fonboarding",
+            "https://klinnova.com/auth/confirm?next=%2Femployer%2Fonboarding",
         }),
       }),
     );

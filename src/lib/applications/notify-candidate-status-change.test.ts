@@ -20,7 +20,7 @@ vi.mock("@/lib/env/public", () => ({
   getPublicEnv: () => ({
     NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "test-key",
-    NEXT_PUBLIC_SITE_URL: "https://stint.company",
+    NEXT_PUBLIC_SITE_URL: "https://klinnova.com",
   }),
 }));
 
@@ -76,7 +76,7 @@ describe("notifyCandidateOfStatusChange", () => {
       "Your application for Morning kitchen support was shortlisted",
     );
     expect(sentMessage.text).toContain(
-      `https://stint.company/candidate/applications/${applicationIdA}`,
+      `https://klinnova.com/candidate/applications/${applicationIdA}`,
     );
   });
 
