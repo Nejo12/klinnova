@@ -38,11 +38,26 @@ export type LoadEmployerResult =
     };
 
 type EmployerClient = SupabaseClient<Database>;
+const employerProfileCacheKey: unique symbol = Symbol(
+  "klinnova.employerProfileRequestCache",
+);
+
+type EmployerClientWithProfileCache = EmployerClient & {
+  [employerProfileCacheKey]?: Promise<LoadEmployerResult>;
+};
 
 /**
  * Load the session user's employer profile and owned company when present.
  */
 export async function loadEmployerProfile(
+  supabase: EmployerClient,
+): Promise<LoadEmployerResult> {
+  const client = supabase as EmployerClientWithProfileCache;
+  client[employerProfileCacheKey] ??= loadEmployerProfileUncached(supabase);
+  return client[employerProfileCacheKey];
+}
+
+async function loadEmployerProfileUncached(
   supabase: EmployerClient,
 ): Promise<LoadEmployerResult> {
   const {
