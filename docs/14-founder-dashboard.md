@@ -18,16 +18,16 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 | Active milestone | **M5 — Berlin private beta** |
 | Previous milestone | **M4 — Complete** (Slices 7–8 closed; PR #73 merged) |
 | Product boundary | Merged M4 implementation under D-M5-1 feature freeze |
-| Active work unit | **M5.1 Unit H — legal/support readiness finalization; NOT STARTED**. Units A→A1→B→C→D→E→F/F2→G1/G2 are complete. Unit I has baseline investigation evidence but is not formally closed. See `docs/53-m5.1-beta-readiness-closure.md`. |
-| PR | Current recovery/closure PR only; Unit H is not authorized by it |
+| Active work unit | **K6-0/K6-1 Production-cutover decision/discovery — PR #135; no hosted mutation.** K6 is now the primary execution track. After PR #135 is merged and verified, K6-2 becomes the next implementation unit subject to normal bounded approval. See `docs/53-m5.1-beta-readiness-closure.md` and `docs/55-k6-production-cutover-discovery.md`. |
+| PR | PR #135 — K6 decision/discovery only; do not merge without Founder action |
 | Product/schema implementation | M5.1 work proceeds only through explicitly approved bounded units; Production changes remain separately authorized |
 | Preview | Provisioned **2026-08-11** — persistent, isolated Supabase project (`stint-preview`); see `docs/52-preview-environment-runbook.md` |
-| Monitoring | **Preview Sentry complete through G1/G2** — repository integration merged, hosted Preview client/server/source-map/privacy verification passed. **Production Sentry remains intentionally unwired** pending separate legal/privacy/activation approval. |
+| Monitoring | **Preview Sentry complete through G1/G2**. **Production Sentry remains OFF/unwired by deliberate Founder decision for Cohort A and is not a K6 blocker.** Do not activate it in K6. |
 | Production | Existing production remains live; no Unit G2 Production activation occurred |
-| Cohort A readiness | **BLOCKED** — legal/support, Production Sentry decision, Unit I closure, demo-fixture obligation, and operational preparation remain open |
+| Cohort A readiness | **ON HOLD / NOT STARTED** — employer acquisition, candidate recruitment, founder-assisted onboarding, support/moderation preparation, and other operational work are preserved for later resumption and do not block K6 |
 | Hosted destructive proof | Not authorized / not run |
 | Demo fixture deadline | Remove or explicitly re-authorize retained Production Demo fixtures by **2026-09-02** |
-| Legal readiness | Founder-owned qualified German legal review/finalization gate before intentional Cohort A external traffic; Unit H is the exact current next unit |
+| Legal readiness | Unit H is **CLOSED for current launch sequencing by Founder decision**. Current merged legal surfaces are accepted provisionally for this launch path; Founder will review/correct legal wording in the nearest future. No qualified legal-review, full legal-compliance, or GDPR-compliance claim is made. Unit H does not block K6. |
 
 ## M5 targets and approved definitions
 
@@ -116,16 +116,14 @@ This is a planning queue, **not automatic authorization**. Current execution sta
 ### Infrastructure
 
 1. ~~Restore an isolated Preview environment before systematic external testing.~~ Done **2026-08-11** — see `docs/52-preview-environment-runbook.md`.
-2. ~~Configure and verify approved minimal Sentry in Preview.~~ Done through M5.1 G1/G2. Production remains intentionally unwired pending the separate legal/privacy/activation decision.
+2. ~~Configure and verify approved minimal Sentry in Preview.~~ Done through M5.1 G1/G2. Production Sentry remains intentionally OFF/unwired for Cohort A by Founder decision and is not a K6 blocker.
 3. Remove/re-authorize retained Production Demo fixtures by 2026-09-02.
 
 ### Operations
 
-1. Prepare cleaning-first employer acquisition with the 1–2 adjacent-employer exception only where justified.
-2. Prepare candidate recruitment channels.
-3. Complete founder-owned qualified German legal review/finalization gate — **Unit H, current next unit**.
-4. Establish support/contact channel and founder-assisted onboarding — **Unit H**.
-5. Run one structured weekly M5 review using `Operate manually / Fix now / Watch / Defer`.
+1. Employer acquisition, candidate recruitment, founder-assisted onboarding, support/moderation operating preparation, and other Cohort A operational work are **ON HOLD** until Founder resumes them after the K6 sequence.
+2. Preserve the existing plans and playbooks for later resumption; do not mark operational readiness complete.
+3. Run one structured M5 review using `Operate manually / Fix now / Watch / Defer` when operations resume.
 
 ### UX / readiness backlog (Unit I not formally closed)
 
@@ -134,17 +132,18 @@ This is a planning queue, **not automatic authorization**. Current execution sta
 
 ## Cohort A readiness gates
 
-Before intentional external Cohort A traffic:
+Before intentional external Cohort A traffic, after K6 and Founder resumption:
 
-- qualified German legal review/finalization of Impressum/business identity, Privacy notice, beta Terms, support/contact channel, and Sentry disclosure if required;
-- ~~minimal Sentry configured within the approved privacy boundary in Preview~~ — complete through G1/G2; Production activation remains a separate unresolved gate;
+- current merged legal surfaces are provisionally accepted for this launch path; Founder will review/correct legal wording in the nearest future; no qualified legal-review, full legal-compliance, or GDPR-compliance claim is made;
+- ~~minimal Sentry configured within the approved privacy boundary in Preview~~ — complete through G1/G2; Production Sentry intentionally remains OFF/unwired for Cohort A and must not be activated in K6;
 - ~~isolated Preview available for systematic external testing of iterative builds~~ — done **2026-08-11**;
-- technical/moderation/privacy support procedures understood;
+- technical/moderation/privacy support procedures resumed and understood;
 - Unit I device/browser/accessibility/readiness proof closed or explicitly dispositioned;
 - demo-fixture cleanup deadline tracked and satisfied/re-authorized as required;
-- Cohort A employer/candidate acquisition and founder-assisted onboarding preparation ready.
+- Cohort A employer/candidate acquisition and founder-assisted onboarding preparation resumed and ready.
+- K6 Production/public-domain cutover completed and verified. K6-0/K6-1 decision/discovery is recorded in `docs/55-k6-production-cutover-discovery.md` but does not itself authorize Production, Preview, DNS, Vercel, Supabase, Resend, Sentry, or domain mutation.
 
-**Current verdict: BLOCKED.** See `docs/53-m5.1-beta-readiness-closure.md`.
+**Current verdict: K6 PRIMARY / OPERATIONAL READINESS ON HOLD.** See `docs/53-m5.1-beta-readiness-closure.md`.
 
 This gate does not establish or claim full GDPR compliance.
 
