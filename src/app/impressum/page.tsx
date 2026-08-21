@@ -27,14 +27,11 @@ export default function ImpressumPage() {
         </h2>
         <p className={styles.body}>
           Provider identification for the Klinnova digital service under § 5 of
-          the Digitale-Dienste-Gesetz (DDG). Personal identity fields marked{" "}
-          <code>[FOUNDER-FILL]</code> are completed at publication from the
-          founder&apos;s private checklist and are not fabricated in this
-          repository.
+          the Digitale-Dienste-Gesetz (DDG).
         </p>
         <dl className={styles.fieldList}>
           <dt>Service operator / legal person</dt>
-          <dd>[FOUNDER-FILL: full legal name], trading as Klinnova</dd>
+          <dd>Olaniyi Gabriel Aborisade, trading as Klinnova</dd>
 
           <dt>Legal form</dt>
           <dd>
@@ -42,13 +39,10 @@ export default function ImpressumPage() {
           </dd>
 
           <dt>Service address</dt>
-          <dd>
-            [FOUNDER-FILL: street and house number], [FOUNDER-FILL: PLZ] Berlin,
-            Germany
-          </dd>
+          <dd>Wattstrasse 57, 12459 Berlin, Germany</dd>
 
           <dt>Responsible representative</dt>
-          <dd>[FOUNDER-FILL: full legal name]</dd>
+          <dd>Olaniyi Gabriel Aborisade</dd>
 
           <dt>Contact email</dt>
           <dd>
@@ -58,13 +52,17 @@ export default function ImpressumPage() {
           </dd>
 
           <dt>Phone</dt>
-          <dd>[IF APPLICABLE]</dd>
+          <dd>
+            <a className={styles.backLink} href="tel:+4915569006852">
+              0155 69006852
+            </a>
+          </dd>
 
           <dt>Commercial register</dt>
           <dd>Not applicable — not entered in the commercial register</dd>
 
           <dt>VAT ID (USt-IdNr)</dt>
-          <dd>[IF APPLICABLE — otherwise not issued]</dd>
+          <dd>Not issued</dd>
 
           <dt>Trade authority (informational)</dt>
           <dd>
@@ -81,7 +79,7 @@ export default function ImpressumPage() {
         </h2>
         <dl className={styles.fieldList}>
           <dt>Diensteanbieter</dt>
-          <dd>[FOUNDER-FILL: Vor- und Nachname]</dd>
+          <dd>Olaniyi Gabriel Aborisade</dd>
 
           <dt>Geschäftsbezeichnung</dt>
           <dd>Klinnova</dd>
@@ -90,7 +88,7 @@ export default function ImpressumPage() {
           <dd>Nicht eingetragenes Einzelunternehmen (Nebenerwerb)</dd>
 
           <dt>Anschrift</dt>
-          <dd>[FOUNDER-FILL: Straße Hausnr.], [FOUNDER-FILL: PLZ] Berlin</dd>
+          <dd>Wattstraße 57, 12459 Berlin</dd>
 
           <dt>E-Mail</dt>
           <dd>
@@ -100,15 +98,17 @@ export default function ImpressumPage() {
           </dd>
 
           <dt>Telefon</dt>
-          <dd>[IF APPLICABLE]</dd>
+          <dd>
+            <a className={styles.backLink} href="tel:+4915569006852">
+              0155 69006852
+            </a>
+          </dd>
 
           <dt>Handelsregister</dt>
           <dd>Nicht eingetragen / entfällt</dd>
 
           <dt>Umsatzsteuer-ID</dt>
-          <dd>
-            [IF APPLICABLE — derzeit nicht erteilt, falls keine ID vorliegt]
-          </dd>
+          <dd>Derzeit nicht erteilt</dd>
         </dl>
       </section>
 
