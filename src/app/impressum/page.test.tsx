@@ -16,19 +16,18 @@ describe("ImpressumPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("uses FOUNDER-FILL / IF APPLICABLE tokens, never fabricated identity data", () => {
+  it("shows founder-provided operator identity without inventing register or VAT IDs", () => {
     render(<ImpressumPage />);
     const text = document.body.textContent ?? "";
 
-    expect(text).toContain("[FOUNDER-FILL: full legal name]");
+    expect(text).toContain("Olaniyi Gabriel Aborisade");
+    expect(text).toContain("Wattstrasse 57, 12459 Berlin");
+    expect(text).toContain("0155 69006852");
     expect(text).toContain("support@klinnova.com");
     expect(text).toContain("§ 5 DDG");
-    // No plausible German company-register number, VAT ID, phone number, or
-    // street address has been fabricated.
+    expect(text).not.toMatch(/\[FOUNDER-FILL/);
     expect(text).not.toMatch(/HRB \d+/);
     expect(text).not.toMatch(/DE\d{9}/);
-    expect(text).not.toMatch(/\+49[\s\d]{6,}/);
-    expect(text).not.toMatch(/\d{5}\s+Berlin/);
   });
 
   it("includes the shared legal footer", () => {
