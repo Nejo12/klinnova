@@ -8,6 +8,7 @@ M5 boundary/metrics: `docs/49-m5-beta-transition-and-measurement.md`.
 M5 outcome proposal: `docs/50-m5-outcome-contract-proposal.md`.
 M5 operating plan: `docs/51-m5-operating-plan.md`.
 M5.1 execution/readiness closure: `docs/53-m5.1-beta-readiness-closure.md`.
+K6 durable Production-cutover closure: `docs/56-k6-production-cutover-durable-closure.md`.
 Deferred ideas: `NOT_NOW.md`.
 Historical slice detail remains in the individual discovery/build-plan/closure documents.
 
@@ -18,16 +19,27 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 | Active milestone | **M5 — Berlin private beta** |
 | Previous milestone | **M4 — Complete** (Slices 7–8 closed; PR #73 merged) |
 | Product boundary | Merged M4 implementation under D-M5-1 feature freeze |
-| Active work unit | **K6-2 repository Production-host conversion — implementation PR only; no hosted mutation.** K6 is now the primary execution track. K6-2 updates repository guard/tests/docs for canonical `https://klinnova.com`; K6-3 hosted Production cutover remains separately authorized. See `docs/53-m5.1-beta-readiness-closure.md` and `docs/55-k6-production-cutover-discovery.md`. |
-| PR | K6-2 implementation PR — repository-only; do not merge without Founder action |
-| Product/schema implementation | M5.1 work proceeds only through explicitly approved bounded units; Production changes remain separately authorized |
-| Preview | Provisioned **2026-08-11** — persistent, isolated Supabase project (`stint-preview`); see `docs/52-preview-environment-runbook.md` |
-| Monitoring | **Preview Sentry complete through G1/G2**. **Production Sentry remains OFF/unwired by deliberate Founder decision for Cohort A and is not a K6 blocker.** Do not activate it in K6. |
-| Production | Existing production remains live; no Unit G2 Production activation occurred |
-| Cohort A readiness | **ON HOLD / NOT STARTED** — employer acquisition, candidate recruitment, founder-assisted onboarding, support/moderation preparation, and other operational work are preserved for later resumption and do not block K6 |
+| Active work unit | **K6 COMPLETE / CLOSED.** Klinnova Production/public-domain cutover is complete through K6-6. `https://klinnova.com` is canonical Production; old public-domain retirement is complete. **Operational readiness remains ON HOLD** until Founder resumption. See `docs/56-k6-production-cutover-durable-closure.md`. |
+| PR | K6-6 durable-closure documentation PR — documentation only; do not merge without Founder action |
+| Product/schema implementation | M5.1 work proceeds only through explicitly approved bounded units; no K6-6 product/schema change is authorized |
+| Preview | Persistent isolated Supabase Preview project remains available through Vercel-generated Preview deployment URLs. Custom `preview.klinnova.com` project-domain attachment is retired. See `docs/52-preview-environment-runbook.md` and `docs/56-k6-production-cutover-durable-closure.md`. |
+| Monitoring | **Preview Sentry complete through G1/G2**. **Production Sentry remains OFF/unwired by deliberate Founder decision for Cohort A.** K6 did not activate it. |
+| Production | **Canonical Production is `https://klinnova.com`.** `www.klinnova.com` permanently redirects to apex. `stint.company` permanently redirects to Klinnova and no longer serves the application directly. Production baseline after K6-4 merge: `0564a5e749b65f5589d1bd2dc32f926b848a5493`. |
+| Cohort A readiness | **ON HOLD / NOT STARTED** — employer acquisition, candidate recruitment, founder-assisted onboarding, support/moderation preparation, and other operational work are preserved for later resumption. K6 completion does not start Cohort A. |
 | Hosted destructive proof | Not authorized / not run |
 | Demo fixture deadline | Remove or explicitly re-authorize retained Production Demo fixtures by **2026-09-02** |
-| Legal readiness | Unit H is **CLOSED for current launch sequencing by Founder decision**. Current merged legal surfaces are accepted provisionally for this launch path; Founder will review/correct legal wording in the nearest future. No qualified legal-review, full legal-compliance, or GDPR-compliance claim is made. Unit H does not block K6. |
+| Legal readiness | Unit H is **CLOSED for current launch sequencing by Founder decision**. Current merged legal surfaces are accepted provisionally for this launch path; Founder will review/correct legal wording in the nearest future. No qualified legal-review, full legal-compliance, or GDPR-compliance claim is made. |
+
+## K6 closure snapshot
+
+- K6-0/K6-1 decision/discovery: complete via PR #135 and `docs/55-k6-production-cutover-discovery.md`.
+- K6-2 repository Production-host conversion: complete via PR #136.
+- K6-3 hosted Production cutover: complete; canonical `NEXT_PUBLIC_SITE_URL` and Supabase Auth Site URL are `https://klinnova.com`.
+- K6-4 Production + Design acceptance: complete, including bounded legal-state remediation PR #137 and responsive remediation PR #138.
+- K6-5 old public-domain retirement: complete — `www.klinnova.com` and `stint.company` use HTTP 308 to the canonical apex; custom `preview.klinnova.com` project attachment is retired; the rollback-era Supabase `https://stint.company/**` redirect allowance is removed.
+- K6-6 durable closure: recorded in `docs/56-k6-production-cutover-durable-closure.md`.
+- `auth.stint.company` remains transitional Auth sender infrastructure and was intentionally not migrated during K6.
+- Mail DNS, Production Sentry, schema, application data, and internal Stint infrastructure names were not changed by K6-5/K6-6.
 
 ## M5 targets and approved definitions
 
@@ -104,46 +116,40 @@ A change may enter active work only when it is required to measure the beta, rem
 - [x] Final founder review of updated PR #74
 - [x] Merge PR #74
 
-## Immediate beta-readiness queue after M5.0 merge
+## Immediate beta-readiness queue after K6
 
-This is a planning queue, **not automatic authorization**. Current execution status is authoritative in `docs/53-m5.1-beta-readiness-closure.md`.
+This is a planning queue, **not automatic authorization**. Current execution status is authoritative in `docs/53-m5.1-beta-readiness-closure.md` and `docs/56-k6-production-cutover-durable-closure.md`.
 
 ### Product / measurement
 
-1. ~~Implement the approved separate outcome-measurement contract and candidate-safe visibility.~~ Complete through M5.1 Units D/E.
-2. Preserve workflow/outcome separation and the approved M5 counting semantics during beta operation.
+1. Preserve workflow/outcome separation and the approved M5 counting semantics during beta operation.
 
 ### Infrastructure
 
-1. ~~Restore an isolated Preview environment before systematic external testing.~~ Done **2026-08-11** — see `docs/52-preview-environment-runbook.md`.
-2. ~~Configure and verify approved minimal Sentry in Preview.~~ Done through M5.1 G1/G2. Production Sentry remains intentionally OFF/unwired for Cohort A by Founder decision and is not a K6 blocker.
-3. Remove/re-authorize retained Production Demo fixtures by 2026-09-02.
+1. Preserve the isolated Preview environment for controlled verification.
+2. Keep Production Sentry OFF/unwired unless a later separately authorized Founder decision activates it.
+3. Remove/re-authorize retained Production Demo fixtures by 2026-09-02 if still applicable under the current fixture record.
 
 ### Operations
 
-1. Employer acquisition, candidate recruitment, founder-assisted onboarding, support/moderation operating preparation, and other Cohort A operational work are **ON HOLD** until Founder resumes them after the K6 sequence.
+1. Employer acquisition, candidate recruitment, founder-assisted onboarding, support/moderation operating preparation, and other Cohort A operational work remain **ON HOLD** until Founder resumes them.
 2. Preserve the existing plans and playbooks for later resumption; do not mark operational readiness complete.
 3. Run one structured M5 review using `Operate manually / Fix now / Watch / Defer` when operations resume.
 
-### UX / readiness backlog (Unit I not formally closed)
-
-1. `/employer` renders two exact-text "Vacancies" links (the shared `EmployerVacancyPageHeader` nav link and the employer-home body button, both introduced/renamed by PR #75) — deeper gated E2E specs (`E2E_AUTH_JOURNEY=1`) that select by exact accessible name hit a strict-mode ambiguity. Not yet a demonstrated user-facing blocker; not a publication/matching integrity issue. Address/disposition under Unit I remediation — do not rename UI solely to satisfy the selector, and do not weaken the affected tests with an arbitrary `.first()`; target the intended nav region/link context instead. Discovered because this was the first session run of the full gated E2E suite — these specs are not part of CI's own `pnpm test:e2e` (smoke-tier only), so this predates M5.1 and was previously unobserved.
-2. Unit I has historical/baseline investigation evidence (including the baseline browser proof that surfaced Unit A1 blockers) but no formal closure artifact/PR. Device/browser/accessibility readiness therefore remains open.
-
 ## Cohort A readiness gates
 
-Before intentional external Cohort A traffic, after K6 and Founder resumption:
+Before intentional external Cohort A traffic, after Founder resumption:
 
-- current merged legal surfaces are provisionally accepted for this launch path; Founder will review/correct legal wording in the nearest future; no qualified legal-review, full legal-compliance, or GDPR-compliance claim is made;
-- ~~minimal Sentry configured within the approved privacy boundary in Preview~~ — complete through G1/G2; Production Sentry intentionally remains OFF/unwired for Cohort A and must not be activated in K6;
-- ~~isolated Preview available for systematic external testing of iterative builds~~ — done **2026-08-11**;
-- technical/moderation/privacy support procedures resumed and understood;
-- Unit I device/browser/accessibility/readiness proof closed or explicitly dispositioned;
-- demo-fixture cleanup deadline tracked and satisfied/re-authorized as required;
-- Cohort A employer/candidate acquisition and founder-assisted onboarding preparation resumed and ready.
-- K6 Production/public-domain cutover completed and verified. K6-0/K6-1 decision/discovery is recorded in `docs/55-k6-production-cutover-discovery.md` but does not itself authorize Production, Preview, DNS, Vercel, Supabase, Resend, Sentry, or domain mutation.
+- K6 Production/public-domain cutover is complete and verified;
+- current merged legal surfaces remain provisionally accepted for this launch path; Founder will review/correct legal wording in the nearest future; no qualified legal-review, full legal-compliance, or GDPR-compliance claim is made;
+- Preview Sentry remains complete; Production Sentry intentionally remains OFF/unwired unless separately authorized;
+- isolated Preview remains available through Vercel-generated Preview deployments;
+- technical/moderation/privacy support procedures are resumed and understood;
+- demo-fixture cleanup/re-authorization obligations are satisfied as required;
+- Cohort A employer/candidate acquisition and founder-assisted onboarding preparation are resumed and ready;
+- Founder explicitly returns GO.
 
-**Current verdict: K6 PRIMARY / OPERATIONAL READINESS ON HOLD.** See `docs/53-m5.1-beta-readiness-closure.md`.
+**Current verdict: K6 COMPLETE / OPERATIONAL READINESS ON HOLD.**
 
 This gate does not establish or claim full GDPR compliance.
 
@@ -170,13 +176,12 @@ Do not optimize M5 for larger test counts. The primary M5 numbers are participat
 | M2 Applications | Complete | Slice 3 |
 | M3 Employer flow | Implementation complete | Slices 4–6; Slice 6 hosted proof remains separately deferred |
 | M4 Trust and beta readiness | **Complete** | Slices 7–8; `docs/44`, `docs/48`; PR #73 |
-| M5 Berlin private beta | **Active** | `docs/49`–`docs/53`; PR #74 M5.0 merged; M5.1 beta-readiness closure in progress; current next unit H |
+| M5 Berlin private beta | **Active** | `docs/49`–`docs/56`; K6 Production/public-domain cutover complete; operational readiness remains ON HOLD |
 
 ## Decision discipline
 
-D-001–D-090 remain in `docs/10-decisions.md`.
-Founder-approved M5 operating/measurement decisions D-M5-1–D-M5-22 are recorded in `docs/49-m5-beta-transition-and-measurement.md`.
+Founder-approved M5 operating/measurement decisions remain recorded in `docs/49-m5-beta-transition-and-measurement.md` and durable project decisions remain in `docs/10-decisions.md`.
 
-When current documentation and execution history conflict, merged Git/PR evidence determines implementation status; accepted hosted proof determines external-configuration status. Historical planning documents retain their original meaning unless explicitly superseded. `docs/53-m5.1-beta-readiness-closure.md` is the durable M5.1 execution/readiness record.
+When current documentation and execution history conflict, merged Git/PR evidence determines implementation status; accepted hosted proof determines external-configuration status. Historical planning documents retain their original meaning unless explicitly superseded. `docs/53-m5.1-beta-readiness-closure.md` remains the durable M5.1 execution/readiness record; `docs/56-k6-production-cutover-durable-closure.md` is the durable K6 closure record.
 
 Normal beta fixes use evidence-first lightweight delivery. Changes affecting schema/database, authorization/RLS, privacy, security, matching authority, employment/legal boundaries, or major architecture require explicit discovery and founder approval before implementation.
