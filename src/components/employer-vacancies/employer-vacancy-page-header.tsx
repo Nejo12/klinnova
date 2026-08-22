@@ -4,6 +4,8 @@ import { LogoutButton } from "@/components/auth/logout-button";
 import { CapabilityNav } from "@/components/employer-onboarding/capability-nav";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 
+import responsiveStyles from "./employer-vacancy-page-header.module.scss";
+
 type EmployerVacancyPageHeaderProps = {
   showCandidate: boolean;
   showEmployer: boolean;
@@ -19,13 +21,15 @@ export function EmployerVacancyPageHeader({
   unseenApplicationsCount,
 }: EmployerVacancyPageHeaderProps) {
   return (
-    <div className={styles.header}>
+    <div className={`${styles.header} ${responsiveStyles.header}`}>
       <Link className={styles.brand} href="/">
         Klinnova
       </Link>
-      <div className={styles.headerActions}>
-        <nav aria-label="Employer">
-          <ul className={styles.appNav}>
+      <div
+        className={`${styles.headerActions} ${responsiveStyles.headerActions}`}
+      >
+        <nav className={responsiveStyles.primaryNav} aria-label="Employer">
+          <ul className={`${styles.appNav} ${responsiveStyles.appNav}`}>
             <li>
               <Link
                 className={styles.appNavLink}
@@ -78,12 +82,14 @@ export function EmployerVacancyPageHeader({
             </li>
           </ul>
         </nav>
-        <CapabilityNav
-          showCandidate={showCandidate}
-          showEmployer={showEmployer}
-          current="employer"
-        />
-        <LogoutButton />
+        <div className={responsiveStyles.utilities}>
+          <CapabilityNav
+            showCandidate={showCandidate}
+            showEmployer={showEmployer}
+            current="employer"
+          />
+          <LogoutButton />
+        </div>
       </div>
     </div>
   );
