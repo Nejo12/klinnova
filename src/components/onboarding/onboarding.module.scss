@@ -367,3 +367,82 @@
   outline: var(--focus-ring-width) solid var(--color-focus-ring);
   outline-offset: var(--focus-ring-offset);
 }
+
+@media (max-width: ($breakpoint-sm - 0.001rem)) {
+  .page {
+    gap: var(--space-5);
+    padding-top: var(--space-5);
+    padding-bottom: var(--space-6);
+  }
+
+  .progress {
+    gap: var(--space-1);
+  }
+
+  .progressList {
+    flex-wrap: nowrap;
+    gap: var(--space-1);
+    overflow-x: auto;
+    padding-bottom: var(--space-2);
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .progressList li {
+    scroll-snap-align: start;
+  }
+
+  .progressList li:not(:last-child)::after {
+    display: none;
+  }
+
+  .progressItem {
+    min-height: var(--touch-target-min);
+    padding: var(--space-2);
+    border: var(--border-width-default) solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-surface);
+    white-space: nowrap;
+  }
+
+  .progressItemLabel {
+    max-width: none;
+    white-space: nowrap;
+  }
+
+  .progressItem[data-state="current"] {
+    border-color: var(--color-action-primary);
+    background-color: var(--color-action-subtle);
+  }
+
+  .actions {
+    align-items: stretch;
+  }
+
+  .actions > * {
+    flex: 1 1 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .reviewTable,
+  .reviewTable tbody,
+  .reviewTableRow,
+  .reviewTableHeaderCell,
+  .reviewTableValueCell,
+  .reviewTableActionCell {
+    display: block;
+    width: 100%;
+  }
+
+  .reviewTableHeaderCell {
+    padding: var(--space-3) var(--space-2) var(--space-1);
+  }
+
+  .reviewTableValueCell,
+  .reviewTableActionCell {
+    padding: var(--space-1) var(--space-2) var(--space-3);
+    text-align: left;
+  }
+}
