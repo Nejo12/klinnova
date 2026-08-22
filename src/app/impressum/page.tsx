@@ -63,8 +63,8 @@ export default function ImpressumPage() {
           <dt>Trade authority (informational)</dt>
           <dd>
             Bezirksamt Treptow-Köpenick von Berlin / Ordnungsamt.
-            Gewerbeanmeldung submitted 2026-08-14; official confirmation pending.
-            Registered commencement date on file: 2026-09-01.
+            Gewerbeanmeldung submitted 2026-08-14; official confirmation
+            pending. Registered commencement date on file: 2026-09-01.
           </dd>
         </dl>
       </section>
