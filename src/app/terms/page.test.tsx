@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import TermsPage from "@/app/terms/page";
 
 describe("TermsPage", () => {
-  it("renders one h1 and the shared founder-verification notice", () => {
+  it("renders one h1 without the obsolete founder-verification notice", () => {
     render(<TermsPage />);
 
     expect(
@@ -12,9 +12,8 @@ describe("TermsPage", () => {
     ).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(
-      screen.getByText("Draft — founder verification required"),
-    ).toBeInTheDocument();
-    expect(screen.getByText(/Terms of Service/)).toBeInTheDocument();
+      screen.queryByText("Draft — founder verification required"),
+    ).not.toBeInTheDocument();
   });
 
   it("includes beta liability and German governing-law wording without counsel-approval claims", () => {
