@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import ImpressumPage from "@/app/impressum/page";
 
 describe("ImpressumPage", () => {
-  it("renders one h1 and the shared founder-verification notice", () => {
+  it("renders one h1 without the obsolete founder-verification notice", () => {
     render(<ImpressumPage />);
 
     expect(
@@ -12,8 +12,8 @@ describe("ImpressumPage", () => {
     ).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(
-      screen.getByText("Draft — founder verification required"),
-    ).toBeInTheDocument();
+      screen.queryByText("Draft — founder verification required"),
+    ).not.toBeInTheDocument();
   });
 
   it("shows founder-provided operator identity without inventing register or VAT IDs", () => {

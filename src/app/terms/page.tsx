@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { DraftNotice } from "@/components/legal/draft-notice";
 import styles from "@/components/legal/legal-page.module.scss";
 import { PublicFooter } from "@/components/public-shared/public-footer";
 
@@ -18,8 +17,6 @@ export default function TermsPage() {
         Klinnova
       </Link>
       <h1 className={styles.heading}>Terms</h1>
-
-      <DraftNotice documentName="Terms of Service" />
 
       <section className={styles.section} aria-labelledby="terms-operator">
         <h2 className={styles.sectionHeading} id="terms-operator">

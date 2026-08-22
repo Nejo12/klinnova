@@ -1,13 +1,11 @@
 import Link from "next/link";
 
-import { DraftNotice } from "@/components/legal/draft-notice";
 import styles from "@/components/legal/legal-page.module.scss";
 import { PublicFooter } from "@/components/public-shared/public-footer";
 
 export const metadata = {
   title: "Impressum · Klinnova",
-  description:
-    "Provider identification for Klinnova under § 5 DDG — founder verification pending.",
+  description: "Provider identification for Klinnova under § 5 DDG.",
   robots: { index: false, follow: false },
 };
 
@@ -18,8 +16,6 @@ export default function ImpressumPage() {
         Klinnova
       </Link>
       <h1 className={styles.heading}>Impressum</h1>
-
-      <DraftNotice documentName="Impressum" />
 
       <section className={styles.section} aria-labelledby="impressum-ddg">
         <h2 className={styles.sectionHeading} id="impressum-ddg">
@@ -67,8 +63,8 @@ export default function ImpressumPage() {
           <dt>Trade authority (informational)</dt>
           <dd>
             Bezirksamt Treptow-Köpenick von Berlin / Ordnungsamt.
-            Gewerbeanmeldung submitted 2026-08-14; official confirmation pending
-            as of this draft. Registered commencement date on file: 2026-09-01.
+            Gewerbeanmeldung submitted 2026-08-14; official confirmation
+            pending. Registered commencement date on file: 2026-09-01.
           </dd>
         </dl>
       </section>

@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { DraftNotice } from "@/components/legal/draft-notice";
 import styles from "@/components/legal/legal-page.module.scss";
 import { PublicFooter } from "@/components/public-shared/public-footer";
 
@@ -18,8 +17,6 @@ export default function PrivacyPage() {
         Klinnova
       </Link>
       <h1 className={styles.heading}>Privacy</h1>
-
-      <DraftNotice documentName="Privacy Notice" />
 
       <section className={styles.section} aria-labelledby="privacy-controller">
         <h2 className={styles.sectionHeading} id="privacy-controller">
@@ -46,8 +43,8 @@ export default function PrivacyPage() {
         </h2>
         <p className={styles.body}>
           This notice describes personal-data processing for the Klinnova
-          private beta (Cohort A). It may change as the product and founder
-          verification progress. It is not a claim of full GDPR certification.
+          private beta (Cohort A). It may change as the product and later legal
+          review progress. It is not a claim of full GDPR certification.
         </p>
       </section>
 
@@ -116,9 +113,7 @@ export default function PrivacyPage() {
             </a>
             : Art. 6(1)(b)/(f)/(c) GDPR as applicable.
           </li>
-          <li>
-            Transactional product email (when configured): Art. 6(1)(b) GDPR.
-          </li>
+          <li>Transactional product email: Art. 6(1)(b) GDPR.</li>
           <li>
             Error monitoring (Sentry), where enabled: Art. 6(1)(f) GDPR —
             keeping the service reliable and secure.
@@ -150,9 +145,8 @@ export default function PrivacyPage() {
             mailbox.
           </li>
           <li>
-            <strong>Resend</strong> — transactional product email only when
-            Production mail is configured. Until that configuration is live,
-            automated product email may be unavailable.
+            <strong>Resend</strong> — transactional product email provider for
+            configured Production mail flows.
           </li>
           <li>
             <strong>Sentry</strong> — error monitoring under the boundary below.
@@ -182,10 +176,9 @@ export default function PrivacyPage() {
             the boundary above.
           </li>
           <li>
-            <strong>Production:</strong> Sentry is intentionally not enabled
-            until the founder separately authorizes Production activation. When
-            authorized, Production is intended to use the same privacy boundary
-            as Preview. This notice will be updated if that changes.
+            <strong>Production:</strong> Sentry is intentionally not enabled for
+            Cohort A unless the founder later authorizes Production activation.
+            If that changes, this notice will be updated.
           </li>
         </ul>
       </section>
@@ -270,7 +263,7 @@ export default function PrivacyPage() {
           12. Changes
         </h2>
         <p className={styles.body}>
-          We may update this notice as the beta and legal verification progress.
+          We may update this notice as the beta and later legal review progress.
           Material changes will be reflected on this page.
         </p>
       </section>
