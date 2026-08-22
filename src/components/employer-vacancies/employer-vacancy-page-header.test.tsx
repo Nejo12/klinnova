@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
@@ -129,5 +129,19 @@ describe("EmployerVacancyPageHeader", () => {
       />,
     );
     expect(screen.getByText("7")).toBeInTheDocument();
+  });
+
+  it("keeps the primary employer navigation and logout control accessible after responsive grouping", () => {
+    render(
+      <EmployerVacancyPageHeader
+        showCandidate={false}
+        showEmployer={true}
+        currentPath="home"
+      />,
+    );
+
+    const nav = screen.getByRole("navigation", { name: "Employer" });
+    expect(within(nav).getAllByRole("link")).toHaveLength(4);
+    expect(screen.getByRole("button", { name: "Log out" })).toBeInTheDocument();
   });
 });
