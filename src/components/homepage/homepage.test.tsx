@@ -44,7 +44,7 @@ describe("Homepage", () => {
       "You never wonder where it went",
       "Open in Berlin right now",
       "Reach people who can start",
-      "Working now, in Berlin first",
+      "Find work that fits your situation",
     ]);
 
     expect(screen.queryByText(/Candidate experience/)).not.toBeInTheDocument();
@@ -94,7 +94,7 @@ describe("Homepage", () => {
       "You never wonder where it went",
       "Open in Berlin right now",
       "Reach people who can start",
-      "Working now, in Berlin first",
+      "Find work that fits your situation",
     ]);
   });
 

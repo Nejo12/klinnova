@@ -75,14 +75,21 @@
   color: var(--color-action-primary-text);
 }
 
-.secondaryCta {
+.secondaryCta,
+.employerCta {
   border: var(--border-width-default) solid var(--color-border-strong);
   background-color: var(--color-bg-surface);
   color: var(--color-text-primary);
 }
 
-.secondaryCta:hover {
+.secondaryCta:hover,
+.employerCta:hover {
   background-color: var(--color-bg-subtle);
+}
+
+.employerCta {
+  border-color: var(--color-accent-warm-strong);
+  color: var(--color-accent-warm-strong);
 }
 
 .trustList {

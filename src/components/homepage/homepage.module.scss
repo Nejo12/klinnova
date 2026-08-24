@@ -2,6 +2,12 @@
 
 .main {
   display: block;
+  background-image: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-border-default) 32%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 25% 100%;
 }
 
 .footer {

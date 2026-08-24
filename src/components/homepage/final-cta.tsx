@@ -7,10 +7,10 @@ export function FinalCta() {
     <section className={styles.section} aria-labelledby="final-cta-heading">
       <div className={styles.copy}>
         <h2 className={styles.heading} id="final-cta-heading">
-          Working now, in Berlin first
+          Find work that fits your situation
         </h2>
         <p className={styles.body}>
-          Klinnova is working and starting in Berlin.
+          Create your candidate account to see jobs matched to your availability, language and location.
         </p>
       </div>
       <div className={styles.ctas}>

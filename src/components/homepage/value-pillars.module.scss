@@ -11,7 +11,7 @@
 
 .heading {
   margin: 0;
-  font-size: var(--type-heading-size);
+  font-size: calc(var(--type-heading-size) * 0.82);
   line-height: var(--type-heading-line-height);
   font-weight: var(--type-heading-weight);
   color: var(--color-text-primary);

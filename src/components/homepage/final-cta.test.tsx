@@ -4,18 +4,20 @@ import { describe, expect, it } from "vitest";
 import { FinalCta } from "@/components/homepage/final-cta";
 
 describe("FinalCta", () => {
-  it("uses the approved rollout wording and real CTA destinations", () => {
+  it("uses clear candidate-facing wording and real CTA destinations", () => {
     render(<FinalCta />);
 
     expect(
       screen.getByRole("heading", {
         level: 2,
-        name: "Working now, in Berlin first",
+        name: "Find work that fits your situation",
       }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText("Klinnova is working and starting in Berlin."),
+      screen.getByText(
+        "Create your candidate account to see jobs matched to your availability, language and location.",
+      ),
     ).toBeInTheDocument();
 
     expect(screen.queryByText(/join early access/i)).not.toBeInTheDocument();

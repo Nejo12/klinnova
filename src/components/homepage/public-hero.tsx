@@ -43,8 +43,8 @@ export function PublicHero() {
           <Link className={styles.primaryCta} href="/register">
             I&apos;m a candidate
           </Link>
-          <Link className={styles.secondaryCta} href="/employer/register">
-            I&apos;m an employer
+          <Link className={styles.employerCta} href="/employer/register">
+            Hire for your team
           </Link>
         </div>
         <ul className={styles.trustList}>
