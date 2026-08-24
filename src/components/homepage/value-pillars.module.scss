@@ -1,73 +1,9 @@
 @use "../../styles/breakpoints" as *;
-
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  max-width: var(--layout-content-max);
-  margin-inline: auto;
-  padding: var(--space-10) var(--layout-gutter-mobile);
-}
-
-.heading {
-  margin: 0;
-  font-size: var(--type-heading-size);
-  line-height: var(--type-heading-line-height);
-  font-weight: var(--type-heading-weight);
-  color: var(--color-text-primary);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-4);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-5);
-  border: var(--border-width-default) solid var(--color-border-default);
-  border-radius: var(--radius-lg);
-  background-color: var(--color-bg-surface);
-}
-
-.cardHeading {
-  margin: 0;
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-}
-
-.cardBody {
-  margin: 0;
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
-  color: var(--color-text-secondary);
-}
-
-@media (min-width: $breakpoint-sm) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: $breakpoint-md) {
-  .section {
-    padding-inline: var(--layout-gutter-tablet);
-  }
-}
-
-@media (min-width: $breakpoint-lg) {
-  .section {
-    padding-inline: var(--layout-gutter-desktop);
-  }
-
-  .grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
+.section { max-width: var(--layout-content-max); margin-inline: auto; padding: var(--space-12) var(--layout-gutter-mobile); }
+.heading { margin: 0 0 var(--space-8); max-width: 10ch; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1; letter-spacing: -.04em; color: var(--color-text-primary); }
+.grid { display: grid; grid-template-columns: 1fr; gap: 0; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--color-border-strong); }
+.card { display: flex; flex-direction: column; gap: var(--space-3); min-height: 11rem; padding: var(--space-5) var(--space-4) var(--space-6) 0; border-bottom: 1px solid var(--color-border-default); }
+.cardHeading { margin: 0; max-width: 18ch; font-size: var(--font-size-lg); line-height: var(--line-height-lg); color: var(--color-text-primary); }
+.cardBody { margin: 0; max-width: 28ch; font-size: var(--font-size-sm); line-height: var(--line-height-md); color: var(--color-text-secondary); }
+@media (min-width: $breakpoint-md) { .section { padding-inline: var(--layout-gutter-tablet); } .grid { grid-template-columns: repeat(2, 1fr); } .card { padding-right: var(--space-6); } .card:nth-child(odd) { border-right: 1px solid var(--color-border-default); } .card:nth-child(even) { padding-left: var(--space-6); } }
+@media (min-width: $breakpoint-lg) { .section { padding-block: var(--space-20); padding-inline: var(--layout-gutter-desktop); } .grid { grid-template-columns: repeat(4, 1fr); } .card { min-height: 13rem; border-right: 1px solid var(--color-border-default); } .card:first-child { padding-left: 0; } .card:not(:first-child) { padding-left: var(--space-5); } .card:last-child { border-right: 0; } }

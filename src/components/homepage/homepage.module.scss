@@ -2,23 +2,40 @@
 
 .main {
   display: block;
+  overflow: hidden;
+  background: var(--color-bg-page);
 }
 
 .footer {
-  background-color: var(--color-bg-surface);
   max-width: var(--layout-content-max);
   margin-inline: auto;
-  padding: var(--space-4) var(--layout-gutter-mobile);
+  padding: var(--space-8) var(--layout-gutter-mobile);
+  border-top: var(--border-width-default) solid var(--color-border-default);
+  background: var(--color-bg-page);
 }
 
 @media (min-width: $breakpoint-md) {
-  .footer {
-    padding-inline: var(--layout-gutter-tablet);
-  }
+  .footer { padding-inline: var(--layout-gutter-tablet); }
 }
 
 @media (min-width: $breakpoint-lg) {
-  .footer {
-    padding-inline: var(--layout-gutter-desktop);
-  }
+  .footer { padding-inline: var(--layout-gutter-desktop); }
+}
+
+:global(section) { position: relative; }
+:global(section + section) { border-top: var(--border-width-default) solid var(--color-border-default); }
+
+:global(a) { transition: background-color var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard); }
+:global(a:focus-visible) { outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset); }
+
+@media (prefers-reduced-motion: reduce) {
+  :global(a) { transition: none; }
+}
+
+@media (min-width: $breakpoint-lg) {
+  :global(section + section) { border-top: 0; }
+}
+
+@media (min-width: $breakpoint-md) {
+  :global(section:nth-of-type(even)) { background: color-mix(in srgb, var(--color-bg-surface) 38%, transparent); }
 }
