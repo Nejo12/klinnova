@@ -1,6 +1,7 @@
 @use "../../styles/breakpoints" as *;
 
-.hero { display: grid; gap: var(--space-10); max-width: var(--layout-content-max); margin-inline: auto; padding: var(--space-12) var(--layout-gutter-mobile) var(--space-16); }
+.hero { display: grid; gap: var(--space-10); max-width: var(--layout-content-max); margin-inline: auto; padding: var(--space-12) var(--layout-gutter-mobile) var(--space-16); position: relative; }
+.hero::before { content: ""; position: absolute; inset: var(--space-6) var(--layout-gutter-mobile) auto; height: 1px; background: var(--color-border-default); }
 .copy { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-5); }
 .eyebrow, .previewReasonsHeading { margin: 0; font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); letter-spacing: var(--letter-spacing-wide); text-transform: uppercase; color: var(--color-accent-warm-strong); }
 .heading { max-width: 9ch; margin: 0; font-size: clamp(3rem, 12vw, 6.5rem); line-height: .94; font-weight: var(--type-display-weight); letter-spacing: -.055em; color: var(--color-text-primary); }
@@ -15,7 +16,9 @@
 .trustList { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); margin: 0; padding: 0; list-style: none; }
 .trustItem { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
 .trustItem::before { content: "↗"; margin-right: var(--space-2); color: var(--color-action-primary); }
-.previewCard { display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-5); border: var(--border-width-default) solid var(--color-border-strong); border-radius: var(--radius-lg); background: var(--color-bg-surface); box-shadow: var(--shadow-md); }
+.previewCard { display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-5); border: var(--border-width-default) solid var(--color-border-strong); border-radius: var(--radius-lg); background: var(--color-bg-surface); box-shadow: var(--shadow-md); position: relative; }
+.previewCard::after { content: "MATCH PREVIEW"; position: absolute; top: var(--space-3); right: var(--space-5); color: var(--color-text-muted); font-family: var(--font-family-mono); font-size: .625rem; letter-spacing: .12em; }
+.previewCard:hover { box-shadow: 0 22px 42px rgb(33 26 27 / .14), 0 4px 10px rgb(33 26 27 / .06); transform: translateY(-3px); }
 .previewHeader { display: flex; justify-content: space-between; gap: var(--space-3); padding-bottom: var(--space-4); border-bottom: var(--border-width-default) solid var(--color-border-default); }
 .previewTitle { margin: 0; font-size: var(--font-size-xl); font-weight: var(--font-weight-semibold); color: var(--color-text-primary); }
 .previewCompany { margin: var(--space-1) 0 0; font-size: var(--font-size-sm); color: var(--color-text-secondary); }
