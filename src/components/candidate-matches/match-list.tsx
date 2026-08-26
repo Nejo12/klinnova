@@ -4,18 +4,25 @@ import type { PublicVacancy } from "@/lib/public-jobs/domain";
 import { MatchCard } from "@/components/candidate-matches/match-card";
 
 import styles from "./candidate-matches.module.scss";
+import pulseStyles from "./match-list-pulse.module.scss";
 
 type MatchListProps = {
   vacancies: readonly PublicVacancy[];
   applicationsByVacancyId: ReadonlyMap<string, OwnedApplicationSummary>;
+  pulseReveal?: boolean;
 };
 
 export function MatchList({
   vacancies,
   applicationsByVacancyId,
+  pulseReveal = false,
 }: MatchListProps) {
   return (
-    <ul className={styles.list}>
+    <ul
+      className={`${styles.list} ${
+        pulseReveal ? pulseStyles.listPulseReveal : ""
+      }`}
+    >
       {vacancies.map((vacancy) => (
         <li key={vacancy.vacancyId}>
           <MatchCard

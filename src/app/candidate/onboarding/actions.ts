@@ -323,7 +323,7 @@ export async function completeOnboardingAction(
     case "incomplete":
       redirect(onboardingGroupHref(parsed.data.first_incomplete_group));
     case "completed":
-      redirect("/candidate");
+      redirect("/candidate/matches?pulse=ready");
     default: {
       const _exhaustive: never = parsed.data;
       return _exhaustive;
