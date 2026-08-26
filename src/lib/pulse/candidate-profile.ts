@@ -120,8 +120,7 @@ export function buildCandidatePulseProfile(
     {
       key: "languages",
       label: "Languages",
-      value:
-        languageLabels.length > 0 ? languageLabels.join(", ") : "Not set",
+      value: languageLabels.length > 0 ? languageLabels.join(", ") : "Not set",
     },
     {
       key: "availability",
