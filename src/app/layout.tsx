@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { assertServerEnv } from "@/lib/env/server";
 import "@/styles/tokens.css";
+import "@/styles/pulse.css";
 import "@/styles/globals.scss";
 
 assertServerEnv();
