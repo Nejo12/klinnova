@@ -99,12 +99,18 @@ export function buildCandidatePulseProfile(
     {
       key: "employment",
       label: "Employment",
-      value: optionLabels(input.profile.employmentTypes, EMPLOYMENT_TYPE_OPTIONS),
+      value: optionLabels(
+        input.profile.employmentTypes,
+        EMPLOYMENT_TYPE_OPTIONS,
+      ),
     },
     {
       key: "shifts",
       label: "Shifts",
-      value: optionLabels(input.profile.shiftPreferences, SHIFT_PREFERENCE_OPTIONS),
+      value: optionLabels(
+        input.profile.shiftPreferences,
+        SHIFT_PREFERENCE_OPTIONS,
+      ),
     },
     {
       key: "german",
@@ -114,7 +120,8 @@ export function buildCandidatePulseProfile(
     {
       key: "languages",
       label: "Languages",
-      value: languageLabels.length > 0 ? languageLabels.join(", ") : "Not set",
+      value:
+        languageLabels.length > 0 ? languageLabels.join(", ") : "Not set",
     },
     {
       key: "availability",
