@@ -1,12 +1,12 @@
-export const KLinnova_PULSE_STAGES = [
+export const KLINNOVA_PULSE_STAGES = [
   "understanding",
   "connecting",
   "progressing",
 ] as const;
 
-export type KlinnovaPulseStage = (typeof KLinnova_PULSE_STAGES)[number];
+export type KlinnovaPulseStage = (typeof KLINNOVA_PULSE_STAGES)[number];
 
-export const KLinnova_PULSE_VERBS = [
+export const KLINNOVA_PULSE_VERBS = [
   "gather",
   "resolve",
   "connect",
@@ -15,9 +15,9 @@ export const KLinnova_PULSE_VERBS = [
   "settle",
 ] as const;
 
-export type KlinnovaPulseVerb = (typeof KLinnova_PULSE_VERBS)[number];
+export type KlinnovaPulseVerb = (typeof KLINNOVA_PULSE_VERBS)[number];
 
-export const KLinnova_PULSE_STAGE_LABELS: Readonly<
+export const KLINNOVA_PULSE_STAGE_LABELS: Readonly<
   Record<KlinnovaPulseStage, string>
 > = {
   understanding: "Understanding",
@@ -25,7 +25,7 @@ export const KLinnova_PULSE_STAGE_LABELS: Readonly<
   progressing: "Progressing",
 };
 
-export const KLinnova_PULSE_STAGE_VERBS: Readonly<
+export const KLINNOVA_PULSE_STAGE_VERBS: Readonly<
   Record<KlinnovaPulseStage, readonly KlinnovaPulseVerb[]>
 > = {
   understanding: ["gather", "resolve", "settle", "advance"],
