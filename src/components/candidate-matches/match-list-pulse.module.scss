@@ -1,0 +1,27 @@
+@keyframes pulseResultReveal {
+  from {
+    opacity: 0;
+    transform: translateY(var(--pulse-distance-reveal));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.listPulseReveal > li {
+  animation: pulseResultReveal var(--pulse-duration-reveal) var(--pulse-ease) both;
+}
+
+.listPulseReveal > li:nth-child(2) {
+  animation-delay: 70ms;
+}
+
+.listPulseReveal > li:nth-child(3) {
+  animation-delay: 140ms;
+}
+
+.listPulseReveal > li:nth-child(n + 4) {
+  animation-delay: 210ms;
+}
