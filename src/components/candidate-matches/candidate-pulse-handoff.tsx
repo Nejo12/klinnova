@@ -46,15 +46,11 @@ export function CandidatePulseHandoff({
     return () => window.clearTimeout(timer);
   }, []);
 
-  const advance = () => setPhase("matching");
-
   return (
     <section
       className={styles.root}
       data-phase={phase}
       aria-label="Klinnova Pulse journey"
-      onPointerDown={advance}
-      onKeyDown={advance}
     >
       <ol className={styles.rail} aria-label="Journey stages">
         <li
@@ -83,6 +79,15 @@ export function CandidatePulseHandoff({
           Your saved essentials are complete. Klinnova can now use them to
           identify current opportunities that fit.
         </p>
+        {phase === "ready" ? (
+          <button
+            className={styles.skipButton}
+            type="button"
+            onClick={() => setPhase("matching")}
+          >
+            Show matches now
+          </button>
+        ) : null}
       </div>
 
       <div className={styles.matching}>
