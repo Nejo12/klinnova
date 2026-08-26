@@ -119,7 +119,7 @@ export async function saveWorkAuthorisationGroupAction(
 
   if (!parsed.success) {
     return {
-      error: parsed.error.issues[[0]?.message ?? ONBOARDING_GENERIC_FAILURE,
+      error: parsed.error.issues[0]?.message ?? ONBOARDING_GENERIC_FAILURE,
       message: null,
     };
   }
