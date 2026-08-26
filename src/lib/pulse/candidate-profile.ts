@@ -40,7 +40,10 @@ function optionLabels(
   }
 
   return values
-    .map((value) => options.find((option) => option.code === value)?.label ?? value)
+    .map(
+      (value) =>
+        options.find((option) => option.code === value)?.label ?? value,
+    )
     .join(", ");
 }
 
