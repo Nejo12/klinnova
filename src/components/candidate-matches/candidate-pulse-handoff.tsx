@@ -37,12 +37,9 @@ export function CandidatePulseHandoff({
     const reducedMotion = window.matchMedia?.(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    if (reducedMotion) {
-      setPhase("matching");
-      return;
-    }
+    const delay = reducedMotion ? 0 : 650;
+    const timer = window.setTimeout(() => setPhase("matching"), delay);
 
-    const timer = window.setTimeout(() => setPhase("matching"), 650);
     return () => window.clearTimeout(timer);
   }, []);
 
