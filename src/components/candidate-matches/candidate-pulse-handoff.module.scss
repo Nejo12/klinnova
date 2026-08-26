@@ -45,7 +45,7 @@
 }
 
 .ready {
-  max-height: 10rem;
+  max-height: 12rem;
   opacity: 1;
   transform: translateY(0);
 }
@@ -83,6 +83,24 @@
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-sm);
+}
+
+.skipButton {
+  margin-top: var(--space-3);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-link);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+
+.skipButton:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .matching {
