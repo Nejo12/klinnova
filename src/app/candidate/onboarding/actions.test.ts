@@ -146,7 +146,7 @@ describe("onboarding actions", () => {
 
     await expect(
       completeOnboardingAction({ error: null, message: null }, form([])),
-    ).rejects.toThrow("REDIRECT:/candidate");
+    ).rejects.toThrow("REDIRECT:/candidate/matches?pulse=ready");
 
     expect(rpc).toHaveBeenCalledTimes(1);
     expect(rpc).toHaveBeenCalledWith("complete_candidate_onboarding");
