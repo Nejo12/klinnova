@@ -5,7 +5,10 @@ import { CandidateMatchesPage } from "@/components/candidate-matches/candidate-m
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadCurrentCandidateMatchesPage } from "@/lib/matching/load-current-candidate-matches-page";
 import { loadCandidateOnboarding } from "@/lib/onboarding/load-candidate";
-import { buildCandidatePulseProfile } from "@/lib/pulse/candidate-profile";
+import {
+  buildCandidatePulseProfile,
+  type CandidatePulseProfileItem,
+} from "@/lib/pulse/candidate-profile";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -43,7 +46,7 @@ export default async function CandidateMatchesRoutePage({
 
   const params = await searchParams;
   const pulseRequested = params.pulse === "ready";
-  let pulseProfileItems = null;
+  let pulseProfileItems: CandidatePulseProfileItem[] | null = null;
 
   if (pulseRequested) {
     const candidate = await loadCandidateOnboarding(supabase);
