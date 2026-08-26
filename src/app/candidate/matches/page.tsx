@@ -50,10 +50,7 @@ export default async function CandidateMatchesRoutePage({
 
   if (pulseRequested) {
     const candidate = await loadCandidateOnboarding(supabase);
-    if (
-      candidate.ok &&
-      candidate.data.profile.onboardingCompletedAt !== null
-    ) {
+    if (candidate.ok && candidate.data.profile.onboardingCompletedAt !== null) {
       pulseProfileItems = buildCandidatePulseProfile(candidate.data);
     }
   }
