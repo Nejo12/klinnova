@@ -1,0 +1,20 @@
+/**
+ * Klinnova Pulse semantic motion tokens.
+ *
+ * These tokens sit on top of the existing design-system motion primitives.
+ * They define the D2-approved Pulse grammar without attaching motion to any
+ * product flow yet. D3-B components should consume these values rather than
+ * scattering ad-hoc durations/distances/easing values.
+ */
+
+:root {
+  --pulse-duration-advance: var(--duration-standard);
+  --pulse-duration-reveal: 200ms;
+  --pulse-duration-settle: var(--duration-fast);
+
+  --pulse-distance-advance: 0.5rem;
+  --pulse-distance-reveal: 0.625rem;
+  --pulse-distance-settle: 0.1875rem;
+
+  --pulse-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
