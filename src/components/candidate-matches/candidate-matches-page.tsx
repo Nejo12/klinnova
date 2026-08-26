@@ -59,6 +59,7 @@ export function CandidateMatchesPage(props: CandidateMatchesPageProps) {
               <MatchList
                 vacancies={props.vacancies}
                 applicationsByVacancyId={props.applicationsByVacancyId}
+                pulseReveal={props.pulseProfileItems != null}
               />
             </>
           )}
