@@ -11,8 +11,7 @@
 }
 
 .listPulseReveal > li {
-  animation:
-    pulseResultReveal var(--pulse-duration-reveal) var(--pulse-ease)
+  animation: pulseResultReveal var(--pulse-duration-reveal) var(--pulse-ease)
     both;
 }
 
