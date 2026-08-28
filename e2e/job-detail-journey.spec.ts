@@ -202,6 +202,9 @@ test.describe("Slice 3 candidate job detail journey", () => {
 
     await page.getByRole("link", { name: "Back to matches" }).click();
     await expect(page).toHaveURL(/\/candidate\/matches$/);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Matches" }),
+    ).toBeVisible();
     await expect(page.getByText("Applied").first()).toBeVisible();
     await expect(
       page.getByRole("link", {

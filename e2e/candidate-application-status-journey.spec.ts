@@ -62,7 +62,15 @@ test.describe("candidate application status journey", () => {
     // --- Inventory ---
     await page.goto("/candidate/applications");
     await expect(
-      page.getByRole("heading", { level: 1, name: "Your applications" }),
+      page.getByRole("heading", { level: 1, name: "Applications" }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByText("Your active and closed applications in one place.")
+        .first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Active" }),
     ).toBeVisible();
     await expect(
       page.getByRole("heading", {
@@ -74,9 +82,7 @@ test.describe("candidate application status journey", () => {
       page.getByText(vacancy.employerDisplayName, { exact: true }),
     ).toBeVisible();
     await expect(page.getByText("Berlin")).toBeVisible();
-    await expect(
-      page.getByRole("definition").filter({ hasText: "Submitted" }),
-    ).toBeVisible();
+    await expect(page.locator("time").first()).toBeVisible();
 
     await page
       .getByRole("link", {
@@ -125,6 +131,17 @@ test.describe("candidate application status journey", () => {
     await page.reload();
     await expect(statusValue).toHaveText("Accepted");
     await expect(timelineSection.getByText("Accepted")).toBeVisible();
+    await page.goto("/candidate/applications");
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Closed" }),
+    ).toBeVisible();
+    await expect(page.getByTestId("application-status-value")).toHaveText(
+      "Accepted",
+    );
+    await expect(
+      page.getByRole("link", { name: "Find more matches" }),
+    ).toHaveAttribute("href", "/candidate/matches");
+    await page.goto(applicationUrl);
     await expect(page.getByRole("combobox")).toHaveCount(0);
     await expect(
       page.getByRole("button", { name: /accept|confirm/i }),
@@ -169,6 +186,17 @@ test.describe("candidate application status journey", () => {
     await expect(page.getByText(/reason/i)).toHaveCount(0);
     await expect(page.getByText(/actor/i)).toHaveCount(0);
     await expect(page.getByRole("combobox")).toHaveCount(0);
+
+    await page.goto("/candidate/applications");
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Closed" }),
+    ).toBeVisible();
+    await expect(page.getByTestId("application-status-value")).toHaveText(
+      "Not selected",
+    );
+    await expect(page.getByText("Role filled internally.")).toHaveCount(0);
+    await expect(page.getByText("Mitte", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("Kreuzberg", { exact: true })).toHaveCount(0);
 
     await employerContext.close();
   });

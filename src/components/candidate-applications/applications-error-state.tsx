@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import styles from "@/components/candidate-matches/candidate-matches.module.scss";
+import styles from "@/components/candidate-applications/candidate-applications.module.scss";
 
 export function ApplicationsErrorState() {
   return (

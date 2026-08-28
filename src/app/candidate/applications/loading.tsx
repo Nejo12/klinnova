@@ -3,7 +3,8 @@ import {
   Skeleton,
   SkeletonRegion,
 } from "@/components/shared/skeleton";
-import styles from "@/components/candidate-matches/candidate-matches.module.scss";
+import { CandidateApplicationsPageHeader } from "@/components/candidate-applications/candidate-applications-page-header";
+import styles from "@/components/candidate-applications/candidate-applications.module.scss";
 import railStyles from "@/components/candidate-applications/application-status-rail.module.scss";
 
 // A representative count, not a claim about how many applications actually
@@ -43,6 +44,13 @@ function MetaRowSkeleton({
 export default function Loading() {
   return (
     <main className={styles.page}>
+      <CandidateApplicationsPageHeader showEmployerNav={false} />
+      <div className={styles.headingCluster}>
+        <h1 className={styles.heading}>Applications</h1>
+        <p className={styles.lead}>
+          Your active and closed applications in one place.
+        </p>
+      </div>
       <DelayedReveal>
         <SkeletonRegion label="Loading applications">
           <ul className={styles.list}>
