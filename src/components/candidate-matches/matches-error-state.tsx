@@ -7,6 +7,7 @@ import styles from "./candidate-matches.module.scss";
 export function MatchesErrorState() {
   return (
     <section className={styles.error} aria-labelledby="matches-error-heading">
+      <p className={styles.stateSubheading}>If loading fails</p>
       <h2 className={styles.errorHeading} id="matches-error-heading">
         We could not load your matches
       </h2>

@@ -40,6 +40,9 @@ export function OnboardingReview({
           Your essential answers are complete. You can view jobs that match your
           saved preferences, or review your answers any time.
         </p>
+        <p className={styles.reviewSummary}>
+          {progress.completeCount} of {progress.totalGroups} sections saved
+        </p>
         <OnboardingReviewTable profile={profile} languages={languages} />
         <p className={styles.note}>
           Updating answers can clear completion when essentials are no longer
@@ -70,6 +73,9 @@ export function OnboardingReview({
           Your answers are saved. Confirm when you are ready — the server checks
           your saved essentials before marking onboarding complete.
         </p>
+        <p className={styles.reviewSummary}>
+          {progress.completeCount} of {progress.totalGroups} sections saved
+        </p>
         <OnboardingReviewTable profile={profile} languages={languages} />
         <p className={styles.note}>
           After you confirm, you can view jobs that match your saved
@@ -99,6 +105,9 @@ export function OnboardingReview({
       <p className={styles.lead}>
         Progress is saved after each section. Continue from the first unfinished
         section when you are ready.
+      </p>
+      <p className={styles.reviewSummary}>
+        {progress.completeCount} of {progress.totalGroups} sections saved
       </p>
       <ul className={styles.reviewList}>
         {progress.incompleteGroups.map((group: OnboardingGroupId) => (

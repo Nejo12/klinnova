@@ -323,6 +323,13 @@
   line-height: var(--type-body-supporting-line-height);
 }
 
+.reviewSummary {
+  margin: 0;
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-supporting-line-height);
+  color: var(--color-text-muted);
+}
+
 .reviewTable {
   width: 100%;
   border-collapse: collapse;

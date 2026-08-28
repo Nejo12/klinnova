@@ -63,7 +63,9 @@ export default async function CandidateOnboardingPage({
     <main className={styles.page}>
       <CandidateAppHeader current="profile" showEmployerNav={showEmployerNav} />
 
-      <OnboardingProgressNav progress={progress} current={current} />
+      {current === "review" ? null : (
+        <OnboardingProgressNav progress={progress} current={current} />
+      )}
 
       {current === "review" ? (
         <OnboardingReview

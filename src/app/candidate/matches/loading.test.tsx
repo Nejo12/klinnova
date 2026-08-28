@@ -31,6 +31,30 @@ describe("candidate matches Loading", () => {
     expect(screen.getByText(CANDIDATE_MATCHES_LEAD)).toBeInTheDocument();
   });
 
+  it("renders static candidate navigation during route loading", () => {
+    render(<Loading />);
+
+    const nav = screen.getByRole("navigation", { name: "Candidate" });
+    expect(nav).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Matches" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(screen.getByRole("link", { name: "Applications" })).toHaveAttribute(
+      "href",
+      "/candidate/applications",
+    );
+    expect(screen.getByRole("link", { name: "Profile" })).toHaveAttribute(
+      "href",
+      "/candidate/onboarding?group=review",
+    );
+    expect(screen.getByRole("link", { name: "Account" })).toHaveAttribute(
+      "href",
+      "/candidate/account",
+    );
+    expect(screen.queryByRole("link", { name: "Employer" })).toBeNull();
+  });
+
   it("renders one skeleton card per list item, matching the card count", () => {
     const { container } = render(<Loading />);
 
@@ -38,10 +62,12 @@ describe("candidate matches Loading", () => {
     expect(items).toHaveLength(MATCH_CARD_SKELETON_COUNT);
   });
 
-  it("renders no interactive controls", () => {
+  it("renders no destructive or data-dependent controls", () => {
     render(<Loading />);
 
-    expect(screen.queryAllByRole("link")).toHaveLength(0);
     expect(screen.queryAllByRole("button")).toHaveLength(0);
+    expect(
+      screen.queryByRole("link", { name: /apply|submit|save|view job/i }),
+    ).toBeNull();
   });
 });

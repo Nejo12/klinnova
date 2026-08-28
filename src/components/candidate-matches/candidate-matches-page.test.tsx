@@ -100,8 +100,13 @@ describe("CandidateMatchesPage", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: /No jobs match all of your saved preferences/i,
+        name: /No matches right now/i,
       }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /No jobs match all of your saved preferences right now/i,
+      ),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /Review your saved preferences/i }),

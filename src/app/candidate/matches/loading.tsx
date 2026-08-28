@@ -3,6 +3,7 @@ import {
   Skeleton,
   SkeletonRegion,
 } from "@/components/shared/skeleton";
+import { CandidateAppHeader } from "@/components/candidate-nav/candidate-app-header";
 import styles from "@/components/candidate-matches/candidate-matches.module.scss";
 import {
   CANDIDATE_MATCHES_HEADING,
@@ -12,24 +13,6 @@ import {
 // A representative count, not a claim about how many matches actually
 // exist — the real count is exactly the thing that's unknown here.
 export const MATCH_CARD_SKELETON_COUNT = 3;
-
-// Paired label+value skeleton matching the two-column `.metaRow` grid that
-// VacancyFactChips actually renders (src/components/public-jobs/
-// vacancy-fact-chips.tsx), rather than a single full-width bar.
-function MetaRowSkeleton({
-  labelWidth,
-  valueWidth,
-}: {
-  labelWidth: string;
-  valueWidth: string;
-}) {
-  return (
-    <div className={styles.metaRow}>
-      <Skeleton height="0.875rem" width={labelWidth} radius="sm" />
-      <Skeleton height="1rem" width={valueWidth} radius="sm" />
-    </div>
-  );
-}
 
 /**
  * Route-loading state for /candidate/matches. Renders the static heading/
@@ -46,46 +29,36 @@ function MetaRowSkeleton({
  * same imported constants — the same fix already applied to
  * `src/app/jobs/loading.tsx` (Task F re-audit, P3.6).
  *
- * Still left out:
- * - `CandidateAppHeader` — genuinely static chrome, but not implicated in
- *   the heading/lead content-relocation finding this fix addresses (same
- *   boundary `jobs/loading.tsx` draws around its own brand-link header).
- * - `WorkAuthorisationNotice` — static chrome too, but out of this fix's
- *   assigned scope (heading/lead only); its appearance at the swap still
- *   shifts the list down by its own height.
- * - the match-card list itself, genuinely data-dependent.
+ * The candidate header is also static enough to render here. Account-space
+ * capability data is unresolved during route loading, so the Candidate /
+ * Employer switcher is intentionally omitted until the resolved page renders.
+ * `WorkAuthorisationNotice` remains out of the loading shell because it is
+ * not part of the approved candidate navigation/state continuity slice.
  */
 export default function Loading() {
   return (
     <main className={styles.page}>
+      <CandidateAppHeader current="matches" showEmployerNav={false} />
       <h1 className={styles.heading}>{CANDIDATE_MATCHES_HEADING}</h1>
       <p className={styles.lead}>{CANDIDATE_MATCHES_LEAD}</p>
 
       <DelayedReveal>
         <SkeletonRegion label="Loading matches">
-          <ul className={styles.list}>
+          <ul className={`${styles.list} ${styles.loadingList}`}>
             {Array.from({ length: MATCH_CARD_SKELETON_COUNT }, (_, index) => (
               <li key={index}>
-                <div className={styles.card}>
-                  <div className={styles.cardHeader}>
-                    <Skeleton height="1.5rem" width="65%" radius="sm" />
-                    <div className={styles.badgeGroup}>
-                      <Skeleton height="1.5rem" width="6rem" radius="sm" />
-                    </div>
-                  </div>
-                  <Skeleton height="1.125rem" width="40%" radius="sm" />
-                  <Skeleton height="1rem" width="92%" radius="sm" />
-                  <div className={styles.meta}>
-                    <MetaRowSkeleton labelWidth="4.5rem" valueWidth="70%" />
-                    <MetaRowSkeleton labelWidth="5rem" valueWidth="55%" />
-                  </div>
-                  <div className={styles.cardActions}>
-                    <Skeleton height="1.25rem" width="5.5rem" radius="sm" />
-                  </div>
+                <div className={styles.loadingCard}>
+                  <Skeleton height="1.25rem" width="58%" radius="sm" />
+                  <Skeleton height="0.875rem" width="38%" radius="sm" />
+                  <Skeleton height="0.875rem" width="82%" radius="sm" />
+                  <Skeleton height="0.875rem" width="34%" radius="sm" />
                 </div>
               </li>
             ))}
           </ul>
+          <p className={styles.loadingNote}>
+            Skeleton only where match data is still loading.
+          </p>
         </SkeletonRegion>
       </DelayedReveal>
     </main>

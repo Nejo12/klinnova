@@ -61,6 +61,7 @@ describe("OnboardingReview", () => {
     expect(
       screen.getByText(/After you confirm, you can view jobs/i),
     ).toBeInTheDocument();
+    expect(screen.getByText("6 of 6 sections saved")).toBeInTheDocument();
   });
 
   it("shows confirmed state without a confirm button when completed", () => {
@@ -108,6 +109,7 @@ describe("OnboardingReview", () => {
     expect(
       screen.getByRole("link", { name: /View matching jobs/i }),
     ).toHaveAttribute("href", "/candidate/matches");
+    expect(screen.getByText("6 of 6 sections saved")).toBeInTheDocument();
   });
 
   it("lists incomplete sections when essentials are not valid", () => {
@@ -143,5 +145,6 @@ describe("OnboardingReview", () => {
     expect(
       screen.getByRole("link", { name: "Continue onboarding" }),
     ).toHaveAttribute("href", "/candidate/onboarding?group=work_authorisation");
+    expect(screen.getByText("1 of 6 sections saved")).toBeInTheDocument();
   });
 });
