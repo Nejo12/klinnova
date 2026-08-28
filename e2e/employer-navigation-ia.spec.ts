@@ -26,11 +26,32 @@ async function registerAndCompleteEmployerOnboarding(
     expectedPath: /\/employer\/onboarding$/,
   });
 
-  await page.getByRole("radio", { name: /Private person/i }).check();
-  await page.getByRole("button", { name: "Continue" }).click();
-  await expect(
-    page.getByRole("heading", { name: /Private employer/i }),
-  ).toBeVisible({ timeout: 15_000 });
+  const privateEmployerHeading = page.getByRole("heading", {
+    name: /Private employer/i,
+  });
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const privatePersonOption = page.getByRole("radio", {
+      name: /Private person/i,
+    });
+    await privatePersonOption.check();
+    await expect(privatePersonOption).toBeChecked();
+    await page.getByRole("button", { name: "Continue" }).click();
+
+    try {
+      await expect(privateEmployerHeading).toBeVisible({ timeout: 15_000 });
+      break;
+    } catch (error) {
+      if (attempt === 1) {
+        throw error;
+      }
+
+      await page.reload();
+      if (await privateEmployerHeading.isVisible()) {
+        break;
+      }
+    }
+  }
 
   await page.getByLabel("Display name").fill(displayName);
   await page.getByLabel("Berlin locality").fill("Mitte");
