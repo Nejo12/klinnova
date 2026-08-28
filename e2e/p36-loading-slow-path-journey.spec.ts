@@ -531,7 +531,7 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
     await installSkeletonWatcher(page);
     await appLink.click();
     await expect(
-      page.getByRole("heading", { level: 1, name: "Application submitted" }),
+      page.getByRole("heading", { level: 1, name: "You're one step closer." }),
     ).toBeVisible({ timeout: 15_000 });
     assertNoUnthrottledSkeletonFlash(
       "candidate applications -> detail",
@@ -550,7 +550,7 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
       .click();
     await waitForSkeletonIfObservable(page, "candidate applications -> detail");
     await expect(
-      page.getByRole("heading", { level: 1, name: "Application submitted" }),
+      page.getByRole("heading", { level: 1, name: "You're one step closer." }),
     ).toBeVisible({ timeout: 15_000 });
     await expect(page.locator(SKELETON_SELECTOR)).toHaveCount(0);
     await unrouteApp();

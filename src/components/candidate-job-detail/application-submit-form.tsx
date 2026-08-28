@@ -39,7 +39,7 @@ function SubmitButton({ locked }: { locked: boolean }) {
       aria-describedby="application-submit-disclosure"
       aria-busy={pending}
     >
-      {pending ? "Submitting…" : "Submit application"}
+      {pending ? "Applying…" : "Apply with profile"}
     </button>
   );
 }
@@ -109,7 +109,7 @@ export function ApplicationSubmitForm({
       aria-labelledby="application-submit-heading"
     >
       <h2 className={styles.sectionHeading} id="application-submit-heading">
-        Submit application
+        Apply with profile
       </h2>
 
       {result !== null ? (

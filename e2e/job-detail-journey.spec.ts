@@ -12,7 +12,7 @@ const WORK_AUTHORISATION_NOTICE =
   "Matches are shown using the work-authorisation declaration you provided during onboarding. Klinnova has not verified documents.";
 
 const APPLICATION_SUBMIT_DISCLOSURE =
-  "By submitting, the profile information shown here will be stored with your application and made available to a future employer review workflow.";
+  "You are applying with your saved Klinnova profile. The profile information shown here will be stored with your application and made available for employer review.";
 
 const MORNING_KITCHEN_ID = "22222222-2222-4222-8222-222222222201";
 const MORNING_KITCHEN_TITLE = "Demo vacancy — Morning kitchen support";
@@ -128,7 +128,7 @@ test.describe("Slice 3 candidate job detail journey", () => {
       page.getByText(WORK_AUTHORISATION_NOTICE).first(),
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Submit application" }),
+      page.getByRole("button", { name: "Apply with profile" }),
     ).toBeVisible();
     await expect(page.getByRole("checkbox")).toHaveCount(0);
     await expect(
@@ -160,17 +160,17 @@ test.describe("Slice 3 candidate job detail journey", () => {
     await expect(page.getByText(APPLICATION_SUBMIT_DISCLOSURE)).toBeVisible();
     await expect(page.getByRole("checkbox")).toHaveCount(0);
 
-    await page.getByRole("button", { name: "Submit application" }).click();
+    await page.getByRole("button", { name: "Apply with profile" }).click();
 
     await expect(page).toHaveURL(/\/candidate\/applications\/[0-9a-f-]{36}$/, {
       timeout: 15_000,
     });
     const confirmationUrl = page.url();
     await expect(
-      page.getByRole("heading", { level: 1, name: "Application submitted" }),
+      page.getByRole("heading", { level: 1, name: "You're one step closer." }),
     ).toBeVisible();
     await expect(
-      page.getByText("Your application was recorded successfully."),
+      page.getByText("Your application is now with the employer."),
     ).toBeVisible();
     await expect(page.getByText("Submitted").first()).toBeVisible();
     await expect(page.getByText("Demo Berlin Work Co").first()).toBeVisible();
@@ -186,16 +186,13 @@ test.describe("Slice 3 candidate job detail journey", () => {
     await page.reload();
     await expect(page).toHaveURL(confirmationUrl);
     await expect(
-      page.getByRole("heading", { level: 1, name: "Application submitted" }),
+      page.getByRole("heading", { level: 1, name: "You're one step closer." }),
     ).toBeVisible();
 
-    await page.getByRole("link", { name: "View job" }).click();
-    await expect(page).toHaveURL(
-      new RegExp(`/candidate/jobs/${MORNING_KITCHEN_ID}$`),
-    );
+    await page.goto(`/candidate/jobs/${MORNING_KITCHEN_ID}`);
     await expect(page.getByText("Applied").first()).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Submit application" }),
+      page.getByRole("button", { name: "Apply with profile" }),
     ).toHaveCount(0);
     await expect(
       page.getByRole("link", {
@@ -222,7 +219,7 @@ test.describe("Slice 3 candidate job detail journey", () => {
     // Duplicate path via job detail is blocked by Applied UI; revisit confirmation.
     await page.goto(`/candidate/jobs/${MORNING_KITCHEN_ID}`);
     await expect(
-      page.getByRole("button", { name: "Submit application" }),
+      page.getByRole("button", { name: "Apply with profile" }),
     ).toHaveCount(0);
     await page
       .getByRole("link", {

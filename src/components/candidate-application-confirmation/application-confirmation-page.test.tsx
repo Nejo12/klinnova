@@ -5,6 +5,7 @@ import { ApplicationConfirmationPage } from "@/components/candidate-application-
 import {
   APPLICATION_CONFIRMATION_BODY,
   APPLICATION_CONFIRMATION_HEADING,
+  APPLICATION_CONFIRMATION_MARKER,
   type ApplicationConfirmation,
 } from "@/lib/applications/application-confirmation";
 import { WORK_AUTHORISATION_NOTICE } from "@/components/candidate-matches/work-authorisation-notice";
@@ -63,6 +64,14 @@ describe("ApplicationConfirmationPage", () => {
         name: APPLICATION_CONFIRMATION_HEADING,
       }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(APPLICATION_CONFIRMATION_MARKER),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        `Your application for ${confirmation.vacancyTitle} is now with ${confirmation.employerDisplayName}.`,
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText(APPLICATION_CONFIRMATION_BODY)).toBeInTheDocument();
     expect(screen.getAllByText("Submitted").length).toBeGreaterThan(0);
     expect(screen.getByText("3 August 2026, 14:30 UTC")).toBeInTheDocument();
@@ -80,6 +89,7 @@ describe("ApplicationConfirmationPage", () => {
     expect(
       screen.queryByRole("button", { name: /withdraw|submit again|edit/i }),
     ).toBeNull();
+    expect(screen.queryByRole("link", { name: "View application" })).toBeNull();
     expect(screen.queryByText(/employer will|response time/i)).toBeNull();
   });
 

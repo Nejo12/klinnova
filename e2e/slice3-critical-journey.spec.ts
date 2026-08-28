@@ -21,7 +21,7 @@ const WORK_AUTHORISATION_NOTICE =
   "Matches are shown using the work-authorisation declaration you provided during onboarding. Klinnova has not verified documents.";
 
 const APPLICATION_SUBMIT_DISCLOSURE =
-  "By submitting, the profile information shown here will be stored with your application and made available to a future employer review workflow.";
+  "You are applying with your saved Klinnova profile. The profile information shown here will be stored with your application and made available for employer review.";
 
 const MORNING_KITCHEN_ID = "22222222-2222-4222-8222-222222222201";
 const MORNING_KITCHEN_TITLE = "Demo vacancy — Morning kitchen support";
@@ -158,7 +158,7 @@ test.describe("Slice 3 critical exit journey", () => {
     ).toHaveCount(0);
     await expectNoUuidInMain(page);
 
-    await page.getByRole("button", { name: "Submit application" }).click();
+    await page.getByRole("button", { name: "Apply with profile" }).click();
     await expect(page).toHaveURL(/\/candidate\/applications\/[0-9a-f-]{36}$/, {
       timeout: 15_000,
     });
@@ -169,10 +169,10 @@ test.describe("Slice 3 critical exit journey", () => {
     );
 
     await expect(
-      page.getByRole("heading", { level: 1, name: "Application submitted" }),
+      page.getByRole("heading", { level: 1, name: "You're one step closer." }),
     ).toBeVisible();
     await expect(
-      page.getByText("Your application was recorded successfully."),
+      page.getByText("Your application is now with the employer."),
     ).toBeVisible();
     await expect(page.getByText("Submitted").first()).toBeVisible();
     await expect(page.getByText("Demo Berlin Work Co").first()).toBeVisible();
@@ -183,7 +183,10 @@ test.describe("Slice 3 critical exit journey", () => {
     await expect(
       page.getByRole("link", { name: "Back to matches" }),
     ).toBeVisible();
-    await expect(page.getByRole("link", { name: "View job" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "View job" })).toHaveAttribute(
+      "href",
+      `/candidate/jobs/${MORNING_KITCHEN_ID}`,
+    );
     await expect(
       page.getByRole("button", { name: /Withdraw|Submit again|Edit/i }),
     ).toHaveCount(0);
@@ -195,14 +198,14 @@ test.describe("Slice 3 critical exit journey", () => {
     await page.reload();
     await expect(page).toHaveURL(confirmationUrl);
     await expect(
-      page.getByRole("heading", { level: 1, name: "Application submitted" }),
+      page.getByRole("heading", { level: 1, name: "You're one step closer." }),
     ).toBeVisible();
     await expect(page.getByText(displayName)).toBeVisible();
 
     await page.goto(`/candidate/jobs/${MORNING_KITCHEN_ID}`);
     await expect(page.getByText("Applied").first()).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Submit application" }),
+      page.getByRole("button", { name: "Apply with profile" }),
     ).toHaveCount(0);
     await expect(
       page.getByRole("link", {
@@ -255,7 +258,7 @@ test.describe("Slice 3 critical exit journey", () => {
     await page.goto(`/candidate/applications/${duplicate.application_id}`);
     await expect(page).toHaveURL(confirmationUrl);
     await expect(
-      page.getByRole("heading", { level: 1, name: "Application submitted" }),
+      page.getByRole("heading", { level: 1, name: "You're one step closer." }),
     ).toBeVisible();
   });
 
@@ -276,7 +279,7 @@ test.describe("Slice 3 critical exit journey", () => {
     await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
 
     await page.goto(`/candidate/jobs/${MORNING_KITCHEN_ID}`);
-    await page.getByRole("button", { name: "Submit application" }).click();
+    await page.getByRole("button", { name: "Apply with profile" }).click();
     await expect(page).toHaveURL(/\/candidate\/applications\/[0-9a-f-]{36}$/, {
       timeout: 15_000,
     });
@@ -314,7 +317,10 @@ test.describe("Slice 3 critical exit journey", () => {
     try {
       await page.goto(confirmationUrl);
       await expect(
-        page.getByRole("heading", { level: 1, name: "Application submitted" }),
+        page.getByRole("heading", {
+          level: 1,
+          name: "You're one step closer.",
+        }),
       ).toBeVisible();
       await expect(page.getByText(displayName)).toBeVisible();
       await expect(page.getByText(changedName)).toHaveCount(0);
@@ -336,7 +342,10 @@ test.describe("Slice 3 critical exit journey", () => {
 
       await page.goto(confirmationUrl);
       await expect(
-        page.getByRole("heading", { level: 1, name: "Application submitted" }),
+        page.getByRole("heading", {
+          level: 1,
+          name: "You're one step closer.",
+        }),
       ).toBeVisible();
       await expect(page.getByText(displayName)).toBeVisible();
       await expect(page.getByText(originalTitle).first()).toBeVisible();
@@ -380,7 +389,7 @@ test.describe("Slice 3 critical exit journey", () => {
     await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
 
     await page.goto(`/candidate/jobs/${MORNING_KITCHEN_ID}`);
-    await page.getByRole("button", { name: "Submit application" }).click();
+    await page.getByRole("button", { name: "Apply with profile" }).click();
     await expect(page).toHaveURL(/\/candidate\/applications\/[0-9a-f-]{36}$/, {
       timeout: 15_000,
     });
@@ -403,7 +412,7 @@ test.describe("Slice 3 critical exit journey", () => {
       }),
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Submit application" }),
+      page.getByRole("button", { name: "Apply with profile" }),
     ).toHaveCount(0);
 
     await context.clearCookies();
@@ -431,7 +440,7 @@ test.describe("Slice 3 critical exit journey", () => {
       timeout: 15_000,
     });
     await expect(
-      page.getByRole("button", { name: "Submit application" }),
+      page.getByRole("button", { name: "Apply with profile" }),
     ).toHaveCount(0);
 
     // Ineligible completed candidate does not see morning kitchen in the
@@ -460,7 +469,7 @@ test.describe("Slice 3 critical exit journey", () => {
     ).toBeVisible();
     await expect(page.getByText("Preferred job category")).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Submit application" }),
+      page.getByRole("button", { name: "Apply with profile" }),
     ).toHaveCount(0);
     await expect(page.getByText(stranger.displayName)).toHaveCount(0);
   });

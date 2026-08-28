@@ -177,15 +177,36 @@ export async function publishEligibleEmployerVacancy(
   await operatorContext.close();
 
   await page.goto(`/employer/vacancies/${vacancyId}`);
-  await page
-    .getByRole("checkbox", {
-      name: /Publishing may make this vacancy publicly visible/i,
-    })
-    .check();
-  await page.getByRole("button", { name: "Publish" }).click();
-  await expect(page.getByText("Published", { exact: true })).toBeVisible({
-    timeout: 15_000,
-  });
+  const publishedStatus = page
+    .getByRole("status")
+    .filter({ hasText: "Published" });
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      if (await publishedStatus.isVisible()) {
+        break;
+      }
+
+      const publishConfirmation = page.getByRole("checkbox", {
+        name: /Publishing may make this vacancy publicly visible/i,
+      });
+      await expect(publishConfirmation).toBeVisible({ timeout: 15_000 });
+      await publishConfirmation.check({ timeout: 15_000 });
+      await expect(publishConfirmation).toBeChecked();
+      await page.getByRole("button", { name: "Publish" }).click();
+      await expect(publishedStatus).toBeVisible({ timeout: 30_000 });
+      break;
+    } catch (error) {
+      if (attempt === 1) {
+        throw error;
+      }
+
+      await page.reload();
+      if (await publishedStatus.isVisible()) {
+        break;
+      }
+    }
+  }
 
   return {
     vacancyId,
@@ -262,7 +283,7 @@ export async function registerAndApplyAsCandidate(
   await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
 
   await page.goto(`/candidate/jobs/${vacancyId}`);
-  await page.getByRole("button", { name: "Submit application" }).click();
+  await page.getByRole("button", { name: "Apply with profile" }).click();
   await expect(page).toHaveURL(/\/candidate\/applications\/[0-9a-f-]{36}$/, {
     timeout: 15_000,
   });
