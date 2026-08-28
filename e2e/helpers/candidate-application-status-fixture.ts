@@ -180,33 +180,45 @@ export async function publishEligibleEmployerVacancy(
   const publishedStatus = page
     .getByRole("status")
     .filter({ hasText: "Published" });
+  const privateDraftStatus = page
+    .getByRole("status")
+    .filter({ hasText: "Private draft" });
 
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    try {
-      if (await publishedStatus.isVisible()) {
-        break;
-      }
+  // Wait for the server-rendered lifecycle projection before deciding whether
+  // this fixture still needs to publish. A previous publish POST can finish
+  // successfully while its React action state remains pending, so checking
+  // the checkbox immediately can misclassify an already-published vacancy.
+  await expect(publishedStatus.or(privateDraftStatus)).toBeVisible({
+    timeout: 30_000,
+  });
 
-      const publishConfirmation = page.getByRole("checkbox", {
-        name: /Publishing may make this vacancy publicly visible/i,
-      });
-      await expect(publishConfirmation).toBeVisible({ timeout: 15_000 });
-      await publishConfirmation.check({ timeout: 15_000 });
-      await expect(publishConfirmation).toBeChecked();
-      await page.getByRole("button", { name: "Publish" }).click();
-      await expect(publishedStatus).toBeVisible({ timeout: 30_000 });
-      break;
-    } catch (error) {
-      if (attempt === 1) {
-        throw error;
-      }
+  if (await privateDraftStatus.isVisible()) {
+    const publishConfirmation = page.getByRole("checkbox", {
+      name: /Publishing may make this vacancy publicly visible/i,
+    });
+    await expect(publishConfirmation).toBeVisible({ timeout: 15_000 });
+    await publishConfirmation.check({ timeout: 15_000 });
+    await expect(publishConfirmation).toBeChecked();
 
-      await page.reload();
-      if (await publishedStatus.isVisible()) {
-        break;
-      }
-    }
+    const [response] = await Promise.all([
+      page.waitForResponse(
+        (candidate) =>
+          candidate.url().includes(`/employer/vacancies/${vacancyId}`) &&
+          candidate.request().method() === "POST",
+      ),
+      page.getByRole("button", { name: "Publish" }).click(),
+    ]);
+    expect(
+      response.status(),
+      "Publish should succeed server-side before the fixture reloads",
+    ).toBe(200);
+
+    // Reload from durable server state rather than depending on a potentially
+    // stuck useActionState transition in the browser.
+    await page.reload();
   }
+
+  await expect(publishedStatus).toBeVisible({ timeout: 30_000 });
 
   return {
     vacancyId,
