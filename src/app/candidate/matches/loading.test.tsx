@@ -29,6 +29,9 @@ describe("candidate matches Loading", () => {
       }),
     ).toBeInTheDocument();
     expect(screen.getByText(CANDIDATE_MATCHES_LEAD)).toBeInTheDocument();
+    expect(
+      screen.queryByText("Current roles matched from your saved profile."),
+    ).toBeNull();
   });
 
   it("renders static candidate navigation during route loading", () => {

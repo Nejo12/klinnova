@@ -87,8 +87,8 @@ export function CandidatePulseHandoff({
         ) : null}
       </div>
 
-      <div className={styles.matching}>
-        <p className={styles.matchingTitle}>Matching on your profile</p>
+      <div className={styles.matching} aria-hidden={phase === "ready"}>
+        <p className={styles.matchingTitle}>Matching with your profile</p>
         <ul className={styles.profileItems}>
           {profileItems.map((item) => (
             <li className={styles.profileItem} key={item.key}>

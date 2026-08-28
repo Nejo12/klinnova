@@ -107,7 +107,7 @@ test.describe("Slice 1 completion gate journey", () => {
     await expect(
       page.getByRole("heading", {
         level: 1,
-        name: "Jobs that match your preferences",
+        name: "Matches",
       }),
     ).toBeVisible();
     await expect(
@@ -141,7 +141,7 @@ test.describe("Slice 1 completion gate journey", () => {
     await expect(
       page.getByRole("heading", {
         level: 1,
-        name: "Jobs that match your preferences",
+        name: "Matches",
       }),
     ).toBeVisible();
     await page.goto("/candidate/onboarding?group=review");

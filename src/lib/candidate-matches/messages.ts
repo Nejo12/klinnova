@@ -5,7 +5,6 @@
 // drift out of sync, matching the precedent `PUBLIC_JOBS_HEADING`/
 // `PUBLIC_JOBS_LEAD` (`src/lib/public-jobs/messages.ts`) already set for
 // `/jobs`.
-export const CANDIDATE_MATCHES_HEADING = "Jobs that match your preferences";
+export const CANDIDATE_MATCHES_HEADING = "Matches";
 
-export const CANDIDATE_MATCHES_LEAD =
-  "These jobs match all of the preferences currently saved in your profile.";
+export const CANDIDATE_MATCHES_LEAD = "Matches use your saved profile.";

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { CandidateMatchesPage } from "@/components/candidate-matches/candidate-matches-page";
 import { WORK_AUTHORISATION_NOTICE } from "@/components/candidate-matches/work-authorisation-notice";
+import { CANDIDATE_MATCHES_LEAD } from "@/lib/candidate-matches/messages";
 import type { PublicVacancy } from "@/lib/public-jobs/domain";
 
 function buildVacancy(overrides: Partial<PublicVacancy> = {}): PublicVacancy {
@@ -40,21 +41,21 @@ describe("CandidateMatchesPage", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: "Jobs that match your preferences",
+        name: "Matches",
       }),
     ).toBeInTheDocument();
     expect(screen.getByText(WORK_AUTHORISATION_NOTICE)).toBeInTheDocument();
-    expect(screen.getByText("1 matching job")).toBeInTheDocument();
+    expect(screen.getByText("1 current role")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
         level: 2,
         name: "Demo vacancy — Morning kitchen support",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Demo Berlin Work Co")).toBeInTheDocument();
+    expect(screen.getByText(/Demo Berlin Work Co/)).toBeInTheDocument();
     expect(screen.getByText("Demo vacancy")).toBeInTheDocument();
     expect(screen.queryByText("Verified employer")).toBeNull();
-    expect(screen.getByText("Mitte, Berlin")).toBeInTheDocument();
+    expect(screen.getByText(/Mitte, Berlin/)).toBeInTheDocument();
     expect(
       screen.getByText("Fictional demo hospitality role."),
     ).toBeInTheDocument();
@@ -86,7 +87,7 @@ describe("CandidateMatchesPage", () => {
       />,
     );
 
-    expect(screen.getByText("2 matching jobs")).toBeInTheDocument();
+    expect(screen.getByText("2 current roles")).toBeInTheDocument();
   });
 
   it("renders empty state distinctly from failure", () => {
@@ -108,6 +109,10 @@ describe("CandidateMatchesPage", () => {
         /No jobs match all of your saved preferences right now/i,
       ),
     ).toBeInTheDocument();
+    expect(screen.getByText(CANDIDATE_MATCHES_LEAD)).toBeInTheDocument();
+    expect(
+      screen.queryByText("Current roles matched from your saved profile."),
+    ).toBeNull();
     expect(
       screen.getByRole("link", { name: /Review your saved preferences/i }),
     ).toHaveAttribute("href", "/candidate/onboarding?group=review");
@@ -142,7 +147,7 @@ describe("CandidateMatchesPage", () => {
     expect(screen.queryByText(/supabase|invariant|sql|uuid/i)).toBeNull();
   });
 
-  it("uses positive intro copy without score or ranking language", () => {
+  it("uses concise heading and count copy without score or ranking language", () => {
     render(
       <CandidateMatchesPage
         status="success"
@@ -152,10 +157,10 @@ describe("CandidateMatchesPage", () => {
     );
 
     expect(
-      screen.getByText(
-        "These jobs match all of the preferences currently saved in your profile.",
-      ),
+      screen.getByRole("heading", { level: 1, name: "Matches" }),
     ).toBeInTheDocument();
+    expect(screen.getByText("1 current role")).toBeInTheDocument();
+    expect(screen.queryByText(CANDIDATE_MATCHES_LEAD)).toBeNull();
     expect(document.body.textContent ?? "").not.toMatch(
       /\b(score|ranking|ranked|AI)\b/i,
     );
@@ -223,6 +228,7 @@ describe("CandidateMatchesPage", () => {
         name: `View job: ${vacancy.title}`,
       }),
     ).toBeInTheDocument();
+    expect(within(card).getAllByRole("link")[0]).toBe(applicationLink);
     expect(within(card).queryAllByRole("link")).toHaveLength(2);
     expect(within(card).queryByText(applicationId)).toBeNull();
   });

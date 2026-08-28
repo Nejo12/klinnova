@@ -15,18 +15,15 @@ import {
 export const MATCH_CARD_SKELETON_COUNT = 3;
 
 /**
- * Route-loading state for /candidate/matches. Renders the static heading/
- * lead for real (imported straight from the same source
+ * Route-loading state for /candidate/matches. Renders the static heading
+ * cluster for real (imported straight from the same source
  * `CandidateMatchesPage` uses) and skeletons only the genuinely
  * data-driven match-card list.
  *
- * `CandidateMatchesPage` renders its `h1`/lead identically across both the
- * `success` and `failure` branches (the lead's presence is nominally tied
- * to `success`, but the string itself never depends on the vacancies
- * data — see that component), so rendering them here unconditionally
- * means the real h1 never pops in above the match-card list on swap, and
- * this copy can't drift out of sync with the real page since it's the
- * same imported constants — the same fix already applied to
+ * The count is unknown while the route is loading, so this shell shows only
+ * the title and resolved fallback line. They cannot drift out of sync with
+ * the real page since they use the same imported constants — the same fix
+ * already applied to
  * `src/app/jobs/loading.tsx` (Task F re-audit, P3.6).
  *
  * The candidate header is also static enough to render here. Account-space
@@ -39,8 +36,10 @@ export default function Loading() {
   return (
     <main className={styles.page}>
       <CandidateAppHeader current="matches" showEmployerNav={false} />
-      <h1 className={styles.heading}>{CANDIDATE_MATCHES_HEADING}</h1>
-      <p className={styles.lead}>{CANDIDATE_MATCHES_LEAD}</p>
+      <div className={styles.headingCluster}>
+        <h1 className={styles.heading}>{CANDIDATE_MATCHES_HEADING}</h1>
+        <p className={styles.lead}>{CANDIDATE_MATCHES_LEAD}</p>
+      </div>
 
       <DelayedReveal>
         <SkeletonRegion label="Loading matches">

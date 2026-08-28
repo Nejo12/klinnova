@@ -6,9 +6,9 @@ type MatchCountProps = {
 
 export function formatMatchCount(count: number): string {
   if (count === 1) {
-    return "1 matching job";
+    return "1 current role";
   }
-  return `${count} matching jobs`;
+  return `${count} current roles`;
 }
 
 export function MatchCount({ count }: MatchCountProps) {

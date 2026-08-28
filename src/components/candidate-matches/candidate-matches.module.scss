@@ -62,11 +62,17 @@
   color: var(--color-text-primary);
 }
 
+.headingCluster {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
 .lead {
   margin: 0;
   max-width: 36rem;
-  font-size: var(--font-size-lg);
-  line-height: var(--line-height-lg);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
   color: var(--color-text-secondary);
 }
 
@@ -82,10 +88,10 @@
 
 .count {
   margin: 0;
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-md);
-  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-sm);
+  color: var(--color-text-muted);
 }
 
 .groups {
@@ -124,8 +130,8 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-5);
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-4);
   border: var(--border-width-default) solid var(--color-border-default);
   border-radius: var(--radius-md);
   background-color: var(--color-bg-surface);
@@ -163,28 +169,26 @@
 
 .cardHeader {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-3);
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
 .cardTitle {
   margin: 0;
-  flex: 1 1 12rem;
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-tight);
-  line-height: var(--line-height-xl);
+  letter-spacing: var(--letter-spacing-normal);
+  line-height: var(--line-height-2xl);
   color: var(--color-text-primary);
 }
 
 .demoLabel {
   display: inline-flex;
   align-items: center;
-  min-height: var(--space-6);
-  padding: var(--space-1) var(--space-3);
-  border: var(--border-width-default) solid var(--color-border-strong);
+  min-height: 1.75rem;
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width-default) solid var(--color-border-default);
   border-radius: var(--radius-sm);
   background-color: var(--color-bg-subtle);
   color: var(--color-text-secondary);
@@ -203,8 +207,9 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  min-height: var(--space-6);
-  padding: var(--space-1) var(--space-3);
+  min-height: 1.75rem;
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
   border: var(--border-width-default) solid var(--color-border-default);
   border-radius: var(--radius-sm);
   background-color: var(--color-bg-subtle);
@@ -223,14 +228,15 @@
 
 .company {
   margin: 0;
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-md);
-  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-sm);
+  color: var(--color-text-secondary);
 }
 
 .summary {
   margin: 0;
+  max-width: 42rem;
   font-size: var(--type-body-supporting-size);
   line-height: var(--type-body-supporting-line-height);
   color: var(--color-text-secondary);
@@ -240,12 +246,14 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  margin: 0;
+  margin: var(--space-1) 0 0;
+  padding-top: var(--space-4);
+  border-top: var(--border-width-default) solid var(--color-border-default);
 }
 
 .metaRow {
   display: grid;
-  grid-template-columns: minmax(6rem, 8rem) 1fr;
+  grid-template-columns: minmax(5.5rem, 7rem) 1fr;
   gap: var(--space-2) var(--space-3);
   margin: 0;
 }
@@ -358,35 +366,66 @@
 }
 
 .detailLink {
-  align-self: flex-start;
-  margin-top: var(--space-1);
-  color: var(--color-text-link);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-5);
+  border: var(--border-width-default) solid var(--color-action-primary);
+  border-radius: var(--radius-md);
+  background-color: var(--color-action-primary);
+  color: var(--color-action-primary-text);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
+  text-align: center;
+  text-decoration: none;
 }
 
 .detailLink:focus-visible,
-.applicationLink:focus-visible {
+.applicationLink:focus-visible,
+.secondaryLink:focus-visible {
   outline: var(--focus-ring-width) solid var(--color-focus-ring);
   outline-offset: var(--focus-ring-offset);
 }
 
 .cardActions {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: var(--space-3);
-  align-items: center;
-  margin-top: var(--space-1);
+  align-items: stretch;
+  margin-top: var(--space-2);
 }
 
 .applicationLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-5);
+  border: var(--border-width-default) solid var(--color-action-primary);
+  border-radius: var(--radius-md);
+  background-color: var(--color-action-primary);
+  color: var(--color-action-primary-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+  text-decoration: none;
+}
+
+.secondaryLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-5);
+  border: var(--border-width-default) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background-color: transparent;
   color: var(--color-text-link);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
+  text-align: center;
+  text-decoration: none;
 }
 
 .badgeGroup {
@@ -399,10 +438,10 @@
 .appliedLabel {
   display: inline-flex;
   align-items: center;
-  min-height: var(--space-6);
+  min-height: 1.75rem;
   margin: 0;
-  padding: var(--space-1) var(--space-3);
-  border: var(--border-width-default) solid var(--color-border-strong);
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width-default) solid var(--color-support-subtle);
   border-radius: var(--radius-sm);
   background-color: var(--color-support-subtle);
   color: var(--color-support-strong);
@@ -442,6 +481,21 @@
   .heading {
     font-size: var(--font-size-4xl);
     line-height: var(--line-height-4xl);
+  }
+
+  .card {
+    padding: var(--space-6);
+  }
+
+  .cardActions {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .detailLink,
+  .applicationLink,
+  .secondaryLink {
+    min-width: 10rem;
   }
 }
 

@@ -21,7 +21,7 @@ describe("CandidatePulseHandoff", () => {
     render(<CandidatePulseHandoff profileItems={profileItems} />);
 
     expect(screen.getByText("Ready for matching")).toBeInTheDocument();
-    expect(screen.getByText("Matching on your profile")).toBeInTheDocument();
+    expect(screen.getByText("Matching with your profile")).toBeInTheDocument();
     expect(screen.queryByText("Deciding")).not.toBeInTheDocument();
 
     await waitFor(() => {
