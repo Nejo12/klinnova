@@ -1,11 +1,11 @@
 /** Candidate-facing copy for application preview and submission (PR 3.3). */
 
 export const APPLICATION_SUBMIT_DISCLOSURE =
-  "By submitting, the profile information shown here will be stored with your application and made available to a future employer review workflow.";
+  "You are applying with your saved Klinnova profile. The profile information shown here will be stored with your application and made available for employer review.";
 
 export const APPLICATION_SUBMITTED_HEADING = "Application submitted.";
 export const APPLICATION_SUBMITTED_BODY =
-  "Your application was recorded successfully.";
+  "Your application is now with the employer.";
 
 export const APPLICATION_ALREADY_APPLIED_HEADING =
   "Application already submitted.";

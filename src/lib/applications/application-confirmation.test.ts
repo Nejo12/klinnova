@@ -62,7 +62,7 @@ describe("buildApplicationConfirmation", () => {
     expect(confirmation?.candidateDisplayName).toBe("Ada Candidate");
     expect(confirmation?.candidateWorkAuthorisationLabel).toBe("Yes");
     expect(confirmation?.vacancyAvailableFromLabel).toBe("Flexible start");
-    expect(APPLICATION_CONFIRMATION_HEADING).toBe("Application submitted");
+    expect(APPLICATION_CONFIRMATION_HEADING).toBe("You're one step closer.");
 
     const serialized = JSON.stringify({
       ...confirmation,

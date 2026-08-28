@@ -3,6 +3,7 @@ import Link from "next/link";
 import {
   APPLICATION_CONFIRMATION_BODY,
   APPLICATION_CONFIRMATION_HEADING,
+  APPLICATION_CONFIRMATION_MARKER,
   type ApplicationConfirmation,
 } from "@/lib/applications/application-confirmation";
 import type { CandidateApplicationHistoryEntry } from "@/lib/applications/load-candidate-application-history";
@@ -63,28 +64,43 @@ export function ApplicationConfirmationPage(
         showEmployerNav={props.showEmployerNav}
       />
 
-      <div className={styles.titleRow}>
-        <h1 className={styles.heading}>{APPLICATION_CONFIRMATION_HEADING}</h1>
-        {confirmation.demoLabel !== null ? (
-          <p className={styles.demoLabel}>{confirmation.demoLabel}</p>
-        ) : null}
-      </div>
-      <p className={styles.lead}>{APPLICATION_CONFIRMATION_BODY}</p>
+      <section className={styles.hero} aria-labelledby="confirmation-heading">
+        <p className={styles.eyebrow}>{APPLICATION_CONFIRMATION_MARKER}</p>
+        <div className={styles.titleRow}>
+          <h1 className={styles.heading} id="confirmation-heading">
+            {APPLICATION_CONFIRMATION_HEADING}
+          </h1>
+          {confirmation.demoLabel !== null ? (
+            <p className={styles.demoLabel}>{confirmation.demoLabel}</p>
+          ) : null}
+        </div>
+        <p className={styles.lead}>
+          Your application for {confirmation.vacancyTitle} is now with{" "}
+          {confirmation.employerDisplayName}.
+        </p>
+      </section>
 
-      <dl className={styles.meta}>
-        <div className={styles.metaRow}>
-          <dt className={styles.metaLabel}>Status</dt>
-          <dd className={styles.metaValue}>{confirmation.statusLabel}</dd>
-        </div>
-        <div className={styles.metaRow}>
-          <dt className={styles.metaLabel}>Submitted</dt>
-          <dd className={styles.metaValue}>
-            <time dateTime={confirmation.submittedAtIso}>
-              {confirmation.submittedAtLabel}
-            </time>
-          </dd>
-        </div>
-      </dl>
+      <section className={styles.statusPanel} aria-labelledby="status-heading">
+        <h2 className={styles.statusHeading} id="status-heading">
+          Current status
+        </h2>
+        <p className={styles.statusValue}>{confirmation.statusLabel}</p>
+        <p className={styles.support}>{APPLICATION_CONFIRMATION_BODY}</p>
+        <dl className={styles.meta}>
+          <div className={styles.metaRow}>
+            <dt className={styles.metaLabel}>Status</dt>
+            <dd className={styles.metaValue}>{confirmation.statusLabel}</dd>
+          </div>
+          <div className={styles.metaRow}>
+            <dt className={styles.metaLabel}>Submitted</dt>
+            <dd className={styles.metaValue}>
+              <time dateTime={confirmation.submittedAtIso}>
+                {confirmation.submittedAtLabel}
+              </time>
+            </dd>
+          </div>
+        </dl>
+      </section>
 
       {confirmation.status === "accepted" ? (
         <section
@@ -272,9 +288,10 @@ export function ApplicationConfirmationPage(
       <nav className={styles.nav} aria-label="Application next steps">
         <Link
           className={styles.cta}
-          href={`/candidate/jobs/${confirmation.vacancyId}`}
+          href="#confirmation-vacancy-heading"
+          aria-current="page"
         >
-          View job
+          View application
         </Link>
         <Link className={styles.secondaryLink} href="/candidate/matches">
           Back to matches

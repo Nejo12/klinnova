@@ -50,7 +50,7 @@ describe("ApplicationSubmitForm", () => {
     expect(form?.querySelectorAll("input")).toHaveLength(1);
 
     expect(
-      screen.getByRole("button", { name: "Submit application" }),
+      screen.getByRole("button", { name: "Apply with profile" }),
     ).toBeEnabled();
   });
 
@@ -66,11 +66,11 @@ describe("ApplicationSubmitForm", () => {
 
     render(<ApplicationSubmitForm vacancyId={VACANCY_ID} />);
     await user.click(
-      screen.getByRole("button", { name: "Submit application" }),
+      screen.getByRole("button", { name: "Apply with profile" }),
     );
 
     const pendingButton = await screen.findByRole("button", {
-      name: "Submitting…",
+      name: "Applying…",
     });
     expect(pendingButton).toBeDisabled();
 
@@ -89,7 +89,7 @@ describe("ApplicationSubmitForm", () => {
 
     render(<ApplicationSubmitForm vacancyId={VACANCY_ID} />);
     await user.click(
-      screen.getByRole("button", { name: "Submit application" }),
+      screen.getByRole("button", { name: "Apply with profile" }),
     );
 
     expect(screen.queryByText("Application submitted.")).toBeNull();
@@ -108,7 +108,7 @@ describe("ApplicationSubmitForm", () => {
 
     render(<ApplicationSubmitForm vacancyId={VACANCY_ID} />);
     await user.click(
-      screen.getByRole("button", { name: "Submit application" }),
+      screen.getByRole("button", { name: "Apply with profile" }),
     );
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
@@ -129,7 +129,7 @@ describe("ApplicationSubmitForm", () => {
 
     render(<ApplicationSubmitForm vacancyId={VACANCY_ID} />);
     await user.click(
-      screen.getByRole("button", { name: "Submit application" }),
+      screen.getByRole("button", { name: "Apply with profile" }),
     );
 
     expect(await screen.findByRole("alert")).toHaveTextContent(

@@ -337,7 +337,7 @@ test.describe("admin moderation: employer suspension journey", () => {
       }),
     ).toBeVisible({ timeout: 15_000 });
     await expect(
-      candidatePage.getByRole("button", { name: "Submit application" }),
+      candidatePage.getByRole("button", { name: "Apply with profile" }),
     ).toHaveCount(0);
 
     // --- Operator: unsuspend ---

@@ -5,6 +5,7 @@ import { ApplicationConfirmationPage } from "@/components/candidate-application-
 import {
   APPLICATION_CONFIRMATION_BODY,
   APPLICATION_CONFIRMATION_HEADING,
+  APPLICATION_CONFIRMATION_MARKER,
   type ApplicationConfirmation,
 } from "@/lib/applications/application-confirmation";
 import { WORK_AUTHORISATION_NOTICE } from "@/components/candidate-matches/work-authorisation-notice";
@@ -63,16 +64,23 @@ describe("ApplicationConfirmationPage", () => {
         name: APPLICATION_CONFIRMATION_HEADING,
       }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(APPLICATION_CONFIRMATION_MARKER),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        `Your application for ${confirmation.vacancyTitle} is now with ${confirmation.employerDisplayName}.`,
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText(APPLICATION_CONFIRMATION_BODY)).toBeInTheDocument();
     expect(screen.getAllByText("Submitted").length).toBeGreaterThan(0);
     expect(screen.getByText("3 August 2026, 14:30 UTC")).toBeInTheDocument();
     expect(screen.getByText("Demo Berlin Work Co")).toBeInTheDocument();
     expect(screen.getByText("Ada Candidate")).toBeInTheDocument();
     expect(screen.getByText(WORK_AUTHORISATION_NOTICE)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "View job" })).toHaveAttribute(
-      "href",
-      `/candidate/jobs/${VACANCY_ID}`,
-    );
+    expect(
+      screen.getByRole("link", { name: "View application" }),
+    ).toHaveAttribute("href", "#confirmation-vacancy-heading");
     expect(
       screen.getByRole("link", { name: "Back to matches" }),
     ).toHaveAttribute("href", "/candidate/matches");
@@ -80,6 +88,7 @@ describe("ApplicationConfirmationPage", () => {
     expect(
       screen.queryByRole("button", { name: /withdraw|submit again|edit/i }),
     ).toBeNull();
+    expect(screen.queryByRole("link", { name: "View job" })).toBeNull();
     expect(screen.queryByText(/employer will|response time/i)).toBeNull();
   });
 

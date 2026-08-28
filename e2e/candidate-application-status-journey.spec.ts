@@ -53,7 +53,7 @@ test.describe("candidate application status journey", () => {
     // demo_label: null in the stored snapshot) — before the demo_label fix
     // this page rendered "Application not available".
     await expect(
-      page.getByRole("heading", { level: 1, name: "Application submitted" }),
+      page.getByRole("heading", { level: 1, name: "You're one step closer." }),
     ).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Application not available" }),
@@ -70,7 +70,9 @@ test.describe("candidate application status journey", () => {
         name: `Morning host role ${stamp}`,
       }),
     ).toBeVisible();
-    await expect(page.getByText(vacancy.employerDisplayName)).toBeVisible();
+    await expect(
+      page.getByText(vacancy.employerDisplayName, { exact: true }),
+    ).toBeVisible();
     await expect(page.getByText("Berlin")).toBeVisible();
     await expect(
       page.getByRole("definition").filter({ hasText: "Submitted" }),
@@ -250,10 +252,14 @@ test.describe("candidate application status journey", () => {
 
     await page.goto(applicationUrl);
     await expect(
-      page.getByRole("heading", { level: 1, name: "Application submitted" }),
+      page.getByRole("heading", { level: 1, name: "You're one step closer." }),
     ).toBeVisible();
-    await expect(page.getByText(`Morning host role ${stamp}`)).toBeVisible();
-    await expect(page.getByText(vacancy.employerDisplayName)).toBeVisible();
+    await expect(
+      page.getByText(`Morning host role ${stamp}`, { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(vacancy.employerDisplayName, { exact: true }),
+    ).toBeVisible();
 
     await page.goto("/candidate/applications");
     await expect(

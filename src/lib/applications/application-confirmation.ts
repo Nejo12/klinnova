@@ -17,9 +17,10 @@ import {
   shiftLabel,
 } from "@/lib/matching/labels";
 
-export const APPLICATION_CONFIRMATION_HEADING = "Application submitted";
+export const APPLICATION_CONFIRMATION_MARKER = "APPLICATION SUBMITTED";
+export const APPLICATION_CONFIRMATION_HEADING = "You're one step closer.";
 export const APPLICATION_CONFIRMATION_BODY =
-  "Your application was recorded successfully.";
+  "Your application is now with the employer.";
 export const APPLICATION_STATUS_SUBMITTED_LABEL = "Submitted";
 export const APPLIED_STATUS_LABEL = "Applied";
 

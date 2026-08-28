@@ -54,11 +54,13 @@ describe("CandidateJobDetailPage", () => {
         name: "Demo vacancy — Morning kitchen support",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Demo Berlin Work Co")).toBeInTheDocument();
+    expect(
+      screen.getByText("Demo Berlin Work Co · Mitte, Berlin"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Demo vacancy")).toBeInTheDocument();
     expect(screen.queryByText("Verified employer")).toBeNull();
     expect(screen.getByText(WORK_AUTHORISATION_NOTICE)).toBeInTheDocument();
-    expect(screen.getByText("Mitte, Berlin")).toBeInTheDocument();
+    expect(screen.getByText(/Mitte, Berlin/)).toBeInTheDocument();
     expect(screen.getByText("Hospitality")).toBeInTheDocument();
     expect(screen.getByText("English — Conversational")).toBeInTheDocument();
     expect(
@@ -73,7 +75,9 @@ describe("CandidateJobDetailPage", () => {
     expect(
       screen.getByRole("link", { name: "Back to matches" }),
     ).toHaveAttribute("href", "/candidate/matches");
-    expect(screen.queryByText(/salary|exact address|cv required/i)).toBeNull();
+    expect(
+      screen.queryByText(/salary|exact address|€15\.50|why it fits/i),
+    ).toBeNull();
   });
 
   it("renders ineligible detail with a labelled missing-requirements list and no submit form", () => {

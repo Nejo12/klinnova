@@ -5,7 +5,6 @@ import { CandidateAppHeader } from "@/components/candidate-nav/candidate-app-hea
 import { JobDetailUnavailable } from "@/components/candidate-job-detail/job-detail-unavailable";
 import { MissingRequirementsList } from "@/components/candidate-job-detail/missing-requirements-list";
 import { WorkAuthorisationNotice } from "@/components/candidate-matches/work-authorisation-notice";
-import { VacancyFactChips } from "@/components/public-jobs/vacancy-fact-chips";
 import {
   APPLIED_STATUS_LABEL,
   formatSubmittedAtUtc,
@@ -20,8 +19,11 @@ import { splitDescriptionParagraphs } from "@/lib/public-jobs/description";
 import { safeExternalHref } from "@/lib/public-jobs/external-link";
 import {
   formatListingDate,
+  jobCategoryLabel,
   languageLabel,
   languageProficiencyLabel,
+  workplaceTypeLabel,
+  workFrequencyLabel,
 } from "@/lib/public-jobs/labels";
 import { DEMO_VACANCY_LABEL } from "@/lib/public-jobs/messages";
 import { onboardingGroupHref } from "@/lib/onboarding/navigation";
@@ -40,6 +42,17 @@ type CandidateJobDetailPageProps =
     }
   | { status: "unavailable"; showEmployerNav?: boolean }
   | { status: "failure"; showEmployerNav?: boolean };
+
+function employerLine(vacancy: PublicVacancy): string {
+  const employerName = vacancy.employerDisplayName ?? "Berlin employer";
+  const locality =
+    vacancy.publicLocality === null
+      ? "Berlin"
+      : `${vacancy.publicLocality}, Berlin`;
+  return vacancy.companyName === null
+    ? `${employerName} · ${locality}`
+    : `${employerName} · ${vacancy.companyName} · ${locality}`;
+}
 
 export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
   const showEmployerNav = props.showEmployerNav === true;
@@ -74,25 +87,25 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
         Back to matches
       </Link>
 
-      <div className={styles.titleRow}>
-        <h1 className={styles.heading}>{vacancy.title}</h1>
-        <div className={styles.badgeGroup}>
-          {vacancy.source === "seed" ? (
-            <p className={styles.demoLabel}>{DEMO_VACANCY_LABEL}</p>
-          ) : null}
-          {vacancy.source === "employer" ? (
-            <p className={styles.verifiedBadge}>Verified employer</p>
-          ) : null}
-          {application !== null ? (
-            <p className={styles.appliedLabel}>{APPLIED_STATUS_LABEL}</p>
-          ) : null}
+      <section className={styles.hero} aria-labelledby="job-detail-heading">
+        <div className={styles.titleRow}>
+          <h1 className={styles.heading} id="job-detail-heading">
+            {vacancy.title}
+          </h1>
+          <div className={styles.badgeGroup}>
+            {vacancy.source === "seed" ? (
+              <p className={styles.demoLabel}>{DEMO_VACANCY_LABEL}</p>
+            ) : null}
+            {vacancy.source === "employer" ? (
+              <p className={styles.verifiedBadge}>Verified employer</p>
+            ) : null}
+            {application !== null ? (
+              <p className={styles.appliedLabel}>{APPLIED_STATUS_LABEL}</p>
+            ) : null}
+          </div>
         </div>
-      </div>
-
-      <p className={styles.company}>
-        {vacancy.employerDisplayName ?? "Berlin employer"}
-        {vacancy.companyName !== null ? ` · ${vacancy.companyName}` : ""}
-      </p>
+        <p className={styles.company}>{employerLine(vacancy)}</p>
+      </section>
 
       <WorkAuthorisationNotice />
 
@@ -100,8 +113,29 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
         <h2 className={styles.sectionHeading} id="job-details-heading">
           Job details
         </h2>
-        <VacancyFactChips vacancy={vacancy} />
         <dl className={styles.meta}>
+          <div className={styles.metaRow}>
+            <dt className={styles.metaLabel}>Category</dt>
+            <dd className={styles.metaValue}>
+              {jobCategoryLabel(vacancy.jobCategory)}
+            </dd>
+          </div>
+          {vacancy.workplaceType !== null ? (
+            <div className={styles.metaRow}>
+              <dt className={styles.metaLabel}>Workplace</dt>
+              <dd className={styles.metaValue}>
+                {workplaceTypeLabel(vacancy.workplaceType)}
+              </dd>
+            </div>
+          ) : null}
+          {vacancy.workFrequency !== null ? (
+            <div className={styles.metaRow}>
+              <dt className={styles.metaLabel}>Frequency</dt>
+              <dd className={styles.metaValue}>
+                {workFrequencyLabel(vacancy.workFrequency)}
+              </dd>
+            </div>
+          ) : null}
           {vacancy.cvRequired !== null ? (
             <div className={styles.metaRow}>
               <dt className={styles.metaLabel}>CV</dt>
