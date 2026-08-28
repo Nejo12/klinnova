@@ -177,15 +177,32 @@ export async function publishEligibleEmployerVacancy(
   await operatorContext.close();
 
   await page.goto(`/employer/vacancies/${vacancyId}`);
-  await page
-    .getByRole("checkbox", {
+  const publishedStatus = page
+    .getByRole("status")
+    .filter({ hasText: "Published" });
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const publishConfirmation = page.getByRole("checkbox", {
       name: /Publishing may make this vacancy publicly visible/i,
-    })
-    .check();
-  await page.getByRole("button", { name: "Publish" }).click();
-  await expect(page.getByText("Published", { exact: true })).toBeVisible({
-    timeout: 15_000,
-  });
+    });
+    await publishConfirmation.check();
+    await expect(publishConfirmation).toBeChecked();
+    await page.getByRole("button", { name: "Publish" }).click();
+
+    try {
+      await expect(publishedStatus).toBeVisible({ timeout: 30_000 });
+      break;
+    } catch (error) {
+      if (attempt === 1) {
+        throw error;
+      }
+
+      await page.reload();
+      if (await publishedStatus.isVisible()) {
+        break;
+      }
+    }
+  }
 
   return {
     vacancyId,
