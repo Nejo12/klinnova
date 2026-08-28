@@ -50,7 +50,9 @@ describe("candidate applications Loading", () => {
   it("renders two metadata skeleton rows per card for Location and Submitted only", () => {
     const { container } = render(<Loading />);
 
-    const items = Array.from(container.querySelectorAll(`.${styles.list} > li`));
+    const items = Array.from(
+      container.querySelectorAll(`.${styles.list} > li`),
+    );
     for (const item of items) {
       expect(
         item.querySelectorAll('[data-testid="application-loading-meta-row"]'),
