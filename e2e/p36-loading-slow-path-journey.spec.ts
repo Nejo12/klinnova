@@ -580,7 +580,7 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
 
     // (b) fast
     await page.goto("/employer");
-    const vacanciesLink = page.getByRole("link", { name: "View vacancies" });
+    const vacanciesLink = page.getByRole("link", { name: "All vacancies" });
     await expect(vacanciesLink).toBeVisible();
     await installSkeletonWatcher(page);
     await vacanciesLink.click();
@@ -599,7 +599,7 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
       vacanciesUrlGlob,
       SLOW_DELAY_MS,
     );
-    await page.getByRole("link", { name: "View vacancies" }).click();
+    await page.getByRole("link", { name: "All vacancies" }).click();
     await waitForSkeletonIfObservable(page, "employer home -> vacancies");
     await expect(
       page.getByRole("heading", { level: 1, name: "Vacancies" }),
@@ -610,7 +610,7 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
     // (d) mocked error, must not get stuck
     await page.goto("/employer");
     const unfailVacancies = await failRoute(page, vacanciesUrlGlob);
-    await page.getByRole("link", { name: "View vacancies" }).click();
+    await page.getByRole("link", { name: "All vacancies" }).click();
     await page.waitForTimeout(3_000);
     await expect(page.locator(SKELETON_SELECTOR)).toHaveCount(0);
     await unfailVacancies();

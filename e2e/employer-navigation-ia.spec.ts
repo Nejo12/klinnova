@@ -78,7 +78,16 @@ test.describe("employer navigation IA (Unit I / I2)", () => {
       expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
       const stamp = Date.now() + width;
       await page.setViewportSize({ width, height: 800 });
-      await registerAndCompleteEmployerOnboarding(page, stamp);
+      const { displayName } = await registerAndCompleteEmployerOnboarding(
+        page,
+        stamp,
+      );
+      await expect(
+        page.getByRole("heading", {
+          level: 1,
+          name: `Welcome, ${displayName}`,
+        }),
+      ).toBeVisible();
 
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth > window.innerWidth,
@@ -91,6 +100,7 @@ test.describe("employer navigation IA (Unit I / I2)", () => {
       const applicationsLink = nav.getByRole("link", { name: "Applications" });
       const verificationLink = nav.getByRole("link", { name: "Verification" });
 
+      await homeLink.scrollIntoViewIfNeeded();
       await expect(homeLink).toBeVisible();
       await expect(vacanciesLink).toBeVisible();
       await expect(applicationsLink).toBeVisible();
@@ -123,7 +133,14 @@ test.describe("employer navigation IA (Unit I / I2)", () => {
     expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
     const stamp = Date.now() + 1000;
     await page.setViewportSize({ width: 1280, height: 900 });
-    await registerAndCompleteEmployerOnboarding(page, stamp);
+    const { displayName } = await registerAndCompleteEmployerOnboarding(
+      page,
+      stamp,
+    );
+    await expect(
+      page.getByRole("heading", { level: 1, name: `Welcome, ${displayName}` }),
+    ).toBeVisible();
+    await page.evaluate(() => window.scrollTo(0, 0));
 
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth > window.innerWidth,
@@ -131,13 +148,19 @@ test.describe("employer navigation IA (Unit I / I2)", () => {
     expect(overflow).toBe(false);
   });
 
-  test("dashboard has exactly one nav-scoped 'Vacancies' link and a distinctly-named quick action, both reaching /employer/vacancies (I-03)", async ({
+  test("employer home keeps nav Vacancies distinct from home vacancy actions (I-03)", async ({
     page,
   }) => {
     test.setTimeout(90_000);
     expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
     const stamp = Date.now() + 2000;
-    await registerAndCompleteEmployerOnboarding(page, stamp);
+    const { displayName } = await registerAndCompleteEmployerOnboarding(
+      page,
+      stamp,
+    );
+    await expect(
+      page.getByRole("heading", { level: 1, name: `Welcome, ${displayName}` }),
+    ).toBeVisible();
 
     // Exactly one "Vacancies" accessible name inside the primary nav.
     const navVacancies = page
@@ -146,17 +169,14 @@ test.describe("employer navigation IA (Unit I / I2)", () => {
     await expect(navVacancies).toHaveCount(1);
     await expect(navVacancies).toHaveAttribute("href", "/employer/vacancies");
 
-    // The dashboard quick-action keeps its visible text "Vacancies" but
-    // exposes a distinct accessible name, so it no longer collides with the
-    // nav link under a page-wide role query.
-    const quickAction = page.getByRole("link", { name: "View vacancies" });
-    await expect(quickAction).toHaveCount(1);
-    await expect(quickAction).toHaveText("Vacancies");
-    await expect(quickAction).toHaveAttribute("href", "/employer/vacancies");
-
-    // A page-wide query for the exact text "Vacancies" still finds both
-    // elements (visible text intentionally unchanged) — only the
-    // accessible-name query is disambiguated.
-    await expect(page.getByText("Vacancies", { exact: true })).toHaveCount(2);
+    await expect(
+      page.getByRole("link", { name: "Create draft" }),
+    ).toHaveAttribute("href", "/employer/vacancies/new");
+    await expect(
+      page.getByRole("link", { name: "All vacancies" }),
+    ).toHaveAttribute("href", "/employer/vacancies");
+    await expect(
+      page.getByRole("link", { name: "View vacancies" }),
+    ).toHaveCount(0);
   });
 });

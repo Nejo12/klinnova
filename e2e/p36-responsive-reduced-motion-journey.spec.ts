@@ -408,12 +408,12 @@ test.describe("responsive verification across 360/390/430/768/1280/1440 (Task G 
       // Full-matrix skeleton-geometry for the two named-flow destinations.
       await page.goto("/employer");
       await expect(
-        page.getByRole("link", { name: "View vacancies" }),
+        page.getByRole("link", { name: "All vacancies" }),
       ).toBeVisible();
       await forceSkeletonAndCheckGeometry(page, {
         urlGlob: "**/employer/vacancies**",
         clickLink: () =>
-          page.getByRole("link", { name: "View vacancies" }).click(),
+          page.getByRole("link", { name: "All vacancies" }).click(),
         label: `employer home -> vacancies @ ${width}`,
       });
 
