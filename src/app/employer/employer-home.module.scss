@@ -1,0 +1,271 @@
+@use "../../styles/breakpoints" as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 76rem;
+  min-height: 70vh;
+  margin: 0 auto;
+  padding: var(--space-5) var(--layout-gutter-mobile) var(--space-10);
+}
+
+.hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-top: var(--space-3);
+}
+
+.heroCopy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.heading {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--type-heading-size);
+  font-weight: var(--type-heading-weight);
+  line-height: var(--type-heading-line-height);
+  letter-spacing: var(--type-heading-tracking);
+}
+
+.lead,
+.cardCopy,
+.note,
+.emptyState,
+.vacancyMeta,
+.vacancyConsequence,
+.expiry {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-line-height);
+}
+
+.verifiedBadge,
+.lifecycleBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.75rem;
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.verifiedBadge,
+.lifecycleBadge[data-state="published"] {
+  background-color: var(--color-status-success-bg);
+  color: var(--color-status-success);
+}
+
+.lifecycleBadge[data-state="draft"] {
+  background-color: var(--color-status-warning-bg);
+  color: var(--color-status-warning);
+}
+
+.lifecycleBadge[data-state="paused"],
+.lifecycleBadge[data-state="expired"],
+.lifecycleBadge[data-state="filled"],
+.lifecycleBadge[data-state="withdrawn"] {
+  background-color: var(--color-action-subtle);
+  color: var(--color-text-primary);
+}
+
+.attentionCard,
+.vacancyRow {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: space-between;
+  padding: var(--space-5);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
+}
+
+.attentionCard {
+  align-items: center;
+}
+
+.cardHeading,
+.sectionHeading,
+.vacancyTitle {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--type-heading-line-height);
+  letter-spacing: var(--type-heading-tracking);
+}
+
+.cardHeading {
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-lg);
+}
+
+.sectionHeading {
+  font-size: var(--font-size-xl);
+}
+
+.section,
+.list,
+.vacancyList,
+.vacancySummary,
+.vacancyState {
+  display: flex;
+  flex-direction: column;
+}
+
+.section {
+  gap: var(--space-4);
+}
+
+.sectionHeader,
+.accountSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.sectionActions,
+.inlineActions,
+.accountActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.list,
+.vacancyList {
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.listItem {
+  padding: var(--space-4) 0;
+  border-top: var(--border-width-default) solid var(--color-border-default);
+}
+
+.note {
+  color: var(--color-text-muted);
+}
+
+.vacancyRow {
+  align-items: flex-start;
+}
+
+.vacancySummary {
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.vacancyTitle {
+  font-size: var(--font-size-lg);
+}
+
+.vacancyConsequence {
+  color: var(--color-text-primary);
+}
+
+.vacancyState {
+  align-items: flex-end;
+  gap: var(--space-3);
+  min-width: 11rem;
+}
+
+.emptyState {
+  padding: var(--space-5);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
+}
+
+.primaryButton,
+.secondaryButton,
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-target-min);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.primaryButton {
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  background-color: var(--color-action-primary);
+  color: var(--color-action-primary-text);
+}
+
+.secondaryButton {
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-link);
+}
+
+.textLink {
+  color: var(--color-text-link);
+}
+
+.primaryButton:focus-visible,
+.secondaryButton:focus-visible,
+.textLink:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.accountSection {
+  padding-top: var(--space-4);
+}
+
+@media (min-width: $breakpoint-sm) {
+  .page {
+    padding-right: var(--layout-gutter-desktop);
+    padding-left: var(--layout-gutter-desktop);
+  }
+}
+
+@media (max-width: ($breakpoint-sm - 0.001rem)) {
+  .hero,
+  .attentionCard,
+  .sectionHeader,
+  .accountSection,
+  .vacancyRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .verifiedBadge,
+  .lifecycleBadge,
+  .primaryButton,
+  .secondaryButton {
+    align-self: flex-start;
+  }
+
+  .sectionActions,
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+  }
+
+  .vacancyState {
+    align-items: stretch;
+    min-width: 0;
+  }
+}

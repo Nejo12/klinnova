@@ -53,8 +53,13 @@ test.describe("employer onboarding journeys", () => {
       .check();
     await page.getByRole("button", { name: "Complete onboarding" }).click();
     await expect(page).toHaveURL(/\/employer$/, { timeout: 15_000 });
-    await expect(page.getByText(/Onboarding: complete/i)).toBeVisible();
-    await expect(page.getByText(/Verification: unverified/i)).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        level: 1,
+        name: `Welcome, Private Emp ${stamp}`,
+      }),
+    ).toBeVisible();
+    await expect(page.getByText(/Verification is required/i)).toBeVisible();
     await expect(page.getByText(/Organisation company/i)).toHaveCount(0);
     await expect(
       page.getByLabel("Employer").getByRole("link", { name: "Vacancies" }),
@@ -107,8 +112,12 @@ test.describe("employer onboarding journeys", () => {
     await page.getByRole("button", { name: "Complete onboarding" }).click();
     await expect(page).toHaveURL(/\/employer$/, { timeout: 15_000 });
     await expect(
-      page.getByText(new RegExp(`Organisation company: Org Care ${stamp}`)),
+      page.getByRole("heading", {
+        level: 1,
+        name: `Welcome, Org Emp ${stamp}`,
+      }),
     ).toBeVisible();
+    await expect(page.getByText(/Verification is required/i)).toBeVisible();
     await expect(
       page.getByLabel("Employer").getByRole("link", { name: "Vacancies" }),
     ).toBeVisible();

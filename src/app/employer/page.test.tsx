@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { EmployerDraftListItem } from "@/lib/employer/vacancies/load-employer-drafts";
@@ -103,6 +103,20 @@ describe("EmployerHomePage account-data export link", () => {
     expect(downloadLink.getAttribute("href")).not.toMatch(/\?/);
   });
 
+  it("keeps employer account deletion explicit", async () => {
+    loadEmployerProfile.mockResolvedValue({
+      ok: true,
+      data: completedProfile,
+      userId: "emp-1",
+    });
+
+    render(await EmployerHomePage());
+
+    expect(
+      screen.getByRole("link", { name: "Delete my Klinnova account" }),
+    ).toHaveAttribute("href", "/employer/account/delete");
+  });
+
   it("never claims GDPR compliance or legal completeness", async () => {
     loadEmployerProfile.mockResolvedValue({
       ok: true,
@@ -143,9 +157,10 @@ describe("EmployerHomePage attention slot", () => {
     render(await EmployerHomePage());
 
     expect(
-      screen.getByRole("link", {
-        name: "3 applications you have not opened",
-      }),
+      screen.getByText("3 new applications are waiting to be opened."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Review applications" }),
     ).toHaveAttribute("href", "/employer/applications");
     expect(document.body.textContent ?? "").not.toMatch(
       /Verification is required before a vacancy can be published/,
@@ -184,6 +199,9 @@ describe("EmployerHomePage attention slot", () => {
 
     expect(
       screen.queryByText(/applications you have not opened/),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/new applications? (is|are) waiting/),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByText(/Verification is required/),
@@ -309,9 +327,13 @@ describe("EmployerHomePage needs-your-action side card and vacancy mini-list", (
 
     expect(screen.getByText("Your vacancies")).toBeInTheDocument();
     expect(screen.getByText("Glasreiniger")).toBeInTheDocument();
-    expect(screen.getByText(/Locality: Mitte/)).toBeInTheDocument();
-    expect(screen.getByText(/Status: Published/)).toBeInTheDocument();
+    expect(screen.getByText(/Mitte\s+·\s+Cleaning/)).toBeInTheDocument();
+    expect(screen.getByText("Published")).toBeInTheDocument();
     expect(document.body.textContent ?? "").not.toMatch(/\d+\s+applications?/);
+    expect(screen.getByRole("link", { name: "Manage" })).toHaveAttribute(
+      "href",
+      "/employer/vacancies/draft-1",
+    );
     expect(screen.getByRole("link", { name: "All vacancies" })).toHaveAttribute(
       "href",
       "/employer/vacancies",
@@ -324,5 +346,143 @@ describe("EmployerHomePage needs-your-action side card and vacancy mini-list", (
     render(await EmployerHomePage());
 
     expect(screen.getByText(/You have no vacancies yet/)).toBeInTheDocument();
+  });
+
+  it("uses the draft edit route and real readiness consequence for draft rows", async () => {
+    loadEmployerDrafts.mockResolvedValue({
+      ok: true,
+      drafts: [
+        draft({
+          id: "draft-1",
+          title: "Warehouse Helper",
+          jobCategory: "logistics",
+          publicLocality: "Neukölln",
+          publicationState: "draft",
+          ready: false,
+          checklist: [
+            { id: "salary", label: "Salary (EUR gross)", complete: false },
+            { id: "title", label: "Title", complete: true },
+          ],
+        }),
+      ],
+    });
+
+    render(await EmployerHomePage());
+
+    const vacancies = screen.getByRole("region", { name: "Your vacancies" });
+    expect(within(vacancies).getByText("Warehouse Helper")).toBeInTheDocument();
+    expect(
+      within(vacancies).getByText(/Neukölln\s+·\s+Logistics/),
+    ).toBeInTheDocument();
+    expect(within(vacancies).getByText("Private draft")).toBeInTheDocument();
+    expect(
+      within(vacancies).getByText(
+        "Salary (EUR gross) still needed before publishing.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(vacancies).getByRole("link", { name: "Continue draft" }),
+    ).toHaveAttribute("href", "/employer/vacancies/draft-1/edit");
+  });
+
+  it.each([
+    ["paused", "Paused"],
+    ["filled", "Filled"],
+    ["expired", "Expired"],
+    ["withdrawn", "Withdrawn"],
+  ] as const)(
+    "represents %s lifecycle rows truthfully",
+    async (state, label) => {
+      loadEmployerDrafts.mockResolvedValue({
+        ok: true,
+        drafts: [
+          draft({
+            id: `${state}-1`,
+            title: `${label} role`,
+            publicationState: state,
+            ready: null,
+          }),
+        ],
+      });
+
+      render(await EmployerHomePage());
+
+      expect(screen.getByText(`${label} role`)).toBeInTheDocument();
+      expect(screen.getByText(label)).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Manage" })).toHaveAttribute(
+        "href",
+        `/employer/vacancies/${state}-1`,
+      );
+    },
+  );
+});
+
+describe("EmployerHomePage navigation and hero", () => {
+  beforeEach(() => {
+    loadEmployerProfile.mockReset();
+    loadEmployerProfile.mockResolvedValue({
+      ok: true,
+      data: completedProfile,
+      userId: "emp-1",
+    });
+    loadAccountCapabilities.mockReset();
+    loadAccountCapabilities.mockResolvedValue({
+      hasCandidateProfile: true,
+      hasEmployerProfile: true,
+    });
+    loadUnseenApplicationsCount.mockReset();
+    loadUnseenApplicationsCount.mockResolvedValue(4);
+    loadEmployerDrafts.mockReset();
+    loadEmployerDrafts.mockResolvedValue({ ok: true, drafts: [] });
+  });
+
+  it("renders one H1 with the real display name and the approved operational lead", async () => {
+    render(await EmployerHomePage());
+
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Welcome, Ada Employer" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Your hiring workspace: new applications first, vacancy readiness second.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps all employer destinations, aria-current, unseen badge, capability switcher, and logout", async () => {
+    render(await EmployerHomePage());
+
+    const nav = screen.getByRole("navigation", { name: "Employer" });
+    expect(
+      screen.getByRole("navigation", { name: "Account spaces" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Log out" })).toBeInTheDocument();
+    expect(
+      within(nav).getByRole("link", { name: "Employer home" }),
+    ).toHaveAttribute("aria-current", "page");
+    expect(
+      within(nav).getByRole("link", { name: "Vacancies" }),
+    ).toHaveAttribute("href", "/employer/vacancies");
+    expect(
+      within(nav).getByRole("link", { name: /^Applications\s*4\s*new$/ }),
+    ).toHaveAttribute("href", "/employer/applications");
+    expect(
+      within(nav).getByRole("link", { name: "Verification" }),
+    ).toHaveAttribute("href", "/employer/verification");
+  });
+
+  it("shows Verified only when the authoritative verification state is verified", async () => {
+    render(await EmployerHomePage());
+    expect(screen.getByText("Verified")).toBeInTheDocument();
+
+    loadEmployerProfile.mockResolvedValue({
+      ok: true,
+      data: unverifiedProfile,
+      userId: "emp-1",
+    });
+
+    render(await EmployerHomePage());
+    expect(screen.getAllByText("Verified")).toHaveLength(1);
   });
 });

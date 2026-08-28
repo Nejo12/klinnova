@@ -20,7 +20,7 @@ export const EMPLOYER_VERIFICATION_NOTICE =
   "Your employer profile is complete. Verification is required before a vacancy can be published.";
 
 export const EMPLOYER_HOME_LEAD =
-  "Your employer profile is ready. Create private vacancy drafts, then publish once verified.";
+  "Your hiring workspace: new applications first, vacancy readiness second.";
 
 export const EMPLOYER_RESTRICTED_NOTICE =
   "Your employer account is temporarily restricted. Some employer actions are unavailable while the restriction is active.";
@@ -45,7 +45,8 @@ export const EMPLOYER_VACANCY_HIDDEN_WHILE_RESTRICTED =
  * unseen applications beat the readiness/verification card (Task F). */
 export function unseenApplicationsHeading(count: number): string {
   const noun = count === 1 ? "application" : "applications";
-  return `${count} ${noun} you have not opened`;
+  const verb = count === 1 ? "is" : "are";
+  return `${count} new ${noun} ${verb} waiting to be opened.`;
 }
 
 export const EMPLOYER_ATTENTION_VACANCIES_HEADING = "Needs your action";
