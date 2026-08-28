@@ -114,7 +114,7 @@ test.describe("Slice 2 candidate matches journey", () => {
     await expect(
       page.getByRole("heading", {
         level: 1,
-        name: "Jobs that match your preferences",
+        name: "Matches",
       }),
     ).toBeVisible();
     await expect(page.getByText(/Demo vacancy/i).first()).toBeVisible();
@@ -136,7 +136,7 @@ test.describe("Slice 2 candidate matches journey", () => {
     await expect(
       page.getByRole("heading", {
         level: 1,
-        name: "Jobs that match your preferences",
+        name: "Matches",
       }),
     ).toBeVisible();
     await expect(page.getByText(/Demo vacancy/i).first()).toBeVisible();

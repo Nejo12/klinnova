@@ -40,21 +40,21 @@ describe("CandidateMatchesPage", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: "Jobs that match your preferences",
+        name: "Matches",
       }),
     ).toBeInTheDocument();
     expect(screen.getByText(WORK_AUTHORISATION_NOTICE)).toBeInTheDocument();
-    expect(screen.getByText("1 matching job")).toBeInTheDocument();
+    expect(screen.getByText("1 current role")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
         level: 2,
         name: "Demo vacancy — Morning kitchen support",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Demo Berlin Work Co")).toBeInTheDocument();
+    expect(screen.getByText(/Demo Berlin Work Co/)).toBeInTheDocument();
     expect(screen.getByText("Demo vacancy")).toBeInTheDocument();
     expect(screen.queryByText("Verified employer")).toBeNull();
-    expect(screen.getByText("Mitte, Berlin")).toBeInTheDocument();
+    expect(screen.getByText(/Mitte, Berlin/)).toBeInTheDocument();
     expect(
       screen.getByText("Fictional demo hospitality role."),
     ).toBeInTheDocument();
@@ -86,7 +86,7 @@ describe("CandidateMatchesPage", () => {
       />,
     );
 
-    expect(screen.getByText("2 matching jobs")).toBeInTheDocument();
+    expect(screen.getByText("2 current roles")).toBeInTheDocument();
   });
 
   it("renders empty state distinctly from failure", () => {
@@ -142,7 +142,7 @@ describe("CandidateMatchesPage", () => {
     expect(screen.queryByText(/supabase|invariant|sql|uuid/i)).toBeNull();
   });
 
-  it("uses positive intro copy without score or ranking language", () => {
+  it("uses concise heading and count copy without score or ranking language", () => {
     render(
       <CandidateMatchesPage
         status="success"
@@ -152,10 +152,12 @@ describe("CandidateMatchesPage", () => {
     );
 
     expect(
-      screen.getByText(
-        "These jobs match all of the preferences currently saved in your profile.",
-      ),
+      screen.getByRole("heading", { level: 1, name: "Matches" }),
     ).toBeInTheDocument();
+    expect(screen.getByText("1 current role")).toBeInTheDocument();
+    expect(
+      screen.queryByText("Current roles matched from your saved profile."),
+    ).toBeNull();
     expect(document.body.textContent ?? "").not.toMatch(
       /\b(score|ranking|ranked|AI)\b/i,
     );
@@ -223,6 +225,7 @@ describe("CandidateMatchesPage", () => {
         name: `View job: ${vacancy.title}`,
       }),
     ).toBeInTheDocument();
+    expect(within(card).getAllByRole("link")[0]).toBe(applicationLink);
     expect(within(card).queryAllByRole("link")).toHaveLength(2);
     expect(within(card).queryByText(applicationId)).toBeNull();
   });

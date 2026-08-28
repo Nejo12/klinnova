@@ -39,7 +39,9 @@ export function CandidateMatchesPage(props: CandidateMatchesPageProps) {
 
       {props.status === "failure" ? (
         <>
-          <h1 className={styles.heading}>{CANDIDATE_MATCHES_HEADING}</h1>
+          <div className={styles.headingCluster}>
+            <h1 className={styles.heading}>{CANDIDATE_MATCHES_HEADING}</h1>
+          </div>
           <MatchesErrorState />
         </>
       ) : (
@@ -48,20 +50,23 @@ export function CandidateMatchesPage(props: CandidateMatchesPageProps) {
           props.pulseProfileItems !== undefined ? (
             <CandidatePulseHandoff profileItems={props.pulseProfileItems} />
           ) : null}
-          <h1 className={styles.heading}>{CANDIDATE_MATCHES_HEADING}</h1>
-          <p className={styles.lead}>{CANDIDATE_MATCHES_LEAD}</p>
+          <div className={styles.headingCluster}>
+            <h1 className={styles.heading}>{CANDIDATE_MATCHES_HEADING}</h1>
+            {props.vacancies.length > 0 ? (
+              <MatchCount count={props.vacancies.length} />
+            ) : (
+              <p className={styles.lead}>{CANDIDATE_MATCHES_LEAD}</p>
+            )}
+          </div>
           <WorkAuthorisationNotice />
           {props.vacancies.length === 0 ? (
             <MatchesEmptyState />
           ) : (
-            <>
-              <MatchCount count={props.vacancies.length} />
-              <MatchList
-                vacancies={props.vacancies}
-                applicationsByVacancyId={props.applicationsByVacancyId}
-                pulseReveal={props.pulseProfileItems != null}
-              />
-            </>
+            <MatchList
+              vacancies={props.vacancies}
+              applicationsByVacancyId={props.applicationsByVacancyId}
+              pulseReveal={props.pulseProfileItems != null}
+            />
           )}
         </>
       )}

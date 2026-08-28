@@ -87,7 +87,7 @@ async function expectDemoMatchInventory(page: import("@playwright/test").Page) {
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: "Jobs that match your preferences",
+      name: "Matches",
     }),
   ).toBeVisible();
   await expect(page.getByText(/Demo vacancy/i).first()).toBeVisible();
