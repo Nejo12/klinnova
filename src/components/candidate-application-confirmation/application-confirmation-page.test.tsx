@@ -78,9 +78,10 @@ describe("ApplicationConfirmationPage", () => {
     expect(screen.getByText("Demo Berlin Work Co")).toBeInTheDocument();
     expect(screen.getByText("Ada Candidate")).toBeInTheDocument();
     expect(screen.getByText(WORK_AUTHORISATION_NOTICE)).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: "View application" }),
-    ).toHaveAttribute("href", "#confirmation-vacancy-heading");
+    expect(screen.getByRole("link", { name: "View job" })).toHaveAttribute(
+      "href",
+      `/candidate/jobs/${VACANCY_ID}`,
+    );
     expect(
       screen.getByRole("link", { name: "Back to matches" }),
     ).toHaveAttribute("href", "/candidate/matches");
@@ -88,7 +89,7 @@ describe("ApplicationConfirmationPage", () => {
     expect(
       screen.queryByRole("button", { name: /withdraw|submit again|edit/i }),
     ).toBeNull();
-    expect(screen.queryByRole("link", { name: "View job" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "View application" })).toBeNull();
     expect(screen.queryByText(/employer will|response time/i)).toBeNull();
   });
 

@@ -183,9 +183,10 @@ test.describe("Slice 3 critical exit journey", () => {
     await expect(
       page.getByRole("link", { name: "Back to matches" }),
     ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "View application" }),
-    ).toHaveAttribute("href", /#confirmation-vacancy-heading$/);
+    await expect(page.getByRole("link", { name: "View job" })).toHaveAttribute(
+      "href",
+      `/candidate/jobs/${MORNING_KITCHEN_ID}`,
+    );
     await expect(
       page.getByRole("button", { name: /Withdraw|Submit again|Edit/i }),
     ).toHaveCount(0);

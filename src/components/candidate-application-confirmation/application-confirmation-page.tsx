@@ -288,10 +288,9 @@ export function ApplicationConfirmationPage(
       <nav className={styles.nav} aria-label="Application next steps">
         <Link
           className={styles.cta}
-          href="#confirmation-vacancy-heading"
-          aria-current="page"
+          href={`/candidate/jobs/${confirmation.vacancyId}`}
         >
-          View application
+          View job
         </Link>
         <Link className={styles.secondaryLink} href="/candidate/matches">
           Back to matches
