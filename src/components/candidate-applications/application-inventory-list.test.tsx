@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { ApplicationInventoryList } from "@/components/candidate-applications/application-inventory-list";
-import styles from "@/components/candidate-matches/candidate-matches.module.scss";
+import styles from "@/components/candidate-applications/candidate-applications.module.scss";
 import type { ApplicationInventoryRow } from "@/lib/applications/snapshot-schemas";
 import type { ApplicationStatus } from "@/lib/applications/status";
 
@@ -37,7 +37,7 @@ function buildRow(
 const cardReducedEmphasisClass = styles.cardReducedEmphasis;
 if (cardReducedEmphasisClass === undefined) {
   throw new Error(
-    "cardReducedEmphasis class missing from candidate-matches.module.scss",
+    "cardReducedEmphasis class missing from candidate-applications.module.scss",
   );
 }
 
@@ -150,6 +150,9 @@ describe("ApplicationInventoryList", () => {
     render(<ApplicationInventoryList active={[]} closed={[]} />);
 
     expect(screen.queryAllByRole("heading", { level: 2 })).toHaveLength(0);
+    expect(
+      screen.getByRole("link", { name: "Find more matches" }),
+    ).toHaveAttribute("href", "/candidate/matches");
   });
 
   it("de-emphasizes closed cards but not active cards", () => {
@@ -175,5 +178,69 @@ describe("ApplicationInventoryList", () => {
     const [activeCard, closedCard] = screen.getAllByRole("article");
     expect(activeCard).not.toHaveClass(cardReducedEmphasisClass);
     expect(closedCard).toHaveClass(cardReducedEmphasisClass);
+  });
+
+  it("keeps submitted, reviewing, and shortlisted under Active and accepted/rejected under Closed", () => {
+    render(
+      <ApplicationInventoryList
+        active={[
+          buildRow("11111111-1111-4111-8111-111111111111", "Submitted app"),
+          buildRow(
+            "22222222-2222-4222-8222-222222222222",
+            "Reviewing app",
+            "reviewing",
+          ),
+          buildRow(
+            "33333333-3333-4333-8333-333333333333",
+            "Shortlisted app",
+            "shortlisted",
+          ),
+        ]}
+        closed={[
+          buildRow(
+            "44444444-4444-4444-8444-444444444444",
+            "Accepted app",
+            "accepted",
+          ),
+          buildRow(
+            "55555555-5555-4555-8555-555555555555",
+            "Rejected app",
+            "rejected",
+          ),
+        ]}
+      />,
+    );
+
+    const activeSection = screen.getByLabelText("Active applications");
+    expect(activeSection).toHaveTextContent("Submitted app");
+    expect(activeSection).toHaveTextContent("Reviewing app");
+    expect(activeSection).toHaveTextContent("Shortlisted app");
+    expect(activeSection).not.toHaveTextContent("Accepted app");
+    expect(activeSection).not.toHaveTextContent("Rejected app");
+
+    const closedSection = screen.getByLabelText("Closed applications");
+    expect(closedSection).toHaveTextContent("Accepted app");
+    expect(closedSection).toHaveTextContent("Rejected app");
+    expect(closedSection).toHaveTextContent("Accepted");
+    expect(closedSection).toHaveTextContent("Not selected");
+  });
+
+  it("adds the approved non-empty route back to Matches", () => {
+    render(
+      <ApplicationInventoryList
+        active={[
+          buildRow(
+            "11111111-1111-4111-8111-111111111111",
+            "Only active",
+            "submitted",
+          ),
+        ]}
+        closed={[]}
+      />,
+    );
+
+    expect(
+      screen.getByRole("link", { name: "Find more matches" }),
+    ).toHaveAttribute("href", "/candidate/matches");
   });
 });

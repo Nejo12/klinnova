@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { ApplicationInventoryCard } from "@/components/candidate-applications/application-inventory-card";
-import styles from "@/components/candidate-matches/candidate-matches.module.scss";
+import styles from "@/components/candidate-applications/candidate-applications.module.scss";
 import type { ApplicationInventoryRow } from "@/lib/applications/snapshot-schemas";
 
 function buildRow(
@@ -35,7 +35,7 @@ function buildRow(
 const cardReducedEmphasisClass = styles.cardReducedEmphasis;
 if (cardReducedEmphasisClass === undefined) {
   throw new Error(
-    "cardReducedEmphasis class missing from candidate-matches.module.scss",
+    "cardReducedEmphasis class missing from candidate-applications.module.scss",
   );
 }
 
@@ -63,6 +63,15 @@ describe("ApplicationInventoryCard", () => {
     );
   });
 
+  it("uses only frozen snapshot location data and never fabricates locality, salary, match score, or AI copy", () => {
+    render(<ApplicationInventoryCard application={buildRow()} />);
+
+    expect(screen.getByText("Berlin")).toBeInTheDocument();
+    expect(screen.queryByText("Mitte")).toBeNull();
+    expect(screen.queryByText("Kreuzberg")).toBeNull();
+    expect(screen.queryByText(/salary|€|eur|match score/i)).toBeNull();
+  });
+
   it("renders the live status label, not a hardcoded Submitted", () => {
     render(
       <ApplicationInventoryCard
@@ -86,9 +95,24 @@ describe("ApplicationInventoryCard", () => {
     expect(screen.getByTestId("application-status-value")).toHaveTextContent(
       "Not selected",
     );
+    expect(screen.queryByText("This one was not the right fit.")).toBeNull();
     expect(
       screen.queryByTestId("application-status-value"),
     ).not.toHaveTextContent("Rejected");
+  });
+
+  it("keeps accepted distinct from rejected closed copy", () => {
+    render(
+      <ApplicationInventoryCard
+        application={buildRow({ status: "accepted" })}
+        emphasis="reduced"
+      />,
+    );
+    expect(screen.getByTestId("application-status-value")).toHaveTextContent(
+      "Accepted",
+    );
+    expect(screen.queryByText(/Keep moving/i)).toBeNull();
+    expect(screen.queryByText("Not selected")).toBeNull();
   });
 
   it("renders the application status rail", () => {

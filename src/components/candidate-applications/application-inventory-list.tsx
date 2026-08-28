@@ -1,5 +1,7 @@
+import Link from "next/link";
+
 import { ApplicationInventoryCard } from "@/components/candidate-applications/application-inventory-card";
-import styles from "@/components/candidate-matches/candidate-matches.module.scss";
+import styles from "@/components/candidate-applications/candidate-applications.module.scss";
 import type { ApplicationInventoryRow } from "@/lib/applications/snapshot-schemas";
 
 type ApplicationInventoryListProps = {
@@ -52,6 +54,10 @@ export function ApplicationInventoryList({
           </ul>
         </section>
       ) : null}
+
+      <Link className={styles.findMoreLink} href="/candidate/matches">
+        Find more matches
+      </Link>
     </div>
   );
 }

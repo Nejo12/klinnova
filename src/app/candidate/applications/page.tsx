@@ -5,7 +5,7 @@ import { ApplicationInventoryList } from "@/components/candidate-applications/ap
 import { ApplicationsEmptyState } from "@/components/candidate-applications/applications-empty-state";
 import { ApplicationsErrorState } from "@/components/candidate-applications/applications-error-state";
 import { CandidateApplicationsPageHeader } from "@/components/candidate-applications/candidate-applications-page-header";
-import styles from "@/components/candidate-matches/candidate-matches.module.scss";
+import styles from "@/components/candidate-applications/candidate-applications.module.scss";
 import { loadCandidateApplicationInventory } from "@/lib/applications/load-candidate-application-inventory";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -31,7 +31,12 @@ export default async function CandidateApplicationsRoutePage() {
   return (
     <main className={styles.page}>
       <CandidateApplicationsPageHeader showEmployerNav={showEmployerNav} />
-      <h1 className={styles.heading}>Your applications</h1>
+      <div className={styles.headingCluster}>
+        <h1 className={styles.heading}>Applications</h1>
+        <p className={styles.lead}>
+          Your active and closed applications in one place.
+        </p>
+      </div>
       {view.kind === "failure" ? (
         <ApplicationsErrorState />
       ) : view.applications.length === 0 ? (

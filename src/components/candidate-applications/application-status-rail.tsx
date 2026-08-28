@@ -28,12 +28,16 @@ export function ApplicationStatusRail({ status }: ApplicationStatusRailProps) {
           key={index}
           className={styles.node}
           aria-current={index === currentNodeIndex ? "step" : undefined}
+          data-state={
+            index < currentNodeIndex
+              ? "complete"
+              : index === currentNodeIndex
+                ? "current"
+                : "upcoming"
+          }
         >
-          <div
-            className={styles.dot}
-            data-state={index <= currentNodeIndex ? "complete" : "upcoming"}
-          />
           <span className={styles.label}>{label}</span>
+          <span className={styles.marker} aria-hidden="true" />
         </li>
       ))}
     </ol>
