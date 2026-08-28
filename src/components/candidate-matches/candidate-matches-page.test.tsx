@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { CandidateMatchesPage } from "@/components/candidate-matches/candidate-matches-page";
 import { WORK_AUTHORISATION_NOTICE } from "@/components/candidate-matches/work-authorisation-notice";
+import { CANDIDATE_MATCHES_LEAD } from "@/lib/candidate-matches/messages";
 import type { PublicVacancy } from "@/lib/public-jobs/domain";
 
 function buildVacancy(overrides: Partial<PublicVacancy> = {}): PublicVacancy {
@@ -108,6 +109,10 @@ describe("CandidateMatchesPage", () => {
         /No jobs match all of your saved preferences right now/i,
       ),
     ).toBeInTheDocument();
+    expect(screen.getByText(CANDIDATE_MATCHES_LEAD)).toBeInTheDocument();
+    expect(
+      screen.queryByText("Current roles matched from your saved profile."),
+    ).toBeNull();
     expect(
       screen.getByRole("link", { name: /Review your saved preferences/i }),
     ).toHaveAttribute("href", "/candidate/onboarding?group=review");
@@ -155,9 +160,7 @@ describe("CandidateMatchesPage", () => {
       screen.getByRole("heading", { level: 1, name: "Matches" }),
     ).toBeInTheDocument();
     expect(screen.getByText("1 current role")).toBeInTheDocument();
-    expect(
-      screen.queryByText("Current roles matched from your saved profile."),
-    ).toBeNull();
+    expect(screen.queryByText(CANDIDATE_MATCHES_LEAD)).toBeNull();
     expect(document.body.textContent ?? "").not.toMatch(
       /\b(score|ranking|ranked|AI)\b/i,
     );

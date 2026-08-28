@@ -7,5 +7,4 @@
 // `/jobs`.
 export const CANDIDATE_MATCHES_HEADING = "Matches";
 
-export const CANDIDATE_MATCHES_LEAD =
-  "Current roles matched from your saved profile.";
+export const CANDIDATE_MATCHES_LEAD = "Matches use your saved profile.";
