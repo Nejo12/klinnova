@@ -53,6 +53,9 @@ function buildDeletedRow(overrides: Partial<DeletedRow> = {}): DeletedRow {
 describe("ApplicationList", () => {
   it("shows an empty-state message when there are no applications", () => {
     render(<ApplicationList applications={[]} />);
+    expect(
+      screen.getByRole("list", { name: "Application summary" }),
+    ).toHaveTextContent("All vacanciesNeeds review 0Open 0Decided 0");
     expect(screen.getByText(APPLICATION_EMPTY_LIST)).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "View vacancies" }),
@@ -71,6 +74,9 @@ describe("ApplicationList", () => {
         }}
       />,
     );
+    expect(
+      screen.getByRole("list", { name: "Application summary" }),
+    ).toHaveTextContent("Filtered vacancyNeeds review 0Open 0Decided 0");
     expect(
       screen.getByRole("heading", {
         level: 2,
@@ -173,7 +179,7 @@ describe("ApplicationList", () => {
     );
 
     const needsReviewSection = screen
-      .getByRole("heading", { level: 2, name: "Needs review (0)" })
+      .getByRole("heading", { level: 2, name: "Needs review" })
       .closest("section");
     expect(needsReviewSection).not.toBeNull();
     expect(
@@ -233,7 +239,11 @@ describe("ApplicationList", () => {
 
   it("renders a Review link to the detail route", () => {
     render(<ApplicationList applications={[buildRow()]} />);
-    expect(screen.getByRole("link", { name: "Review" })).toHaveAttribute(
+    expect(
+      screen.getAllByRole("link", {
+        name: "Review J. Doe for Morning kitchen support",
+      })[0],
+    ).toHaveAttribute(
       "href",
       "/employer/applications/11111111-1111-4111-8111-111111111111",
     );
@@ -252,9 +262,32 @@ describe("ApplicationList", () => {
     expect(screen.queryByText(/Matched category/i)).toBeNull();
     expect(screen.queryByText(/German comfort/i)).toBeNull();
     expect(screen.queryByText(/Available from/i)).toBeNull();
+    expect(
+      screen.getAllByText("Candidate data has been removed.")[0],
+    ).toBeInTheDocument();
   });
 
-  it("renders the three group headings with their own counts", () => {
+  it("renders real informational summary counts without fake group filter links", () => {
+    render(
+      <ApplicationList
+        applications={[
+          buildRow({
+            application_id: "11111111-1111-4111-8111-111111111111",
+            current_status: "submitted",
+            employer_seen_at: "2026-08-01T00:00:00Z",
+          }),
+        ]}
+      />,
+    );
+
+    const summary = screen.getByRole("list", { name: "Application summary" });
+    expect(summary).toHaveTextContent(
+      "All vacanciesNeeds review 0Open 1Decided 0",
+    );
+    expect(within(summary).queryByRole("link")).toBeNull();
+  });
+
+  it("renders the three group headings with their own real counts", () => {
     render(
       <ApplicationList
         applications={[
@@ -268,14 +301,27 @@ describe("ApplicationList", () => {
     );
 
     expect(
-      screen.getByRole("heading", { level: 2, name: "Needs review (0)" }),
+      screen.getByRole("heading", { level: 2, name: "Needs review" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { level: 2, name: "Open (1)" }),
+      screen.getByRole("heading", { level: 2, name: "Open" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { level: 2, name: "Decided (0)" }),
+      screen.getByRole("heading", { level: 2, name: "Decided" }),
     ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Needs review" })
+        .nextElementSibling,
+    ).toHaveTextContent("0");
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Open" })
+        .nextElementSibling,
+    ).toHaveTextContent("1");
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Decided" })
+        .nextElementSibling,
+    ).toHaveTextContent("0");
   });
 
   it("puts an unseen row's card in both Needs review and its status group", () => {
@@ -288,10 +334,10 @@ describe("ApplicationList", () => {
     render(<ApplicationList applications={[row]} />);
 
     expect(
-      screen.getByRole("heading", { level: 2, name: "Needs review (1)" }),
+      screen.getByRole("heading", { level: 2, name: "Needs review" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { level: 2, name: "Decided (1)" }),
+      screen.getByRole("heading", { level: 2, name: "Decided" }),
     ).toBeInTheDocument();
     // The candidate's own heading renders twice — once inside each group.
     expect(
@@ -308,8 +354,36 @@ describe("ApplicationList", () => {
 
     const decidedHeading = screen.getByRole("heading", {
       level: 2,
-      name: "Decided (0)",
+      name: "Decided",
     });
     expect(decidedHeading.parentElement?.querySelector("ul")).toBeNull();
+  });
+
+  it("renders compact real row facts, stable submitted timestamp, status, and review action", () => {
+    render(<ApplicationList applications={[buildRow()]} />);
+
+    expect(
+      screen.getAllByText("Morning kitchen support")[0],
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByText(
+        "Hospitality · Basic German · Available 1 September 2026",
+      )[0],
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByText(
+        (_content, element) =>
+          element?.textContent?.startsWith("Submitted 1 Aug 2026") === true,
+      )[0],
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("Submitted")[0]).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("link", {
+        name: "Review J. Doe for Morning kitchen support",
+      })[0],
+    ).toHaveAttribute(
+      "href",
+      "/employer/applications/11111111-1111-4111-8111-111111111111",
+    );
   });
 });

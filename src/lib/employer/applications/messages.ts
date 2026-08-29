@@ -29,7 +29,7 @@ export const APPLICATION_DRAFT_VACANCY_VISIBILITY_NOTE =
 export const APPLICATION_DRAFT_VACANCY_ACTION = "Finish this vacancy";
 
 export const APPLICATION_LIST_LEAD =
-  "Review applicants for your vacancies and update their status.";
+  "Review new applicants first, then keep open and decided work visible without mixing priorities.";
 
 export const APPLICATION_REASON_MAX_LENGTH = 1000;
 

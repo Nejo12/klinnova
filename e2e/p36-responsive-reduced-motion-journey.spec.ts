@@ -365,7 +365,10 @@ test.describe("responsive verification across 360/390/430/768/1280/1440 (Task G 
     // page. Grab the employer application detail id once via a real
     // (undelayed) navigation.
     await page.goto("/employer/applications");
-    await page.getByRole("link", { name: "Review" }).first().click();
+    await page
+      .getByRole("link", { name: /^Review\b/ })
+      .first()
+      .click();
     await expect(page).toHaveURL(/\/employer\/applications\/[0-9a-f-]{36}$/, {
       timeout: 15_000,
     });
@@ -419,12 +422,15 @@ test.describe("responsive verification across 360/390/430/768/1280/1440 (Task G 
 
       await page.goto("/employer/applications");
       await expect(
-        page.getByRole("link", { name: "Review" }).first(),
+        page.getByRole("link", { name: /^Review\b/ }).first(),
       ).toBeVisible();
       await forceSkeletonAndCheckGeometry(page, {
         urlGlob: `**/employer/applications/${applicationId}**`,
         clickLink: () =>
-          page.getByRole("link", { name: "Review" }).first().click(),
+          page
+            .getByRole("link", { name: /^Review\b/ })
+            .first()
+            .click(),
         label: `employer applications -> detail @ ${width}`,
       });
 
@@ -523,7 +529,10 @@ test.describe("responsive verification across 360/390/430/768/1280/1440 (Task G 
     await candidateContext.close();
 
     await page.goto("/employer/applications");
-    await page.getByRole("link", { name: "Review" }).first().click();
+    await page
+      .getByRole("link", { name: /^Review\b/ })
+      .first()
+      .click();
     await expect(page).toHaveURL(/\/employer\/applications\/[0-9a-f-]{36}$/, {
       timeout: 15_000,
     });

@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import styles from "@/components/employer-applications/employer-applications.module.scss";
 import type { ApplicationListFilter } from "@/lib/employer/applications/schemas";
 import {
   APPLICATION_STATUS_CODES,
@@ -23,8 +23,8 @@ export function ApplicationListFilters({
   vacancyTitle,
 }: ApplicationListFiltersProps) {
   return (
-    <div>
-      <form className={styles.form} method="get">
+    <div className={styles.filterPanel}>
+      <form className={styles.filterForm} method="get">
         {filter.vacancyId !== null ? (
           <input type="hidden" name="vacancy" value={filter.vacancyId} />
         ) : null}
@@ -46,7 +46,7 @@ export function ApplicationListFilters({
             ))}
           </select>
         </div>
-        <div className={styles.actions}>
+        <div className={styles.filterActions}>
           <button className={styles.buttonSecondary} type="submit">
             Apply filter
           </button>

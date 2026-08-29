@@ -3,7 +3,7 @@ import {
   Skeleton,
   SkeletonRegion,
 } from "@/components/shared/skeleton";
-import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import styles from "@/components/employer-applications/employer-applications.module.scss";
 
 // Representative counts, not a claim about how many applications actually
 // fall into each group — the real split (and whether the list is empty
@@ -13,41 +13,18 @@ const NEEDS_REVIEW_SKELETON_COUNT = 2;
 const OPEN_SKELETON_COUNT = 1;
 const DECIDED_SKELETON_COUNT = 1;
 
-// ApplicationListRow's `.meta` list renders single-line "Label: value" text
-// items (not a two-column grid — employer-vacancies.module.scss has no
-// `.metaRow`-style class), so each row gets one Skeleton bar per line,
-// matching that real shape rather than a paired label/value block. Six
-// lines — Vacancy, Matched category, German comfort, Available from,
-// Status, Submitted — the typical, higher-fidelity case per
-// `ApplicationListRow` in application-list.tsx: those last three lines
-// disappear only when `candidate_deleted` is true, which — like the
-// applicant-detail skeleton's identical assumption on the confirmation
-// route — is unknown pre-load, so the common case is skeletoned rather
-// than the shorter deleted-candidate branch.
+// ApplicationListRow renders a compact triage grid: candidate, vacancy,
+// factual fit/availability line, submitted timestamp, status badge, and
+// Review action. Values are unknown pre-load, so every visible datum is a
+// skeleton rather than an illustrative candidate/status/count.
 function ApplicationRowSkeleton() {
   return (
     <li className={styles.listItem}>
       <Skeleton height="1.125rem" width="55%" radius="sm" />
-      <ul className={styles.meta}>
-        <li>
-          <Skeleton height="0.8rem" width="10rem" radius="sm" />
-        </li>
-        <li>
-          <Skeleton height="0.8rem" width="8rem" radius="sm" />
-        </li>
-        <li>
-          <Skeleton height="0.8rem" width="9rem" radius="sm" />
-        </li>
-        <li>
-          <Skeleton height="0.8rem" width="6rem" radius="sm" />
-        </li>
-        <li>
-          <Skeleton height="0.8rem" width="11rem" radius="sm" />
-        </li>
-        <li>
-          <Skeleton height="0.8rem" width="7rem" radius="sm" />
-        </li>
-      </ul>
+      <Skeleton height="1rem" width="70%" radius="sm" />
+      <Skeleton height="1rem" width="min(100%, 22rem)" radius="sm" />
+      <Skeleton height="0.85rem" width="10rem" radius="sm" />
+      <Skeleton height="1.75rem" width="6rem" radius="pill" />
       <div className={styles.actions}>
         <Skeleton height="2.75rem" width="6rem" radius="sm" />
       </div>
@@ -57,40 +34,68 @@ function ApplicationRowSkeleton() {
 
 /**
  * Route-loading state for /employer/applications. Skeletons the page
- * heading/lead and the Needs review / Open / Decided row groups at
- * `ApplicationList`'s real `.listItem`/`.meta` geometry.
+ * hierarchy, informational count chips, quiet filter controls, and the
+ * Needs review / Open / Decided triage groups at `ApplicationList`'s real
+ * row geometry.
  *
  * Left out entirely because their structure is data-dependent:
- * - `ApplicationListFilters` (interactive filter controls, not loaded data)
- * - the group heading counts ("Needs review (N)") — N is unknown pre-load
+ * - the summary and group counts — unknown pre-load
  * - the empty-list state (whether it's empty is itself the unresolved
  *   question)
- * - each row's language/proficiency/available-from lines when
- *   `candidate_deleted` is true — unknown per-row until the request
- *   resolves, so the typical (non-deleted) row shape is skeletoned instead
+ * - candidate identities, vacancy titles, status labels, timestamps, and
+ *   availability details
  */
-// The real page (src/app/employer/applications/page.tsx, via
-// ApplicationList) has five distinct top-level children under
-// `<main className={styles.page}>`: heading, lead, and the Needs
-// review / Open / Decided groups — each individually gapped by `.page`'s
-// `gap: var(--space-6)`. A single DelayedReveal/SkeletonRegion pair around
-// all of it (as this file used to have) makes them one child of `.page`,
-// so that gap never applies between them. One pair per genuinely distinct
-// region restores it.
 export default function Loading() {
   return (
     <main className={styles.page}>
       <DelayedReveal>
         <SkeletonRegion label="Loading applications">
-          <Skeleton height="2.25rem" width="45%" radius="sm" />
-          <Skeleton height="1rem" width="70%" radius="sm" />
+          <div className={styles.pageIntro}>
+            <Skeleton height="2.25rem" width="45%" radius="sm" />
+            <Skeleton height="1rem" width="70%" radius="sm" />
+          </div>
+        </SkeletonRegion>
+      </DelayedReveal>
+
+      <DelayedReveal>
+        <SkeletonRegion label="Loading application summary">
+          <ul className={styles.summaryList}>
+            {Array.from({ length: 4 }, (_, index) => (
+              <li key={index} className={styles.summaryChip}>
+                <Skeleton height="0.75rem" width="5rem" radius="sm" />
+              </li>
+            ))}
+          </ul>
+        </SkeletonRegion>
+      </DelayedReveal>
+
+      <DelayedReveal>
+        <SkeletonRegion label="Loading application filters">
+          <div className={styles.filterPanel}>
+            <div className={styles.filterForm}>
+              <div className={styles.field}>
+                <Skeleton height="0.875rem" width="7rem" radius="sm" />
+                <Skeleton
+                  height="2.75rem"
+                  width="min(100%, 18rem)"
+                  radius="sm"
+                />
+              </div>
+              <div className={styles.filterActions}>
+                <Skeleton height="2.75rem" width="7rem" radius="sm" />
+              </div>
+            </div>
+          </div>
         </SkeletonRegion>
       </DelayedReveal>
 
       <DelayedReveal>
         <SkeletonRegion label="Loading applications needing review">
-          <div className={styles.section}>
-            <Skeleton height="1.25rem" width="9rem" radius="sm" />
+          <div className={styles.section} data-priority="primary">
+            <div className={styles.sectionHeader}>
+              <Skeleton height="1.25rem" width="9rem" radius="sm" />
+              <Skeleton height="1rem" width="2rem" radius="sm" />
+            </div>
             <ul className={styles.list}>
               {Array.from(
                 { length: NEEDS_REVIEW_SKELETON_COUNT },
@@ -105,8 +110,11 @@ export default function Loading() {
 
       <DelayedReveal>
         <SkeletonRegion label="Loading open applications">
-          <div className={styles.section}>
-            <Skeleton height="1.25rem" width="5rem" radius="sm" />
+          <div className={styles.section} data-priority="quiet">
+            <div className={styles.sectionHeader}>
+              <Skeleton height="1.25rem" width="5rem" radius="sm" />
+              <Skeleton height="1rem" width="2rem" radius="sm" />
+            </div>
             <ul className={styles.list}>
               {Array.from({ length: OPEN_SKELETON_COUNT }, (_, index) => (
                 <ApplicationRowSkeleton key={index} />
@@ -118,8 +126,11 @@ export default function Loading() {
 
       <DelayedReveal>
         <SkeletonRegion label="Loading decided applications">
-          <div className={styles.section}>
-            <Skeleton height="1.25rem" width="6rem" radius="sm" />
+          <div className={styles.section} data-priority="quiet">
+            <div className={styles.sectionHeader}>
+              <Skeleton height="1.25rem" width="6rem" radius="sm" />
+              <Skeleton height="1rem" width="2rem" radius="sm" />
+            </div>
             <ul className={styles.list}>
               {Array.from({ length: DECIDED_SKELETON_COUNT }, (_, index) => (
                 <ApplicationRowSkeleton key={index} />
