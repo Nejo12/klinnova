@@ -1,4 +1,4 @@
-/** Shared `en-GB` date+time formatter for application list/detail/history timestamps. */
+/** Shared Berlin-local `en-GB` date+time formatter for application list/detail/history timestamps. */
 export function formatApplicationTimestamp(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
@@ -7,5 +7,6 @@ export function formatApplicationTimestamp(value: string): string {
   return new Intl.DateTimeFormat("en-GB", {
     dateStyle: "medium",
     timeStyle: "short",
+    timeZone: "Europe/Berlin",
   }).format(date);
 }
