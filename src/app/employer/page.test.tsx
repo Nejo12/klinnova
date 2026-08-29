@@ -212,7 +212,7 @@ describe("EmployerHomePage attention slot", () => {
   });
 });
 
-describe("EmployerHomePage needs-your-action side card and vacancy mini-list", () => {
+describe("EmployerHomePage vacancy mini-list", () => {
   beforeEach(() => {
     loadEmployerProfile.mockReset();
     loadEmployerProfile.mockResolvedValue({
@@ -230,7 +230,7 @@ describe("EmployerHomePage needs-your-action side card and vacancy mini-list", (
     loadEmployerDrafts.mockReset();
   });
 
-  it("lists a not-ready draft in the side card with a plain-words reason drawn from its checklist", async () => {
+  it("keeps incomplete draft readiness in the vacancies section without a standalone needs-your-action section", async () => {
     loadEmployerDrafts.mockResolvedValue({
       ok: true,
       drafts: [
@@ -248,19 +248,20 @@ describe("EmployerHomePage needs-your-action side card and vacancy mini-list", (
 
     render(await EmployerHomePage());
 
-    expect(screen.getByText("Needs your action")).toBeInTheDocument();
+    expect(screen.queryByText("Needs your action")).not.toBeInTheDocument();
+    const vacancies = screen.getByRole("region", { name: "Your vacancies" });
+    expect(within(vacancies).getByText("Private draft")).toBeInTheDocument();
     expect(
-      screen.getByText(
-        (_content, element) =>
-          element?.tagName.toLowerCase() === "p" &&
-          /Glasreiniger\s+is a draft, missing Salary \(EUR gross\)/.test(
-            element.textContent ?? "",
-          ),
+      within(vacancies).getByText(
+        "Salary (EUR gross) still needed before publishing.",
       ),
     ).toBeInTheDocument();
+    expect(
+      within(vacancies).getByRole("link", { name: "Continue draft" }),
+    ).toHaveAttribute("href", "/employer/vacancies/draft-1/edit");
   });
 
-  it("truncates a long missing-field list to a count rather than a run-on comma list", async () => {
+  it("keeps long draft-readiness consequences concise in the vacancy row", async () => {
     loadEmployerDrafts.mockResolvedValue({
       ok: true,
       drafts: [
@@ -282,13 +283,7 @@ describe("EmployerHomePage needs-your-action side card and vacancy mini-list", (
     render(await EmployerHomePage());
 
     expect(
-      screen.getByText(
-        (_content, element) =>
-          element?.tagName.toLowerCase() === "p" &&
-          /Glasreiniger\s+is a draft, missing 4 required details/.test(
-            element.textContent ?? "",
-          ),
-      ),
+      screen.getByText("4 required details missing before publishing."),
     ).toBeInTheDocument();
     expect(document.body.textContent ?? "").not.toMatch(
       /Salary \(EUR gross\), Work frequency, Languages, Description/,
@@ -307,6 +302,94 @@ describe("EmployerHomePage needs-your-action side card and vacancy mini-list", (
     render(await EmployerHomePage());
 
     expect(screen.queryByText("Needs your action")).not.toBeInTheDocument();
+  });
+
+  it("shows future-tense expiry only for a current published vacancy", async () => {
+    loadEmployerDrafts.mockResolvedValue({
+      ok: true,
+      drafts: [
+        draft({
+          id: "published-1",
+          title: "Current published role",
+          publicationState: "published",
+          ready: null,
+          expiresAt: "2026-09-30T00:00:00Z",
+          isEffectivelyExpired: false,
+        }),
+      ],
+    });
+
+    render(await EmployerHomePage());
+
+    expect(screen.getByText("Expires 30 Sept 2026")).toBeInTheDocument();
+  });
+
+  it.each([
+    ["filled", "Filled"],
+    ["withdrawn", "Withdrawn"],
+  ] as const)(
+    "does not show future-tense expiry for a %s vacancy retaining expiresAt",
+    async (state, label) => {
+      loadEmployerDrafts.mockResolvedValue({
+        ok: true,
+        drafts: [
+          draft({
+            id: `${state}-1`,
+            title: `${label} role`,
+            publicationState: state,
+            ready: null,
+            expiresAt: "2026-09-30T00:00:00Z",
+          }),
+        ],
+      });
+
+      render(await EmployerHomePage());
+
+      expect(screen.getByText(label)).toBeInTheDocument();
+      expect(screen.queryByText(/Expires/)).not.toBeInTheDocument();
+    },
+  );
+
+  it("does not show future-tense expiry for an expired vacancy and keeps the expired consequence", async () => {
+    loadEmployerDrafts.mockResolvedValue({
+      ok: true,
+      drafts: [
+        draft({
+          id: "expired-1",
+          title: "Expired role",
+          publicationState: "expired",
+          ready: null,
+          expiresAt: "2026-09-30T00:00:00Z",
+          expiredAt: "2026-09-30T00:00:00Z",
+        }),
+      ],
+    });
+
+    render(await EmployerHomePage());
+
+    expect(screen.getByText("Expired")).toBeInTheDocument();
+    expect(screen.getByText("Ran out on 30 Sept 2026.")).toBeInTheDocument();
+    expect(screen.queryByText(/Expires/)).not.toBeInTheDocument();
+  });
+
+  it("does not show future-tense expiry for an effectively expired published vacancy", async () => {
+    loadEmployerDrafts.mockResolvedValue({
+      ok: true,
+      drafts: [
+        draft({
+          id: "effectively-expired-1",
+          title: "Past published role",
+          publicationState: "published",
+          ready: null,
+          expiresAt: "2026-09-30T00:00:00Z",
+          isEffectivelyExpired: true,
+        }),
+      ],
+    });
+
+    render(await EmployerHomePage());
+
+    expect(screen.queryByText(/Expires/)).not.toBeInTheDocument();
   });
 
   it("renders the vacancy mini-list with title, locality, and lifecycle state, and no application-count figures", async () => {

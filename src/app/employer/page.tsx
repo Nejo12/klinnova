@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import {
   draftConsequence,
   statusLabel,
-  summarizeMissingLabels,
 } from "@/components/employer-vacancies/vacancy-list";
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
 import styles from "@/app/employer/employer-home.module.scss";
@@ -17,7 +16,6 @@ import { loadUnseenApplicationsCount } from "@/lib/employer/applications/load-un
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadEmployerProfile } from "@/lib/employer/load-employer";
 import {
-  EMPLOYER_ATTENTION_VACANCIES_HEADING,
   EMPLOYER_HOME_LEAD,
   EMPLOYER_VACANCIES_MINI_LIST_HEADING,
   EMPLOYER_VERIFICATION_NOTICE,
@@ -27,31 +25,9 @@ import { resolveEmployerHomeView } from "@/lib/employer/resolve-employer-home";
 import type { EmployerDraftListItem } from "@/lib/employer/vacancies/load-employer-drafts";
 import { loadEmployerDrafts } from "@/lib/employer/vacancies/load-employer-drafts";
 import { VACANCY_EMPTY_LIST } from "@/lib/employer/vacancies/messages";
-import { selectAttentionVacancies } from "@/lib/employer/vacancies/select-attention-vacancies";
 import { jobCategoryLabel } from "@/lib/matching/labels";
 import type { JobCategoryCode } from "@/lib/onboarding/allow-lists";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-
-/**
- * Plain-words reason for a draft_incomplete attention-card row, built only
- * from real readiness-checklist data (Founder Ruling #7 — no fabricated
- * missing-field names, no application counts). Reuses
- * `summarizeMissingLabels` — the same 3-item truncation discipline
- * `vacancy-list.tsx`'s `draftConsequence` uses — rather than joining every
- * missing label with commas, since a brand-new draft's checklist can have
- * ~13 missing items.
- */
-function draftIncompleteReason(
-  draft: EmployerDraftListItem | undefined,
-): string {
-  const missingLabels =
-    draft?.checklist
-      .filter((item) => !item.complete)
-      .map((item) => item.label) ?? [];
-  return missingLabels.length > 0
-    ? `missing ${summarizeMissingLabels(missingLabels)}`
-    : "not yet ready to publish";
-}
 
 function formatDate(value: string | null): string | null {
   if (value === null) {
@@ -90,7 +66,11 @@ function vacancyHomeConsequence(draft: EmployerDraftListItem): string | null {
 }
 
 function EmployerHomeVacancyRow({ draft }: { draft: EmployerDraftListItem }) {
-  const expiry = formatDate(draft.expiresAt);
+  const expiry =
+    draft.publicationState === "published" &&
+    draft.isEffectivelyExpired === false
+      ? formatDate(draft.expiresAt)
+      : null;
   const consequence = vacancyHomeConsequence(draft);
   const actionHref =
     draft.publicationState === "draft"
@@ -169,7 +149,6 @@ export default async function EmployerHomePage() {
   // this page's own auth/completion gates already ran above.
   const draftsResult = await loadEmployerDrafts(supabase);
   const drafts = draftsResult.ok ? draftsResult.drafts : [];
-  const attentionVacancies = selectAttentionVacancies(drafts);
 
   return (
     <main className={styles.page}>
@@ -231,35 +210,6 @@ export default async function EmployerHomePage() {
           >
             Verification
           </Link>
-        </section>
-      ) : null}
-
-      {attentionVacancies.length > 0 ? (
-        <section
-          className={styles.section}
-          aria-labelledby="attention-vacancies-heading"
-        >
-          <h2
-            id="attention-vacancies-heading"
-            className={styles.sectionHeading}
-          >
-            {EMPLOYER_ATTENTION_VACANCIES_HEADING}
-          </h2>
-          <ul className={styles.list}>
-            {attentionVacancies.map((item) => {
-              const draft = drafts.find((d) => d.id === item.vacancyId);
-              return (
-                <li key={item.vacancyId} className={styles.listItem}>
-                  <p className={styles.note}>
-                    <Link href={`/employer/vacancies/${item.vacancyId}`}>
-                      {item.title}
-                    </Link>{" "}
-                    is a draft, {draftIncompleteReason(draft)}
-                  </p>
-                </li>
-              );
-            })}
-          </ul>
         </section>
       ) : null}
 
