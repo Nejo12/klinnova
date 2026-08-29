@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page, type Response } from "@playwright/test";
 
 import { registerAndConfirm } from "./helpers/auth";
 import {
@@ -8,6 +8,26 @@ import {
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const runAuthJourney = process.env.E2E_AUTH_JOURNEY === "1";
+
+function waitForVacancyEditPost(page: Page): Promise<Response> {
+  return page.waitForResponse(
+    (candidate) =>
+      candidate.url().includes("/edit") &&
+      candidate.request().method() === "POST",
+  );
+}
+
+async function saveVacancyEditFormAndReload(
+  page: Page,
+  buttonName: "Save draft" | "Save languages",
+): Promise<void> {
+  const [response] = await Promise.all([
+    waitForVacancyEditPost(page),
+    page.getByRole("button", { name: buttonName }).click(),
+  ]);
+  expect(response.status()).toBe(200);
+  await page.reload();
+}
 
 async function onboardPrivateEmployer(
   page: Page,
@@ -63,20 +83,16 @@ async function createAndReadyVacancy(
   await page
     .getByRole("checkbox", { name: "Interview can be in English" })
     .check();
+  await page.getByRole("checkbox", { name: "Full time" }).check();
+  await page.getByRole("checkbox", { name: "Evening" }).check();
   await page.getByLabel("Amount in EUR").fill("18.00");
   await page.getByLabel("Period").selectOption("hourly");
-  await page.getByRole("button", { name: "Save draft" }).click();
-  await expect(page.getByText("Draft changes saved.")).toBeVisible({
-    timeout: 15_000,
-  });
+  await saveVacancyEditFormAndReload(page, "Save draft");
 
   await page.getByRole("button", { name: "Add language" }).click();
   await page.getByLabel(/Language 1/i).selectOption("en");
   await page.getByLabel(/Minimum proficiency 1/i).selectOption("basic");
-  await page.getByRole("button", { name: "Save languages" }).click();
-  await expect(page.getByText("Language requirements saved.")).toBeVisible({
-    timeout: 15_000,
-  });
+  await saveVacancyEditFormAndReload(page, "Save languages");
 
   return vacancyId;
 }
@@ -90,7 +106,7 @@ async function requestVerification(page: Page) {
     .check();
   await page.getByRole("button", { name: "Request verification" }).click();
   await expect(
-    page.getByRole("heading", { name: /Pending review/i }),
+    page.getByRole("status", { name: "Pending review" }),
   ).toBeVisible({ timeout: 15_000 });
 }
 
@@ -121,15 +137,25 @@ async function approveEmployerVerification(
 
 async function publishVacancy(page: Page, vacancyId: string) {
   await page.goto(`/employer/vacancies/${vacancyId}`);
+  const vacancyPath = `/employer/vacancies/${vacancyId}`;
   await page
     .getByRole("checkbox", {
       name: /Publishing may make this vacancy publicly visible/i,
     })
     .check();
-  await page.getByRole("button", { name: "Publish" }).click();
-  await expect(page.getByText("Published", { exact: true })).toBeVisible({
-    timeout: 15_000,
-  });
+  const [response] = await Promise.all([
+    page.waitForResponse(
+      (candidate) =>
+        new URL(candidate.url()).pathname === vacancyPath &&
+        candidate.request().method() === "POST",
+    ),
+    page.getByRole("button", { name: "Publish" }).click(),
+  ]);
+  expect(response.status()).toBeLessThan(400);
+  await page.reload();
+  await expect(
+    page.getByRole("region", { name: "Status" }).getByRole("status"),
+  ).toHaveText("Published", { timeout: 15_000 });
 }
 
 async function completeCandidateMatchingEssentials(page: Page) {

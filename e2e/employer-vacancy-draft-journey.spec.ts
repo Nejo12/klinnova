@@ -171,7 +171,7 @@ test.describe("employer vacancy draft journeys", () => {
       .check();
     await page.getByRole("button", { name: "Request verification" }).click();
     await expect(
-      page.getByRole("heading", { name: /Pending review/i }),
+      page.getByRole("status", { name: "Pending review" }),
     ).toBeVisible({ timeout: 15_000 });
 
     const operatorContext = await browser.newContext();

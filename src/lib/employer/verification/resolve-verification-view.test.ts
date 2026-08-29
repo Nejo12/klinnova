@@ -80,11 +80,12 @@ describe("resolveVerificationView", () => {
     expect(view).toMatchObject({ status: "revoked", canRequest: false });
   });
 
-  it("falls back to unverified for an unrecognized state", () => {
-    const view = resolveVerificationView({
-      ...base,
-      verificationState: "unexpected",
-    });
-    expect(view).toMatchObject({ status: "unverified" });
+  it("falls back to unverified for an unrecognized or null state", () => {
+    expect(
+      resolveVerificationView({ ...base, verificationState: "unexpected" }),
+    ).toMatchObject({ status: "unverified" });
+    expect(
+      resolveVerificationView({ ...base, verificationState: null }),
+    ).toMatchObject({ status: "unverified", canRequest: true });
   });
 });

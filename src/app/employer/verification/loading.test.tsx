@@ -9,13 +9,12 @@ describe("employer verification Loading", () => {
   it("announces a busy 'Loading verification status' region", () => {
     render(<Loading />);
 
-    const regions = screen.getAllByRole("status");
-    expect(regions).toHaveLength(1);
-    expect(regions[0]).toHaveAttribute("aria-busy", "true");
-    expect(regions[0]).toHaveTextContent("Loading verification status");
+    const region = screen.getByRole("status");
+    expect(region).toHaveAttribute("aria-busy", "true");
+    expect(region).toHaveTextContent("Loading verification status");
   });
 
-  it("renders the real static page heading directly, not as a skeleton", () => {
+  it("renders the real header and page heading, not as skeletons", () => {
     render(<Loading />);
 
     expect(
@@ -24,19 +23,23 @@ describe("employer verification Loading", () => {
         name: VERIFICATION_PAGE_HEADING,
       }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: "Employer" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Verification" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
   });
 
-  it("renders one panel with a representative detail-row count", () => {
+  it("renders one state-surface skeleton without claiming details", () => {
     const { container } = render(<Loading />);
 
-    const panels = container.querySelectorAll(`.${styles.panel}`);
-    expect(panels).toHaveLength(1);
-    expect(
-      panels[0]?.querySelectorAll(`.${styles.detailList} > *`),
-    ).toHaveLength(2);
+    expect(container.querySelectorAll(`.${styles.panel}`)).toHaveLength(1);
+    expect(container.querySelector(`.${styles.detailList}`)).toBeNull();
   });
 
-  it("does not render any specific status heading text", () => {
+  it("does not render any specific status text or request controls", () => {
     render(<Loading />);
 
     for (const heading of [
@@ -48,12 +51,11 @@ describe("employer verification Loading", () => {
     ]) {
       expect(screen.queryByText(heading)).toBeNull();
     }
-  });
-
-  it("renders no interactive controls", () => {
-    render(<Loading />);
-
-    expect(screen.queryAllByRole("link")).toHaveLength(0);
-    expect(screen.queryAllByRole("button")).toHaveLength(0);
+    expect(
+      screen.queryByRole("button", { name: "Request verification" }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: "Resubmit verification" }),
+    ).toBeNull();
   });
 });

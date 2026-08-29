@@ -58,7 +58,7 @@ test.describe("internal verification operator journey", () => {
       .check();
     await page.getByRole("button", { name: "Request verification" }).click();
     await expect(
-      page.getByRole("heading", { name: /Pending review/i }),
+      page.getByRole("status", { name: "Pending review" }),
     ).toBeVisible({ timeout: 15_000 });
 
     const employerId = await getLocalUserIdByEmail(employerEmail);
@@ -109,9 +109,9 @@ test.describe("internal verification operator journey", () => {
     await operatorContext.close();
 
     await page.reload();
-    await expect(
-      page.getByRole("heading", { name: /^Verified$/i }),
-    ).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("status", { name: "Verified" })).toBeVisible({
+      timeout: 15_000,
+    });
   });
 });
 

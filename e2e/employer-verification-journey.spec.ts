@@ -47,7 +47,7 @@ test.describe("employer verification journeys", () => {
       .click();
     await expect(page).toHaveURL(/\/employer\/verification$/);
     await expect(
-      page.getByRole("heading", { name: /Not requested/i }),
+      page.getByRole("status", { name: "Not requested" }),
     ).toBeVisible();
 
     await page
@@ -57,12 +57,12 @@ test.describe("employer verification journeys", () => {
       .check();
     await page.getByRole("button", { name: "Request verification" }).click();
     await expect(
-      page.getByRole("heading", { name: /Pending review/i }),
+      page.getByRole("status", { name: "Pending review" }),
     ).toBeVisible({ timeout: 15_000 });
 
     await page.reload();
     await expect(
-      page.getByRole("heading", { name: /Pending review/i }),
+      page.getByRole("status", { name: "Pending review" }),
     ).toBeVisible();
     await expect(
       page.getByRole("button", { name: /request verification/i }),
