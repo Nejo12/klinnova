@@ -1,8 +1,11 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import {
+  draftConsequence,
+  formatVacancyDate,
   groupVacancies,
+  summarizeMissingLabels,
   VacancyList,
 } from "@/components/employer-vacancies/vacancy-list";
 import type { EmployerDraftListItem } from "@/lib/employer/vacancies/load-employer-drafts";
@@ -57,7 +60,17 @@ describe("groupVacancies", () => {
   it("never re-sorts within a group", () => {
     const a = buildDraft({ id: "a", publicationState: "published" });
     const b = buildDraft({ id: "b", publicationState: "paused" });
-    expect(groupVacancies([b, a]).live.map((d) => d.id)).toEqual(["b", "a"]);
+    expect(groupVacancies([b, a]).live.map((item) => item.id)).toEqual([
+      "b",
+      "a",
+    ]);
+
+    const draft = buildDraft({ id: "c", publicationState: "draft" });
+    const filled = buildDraft({ id: "d", publicationState: "filled" });
+    const expired = buildDraft({ id: "e", publicationState: "expired" });
+    expect(
+      groupVacancies([expired, filled, draft]).notLive.map((item) => item.id),
+    ).toEqual(["e", "d", "c"]);
   });
 });
 
@@ -130,7 +143,7 @@ describe("VacancyList", () => {
     );
   });
 
-  it("renders the two group headings with their own counts", () => {
+  it("renders the two group headings with in-memory counts", () => {
     render(
       <VacancyList
         drafts={[
@@ -141,11 +154,15 @@ describe("VacancyList", () => {
     );
 
     expect(
-      screen.getByRole("heading", { level: 2, name: "Live (1)" }),
+      screen.getByRole("heading", { level: 2, name: "Live" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { level: 2, name: "Not live (1)" }),
+      screen.getByRole("heading", { level: 2, name: "Not live" }),
     ).toBeInTheDocument();
+    const liveSection = screen.getByRole("region", { name: "Live" });
+    const notLiveSection = screen.getByRole("region", { name: "Not live" });
+    expect(within(liveSection).getByText("1")).toBeInTheDocument();
+    expect(within(notLiveSection).getByText("1")).toBeInTheDocument();
   });
 
   it("renders no list under a group with zero rows", () => {
@@ -157,9 +174,50 @@ describe("VacancyList", () => {
 
     const liveHeading = screen.getByRole("heading", {
       level: 2,
-      name: "Live (0)",
+      name: "Live",
     });
-    expect(liveHeading.parentElement?.querySelector("ul")).toBeNull();
+    expect(liveHeading.closest("section")?.querySelector("ul")).toBeNull();
+  });
+
+  it("keeps source order inside Live and Not live in the rendered list", () => {
+    render(
+      <VacancyList
+        drafts={[
+          buildDraft({
+            id: "paused-first",
+            title: "Paused first",
+            publicationState: "paused",
+          }),
+          buildDraft({
+            id: "published-second",
+            title: "Published second",
+            publicationState: "published",
+          }),
+          buildDraft({
+            id: "withdrawn-first",
+            title: "Withdrawn first",
+            publicationState: "withdrawn",
+          }),
+          buildDraft({
+            id: "draft-second",
+            title: "Draft second",
+            publicationState: "draft",
+          }),
+        ]}
+      />,
+    );
+
+    const liveTitles = within(screen.getByRole("region", { name: "Live" }))
+      .getAllByRole("heading", { level: 3 })
+      .map((heading) => heading.textContent);
+    const notLiveTitles = within(
+      screen.getByRole("region", { name: "Not live" }),
+    )
+      .getAllByRole("heading", { level: 3 })
+      .map((heading) => heading.textContent);
+
+    expect(liveTitles).toEqual(["Paused first", "Published second"]);
+    expect(notLiveTitles).toEqual(["Withdrawn first", "Draft second"]);
   });
 
   it("renders a Manage link to the detail route for every row", () => {
@@ -168,7 +226,9 @@ describe("VacancyList", () => {
         drafts={[buildDraft({ id: "22222222-2222-4222-8222-222222222222" })]}
       />,
     );
-    expect(screen.getByRole("link", { name: "Manage" })).toHaveAttribute(
+    expect(
+      screen.getByRole("link", { name: "Manage Glasreiniger" }),
+    ).toHaveAttribute(
       "href",
       "/employer/vacancies/22222222-2222-4222-8222-222222222222",
     );
@@ -186,8 +246,7 @@ describe("VacancyList", () => {
     render(
       <VacancyList drafts={[buildDraft({ publicationState: "published" })]} />,
     );
-    // Only the meta list's "Status: Published" line should mention the word.
-    expect(screen.getAllByText(/Published/)).toHaveLength(1);
+    expect(screen.getAllByText(/^Published$/)).toHaveLength(1);
   });
 
   it("shows the paused consequence sentence", () => {
@@ -333,5 +392,238 @@ describe("VacancyList", () => {
       />,
     );
     expect(screen.getByText("Ready to publish.")).toBeInTheDocument();
+  });
+
+  it("uses the existing truncation discipline for many missing readiness items", () => {
+    render(
+      <VacancyList
+        drafts={[
+          buildDraft({
+            publicationState: "draft",
+            ready: false,
+            checklist: [
+              { id: "a", label: "Title", complete: false },
+              { id: "b", label: "Job category", complete: false },
+              { id: "c", label: "Description", complete: false },
+              { id: "d", label: "Salary (EUR gross)", complete: false },
+            ],
+          }),
+        ]}
+      />,
+    );
+    expect(
+      screen.getByText("4 required details missing before publishing."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/%/)).toBeNull();
+    expect(screen.queryByText("Office Cleaner")).toBeNull();
+    expect(screen.queryByText("Applications 8")).toBeNull();
+  });
+
+  it("shows a published row with expiry, next action, and Manage — not a fake application count", () => {
+    render(
+      <VacancyList
+        drafts={[
+          buildDraft({
+            title: "Glasreiniger",
+            publicationState: "published",
+            publicLocality: "Mitte",
+            expiresAt: "2026-09-15T00:00:00Z",
+            isEffectivelyExpired: false,
+          }),
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByRole("heading", { level: 3, name: "Glasreiniger" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Cleaning · Mitte · Private")).toBeInTheDocument();
+    expect(screen.getByText("Published")).toBeInTheDocument();
+    expect(screen.getByText("Expires 15 Sept 2026")).toBeInTheDocument();
+    expect(
+      screen.getByText("Next: Pause, mark filled, or withdraw"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Manage Glasreiniger" }),
+    ).toHaveAttribute(
+      "href",
+      "/employer/vacancies/11111111-1111-4111-8111-111111111111",
+    );
+    expect(screen.queryByText(/Applications/i)).toBeNull();
+    expect(screen.queryByRole("link", { name: /Edit/ })).toBeNull();
+    expect(screen.queryByRole("link", { name: /Delete/ })).toBeNull();
+  });
+
+  it("does not show Expires for a published vacancy that is effectively expired", () => {
+    render(
+      <VacancyList
+        drafts={[
+          buildDraft({
+            publicationState: "published",
+            expiresAt: "2026-01-01T00:00:00Z",
+            isEffectivelyExpired: true,
+          }),
+        ]}
+      />,
+    );
+    expect(
+      screen.getByText("Published — effectively expired"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Expires/)).toBeNull();
+    expect(
+      screen.getByText("Next: Refresh expired status or renew"),
+    ).toBeInTheDocument();
+  });
+
+  it("does not show Expires for paused, draft, filled, expired, or withdrawn rows", () => {
+    render(
+      <VacancyList
+        drafts={[
+          buildDraft({
+            id: "paused",
+            publicationState: "paused",
+            expiresAt: "2026-09-15T00:00:00Z",
+          }),
+          buildDraft({
+            id: "draft",
+            publicationState: "draft",
+            expiresAt: "2026-09-15T00:00:00Z",
+          }),
+        ]}
+      />,
+    );
+    expect(screen.queryByText(/Expires/)).toBeNull();
+  });
+
+  it("keeps paused under Live with the verified not-visible consequence and Edit", () => {
+    render(
+      <VacancyList
+        drafts={[
+          buildDraft({
+            title: "Kitchen Assistant",
+            publicationState: "paused",
+          }),
+        ]}
+      />,
+    );
+
+    expect(
+      within(screen.getByRole("region", { name: "Live" })).getByText(
+        "Kitchen Assistant",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Paused")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Not visible to candidates. Existing applications stay open.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Next: Resume, mark filled, or withdraw"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Edit Kitchen Assistant" }),
+    ).toHaveAttribute(
+      "href",
+      "/employer/vacancies/11111111-1111-4111-8111-111111111111/edit",
+    );
+  });
+
+  it("shows Edit and Delete only for drafts, and keeps drafts under Not live", () => {
+    render(
+      <VacancyList
+        drafts={[
+          buildDraft({
+            title: "Warehouse Helper",
+            publicationState: "draft",
+            checklist: [{ id: "title", label: "Title", complete: true }],
+          }),
+        ]}
+      />,
+    );
+
+    expect(
+      within(screen.getByRole("region", { name: "Not live" })).getByText(
+        "Warehouse Helper",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Private draft")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Delete Warehouse Helper" }),
+    ).toHaveAttribute(
+      "href",
+      "/employer/vacancies/11111111-1111-4111-8111-111111111111#delete-draft",
+    );
+  });
+
+  it("shows filled, expired, and withdrawn with truthful actions", () => {
+    render(
+      <VacancyList
+        drafts={[
+          buildDraft({
+            id: "filled",
+            title: "Filled role",
+            publicationState: "filled",
+            filledAt: "2026-08-10T00:00:00Z",
+          }),
+          buildDraft({
+            id: "expired",
+            title: "Expired role",
+            publicationState: "expired",
+            expiredAt: "2026-08-12T00:00:00Z",
+          }),
+          buildDraft({
+            id: "withdrawn",
+            title: "Withdrawn role",
+            publicationState: "withdrawn",
+          }),
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Filled")).toBeInTheDocument();
+    expect(screen.getByText("Expired")).toBeInTheDocument();
+    expect(screen.getByText("Withdrawn")).toBeInTheDocument();
+    expect(screen.getByText("Next: Renew to draft")).toBeInTheDocument();
+    expect(screen.getAllByText("Next: No action available")).toHaveLength(2);
+    expect(screen.queryByRole("link", { name: /Edit Filled/ })).toBeNull();
+    expect(screen.queryByRole("link", { name: /Delete Filled/ })).toBeNull();
+  });
+});
+
+describe("formatVacancyDate", () => {
+  it("formats UTC midnights in Europe/Berlin without depending on the server timezone", () => {
+    expect(formatVacancyDate("2026-08-10T00:00:00Z")).toBe("10 Aug 2026");
+    expect(formatVacancyDate("2026-01-01T00:00:00Z")).toBe("1 Jan 2026");
+  });
+
+  it("returns null for missing or invalid values", () => {
+    expect(formatVacancyDate(null)).toBeNull();
+    expect(formatVacancyDate("not-a-date")).toBeNull();
+  });
+});
+
+describe("summarizeMissingLabels", () => {
+  it("names one, two, or three labels and falls back to a count after that", () => {
+    expect(summarizeMissingLabels(["Title"])).toBe("Title");
+    expect(summarizeMissingLabels(["Title", "Salary (EUR gross)"])).toBe(
+      "Title and Salary (EUR gross)",
+    );
+    expect(summarizeMissingLabels(["A", "B", "C"])).toBe("A, B, and C");
+    expect(summarizeMissingLabels(["A", "B", "C", "D"])).toBe(
+      "4 required details",
+    );
+  });
+});
+
+describe("draftConsequence", () => {
+  it("uses a single missing field label", () => {
+    expect(
+      draftConsequence({
+        checklist: [
+          { id: "salary", label: "Salary (EUR gross)", complete: false },
+        ],
+      }),
+    ).toBe("Salary (EUR gross) still needed before publishing.");
   });
 });

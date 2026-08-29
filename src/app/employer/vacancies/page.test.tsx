@@ -6,6 +6,11 @@ const loadEmployerProfile = vi.hoisted(() => vi.fn());
 const loadAccountCapabilities = vi.hoisted(() => vi.fn());
 const loadUnseenApplicationsCount = vi.hoisted(() => vi.fn());
 const loadCurrentEmployerSuspensionStatus = vi.hoisted(() => vi.fn());
+const redirect = vi.hoisted(() =>
+  vi.fn((href: string) => {
+    throw new Error(href);
+  }),
+);
 
 vi.mock("@/lib/employer/vacancies/load-employer-drafts", () => ({
   loadEmployerDrafts,
@@ -22,6 +27,9 @@ vi.mock("@/lib/employer/suspension-guard", () => ({
 }));
 vi.mock("@/lib/supabase/server", () => ({
   createServerSupabaseClient: vi.fn().mockResolvedValue({}),
+}));
+vi.mock("next/navigation", () => ({
+  redirect: (href: string) => redirect(href),
 }));
 
 import EmployerVacanciesPage from "@/app/employer/vacancies/page";
@@ -60,6 +68,78 @@ describe("EmployerVacanciesPage empty states", () => {
       ok: true,
       suspended: false,
     });
+    redirect.mockClear();
+  });
+
+  it("redirects unauthenticated visitors to login", async () => {
+    loadEmployerDrafts.mockResolvedValue({
+      ok: false,
+      reason: "unauthenticated",
+    });
+
+    await expect(EmployerVacanciesPage()).rejects.toThrow(
+      "/login?next=/employer/vacancies",
+    );
+    expect(redirect).toHaveBeenCalledWith("/login?next=/employer/vacancies");
+  });
+
+  it("redirects incomplete employers to onboarding", async () => {
+    loadEmployerDrafts.mockResolvedValue({
+      ok: false,
+      reason: "incomplete",
+    });
+
+    await expect(EmployerVacanciesPage()).rejects.toThrow(
+      "/employer/onboarding",
+    );
+    expect(redirect).toHaveBeenCalledWith("/employer/onboarding");
+  });
+
+  it("preserves employer header capability and unseen-application badge behaviour", async () => {
+    loadEmployerProfile.mockResolvedValue({
+      ok: true,
+      data: { ...baseProfile, verificationState: "verified" },
+      userId: "emp-1",
+    });
+    loadAccountCapabilities.mockResolvedValue({
+      hasCandidateProfile: true,
+      hasEmployerProfile: true,
+    });
+    loadUnseenApplicationsCount.mockResolvedValue(2);
+
+    render(await EmployerVacanciesPage());
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Vacancies" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Create draft" })).toHaveAttribute(
+      "href",
+      "/employer/vacancies/new",
+    );
+    expect(screen.getByRole("link", { name: "Candidate" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /Applications/ }),
+    ).toHaveTextContent("2");
+  });
+
+  it("shows the restricted notice when the employer is suspended", async () => {
+    loadEmployerProfile.mockResolvedValue({
+      ok: true,
+      data: { ...baseProfile, verificationState: "verified" },
+      userId: "emp-1",
+    });
+    loadCurrentEmployerSuspensionStatus.mockResolvedValue({
+      ok: true,
+      suspended: true,
+    });
+
+    render(await EmployerVacanciesPage());
+
+    expect(
+      screen.getByText(
+        "Your employer account is temporarily restricted. Some employer actions are unavailable while the restriction is active.",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("shows the generic 'No vacancies yet' state when verified with zero drafts", async () => {

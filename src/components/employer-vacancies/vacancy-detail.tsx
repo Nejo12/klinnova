@@ -53,6 +53,7 @@ export function VacancyDetail({
     !suspended &&
     (vacancy.publicationState === "draft" ||
       vacancy.publicationState === "paused");
+  const showDraftReadiness = vacancy.publicationState === "draft";
 
   return (
     <>
@@ -62,19 +63,35 @@ export function VacancyDetail({
         <EmployerRestrictedNotice message={EMPLOYER_RESTRICTED_ACTION} />
       ) : null}
 
-      <p className={styles.actions}>
-        {editable ? (
+      {showDraftReadiness ? (
+        <ReadinessChecklist
+          ready={vacancy.ready ?? false}
+          checklist={vacancy.checklist}
+          available={vacancy.readinessAvailable}
+          continueHref={
+            editable ? `/employer/vacancies/${vacancy.id}/edit` : undefined
+          }
+        />
+      ) : null}
+
+      {editable && !showDraftReadiness ? (
+        <p className={styles.actions}>
           <Link
             className={styles.button}
             href={`/employer/vacancies/${vacancy.id}/edit`}
           >
             Edit vacancy
           </Link>
-        ) : null}
-        <Link className={styles.linkButton} href="/employer/vacancies">
-          Back to list
-        </Link>
-      </p>
+        </p>
+      ) : null}
+
+      {suspended ? null : (
+        <VacancyLifecycleActions
+          vacancyId={vacancy.id}
+          publicationState={vacancy.publicationState}
+          isEffectivelyExpired={vacancy.isEffectivelyExpired}
+        />
+      )}
 
       <dl className={styles.detailList}>
         <div>
@@ -165,22 +182,6 @@ export function VacancyDetail({
           </dd>
         </div>
       </dl>
-
-      {vacancy.publicationState === "draft" ? (
-        <ReadinessChecklist
-          ready={vacancy.ready ?? false}
-          checklist={vacancy.checklist}
-          available={vacancy.readinessAvailable}
-        />
-      ) : null}
-
-      {suspended ? null : (
-        <VacancyLifecycleActions
-          vacancyId={vacancy.id}
-          publicationState={vacancy.publicationState}
-          isEffectivelyExpired={vacancy.isEffectivelyExpired}
-        />
-      )}
 
       {!suspended && vacancy.publicationState === "draft" ? (
         <DeleteDraftForm vacancyId={vacancy.id} title={vacancy.title} />

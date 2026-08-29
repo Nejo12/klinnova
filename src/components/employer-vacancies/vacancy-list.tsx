@@ -65,18 +65,8 @@ export function groupVacancies(
   return { live, notLive };
 }
 
-function formatUpdatedAt(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-  return new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date);
-}
-
-function formatDate(value: string | null): string | null {
+/** Berlin-facing calendar dates for vacancy list/manage consequence copy. */
+export function formatVacancyDate(value: string | null): string | null {
   if (value === null) {
     return null;
   }
@@ -84,7 +74,10 @@ function formatDate(value: string | null): string | null {
   if (Number.isNaN(date.getTime())) {
     return null;
   }
-  return new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" }).format(date);
+  return new Intl.DateTimeFormat("en-GB", {
+    dateStyle: "medium",
+    timeZone: "Europe/Berlin",
+  }).format(date);
 }
 
 export function statusLabel(draft: EmployerDraftListItem): string {
@@ -171,8 +164,8 @@ export function draftConsequence(draft: {
 /**
  * One consequence-of-current-state sentence per row, distinct from
  * `nextActionHint` (an available-actions hint). `null` for `published`
- * (the design has no consequence copy for this state; its rows show
- * application-count badges instead, dropped per Founder Ruling #7).
+ * (no consequence copy for this state; per-vacancy application counts
+ * remain unsupported and must not be shown).
  *
  * Every non-null sentence here is verified against
  * `_transition_employer_vacancy`
@@ -188,13 +181,13 @@ function consequenceSentence(draft: EmployerDraftListItem): string | null {
     case "paused":
       return "Not visible to candidates. Existing applications stay open.";
     case "filled": {
-      const date = formatDate(draft.filledAt);
+      const date = formatVacancyDate(draft.filledAt);
       return date === null
         ? "Marked filled. No further action is available."
         : `You marked this filled on ${date}.`;
     }
     case "expired": {
-      const date = formatDate(draft.expiredAt ?? draft.expiresAt);
+      const date = formatVacancyDate(draft.expiredAt ?? draft.expiresAt);
       return date === null
         ? "Ran out without being filled."
         : `Ran out on ${date} without being filled.`;
@@ -222,13 +215,17 @@ export function VacancyList({
 
   return (
     <>
-      <p className={styles.lead}>{VACANCY_LIST_LEAD}</p>
-      <p className={styles.note}>{VACANCY_PRIVATE_NOTICE}</p>
-      <p className={styles.actions}>
-        <Link className={styles.button} href="/employer/vacancies/new">
-          Create draft
-        </Link>
-      </p>
+      <div className={styles.pageIntro}>
+        <div className={styles.pageIntroCopy}>
+          <p className={styles.lead}>{VACANCY_LIST_LEAD}</p>
+          <p className={styles.note}>{VACANCY_PRIVATE_NOTICE}</p>
+        </div>
+        <p className={styles.pageIntroActions}>
+          <Link className={styles.button} href="/employer/vacancies/new">
+            Create draft
+          </Link>
+        </p>
+      </div>
 
       {drafts.length === 0 ? (
         showVerificationEmptyState ? (
@@ -252,12 +249,12 @@ export function VacancyList({
         <>
           <VacancyListGroup
             headingId="live-vacancies-heading"
-            heading={`Live (${live.length})`}
+            heading="Live"
             drafts={live}
           />
           <VacancyListGroup
             headingId="not-live-vacancies-heading"
-            heading={`Not live (${notLive.length})`}
+            heading="Not live"
             drafts={notLive}
           />
         </>
@@ -278,10 +275,16 @@ function VacancyListGroup({
   drafts,
 }: VacancyListGroupProps) {
   return (
-    <section className={styles.section} aria-labelledby={headingId}>
-      <h2 id={headingId} className={styles.sectionHeading}>
-        {heading}
-      </h2>
+    <section
+      className={`${styles.section} ${styles.vacancyGroup}`}
+      aria-labelledby={headingId}
+    >
+      <div className={styles.sectionHeader}>
+        <h2 id={headingId} className={styles.sectionHeading}>
+          {heading}
+        </h2>
+        <span className={styles.sectionCount}>{drafts.length}</span>
+      </div>
       {drafts.length > 0 ? (
         <ul className={styles.list}>
           {drafts.map((draft) => (
@@ -293,53 +296,69 @@ function VacancyListGroup({
   );
 }
 
+function primaryFactLine(draft: EmployerDraftListItem): string {
+  const category = jobCategoryLabel(draft.jobCategory as JobCategoryCode);
+  const locality = draft.publicLocality ?? "Locality not set";
+  const employerContext =
+    draft.employerType === "organisation"
+      ? draft.companyName !== null
+        ? `Organisation · ${draft.companyName}`
+        : "Organisation"
+      : "Private";
+  return `${category} · ${locality} · ${employerContext}`;
+}
+
 function VacancyListRow({ draft }: { draft: EmployerDraftListItem }) {
-  const expiresAt = formatDate(draft.expiresAt);
+  const showExpiry =
+    draft.publicationState === "published" &&
+    draft.isEffectivelyExpired === false;
+  const expiresAt = showExpiry ? formatVacancyDate(draft.expiresAt) : null;
   const consequence = consequenceSentence(draft);
+  const canEdit =
+    draft.publicationState === "draft" || draft.publicationState === "paused";
+  const canDelete = draft.publicationState === "draft";
 
   return (
-    <li className={styles.listItem}>
-      <h3 className={styles.listTitle}>{draft.title}</h3>
-      <ul className={styles.meta}>
-        <li>
-          Category: {jobCategoryLabel(draft.jobCategory as JobCategoryCode)}
-        </li>
-        <li>Locality: {draft.publicLocality ?? "Not set"}</li>
-        <li>
-          Employer type:{" "}
-          {draft.employerType === "organisation" ? "Organisation" : "Private"}
-        </li>
-        {draft.companyName !== null ? (
-          <li>Company: {draft.companyName}</li>
+    <li className={`${styles.listItem} ${styles.vacancyRow}`}>
+      <div className={styles.rowMain}>
+        <h3 className={styles.listTitle}>{draft.title}</h3>
+        <p className={styles.factLine}>{primaryFactLine(draft)}</p>
+        <p
+          className={styles.lifecycleBadge}
+          data-state={draft.publicationState}
+        >
+          {statusLabel(draft)}
+        </p>
+        {expiresAt !== null ? (
+          <p className={styles.expiry}>Expires {expiresAt}</p>
         ) : null}
-        <li>Status: {statusLabel(draft)}</li>
-        {expiresAt !== null ? <li>Expires: {expiresAt}</li> : null}
-        <li>Next: {nextActionHint(draft)}</li>
-        <li>Updated: {formatUpdatedAt(draft.updatedAt)}</li>
-      </ul>
-      {consequence !== null ? (
-        <p className={styles.support}>{consequence}</p>
-      ) : null}
-      <div className={styles.actions}>
+        {consequence !== null ? (
+          <p className={styles.support}>{consequence}</p>
+        ) : null}
+        <p className={styles.nextHint}>Next: {nextActionHint(draft)}</p>
+      </div>
+      <div className={styles.rowActions}>
         <Link
           className={styles.linkButton}
           href={`/employer/vacancies/${draft.id}`}
+          aria-label={`Manage ${draft.title}`}
         >
           Manage
         </Link>
-        {draft.publicationState === "draft" ||
-        draft.publicationState === "paused" ? (
+        {canEdit ? (
           <Link
-            className={styles.linkButton}
+            className={styles.quietLink}
             href={`/employer/vacancies/${draft.id}/edit`}
+            aria-label={`Edit ${draft.title}`}
           >
             Edit
           </Link>
         ) : null}
-        {draft.publicationState === "draft" ? (
+        {canDelete ? (
           <Link
-            className={styles.linkButton}
+            className={styles.quietLink}
             href={`/employer/vacancies/${draft.id}#delete-draft`}
+            aria-label={`Delete ${draft.title}`}
           >
             Delete
           </Link>

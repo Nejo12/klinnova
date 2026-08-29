@@ -47,7 +47,7 @@ export const VACANCY_VERIFICATION_EMPTY_ACTION = "Continue verification";
 export const VACANCY_LIST_HEADING = "Vacancies";
 
 export const VACANCY_LIST_LEAD =
-  "Create private vacancy drafts, then publish once verified. Manage the full lifecycle — pause, resume, mark filled, or withdraw — from here.";
+  "Create, publish and manage roles. Live work stays distinct from drafts and closed states.";
 
 export const VACANCY_CREATED =
   "Draft saved. You can keep editing — nothing is published.";

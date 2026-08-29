@@ -10,7 +10,7 @@ import {
 } from "@/lib/employer/vacancies/messages";
 
 describe("employer vacancies list Loading", () => {
-  it("announces busy status regions, including 'Loading actions' and 'Loading live vacancies'", () => {
+  it("announces busy status regions for Live and Not live", () => {
     render(<Loading />);
 
     const regions = screen.getAllByRole("status");
@@ -18,13 +18,16 @@ describe("employer vacancies list Loading", () => {
     for (const region of regions) {
       expect(region).toHaveAttribute("aria-busy", "true");
     }
-    const labels = regions.map((region) => region.textContent);
-    expect(labels).toContain("Loading actions");
-    expect(labels).toContain("Loading live vacancies");
-    expect(labels).toContain("Loading not-live vacancies");
+    const labels = regions.map((region) => region.textContent ?? "");
+    expect(
+      labels.some((label) => label.includes("Loading live vacancies")),
+    ).toBe(true);
+    expect(
+      labels.some((label) => label.includes("Loading not-live vacancies")),
+    ).toBe(true);
   });
 
-  it("renders the real static heading/lead/note directly, not as skeletons", () => {
+  it("renders the real header, heading, lead, note, and Create draft action", () => {
     render(<Loading />);
 
     expect(
@@ -32,30 +35,40 @@ describe("employer vacancies list Loading", () => {
     ).toBeInTheDocument();
     expect(screen.getByText(VACANCY_LIST_LEAD)).toBeInTheDocument();
     expect(screen.getByText(VACANCY_PRIVATE_NOTICE)).toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: "Employer" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Create draft" })).toHaveAttribute(
+      "href",
+      "/employer/vacancies/new",
+    );
   });
 
-  it("renders representative Live and Not-live row counts", () => {
+  it("renders Live and Not live structure without claiming counts or vacancy names", () => {
     const { container } = render(<Loading />);
 
-    const sections = container.querySelectorAll(`.${styles.section}`);
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Live" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Not live" }),
+    ).toBeInTheDocument();
+
+    const sections = container.querySelectorAll(`.${styles.vacancyGroup}`);
     expect(sections).toHaveLength(2);
 
     const [live, notLive] = sections;
-    expect(live?.querySelectorAll(`.${styles.listItem}`)).toHaveLength(2);
-    expect(notLive?.querySelectorAll(`.${styles.listItem}`)).toHaveLength(1);
+    expect(live?.querySelectorAll(`.${styles.vacancyRow}`)).toHaveLength(2);
+    expect(notLive?.querySelectorAll(`.${styles.vacancyRow}`)).toHaveLength(1);
+    expect(screen.queryByText("Office Cleaner")).toBeNull();
+    expect(screen.queryByText("Applications 8")).toBeNull();
   });
 
-  it("renders each row's six unconditional meta lines (Category, Locality, Employer type, Status, Next, Updated)", () => {
-    const { container } = render(<Loading />);
-
-    const firstRow = container.querySelector(`.${styles.listItem}`);
-    expect(firstRow?.querySelectorAll(`.${styles.meta} > li`)).toHaveLength(6);
-  });
-
-  it("renders no interactive controls", () => {
+  it("does not render pretend Publish, Edit, or Manage controls", () => {
     render(<Loading />);
 
-    expect(screen.queryAllByRole("link")).toHaveLength(0);
-    expect(screen.queryAllByRole("button")).toHaveLength(0);
+    expect(screen.queryByRole("link", { name: "Manage" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Edit" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Publish" })).toBeNull();
   });
 });
