@@ -96,7 +96,15 @@ describe("ApplicationDetail", () => {
       />,
     );
 
-    expect(screen.getByText("J. Doe")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 1, name: "J. Doe" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", {
+        level: 2,
+        name: "Applicant essentials",
+      }),
+    ).toBeInTheDocument();
     expect(screen.getByText("Declared")).toBeInTheDocument();
     expect(
       screen.queryByText(
@@ -116,7 +124,7 @@ describe("ApplicationDetail", () => {
     expect(screen.getByText("Not declared")).toBeInTheDocument();
   });
 
-  it("renders the vacancy section with title, submitted time, and current status", () => {
+  it("renders vacancy context, submitted time, and current status in the page header", () => {
     render(
       <ApplicationDetail
         application={buildApplication()}
@@ -124,7 +132,16 @@ describe("ApplicationDetail", () => {
         todayIso={TODAY_ISO}
       />,
     );
-    expect(screen.getByText("Morning kitchen support")).toBeInTheDocument();
+    expect(
+      screen.getByText((_, element) =>
+        Boolean(
+          element?.tagName === "P" &&
+          element?.textContent?.includes(
+            "Morning kitchen support · submitted 1 Aug 2026, 02:00",
+          ),
+        ),
+      ),
+    ).toBeInTheDocument();
     expect(screen.getAllByText("Submitted").length).toBeGreaterThan(0);
   });
 
@@ -150,17 +167,17 @@ describe("ApplicationDetail", () => {
         todayIso={TODAY_ISO}
       />,
     );
-    const statusSection = screen
-      .getByRole("heading", { level: 2, name: "Status" })
+    const reviewSection = screen
+      .getByRole("heading", { level: 2, name: "Review" })
       .closest("section");
-    expect(statusSection?.querySelector("select")).toBeNull();
+    expect(reviewSection?.querySelector("select")).toBeNull();
     expect(
-      within(statusSection as HTMLElement).getByRole("button", {
+      within(reviewSection as HTMLElement).getByRole("button", {
         name: "Start reviewing",
       }),
     ).toBeInTheDocument();
     expect(
-      within(statusSection as HTMLElement).getByRole("button", {
+      within(reviewSection as HTMLElement).getByRole("button", {
         name: "Reject application",
       }),
     ).toBeInTheDocument();
@@ -178,13 +195,13 @@ describe("ApplicationDetail", () => {
       />,
     );
     expect(screen.getByText(/status is final/i)).toBeInTheDocument();
-    // Scoped to the Status section specifically — a second, unrelated
+    // Scoped to the Review section specifically — a second, unrelated
     // combobox (outcome type) is always present regardless of transition
     // state (M5.1 Unit E).
-    const statusSection = screen
-      .getByRole("heading", { level: 2, name: "Status" })
+    const reviewSection = screen
+      .getByRole("heading", { level: 2, name: "Review" })
       .closest("section");
-    expect(statusSection?.querySelector("select")).toBeNull();
+    expect(reviewSection?.querySelector("select")).toBeNull();
   });
 
   it("renders 'First opened' with a formatted date when employer_seen_at is set", () => {
@@ -219,7 +236,9 @@ describe("ApplicationDetail", () => {
         todayIso={TODAY_ISO}
       />,
     );
-    expect(screen.getByText("Deleted candidate")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Deleted candidate" }),
+    ).toBeInTheDocument();
     expect(
       screen.getByText("Candidate data has been removed."),
     ).toBeInTheDocument();
@@ -239,7 +258,16 @@ describe("ApplicationDetail", () => {
         todayIso={TODAY_ISO}
       />,
     );
-    expect(screen.getByText("Morning kitchen support")).toBeInTheDocument();
+    expect(
+      screen.getByText((_, element) =>
+        Boolean(
+          element?.tagName === "P" &&
+          element?.textContent?.includes(
+            "Morning kitchen support · submitted 1 Aug 2026, 02:00",
+          ),
+        ),
+      ),
+    ).toBeInTheDocument();
     expect(screen.getAllByText("Submitted").length).toBeGreaterThan(0);
   });
 
@@ -252,10 +280,10 @@ describe("ApplicationDetail", () => {
       />,
     );
     expect(screen.getByText(/status is final/i)).toBeInTheDocument();
-    const statusSection = screen
-      .getByRole("heading", { level: 2, name: "Status" })
+    const reviewSection = screen
+      .getByRole("heading", { level: 2, name: "Review" })
       .closest("section");
-    expect(statusSection?.querySelector("select")).toBeNull();
+    expect(reviewSection?.querySelector("select")).toBeNull();
     expect(screen.queryByRole("button", { name: /update status/i })).toBeNull();
   });
 });

@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import Loading from "@/app/employer/applications/[applicationId]/loading";
-import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import styles from "@/components/employer-applications/employer-applications.module.scss";
 
 describe("employer application detail Loading", () => {
   it("announces busy status regions, including 'Loading application'", () => {
@@ -18,21 +18,20 @@ describe("employer application detail Loading", () => {
     ).toBe(true);
   });
 
-  it("renders the fixed Applicant (8) and Vacancy (3) detail-list row counts", () => {
+  it("renders the fixed Applicant essentials detail-list row count", () => {
     const { container } = render(<Loading />);
 
     const detailLists = container.querySelectorAll(`.${styles.detailList}`);
-    expect(detailLists).toHaveLength(2);
+    expect(detailLists).toHaveLength(1);
 
-    const [applicant, vacancy] = detailLists;
-    expect(applicant?.children).toHaveLength(8);
-    expect(vacancy?.children).toHaveLength(3);
+    const [applicant] = detailLists;
+    expect(applicant?.children).toHaveLength(7);
   });
 
   it("renders status-history rows as a list, not fabricated event text", () => {
     const { container } = render(<Loading />);
 
-    const listItems = container.querySelectorAll(`.${styles.listItem}`);
+    const listItems = container.querySelectorAll(`.${styles.historyItem}`);
     expect(listItems.length).toBeGreaterThan(0);
   });
 

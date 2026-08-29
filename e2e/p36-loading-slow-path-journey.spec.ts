@@ -84,6 +84,14 @@ const SLOW_DELAY_MS = 3_000;
 // assertion's patience needs the margin.
 const SKELETON_APPEAR_TIMEOUT_MS = SLOW_DELAY_MS + 3_000;
 
+async function expectReviewCurrentStatus(page: Page, status: string) {
+  const reviewSection = page
+    .getByRole("heading", { level: 2, name: "Review" })
+    .locator("..");
+  await expect(reviewSection.getByText("Current status")).toBeVisible();
+  await expect(reviewSection.getByText(status, { exact: true })).toBeVisible();
+}
+
 /**
  * `SkeletonRegion`'s `[role="status"][aria-busy="true"]` element is always
  * a DOM child of `DelayedReveal`'s wrapper, which starts at `opacity: 0`
@@ -741,9 +749,7 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
       "a rapid double-click on a pending status-transition button must fire exactly one request",
     ).toBe(1);
     await page.goto(applicationDetailUrl);
-    await expect(page.getByText("Current status: In review")).toBeVisible({
-      timeout: 15_000,
-    });
+    await expectReviewCurrentStatus(page, "In review");
 
     await page.unroute(transitionUrlGlob, slowTransitionHandler);
 
@@ -779,9 +785,7 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
     const shortlistResponse = await shortlistResponsePromise;
     expect(shortlistResponse.status()).toBe(200);
     await page.goto(applicationDetailUrl);
-    await expect(page.getByText("Current status: Shortlisted")).toBeVisible({
-      timeout: 15_000,
-    });
+    await expectReviewCurrentStatus(page, "Shortlisted");
 
     const slowAcceptHandler = async (
       route: Parameters<Parameters<Page["route"]>[1]>[0],
@@ -822,9 +826,7 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
     const acceptResponse = await acceptResponsePromise;
     expect(acceptResponse.status()).toBe(200);
     await page.goto(applicationDetailUrl);
-    await expect(page.getByText("Current status: Accepted")).toBeVisible({
-      timeout: 15_000,
-    });
+    await expectReviewCurrentStatus(page, "Accepted");
     await page.unroute(transitionUrlGlob, slowAcceptHandler);
   });
 });

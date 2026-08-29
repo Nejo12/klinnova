@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 import {
   publishEligibleEmployerVacancy,
@@ -10,9 +10,7 @@ import { registerAndConfirm } from "./helpers/auth";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const runAuthJourney = process.env.E2E_AUTH_JOURNEY === "1";
 
-async function openEmployerApplicationDetail(
-  employerPage: import("@playwright/test").Page,
-) {
+async function openEmployerApplicationDetail(employerPage: Page) {
   await employerPage.goto("/employer/applications");
   // Task A's applications list intentionally shows a row in more than one
   // group when it's both unseen and open (needsReview/open are orthogonal
@@ -27,6 +25,14 @@ async function openEmployerApplicationDetail(
     /\/employer\/applications\/[0-9a-f-]{36}$/,
     { timeout: 15_000 },
   );
+}
+
+async function expectReviewCurrentStatus(page: Page, status: string) {
+  const reviewSection = page
+    .getByRole("heading", { level: 2, name: "Review" })
+    .locator("..");
+  await expect(reviewSection.getByText("Current status")).toBeVisible();
+  await expect(reviewSection.getByText(status, { exact: true })).toBeVisible();
 }
 
 test.describe("candidate application status journey", () => {
@@ -97,9 +103,7 @@ test.describe("candidate application status journey", () => {
     // --- Timeline: submitted -> reviewing ---
     await openEmployerApplicationDetail(employerPage);
     await transitionApplicationStatusAsEmployer(employerPage, "reviewing");
-    await expect(
-      employerPage.getByText("Current status: In review"),
-    ).toBeVisible({ timeout: 15_000 });
+    await expectReviewCurrentStatus(employerPage, "In review");
 
     await page.reload();
     const statusValue = page.getByRole("definition").first();
@@ -117,9 +121,7 @@ test.describe("candidate application status journey", () => {
 
     // --- reviewing -> shortlisted ---
     await transitionApplicationStatusAsEmployer(employerPage, "shortlisted");
-    await expect(
-      employerPage.getByText("Current status: Shortlisted"),
-    ).toBeVisible({ timeout: 15_000 });
+    await expectReviewCurrentStatus(employerPage, "Shortlisted");
 
     await page.reload();
     await expect(statusValue).toHaveText("Shortlisted");
@@ -127,9 +129,7 @@ test.describe("candidate application status journey", () => {
 
     // --- shortlisted -> accepted (terminal, informational only) ---
     await transitionApplicationStatusAsEmployer(employerPage, "accepted");
-    await expect(
-      employerPage.getByText("Current status: Accepted"),
-    ).toBeVisible({ timeout: 15_000 });
+    await expectReviewCurrentStatus(employerPage, "Accepted");
 
     await page.reload();
     await expect(statusValue).toHaveText("Accepted");
@@ -176,9 +176,7 @@ test.describe("candidate application status journey", () => {
       "Role filled internally.",
     );
     // Employer/internal label is the unchanged canonical label.
-    await expect(
-      employerPage.getByText("Current status: Rejected"),
-    ).toBeVisible({ timeout: 15_000 });
+    await expectReviewCurrentStatus(employerPage, "Rejected");
 
     await page.reload();
     // Candidate-facing label is the candidate-only display label.

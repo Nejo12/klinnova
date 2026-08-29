@@ -42,6 +42,14 @@ async function submitEmployerApplicationActionAndReload(
   await page.reload();
 }
 
+async function expectReviewCurrentStatus(page: Page, status: string) {
+  const reviewSection = page
+    .getByRole("heading", { level: 2, name: "Review" })
+    .locator("..");
+  await expect(reviewSection.getByText("Current status")).toBeVisible();
+  await expect(reviewSection.getByText(status, { exact: true })).toBeVisible();
+}
+
 /**
  * M5.1 Unit E — the real UI on top of Unit D's outcome-events RPCs. This is
  * deliberately a separate spec from `e2e/application-outcome-events-
@@ -93,7 +101,7 @@ test.describe("employer application outcome UI journey (M5.1 Unit E)", () => {
     await expect(
       page.getByText("No interview or hire events recorded yet."),
     ).toBeVisible();
-    await expect(page.getByText("Current status: Submitted")).toBeVisible();
+    await expectReviewCurrentStatus(page, "Submitted");
 
     // Record the first interview_completed via the real form.
     await page
@@ -196,7 +204,7 @@ test.describe("employer application outcome UI journey (M5.1 Unit E)", () => {
     // applications.status was never touched by any of the above — recording
     // hired is not the same as the employer's separate accept/reject
     // workflow, and setting status=accepted is never implied by hired.
-    await expect(page.getByText("Current status: Submitted")).toBeVisible();
+    await expectReviewCurrentStatus(page, "Submitted");
 
     // Candidate sees only the active facts, in a section separate from the
     // status timeline, with no "Interview set"/scheduling language and no

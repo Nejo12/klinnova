@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef } from "react";
 
-import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import styles from "@/components/employer-applications/employer-applications.module.scss";
 import { APPLICATION_REASON_MAX_LENGTH } from "@/lib/employer/applications/messages";
 
 type StatusTransitionConfirmDialogProps = {

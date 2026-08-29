@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 import {
   candidateApplicationOutcomes,
@@ -14,6 +14,14 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const runAuthJourney = process.env.E2E_AUTH_JOURNEY === "1";
 const hasServiceRoleKey =
   (process.env.SUPABASE_SERVICE_ROLE_KEY ?? "").length > 0;
+
+async function expectReviewCurrentStatus(page: Page, status: string) {
+  const reviewSection = page
+    .getByRole("heading", { level: 2, name: "Review" })
+    .locator("..");
+  await expect(reviewSection.getByText("Current status")).toBeVisible();
+  await expect(reviewSection.getByText(status, { exact: true })).toBeVisible();
+}
 
 test.describe("application outcome events journey (D-M5-22)", () => {
   test.skip(
@@ -184,9 +192,7 @@ test.describe("application outcome events journey (D-M5-22)", () => {
     // transition workflow. Verified through the existing employer
     // application-detail UI, which is the authoritative status projection.
     await page.goto(`/employer/applications/${applicationId}`);
-    await expect(page.getByText("Current status: Submitted")).toBeVisible({
-      timeout: 15_000,
-    });
+    await expectReviewCurrentStatus(page, "Submitted");
   });
 
   test("an unrelated employer cannot record, void, or read another employer's application outcomes", async ({

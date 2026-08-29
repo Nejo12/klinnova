@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 
 import { ApplicationDetail } from "@/components/employer-applications/application-detail";
+import styles from "@/components/employer-applications/employer-applications.module.scss";
 import { ApplicationUnavailable } from "@/components/employer-applications/application-unavailable";
 import { EmployerRestrictedNotice } from "@/components/employer-shared/employer-restricted-notice";
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
-import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import { berlinTodayIso } from "@/lib/applications/outcome-type";
 import { loadEmployerApplication } from "@/lib/employer/applications/load-employer-application";
 import { loadEmployerApplicationOutcomes } from "@/lib/employer/applications/load-employer-application-outcomes";
@@ -104,9 +104,6 @@ export default async function EmployerApplicationDetailPage({
         currentPath="applications"
         unseenApplicationsCount={unseenApplicationsCount}
       />
-      <h1 className={styles.heading}>
-        {loaded.application.candidate_display_name}
-      </h1>
       <ApplicationDetail
         application={loaded.application}
         outcomes={outcomesResult.ok ? outcomesResult.outcomes : null}
