@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 const root = process.cwd();
 
 const PUBLIC_JOBS_FILES = [
-  "src/app/jobs/page.tsx",
+  "src/app/jobs/(browse)/page.tsx",
   "src/app/jobs/[vacancyId]/page.tsx",
   "src/app/jobs/[vacancyId]/not-found.tsx",
   "src/lib/public-jobs/load-public-vacancies.ts",
@@ -24,6 +24,20 @@ function readSource(relativePath: (typeof PUBLIC_JOBS_FILES)[number]) {
 }
 
 describe("PR 5.5b public-jobs static security proof", () => {
+  it("does not wrap public job detail in a loading.tsx Suspense shell", () => {
+    // A loading.tsx in `app/jobs/` wraps `/jobs/[vacancyId]` as well as the
+    // listing. Combined with `app/jobs/[vacancyId]/loading.tsx`, Next.js
+    // streams HTTP 200 + skeleton before `notFound()`, so Playwright and
+    // curl observe 200 even when get_effective_public_vacancy returns zero
+    // rows (D-072/D-073 hidden vacancies). Listing loading belongs in a
+    // route group that does not wrap the detail segment, and the detail
+    // route must not have its own loading.tsx.
+    expect(existsSync(join(root, "src/app/jobs/loading.tsx"))).toBe(false);
+    expect(existsSync(join(root, "src/app/jobs/[vacancyId]/loading.tsx"))).toBe(
+      false,
+    );
+  });
+
   it("avoids service-role clients", () => {
     for (const file of PUBLIC_JOBS_FILES) {
       const source = readSource(file);

@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import Loading from "@/app/jobs/loading";
+import Loading from "@/app/jobs/(browse)/loading";
 import styles from "@/components/public-jobs/public-jobs.module.scss";
 
 describe("public jobs list Loading", () => {

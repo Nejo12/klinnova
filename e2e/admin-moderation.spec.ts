@@ -399,10 +399,8 @@ test.describe("admin moderation: employer suspension journey", () => {
       ),
     ).toHaveCount(0);
     await expect(
-      page.getByText(
-        "Review applicants for your vacancies and update their status.",
-      ),
-    ).toBeVisible();
+      page.getByRole("heading", { name: "No applications yet." }),
+    ).toBeVisible({ timeout: 15_000 });
 
     await anonContext.close();
     await candidateContext.close();

@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(222);
+select plan(225);
 
 -- ---------------------------------------------------------------------------
 -- Fixtures
@@ -704,6 +704,10 @@ select is_empty(
   $$ select * from public.get_effective_public_vacancy('a2900000-0000-4000-8000-000000000041') $$,
   'the public detail RPC returns zero rows for a suspended employer''s vacancy'
 );
+select is_empty(
+  $$ select * from public.get_effective_public_vacancy_languages('a2900000-0000-4000-8000-000000000041') $$,
+  'the public language RPC returns zero rows for a suspended employer''s vacancy'
+);
 
 set local role authenticated;
 select set_config('request.jwt.claim.sub','a2900000-0000-4000-8000-000000000021',true);
@@ -752,6 +756,14 @@ select is(
 
 select is(public.is_vacancy_effectively_public('a2900000-0000-4000-8000-000000000041'), false, 'vacancy one is hidden while moderated');
 select is(public.is_vacancy_effectively_public('a2900000-0000-4000-8000-000000000042'), true, 'sibling vacancy two is unaffected by vacancy one''s moderation');
+select is_empty(
+  $$ select * from public.get_effective_public_vacancy('a2900000-0000-4000-8000-000000000041') $$,
+  'the public detail RPC returns zero rows for a moderated vacancy'
+);
+select is_empty(
+  $$ select * from public.get_effective_public_vacancy_languages('a2900000-0000-4000-8000-000000000041') $$,
+  'the public language RPC returns zero rows for a moderated vacancy'
+);
 
 set local role authenticated;
 select set_config('request.jwt.claim.sub','a2900000-0000-4000-8000-000000000001',true);
