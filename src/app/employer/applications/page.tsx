@@ -7,7 +7,7 @@ import {
 import { ApplicationListFilters } from "@/components/employer-applications/application-list-filters";
 import { EmployerRestrictedNotice } from "@/components/employer-shared/employer-restricted-notice";
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
-import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import styles from "@/components/employer-applications/employer-applications.module.scss";
 import { APPLICATION_LIST_LEAD } from "@/lib/employer/applications/messages";
 import { loadEmployerApplications } from "@/lib/employer/applications/load-employer-applications";
 import { loadUnseenApplicationsCount } from "@/lib/employer/applications/load-unseen-applications-count";
@@ -54,7 +54,9 @@ export default async function EmployerApplicationsPage({
           currentPath="applications"
           unseenApplicationsCount={0}
         />
-        <h1 className={styles.heading}>Applications</h1>
+        <div className={styles.pageIntro}>
+          <h1 className={styles.heading}>Applications</h1>
+        </div>
         <EmployerRestrictedNotice message={EMPLOYER_RESTRICTED_APPLICATIONS} />
       </main>
     );
@@ -115,8 +117,10 @@ export default async function EmployerApplicationsPage({
         currentPath="applications"
         unseenApplicationsCount={unseenApplicationsCount}
       />
-      <h1 className={styles.heading}>Applications</h1>
-      <p className={styles.lead}>{APPLICATION_LIST_LEAD}</p>
+      <div className={styles.pageIntro}>
+        <h1 className={styles.heading}>Applications</h1>
+        <p className={styles.lead}>{APPLICATION_LIST_LEAD}</p>
+      </div>
       <ApplicationListFilters filter={filter} vacancyTitle={vacancyTitle} />
       <ApplicationList
         applications={loaded.applications}

@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { EmployerEmptyState } from "@/components/employer-shared/employer-empty-state";
 import { draftConsequence } from "@/components/employer-vacancies/vacancy-list";
-import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import styles from "@/components/employer-applications/employer-applications.module.scss";
 import { groupEmployerApplications } from "@/lib/employer/applications/group-applications";
 import {
   APPLICATION_DRAFT_VACANCY_ACTION,
@@ -12,6 +12,7 @@ import {
   APPLICATION_DRAFT_VACANCY_VISIBILITY_NOTE,
   APPLICATION_EMPTY_LIST,
   APPLICATION_EMPTY_LIST_SUPPORT,
+  CANDIDATE_DATA_REMOVED,
   APPLICATION_NO_REVIEW_HEADING,
 } from "@/lib/employer/applications/messages";
 import { formatApplicationTimestamp } from "@/lib/employer/applications/format-timestamp";
@@ -51,6 +52,7 @@ type ApplicationListGroupProps = {
   headingId: string;
   heading: string;
   rows: EmployerApplicationListRow[];
+  priority: "primary" | "quiet";
   emptyContent?: ReactNode;
 };
 
@@ -65,6 +67,20 @@ export function ApplicationList({
   applications,
   filteredVacancy = null,
 }: ApplicationListProps) {
+  const { needsReview, open, decided } =
+    groupEmployerApplications(applications);
+  const summaryLabel =
+    filteredVacancy === null ? "All vacancies" : "Filtered vacancy";
+  const summary = (
+    <ApplicationSummary
+      allLabel={summaryLabel}
+      total={applications.length}
+      needsReview={needsReview.length}
+      open={open.length}
+      decided={decided.length}
+    />
+  );
+
   if (applications.length === 0) {
     if (filteredVacancy !== null) {
       if (filteredVacancy.publicationState === "draft") {
@@ -75,41 +91,47 @@ export function ApplicationList({
         // "pay and hours" claim that might not be true for this draft.
         const support = `${draftConsequence({ checklist: filteredVacancy.checklist })} ${APPLICATION_DRAFT_VACANCY_VISIBILITY_NOTE}`;
         return (
-          <EmployerEmptyState
-            headingId="applications-empty-heading"
-            heading={APPLICATION_DRAFT_VACANCY_HEADING}
-            support={support}
-            actionHref={`/employer/vacancies/${filteredVacancy.id}/edit`}
-            actionLabel={APPLICATION_DRAFT_VACANCY_ACTION}
-          />
+          <>
+            {summary}
+            <EmployerEmptyState
+              headingId="applications-empty-heading"
+              heading={APPLICATION_DRAFT_VACANCY_HEADING}
+              support={support}
+              actionHref={`/employer/vacancies/${filteredVacancy.id}/edit`}
+              actionLabel={APPLICATION_DRAFT_VACANCY_ACTION}
+            />
+          </>
         );
       }
       return (
-        <EmployerEmptyState
-          headingId="applications-empty-heading"
-          heading={
-            filteredVacancy.title !== null
-              ? `No applications for ${filteredVacancy.title}`
-              : "No applications for this vacancy"
-          }
-          actionHref={`/employer/vacancies/${filteredVacancy.id}`}
-          actionLabel="View vacancy"
-        />
+        <>
+          {summary}
+          <EmployerEmptyState
+            headingId="applications-empty-heading"
+            heading={
+              filteredVacancy.title !== null
+                ? `No applications for ${filteredVacancy.title}`
+                : "No applications for this vacancy"
+            }
+            actionHref={`/employer/vacancies/${filteredVacancy.id}`}
+            actionLabel="View vacancy"
+          />
+        </>
       );
     }
     return (
-      <EmployerEmptyState
-        headingId="applications-empty-heading"
-        heading={APPLICATION_EMPTY_LIST}
-        support={APPLICATION_EMPTY_LIST_SUPPORT}
-        actionHref="/employer/vacancies"
-        actionLabel="View vacancies"
-      />
+      <>
+        {summary}
+        <EmployerEmptyState
+          headingId="applications-empty-heading"
+          heading={APPLICATION_EMPTY_LIST}
+          support={APPLICATION_EMPTY_LIST_SUPPORT}
+          actionHref="/employer/vacancies"
+          actionLabel="View vacancies"
+        />
+      </>
     );
   }
-
-  const { needsReview, open, decided } =
-    groupEmployerApplications(applications);
 
   // "Everything reviewed": nothing unopened, but applications are still
   // moving through review — distinct from the true empty-list case above.
@@ -126,23 +148,54 @@ export function ApplicationList({
 
   return (
     <>
+      {summary}
       <ApplicationListGroup
         headingId="needs-review-heading"
-        heading={`Needs review (${needsReview.length})`}
+        heading="Needs review"
         rows={needsReview}
+        priority="primary"
         emptyContent={needsReviewEmptyContent}
       />
       <ApplicationListGroup
         headingId="open-heading"
-        heading={`Open (${open.length})`}
+        heading="Open"
         rows={open}
+        priority="quiet"
       />
       <ApplicationListGroup
         headingId="decided-heading"
-        heading={`Decided (${decided.length})`}
+        heading="Decided"
         rows={decided}
+        priority="quiet"
       />
     </>
+  );
+}
+
+function ApplicationSummary({
+  allLabel,
+  total,
+  needsReview,
+  open,
+  decided,
+}: {
+  allLabel: string;
+  total: number;
+  needsReview: number;
+  open: number;
+  decided: number;
+}) {
+  return (
+    <ul className={styles.summaryList} aria-label="Application summary">
+      <li className={styles.summaryChip}>
+        {allLabel} {total}
+      </li>
+      <li className={`${styles.summaryChip} ${styles.summaryChipAttention}`}>
+        Needs review {needsReview}
+      </li>
+      <li className={styles.summaryChip}>Open {open}</li>
+      <li className={styles.summaryChip}>Decided {decided}</li>
+    </ul>
   );
 }
 
@@ -150,13 +203,21 @@ function ApplicationListGroup({
   headingId,
   heading,
   rows,
+  priority,
   emptyContent = null,
 }: ApplicationListGroupProps) {
   return (
-    <section className={styles.section} aria-labelledby={headingId}>
-      <h2 id={headingId} className={styles.sectionHeading}>
-        {heading}
-      </h2>
+    <section
+      className={styles.section}
+      data-priority={priority}
+      aria-labelledby={headingId}
+    >
+      <div className={styles.sectionHeader}>
+        <h2 id={headingId} className={styles.sectionHeading}>
+          {heading}
+        </h2>
+        <span className={styles.sectionCount}>{rows.length}</span>
+      </div>
       {rows.length > 0 ? (
         <ul className={styles.list}>
           {rows.map((application) => (
@@ -167,7 +228,7 @@ function ApplicationListGroup({
           ))}
         </ul>
       ) : (
-        emptyContent
+        <div className={styles.emptyGroup}>{emptyContent}</div>
       )}
     </section>
   );
@@ -178,39 +239,40 @@ function ApplicationListRow({
 }: {
   application: EmployerApplicationListRow;
 }) {
+  const facts = application.candidate_deleted
+    ? CANDIDATE_DATA_REMOVED
+    : `${jobCategoryLabel(application.job_category)} · ${germanRequirementLabel(
+        application.german_comfort,
+      )} · ${
+        application.available_from === null
+          ? "Available date not set"
+          : `Available ${formatIsoCalendarDate(application.available_from)}`
+      }`;
+  const submitted = formatApplicationTimestamp(application.submitted_at);
+
   return (
     <li className={styles.listItem}>
       <h3 className={styles.listTitle}>{application.candidate_display_name}</h3>
-      <ul className={styles.meta}>
-        <li>Vacancy: {application.vacancy_title}</li>
-        {application.candidate_deleted ? null : (
-          <>
-            <li>
-              Matched category: {jobCategoryLabel(application.job_category)}
-            </li>
-            <li>
-              German comfort:{" "}
-              {germanRequirementLabel(application.german_comfort)}
-            </li>
-            <li>
-              Available from:{" "}
-              {application.available_from === null
-                ? "Not set"
-                : formatIsoCalendarDate(application.available_from)}
-            </li>
-          </>
-        )}
-        <li>Status: {applicationStatusLabel(application.current_status)}</li>
-        <li>
-          Submitted: {formatApplicationTimestamp(application.submitted_at)}
-        </li>
-      </ul>
+      <p className={styles.vacancyTitle}>{application.vacancy_title}</p>
+      <p className={styles.facts}>{facts}</p>
+      <p className={styles.timestamp}>Submitted {submitted}</p>
+      <span
+        className={styles.statusBadge}
+        data-status={application.current_status}
+      >
+        {applicationStatusLabel(application.current_status)}
+      </span>
       <div className={styles.actions}>
         <Link
           className={styles.linkButton}
           href={`/employer/applications/${application.application_id}`}
+          aria-label={`Review ${application.candidate_display_name} for ${application.vacancy_title}`}
         >
           Review
+          <span className={styles.srOnly}>
+            {" "}
+            {application.candidate_display_name} for {application.vacancy_title}
+          </span>
         </Link>
       </div>
     </li>

@@ -352,7 +352,9 @@ async function createEmployerApplicationFixture(
 
   // `page` is still authenticated as the employer.
   await page.goto("/employer/applications");
-  const initialReviewLink = page.getByRole("link", { name: "Review" }).first();
+  const initialReviewLink = page
+    .getByRole("link", { name: /^Review\b/ })
+    .first();
   await expect(initialReviewLink).toBeVisible();
   const applicationDetailUrl = await initialReviewLink.getAttribute("href");
   if (applicationDetailUrl === null) {
@@ -626,7 +628,10 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
       appUrlGlob,
       SLOW_DELAY_MS,
     );
-    await page.getByRole("link", { name: "Review" }).first().click();
+    await page
+      .getByRole("link", { name: /^Review\b/ })
+      .first()
+      .click();
     await waitForSkeletonIfObservable(page, "employer applications -> detail");
     await expect(
       page.getByRole("heading", { level: 1, name: candidateDisplayName }),
@@ -636,7 +641,7 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
 
     // (b) fast
     await page.goto("/employer/applications");
-    const reviewLink = page.getByRole("link", { name: "Review" }).first();
+    const reviewLink = page.getByRole("link", { name: /^Review\b/ }).first();
     await expect(reviewLink).toBeVisible();
     await installSkeletonWatcher(page);
     await reviewLink.click();
@@ -651,7 +656,10 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
     // (d) mocked error, must not get stuck
     await page.goto("/employer/applications");
     const unfailApp = await failRoute(page, appUrlGlob);
-    await page.getByRole("link", { name: "Review" }).first().click();
+    await page
+      .getByRole("link", { name: /^Review\b/ })
+      .first()
+      .click();
     await page.waitForTimeout(3_000);
     await expect(page.locator(SKELETON_SELECTOR)).toHaveCount(0);
     await unfailApp();

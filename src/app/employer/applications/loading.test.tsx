@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import Loading from "@/app/employer/applications/loading";
-import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import styles from "@/components/employer-applications/employer-applications.module.scss";
 
 describe("employer applications list Loading", () => {
   it("announces busy status regions, including 'Loading applications'", () => {
@@ -16,6 +16,15 @@ describe("employer applications list Loading", () => {
     expect(
       regions.some((region) => region.textContent === "Loading applications"),
     ).toBe(true);
+  });
+
+  it("renders unknown summary counts as skeleton chips", () => {
+    const { container } = render(<Loading />);
+
+    expect(container.querySelectorAll(`.${styles.summaryChip}`)).toHaveLength(
+      4,
+    );
+    expect(screen.queryByText(/Needs review 3|Open 5|Decided 7/)).toBeNull();
   });
 
   it("renders representative Needs review / Open / Decided row counts", () => {
@@ -32,11 +41,11 @@ describe("employer applications list Loading", () => {
     expect(decided?.querySelectorAll(`.${styles.listItem}`)).toHaveLength(1);
   });
 
-  it("renders each row's six typical-case meta lines (Vacancy, Matched category, German comfort, Available from, Status, Submitted)", () => {
+  it("renders each row's current triage skeleton structure", () => {
     const { container } = render(<Loading />);
 
     const firstRow = container.querySelector(`.${styles.listItem}`);
-    expect(firstRow?.querySelectorAll(`.${styles.meta} > li`)).toHaveLength(6);
+    expect(firstRow?.querySelectorAll('[aria-hidden="true"]')).toHaveLength(6);
   });
 
   it("renders no interactive controls", () => {
