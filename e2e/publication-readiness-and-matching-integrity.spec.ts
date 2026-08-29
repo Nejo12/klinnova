@@ -78,6 +78,39 @@ async function saveLanguagesAndReload(page: Page): Promise<void> {
   await page.reload();
 }
 
+async function publishVacancyAndReload(page: Page): Promise<void> {
+  const vacancyPath = new URL(page.url()).pathname;
+  expect(vacancyPath).toMatch(/^\/employer\/vacancies\/[^/]+$/);
+
+  await page
+    .getByRole("checkbox", {
+      name: /Publishing may make this vacancy publicly visible/i,
+    })
+    .check();
+  const [response] = await Promise.all([
+    page.waitForResponse(
+      (candidate) =>
+        new URL(candidate.url()).pathname === vacancyPath &&
+        candidate.request().method() === "POST",
+    ),
+    page.getByRole("button", { name: "Publish" }).click(),
+  ]);
+  expect(response.status()).toBeLessThan(400);
+  await page.reload();
+
+  const statusRegion = page.getByRole("region", { name: "Status" });
+  await expect(statusRegion.getByRole("status")).toHaveText("Published", {
+    timeout: 15_000,
+  });
+  await expect(
+    statusRegion.getByText(
+      "This vacancy is currently visible to eligible candidates.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Publish" })).toHaveCount(0);
+}
+
 async function expectReadyDraftFieldsPersisted(page: Page): Promise<void> {
   await expect(page.getByLabel("Description")).toHaveValue(
     "Cleaning role, small office.",
@@ -234,15 +267,7 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     await expect(
       page.getByText("Ready for a future publication step", { exact: true }),
     ).toBeVisible({ timeout: 15_000 });
-    await page
-      .getByRole("checkbox", {
-        name: /Publishing may make this vacancy publicly visible/i,
-      })
-      .check();
-    await page.getByRole("button", { name: "Publish" }).click();
-    await expect(page.getByText("Published", { exact: true })).toBeVisible({
-      timeout: 15_000,
-    });
+    await publishVacancyAndReload(page);
 
     // --- Candidate side: onboard with genuinely compatible requirements,
     // reach Matches, open the job, and apply — the exact chain the
@@ -436,15 +461,7 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     await operatorContext.close();
 
     await page.goto(`/employer/vacancies/${vacancyId}`);
-    await page
-      .getByRole("checkbox", {
-        name: /Publishing may make this vacancy publicly visible/i,
-      })
-      .check();
-    await page.getByRole("button", { name: "Publish" }).click();
-    await expect(page.getByText("Published", { exact: true })).toBeVisible({
-      timeout: 15_000,
-    });
+    await publishVacancyAndReload(page);
 
     const candidateContext = await page.context().browser()?.newContext();
     if (candidateContext === undefined) {
