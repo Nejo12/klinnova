@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useRef } from "react";
 
 import { voidApplicationOutcomeAction } from "@/app/employer/applications/[applicationId]/outcome-actions";
-import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import styles from "@/components/employer-applications/employer-applications.module.scss";
 import {
   OUTCOME_ALREADY_VOIDED,
   OUTCOME_GENERIC_FAILURE,

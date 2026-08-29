@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useRef } from "react";
 
 import { recordApplicationOutcomeAction } from "@/app/employer/applications/[applicationId]/outcome-actions";
-import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import styles from "@/components/employer-applications/employer-applications.module.scss";
 import {
   OUTCOME_TYPE_CODES,
   outcomeTypeLabel,

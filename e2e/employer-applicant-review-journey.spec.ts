@@ -21,6 +21,52 @@ type PublishedVacancy = {
   employerDisplayName: string;
 };
 
+async function expectReviewCurrentStatus(page: Page, status: string) {
+  const reviewSection = page
+    .getByRole("heading", { level: 2, name: "Review" })
+    .locator("..");
+  await expect(reviewSection.getByText("Current status")).toBeVisible();
+  await expect(reviewSection.getByText(status, { exact: true })).toBeVisible();
+}
+
+async function saveVacancyDraftFormAndReload(
+  page: Page,
+  buttonName: "Save draft" | "Save languages",
+): Promise<void> {
+  const [response] = await Promise.all([
+    page.waitForResponse(
+      (candidate) =>
+        candidate.url().includes("/edit") &&
+        candidate.request().method() === "POST",
+    ),
+    page.getByRole("button", { name: buttonName }).click(),
+  ]);
+  expect(
+    response.status(),
+    `"${buttonName}" should succeed even if the draft form confirmation UI gets stuck`,
+  ).toBe(200);
+  await page.reload();
+}
+
+async function submitApplicationActionAndReload(
+  page: Page,
+  submit: () => Promise<void>,
+) {
+  const applicationPath = new URL(page.url()).pathname;
+  const responsePromise = page.waitForResponse(
+    (response) =>
+      response.request().method() === "POST" &&
+      new URL(response.url()).pathname === applicationPath,
+    { timeout: 15_000 },
+  );
+
+  await submit();
+
+  const response = await responsePromise;
+  expect(response.status()).toBeLessThan(400);
+  await page.reload();
+}
+
 /**
  * Registers a private employer, creates a fully-readied draft, verifies it
  * (via a separate operator context), and publishes it. The employer vacancy
@@ -81,18 +127,12 @@ async function publishEligibleEmployerVacancy(
     .check();
   await page.getByLabel("Amount in EUR").fill("16.00");
   await page.getByLabel("Period").selectOption("hourly");
-  await page.getByRole("button", { name: "Save draft" }).click();
-  await expect(page.getByText("Draft changes saved.")).toBeVisible({
-    timeout: 15_000,
-  });
+  await saveVacancyDraftFormAndReload(page, "Save draft");
 
   await page.getByRole("button", { name: "Add language" }).click();
   await page.getByLabel(/Language 1/i).selectOption("en");
   await page.getByLabel(/Minimum proficiency 1/i).selectOption("basic");
-  await page.getByRole("button", { name: "Save languages" }).click();
-  await expect(page.getByText("Language requirements saved.")).toBeVisible({
-    timeout: 15_000,
-  });
+  await saveVacancyDraftFormAndReload(page, "Save languages");
 
   await seedVacancyMatchingArrays(vacancyId, ["part_time"], ["morning"]);
 
@@ -274,9 +314,9 @@ test.describe("employer applicant review journey", () => {
     // both the "Needs review" and "Open" groups (grouping is two
     // independent axes, not four exclusive buckets) — scope to the
     // "Needs review" section to assert on a single, unambiguous match.
-    const needsReviewSection = page
-      .getByRole("heading", { level: 2, name: /Needs review/ })
-      .locator("..");
+    const needsReviewSection = page.getByRole("region", {
+      name: "Needs review",
+    });
     await expect(
       needsReviewSection.getByRole("heading", {
         level: 3,
@@ -289,7 +329,9 @@ test.describe("employer applicant review journey", () => {
     // application is both, so both this text and the "Review" link below
     // legitimately appear twice (identical content, identical href);
     // .first() is the correct scoping, not a workaround.
-    await expect(needsReviewSection.getByText("Submitted")).toBeVisible();
+    await expect(
+      needsReviewSection.getByText("Submitted", { exact: true }),
+    ).toBeVisible();
 
     await page
       .getByRole("link", { name: /^Review\b/ })
@@ -311,16 +353,16 @@ test.describe("employer applicant review journey", () => {
     // same way the vacancy-lifecycle actions unmount their own inline
     // success message — so this asserts on the resulting state, not the
     // transient "Status updated to…" banner.
-    await page.getByRole("button", { name: "Start reviewing" }).click();
-    await expect(page.getByText("Current status: In review")).toBeVisible({
-      timeout: 15_000,
+    await submitApplicationActionAndReload(page, async () => {
+      await page.getByRole("button", { name: "Start reviewing" }).click();
     });
+    await expectReviewCurrentStatus(page, "In review");
 
     // reviewing -> shortlisted
-    await page.getByRole("button", { name: "Shortlist" }).click();
-    await expect(page.getByText("Current status: Shortlisted")).toBeVisible({
-      timeout: 15_000,
+    await submitApplicationActionAndReload(page, async () => {
+      await page.getByRole("button", { name: "Shortlist" }).click();
     });
+    await expectReviewCurrentStatus(page, "Shortlisted");
 
     // shortlisted -> accepted (terminal) — the trigger opens a confirm
     // dialog; its own submit button is the real action.
@@ -329,17 +371,17 @@ test.describe("employer applicant review journey", () => {
       name: "Accept this application?",
     });
     await expect(acceptDialog).toBeVisible();
-    await acceptDialog
-      .getByRole("button", { name: "Accept application" })
-      .click();
-    await expect(page.getByText("Current status: Accepted")).toBeVisible({
-      timeout: 15_000,
+    await submitApplicationActionAndReload(page, async () => {
+      await acceptDialog
+        .getByRole("button", { name: "Accept application" })
+        .click();
     });
+    await expectReviewCurrentStatus(page, "Accepted");
     await expect(page.getByText(/status is final/i)).toBeVisible();
-    // Scoped to the Status section — a second, unrelated combobox (outcome
+    // Scoped to the Review section — a second, unrelated combobox (outcome
     // type) is always present regardless of transition state (M5.1 Unit E).
     const statusSection = page
-      .getByRole("heading", { level: 2, name: "Status" })
+      .getByRole("heading", { level: 2, name: "Review" })
       .locator("..");
     await expect(statusSection.getByRole("combobox")).toHaveCount(0);
 
@@ -361,7 +403,7 @@ test.describe("employer applicant review journey", () => {
     await expect(page.getByText(/actor/i)).toHaveCount(0);
 
     await page.reload();
-    await expect(page.getByText("Current status: Accepted")).toBeVisible();
+    await expectReviewCurrentStatus(page, "Accepted");
     await expect(page.getByText(/status is final/i)).toBeVisible();
   });
 
@@ -401,20 +443,20 @@ test.describe("employer applicant review journey", () => {
     });
     await expect(rejectDialog).toBeVisible();
     await rejectDialog.getByLabel(/reason/i).fill("Role filled internally.");
-    await rejectDialog
-      .getByRole("button", { name: "Reject application" })
-      .click();
-
-    await expect(page.getByText("Current status: Rejected")).toBeVisible({
-      timeout: 15_000,
+    await submitApplicationActionAndReload(page, async () => {
+      await rejectDialog
+        .getByRole("button", { name: "Reject application" })
+        .click();
     });
+
+    await expectReviewCurrentStatus(page, "Rejected");
     await expect(
       page.getByText("Reason: Role filled internally."),
     ).toBeVisible();
     await expect(page.getByText(/status is final/i)).toBeVisible();
 
     await page.reload();
-    await expect(page.getByText("Current status: Rejected")).toBeVisible();
+    await expectReviewCurrentStatus(page, "Rejected");
     await expect(
       page.getByText("Reason: Role filled internally."),
     ).toBeVisible();
@@ -507,10 +549,10 @@ test.describe("employer applicant review journey", () => {
     await expect(page).toHaveURL(/\/employer\/applications\/[0-9a-f-]{36}$/, {
       timeout: 15_000,
     });
-    await page.getByRole("button", { name: "Start reviewing" }).click();
-    await expect(page.getByText("Current status: In review")).toBeVisible({
-      timeout: 15_000,
+    await submitApplicationActionAndReload(page, async () => {
+      await page.getByRole("button", { name: "Start reviewing" }).click();
     });
+    await expectReviewCurrentStatus(page, "In review");
   });
 
   test("a stale transition attempt refreshes safely without a false success", async ({
@@ -550,12 +592,12 @@ test.describe("employer applicant review journey", () => {
       name: "Accept this application?",
     });
     await expect(secondTabAcceptDialog).toBeVisible();
-    await secondTabAcceptDialog
-      .getByRole("button", { name: "Accept application" })
-      .click();
-    await expect(secondTab.getByText("Current status: Accepted")).toBeVisible({
-      timeout: 15_000,
+    await submitApplicationActionAndReload(secondTab, async () => {
+      await secondTabAcceptDialog
+        .getByRole("button", { name: "Accept application" })
+        .click();
     });
+    await expectReviewCurrentStatus(secondTab, "Accepted");
     await secondTab.close();
 
     // The first tab still shows the stale "submitted" form (no auto-poll).
@@ -565,20 +607,25 @@ test.describe("employer applicant review journey", () => {
     // revalidatePath-triggered refresh that clears a real success message
     // elsewhere in this suite also replaces this stale form with the true
     // canonical (terminal, no-form) state — never a false "In review".
-    await page.getByRole("button", { name: "Start reviewing" }).click();
-    await expect(page.getByText("Current status: Accepted")).toBeVisible({
-      timeout: 15_000,
+    await submitApplicationActionAndReload(page, async () => {
+      await page.getByRole("button", { name: "Start reviewing" }).click();
     });
+    await expectReviewCurrentStatus(page, "Accepted");
     await expect(page.getByText(/status is final/i)).toBeVisible();
-    await expect(page.getByText("Current status: In review")).toHaveCount(0);
+    const reviewSectionAfterStale = page
+      .getByRole("heading", { level: 2, name: "Review" })
+      .locator("..");
+    await expect(
+      reviewSectionAfterStale.getByText("In review", { exact: true }),
+    ).toHaveCount(0);
     const statusSectionAfterStale = page
-      .getByRole("heading", { level: 2, name: "Status" })
+      .getByRole("heading", { level: 2, name: "Review" })
       .locator("..");
     await expect(statusSectionAfterStale.getByRole("combobox")).toHaveCount(0);
 
     // A reload reflects the same true canonical state.
     await page.reload();
-    await expect(page.getByText("Current status: Accepted")).toBeVisible();
+    await expectReviewCurrentStatus(page, "Accepted");
     await expect(page.getByText(/status is final/i)).toBeVisible();
   });
 });

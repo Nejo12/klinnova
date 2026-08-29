@@ -3,30 +3,25 @@ import {
   Skeleton,
   SkeletonRegion,
 } from "@/components/shared/skeleton";
-import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import styles from "@/components/employer-applications/employer-applications.module.scss";
 
 // Mirrors the fixed, unconditional `<dl><div><dt/dd></div></dl>` rows
-// `ApplicationDetail`'s "Applicant" section renders when the candidate has
-// not been deleted (Name, Matched category, German comfort, Languages,
-// Work permission, Available from, Availability, Employment types) — the
+// `ApplicationDetail`'s "Applicant essentials" section renders when the candidate has
+// not been deleted (Matched category, German comfort, Languages, Work
+// permission, Available from, Availability, Employment types) — the
 // typical, higher-fidelity case. Whether `candidate_deleted` is true is
 // itself unknown pre-load; that branch instead collapses to a single Name
 // row plus a support notice, which this skeleton does not attempt to
 // predict.
-const APPLICANT_ROW_COUNT = 8;
-// "Vacancy" section rows (Title, Submitted, Current status) — always
-// rendered regardless of candidate state.
-const VACANCY_ROW_COUNT = 3;
+const APPLICANT_ROW_COUNT = 7;
 // A representative count for status history — every application has at
 // least one "Submitted" event (from_status === null), but the real count
 // is unknown until the history query resolves.
 const STATUS_HISTORY_ROW_COUNT = 2;
 
-// employer-vacancies.module.scss's `.detailList` stacks a bare `<dt>` over
-// a bare `<dd>` inside an unclassed wrapper `<div>` — there is no
-// `.metaRow`-style two-column grid class on this surface (confirmed by
-// reading the module directly), so each row here is two stacked Skeleton
-// blocks, not a paired label|value grid.
+// employer-applications.module.scss's detail rows use the same label/value
+// structure as the real detail surface, while keeping every dynamic value as
+// a skeleton until the application authority has loaded.
 function DetailRowSkeleton({
   labelWidth,
   valueWidth,
@@ -63,12 +58,10 @@ function DetailRowSkeleton({
  * Left out entirely, because rendering them would mean guessing at
  * structure the data hasn't confirmed yet:
  * - the "First opened" notice (only shown once `employer_seen_at` is set)
- * - `ApplicationStatusActions` (which transition buttons show depends
- *   entirely on `current_status`/`allowed_transitions`; they're also
- *   interactive controls a skeleton must never fabricate)
- * - `ApplicationOutcomeHistory` (only renders entries when outcomes are
- *   non-empty; most applications have none, mirroring the equivalent
- *   candidate-side "outcomes timeline" exclusion)
+ * - real status transition buttons (which buttons show depends entirely on
+ *   `current_status`/`allowed_transitions`; a skeleton must never fabricate
+ *   them)
+ * - concrete `ApplicationOutcomeHistory` entries
  *
  * `RecordOutcomeForm` is always rendered regardless of application data
  * (its own shape — an outcome select, a date input, a submit button — is
@@ -76,73 +69,67 @@ function DetailRowSkeleton({
  * mounts, using plain blocks rather than any real `<select>`/`<input>`/
  * `<button>`.
  */
-// The real page (src/app/employer/applications/[applicationId]/page.tsx,
-// via ApplicationDetail) has five distinct top-level children under
-// `<main className={styles.page}>`: the heading, the Applicant section,
-// the Vacancy section, the Status history section, and RecordOutcomeForm
-// — each individually gapped by `.page`'s `gap: var(--space-6)`. A single
-// DelayedReveal/SkeletonRegion pair around all of it (as this file used to
-// have) makes them one child of `.page`, so that gap never applies between
-// them. One pair per genuinely distinct region restores it.
 export default function Loading() {
   return (
     <main className={styles.page}>
       <DelayedReveal>
         <SkeletonRegion label="Loading application">
-          <Skeleton height="2.25rem" width="50%" radius="sm" />
-        </SkeletonRegion>
-      </DelayedReveal>
-
-      <DelayedReveal>
-        <SkeletonRegion label="Loading applicant details">
-          <div className={styles.section}>
-            <Skeleton height="1.25rem" width="6rem" radius="sm" />
-            <div className={styles.detailList}>
-              {Array.from({ length: APPLICANT_ROW_COUNT }, (_, index) => (
-                <DetailRowSkeleton
-                  key={index}
-                  labelWidth="8rem"
-                  valueWidth="60%"
-                />
-              ))}
+          <div className={styles.detailBackShell}>
+            <Skeleton height="1rem" width="10rem" radius="sm" />
+          </div>
+          <div className={styles.detailHeader}>
+            <div className={styles.pageIntro}>
+              <Skeleton height="2.25rem" width="min(18rem, 70%)" radius="sm" />
+              <Skeleton height="1rem" width="min(26rem, 90%)" radius="sm" />
             </div>
+            <Skeleton height="1.75rem" width="6rem" radius="pill" />
           </div>
         </SkeletonRegion>
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading vacancy details">
-          <div className={styles.section}>
-            <Skeleton height="1.25rem" width="6rem" radius="sm" />
-            <div className={styles.detailList}>
-              {Array.from({ length: VACANCY_ROW_COUNT }, (_, index) => (
-                <DetailRowSkeleton
-                  key={index}
-                  labelWidth="7rem"
-                  valueWidth="55%"
-                />
-              ))}
-            </div>
-          </div>
-        </SkeletonRegion>
-      </DelayedReveal>
-
-      <DelayedReveal>
-        <SkeletonRegion label="Loading status history">
-          <div className={styles.section}>
-            <Skeleton height="1.25rem" width="9rem" radius="sm" />
-            <ul className={styles.list}>
-              {Array.from({ length: STATUS_HISTORY_ROW_COUNT }, (_, index) => (
-                <li key={index} className={styles.listItem}>
-                  <Skeleton height="1.125rem" width="45%" radius="sm" />
-                  <ul className={styles.meta}>
-                    <li>
-                      <Skeleton height="0.8rem" width="9rem" radius="sm" />
-                    </li>
+        <SkeletonRegion label="Loading applicant review">
+          <div className={styles.detailGrid}>
+            <div className={styles.detailMain}>
+              <section className={styles.section}>
+                <Skeleton height="1.25rem" width="11rem" radius="sm" />
+                <div className={styles.detailList}>
+                  {Array.from({ length: APPLICANT_ROW_COUNT }, (_, index) => (
+                    <DetailRowSkeleton
+                      key={index}
+                      labelWidth="8rem"
+                      valueWidth="60%"
+                    />
+                  ))}
+                </div>
+                <div className={styles.historyBlock}>
+                  <Skeleton height="1.125rem" width="9rem" radius="sm" />
+                  <ul className={styles.historyList}>
+                    {Array.from(
+                      { length: STATUS_HISTORY_ROW_COUNT },
+                      (_, index) => (
+                        <li key={index} className={styles.historyItem}>
+                          <Skeleton height="1rem" width="45%" radius="sm" />
+                          <Skeleton height="0.8rem" width="9rem" radius="sm" />
+                        </li>
+                      ),
+                    )}
                   </ul>
-                </li>
-              ))}
-            </ul>
+                </div>
+              </section>
+            </div>
+
+            <aside className={styles.detailSide}>
+              <section className={styles.section}>
+                <Skeleton height="1.25rem" width="5rem" radius="sm" />
+                <Skeleton height="0.75rem" width="7rem" radius="sm" />
+                <Skeleton height="1.5rem" width="8rem" radius="sm" />
+                <div className={styles.divider} />
+                <Skeleton height="0.875rem" width="6rem" radius="sm" />
+                <Skeleton height="2.75rem" width="100%" radius="sm" />
+                <Skeleton height="2.75rem" width="100%" radius="sm" />
+              </section>
+            </aside>
           </div>
         </SkeletonRegion>
       </DelayedReveal>

@@ -3,8 +3,8 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 
 import { transitionEmployerApplicationAction } from "@/app/employer/applications/[applicationId]/transition-actions";
+import styles from "@/components/employer-applications/employer-applications.module.scss";
 import { StatusTransitionConfirmDialog } from "@/components/employer-applications/status-transition-confirm-dialog";
-import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import {
   APPLICATION_ALREADY_IN_STATE,
   APPLICATION_GENERIC_FAILURE,
@@ -146,13 +146,16 @@ export function ApplicationStatusActions({
 
   if (allowedTransitions.length === 0) {
     return (
-      <section className={styles.section} aria-labelledby="transition-heading">
-        <h2 id="transition-heading" className={styles.sectionHeading}>
-          Status
+      <section className={styles.reviewPanel} aria-labelledby="review-heading">
+        <h2 id="review-heading" className={styles.sectionHeading}>
+          Review
         </h2>
-        <p className={styles.support}>
-          Current status: {applicationStatusLabel(currentStatus)}
-        </p>
+        <div className={styles.reviewCurrent}>
+          <p className={styles.kicker}>Current status</p>
+          <p className={styles.reviewStatus}>
+            {applicationStatusLabel(currentStatus)}
+          </p>
+        </div>
         <p className={styles.note}>{APPLICATION_TERMINAL_STATE}</p>
       </section>
     );
@@ -165,13 +168,16 @@ export function ApplicationStatusActions({
   const dialogOpen = pendingTerminal !== null;
 
   return (
-    <section className={styles.section} aria-labelledby="transition-heading">
-      <h2 id="transition-heading" className={styles.sectionHeading}>
-        Status
+    <section className={styles.reviewPanel} aria-labelledby="review-heading">
+      <h2 id="review-heading" className={styles.sectionHeading}>
+        Review
       </h2>
-      <p className={styles.support}>
-        Current status: {applicationStatusLabel(currentStatus)}
-      </p>
+      <div className={styles.reviewCurrent}>
+        <p className={styles.kicker}>Current status</p>
+        <p className={styles.reviewStatus}>
+          {applicationStatusLabel(currentStatus)}
+        </p>
+      </div>
 
       <form className={styles.form} action={formAction} noValidate>
         <input type="hidden" name="applicationId" value={applicationId} />
@@ -180,6 +186,7 @@ export function ApplicationStatusActions({
           {renderFeedback(state)}
         </div>
 
+        <p className={styles.kicker}>Next status</p>
         <div className={`${styles.actions} ${styles.statusActionsGroup}`}>
           {ordinaryTransitions.map((status) => {
             const isPressed = pending && pressedStatus === status;
@@ -225,6 +232,11 @@ export function ApplicationStatusActions({
             </div>
           </>
         ) : null}
+
+        <p className={styles.note}>
+          Accepted and rejected are terminal application states. Hired remains a
+          separate outcome event.
+        </p>
 
         {pendingTerminal !== null ? (
           <StatusTransitionConfirmDialog

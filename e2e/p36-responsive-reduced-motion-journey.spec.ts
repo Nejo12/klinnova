@@ -37,6 +37,14 @@ const SKELETON_SELECTOR = '[role="status"][aria-busy="true"]';
 const DELAY_MS = 1_200;
 const SKELETON_TIMEOUT_MS = DELAY_MS + 3_000;
 
+async function expectReviewCurrentStatus(page: Page, status: string) {
+  const reviewSection = page
+    .getByRole("heading", { level: 2, name: "Review" })
+    .locator("..");
+  await expect(reviewSection.getByText("Current status")).toBeVisible();
+  await expect(reviewSection.getByText(status, { exact: true })).toBeVisible();
+}
+
 function isRealNavigationRequest(
   route: Parameters<Parameters<Page["route"]>[1]>[0],
 ): boolean {
@@ -673,11 +681,11 @@ test.describe("responsive verification across 360/390/430/768/1280/1440 (Task G 
     // of the test (every request after the first POST passes straight
     // through, undelayed); the handler is cleaned up automatically when
     // the page/context tears down at test end.
-    // Asserts on the durable "Current status: X" line (always rendered,
+    // Asserts on the durable Review panel current-status value (always rendered,
     // sourced from the transitioned server state) rather than the
     // transient "Status updated to X." confirmation banner: a live run
     // showed the transition itself completing correctly (confirmed via
-    // the captured page snapshot: "Current status: In review", with
+    // the captured page snapshot: Review showing "In review", with
     // "Shortlist"/"Accept"/"Reject application" already re-rendered as
     // the next available actions) while the transient banner text was no
     // longer present by the time this assertion's polling sampled the
@@ -686,9 +694,7 @@ test.describe("responsive verification across 360/390/430/768/1280/1440 (Task G 
     // transient-banner copy itself is already covered live in
     // e2e/p36-loading-slow-path-journey.spec.ts; this test's own concern
     // is confirming the pending state resolved to real, correct content.
-    await expect(page.getByText("Current status: In review")).toBeVisible({
-      timeout: 15_000,
-    });
+    await expectReviewCurrentStatus(page, "In review");
   });
 });
 

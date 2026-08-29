@@ -1,5 +1,5 @@
 import { VoidOutcomeButton } from "@/components/employer-applications/void-outcome-button";
-import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import styles from "@/components/employer-applications/employer-applications.module.scss";
 import { outcomeTypeLabel } from "@/lib/applications/outcome-type";
 import { formatApplicationTimestamp } from "@/lib/employer/applications/format-timestamp";
 import { OUTCOME_EMPTY_HISTORY } from "@/lib/employer/applications/messages";

@@ -39,7 +39,8 @@ describe("ApplicationStatusActions", () => {
     expect(screen.queryByRole("form")).toBeNull();
     expect(screen.queryByRole("button")).toBeNull();
     expect(screen.getByText(/status is final/i)).toBeInTheDocument();
-    expect(screen.getByText(/current status: accepted/i)).toBeInTheDocument();
+    expect(screen.getByText("Current status")).toBeInTheDocument();
+    expect(screen.getByText("Accepted")).toBeInTheDocument();
   });
 
   it("renders one discrete button per allowed transition, with the correct action-verb label", () => {
