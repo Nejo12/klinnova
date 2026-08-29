@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page, type Response } from "@playwright/test";
 
 import { registerAndConfirm } from "./helpers/auth";
 import {
@@ -8,6 +8,26 @@ import {
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const runAuthJourney = process.env.E2E_AUTH_JOURNEY === "1";
+
+function waitForVacancyEditPost(page: Page): Promise<Response> {
+  return page.waitForResponse(
+    (candidate) =>
+      candidate.url().includes("/edit") &&
+      candidate.request().method() === "POST",
+  );
+}
+
+async function saveVacancyFormAndReload(
+  page: Page,
+  buttonName: "Save draft" | "Save languages",
+): Promise<void> {
+  const [response] = await Promise.all([
+    waitForVacancyEditPost(page),
+    page.getByRole("button", { name: buttonName }).click(),
+  ]);
+  expect(response.status()).toBe(200);
+  await page.reload();
+}
 
 async function completePrivateEmployer(
   page: Parameters<typeof registerAndConfirm>[0],
@@ -120,18 +140,16 @@ test.describe("employer vacancy draft journeys", () => {
     await page.getByRole("checkbox", { name: "Morning" }).check();
     await page.getByLabel("Amount in EUR").fill("15.50");
     await page.getByLabel("Period").selectOption("hourly");
-    await page.getByRole("button", { name: "Save draft" }).click();
-    await expect(page.getByText("Draft changes saved.")).toBeVisible({
-      timeout: 15_000,
-    });
+    await saveVacancyFormAndReload(page, "Save draft");
+    await expect(page.getByLabel("Description")).toHaveValue(
+      "Wash kitchen floors before noon.",
+    );
 
     await page.getByRole("button", { name: "Add language" }).click();
     await page.getByLabel(/Language 1/i).selectOption("en");
     await page.getByLabel(/Minimum proficiency 1/i).selectOption("basic");
-    await page.getByRole("button", { name: "Save languages" }).click();
-    await expect(page.getByText("Language requirements saved.")).toBeVisible({
-      timeout: 15_000,
-    });
+    await saveVacancyFormAndReload(page, "Save languages");
+    await expect(page.getByLabel(/Language 1/i)).toHaveValue("en");
 
     // D-M5-19: employer verification is a genuine readiness requirement —
     // employer_vacancy_draft_readiness and publish_employer_vacancy both
@@ -188,7 +206,7 @@ test.describe("employer vacancy draft journeys", () => {
     await expect(
       page
         .getByLabel("Publication readiness")
-        .getByText("Ready for a future publication step", { exact: true }),
+        .getByText("Ready to publish.", { exact: true }),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: /publish/i })).toHaveCount(0);
     await expect(page.getByRole("link", { name: /publish/i })).toHaveCount(0);

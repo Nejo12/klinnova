@@ -168,7 +168,11 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
 
     // --- Negative proof: readiness truthfully reports what publish will
     // actually require, before anything beyond the minimum is filled.
-    await expect(page.getByText("Not ready for publication yet")).toBeVisible({
+    await expect(
+      page.getByText(
+        /still needed before publishing\.|missing before publishing\./,
+      ),
+    ).toBeVisible({
       timeout: 15_000,
     });
     const workplaceTypeRow = page
@@ -208,7 +212,9 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
 
     // Still not ready: employer is not yet verified. Readiness must not
     // claim otherwise merely because every vacancy field is complete.
-    await expect(page.getByText("Not ready for publication yet")).toBeVisible({
+    await expect(
+      page.getByText("Employer verification still needed before publishing."),
+    ).toBeVisible({
       timeout: 15_000,
     });
     const verificationRow = page
@@ -265,7 +271,7 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
 
     await page.goto(`/employer/vacancies/${vacancyId}`);
     await expect(
-      page.getByText("Ready for a future publication step", { exact: true }),
+      page.getByText("Ready to publish.", { exact: true }),
     ).toBeVisible({ timeout: 15_000 });
     await publishVacancyAndReload(page);
 

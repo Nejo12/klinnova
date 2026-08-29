@@ -70,6 +70,7 @@ export default function Loading() {
     <main className={styles.page}>
       <DelayedReveal>
         <SkeletonRegion label="Loading vacancy">
+          <Skeleton height="1rem" width="9rem" radius="sm" />
           <Skeleton height="2.25rem" width="60%" radius="sm" />
         </SkeletonRegion>
       </DelayedReveal>

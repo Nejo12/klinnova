@@ -1,8 +1,8 @@
+import Link from "next/link";
+
+import { draftConsequence } from "@/components/employer-vacancies/vacancy-list";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
-import {
-  readinessHeadline,
-  type ReadinessChecklistItem,
-} from "@/lib/employer/vacancies/readiness";
+import type { ReadinessChecklistItem } from "@/lib/employer/vacancies/readiness";
 import {
   VACANCY_PRIVATE_NOTICE,
   VACANCY_VERIFICATION_INFO,
@@ -12,17 +12,15 @@ type ReadinessChecklistProps = {
   ready: boolean;
   checklist: ReadinessChecklistItem[];
   available?: boolean;
+  continueHref?: string;
 };
 
 export function ReadinessChecklist({
   ready,
   checklist,
   available = true,
+  continueHref,
 }: ReadinessChecklistProps) {
-  // Missing items are what the employer needs to act on next, so surface
-  // them first — this only reorders the rendered `<li>`s (a stable sort on
-  // a copy of `checklist`); it never changes the checklist item set, the
-  // `complete` flags, or `readinessHeadline`.
   const orderedChecklist = [...checklist].sort((a, b) => {
     if (a.complete === b.complete) {
       return 0;
@@ -48,7 +46,7 @@ export function ReadinessChecklist({
             data-ready={ready ? "true" : "false"}
             role="status"
           >
-            {readinessHeadline(ready)}
+            {draftConsequence({ checklist })}
           </p>
           <ul className={styles.checklist}>
             {orderedChecklist.map((item) => (
@@ -64,6 +62,13 @@ export function ReadinessChecklist({
               </li>
             ))}
           </ul>
+          {continueHref !== undefined ? (
+            <p className={styles.actions}>
+              <Link className={styles.button} href={continueHref}>
+                Edit vacancy
+              </Link>
+            </p>
+          ) : null}
         </>
       )}
     </section>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
@@ -59,6 +60,11 @@ export default async function EmployerVacancyDetailPage({
         currentPath="vacancies"
         unseenApplicationsCount={unseenApplicationsCount}
       />
+      <p className={styles.detailBack}>
+        <Link className={styles.backLink} href="/employer/vacancies">
+          Back to vacancies
+        </Link>
+      </p>
       <h1 className={styles.heading}>{loaded.vacancy.title}</h1>
       <VacancyDetail vacancy={loaded.vacancy} suspended={suspended} />
     </main>

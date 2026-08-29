@@ -4,10 +4,148 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
-  max-width: 44rem;
+  width: 100%;
+  max-width: var(--layout-content-max);
+  min-height: 70vh;
   margin: 0 auto;
   padding: var(--space-8) var(--layout-gutter-mobile);
-  min-height: 70vh;
+}
+
+.pageIntro {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.pageIntroCopy,
+.pageIntroActions {
+  margin: 0;
+}
+
+.pageIntroCopy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.sectionCount {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+}
+
+.vacancyGroup {
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-surface);
+}
+
+.vacancyRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-page);
+}
+
+.rowMain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.rowActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.factLine,
+.nextHint,
+.expiry {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-line-height);
+  overflow-wrap: anywhere;
+}
+
+.nextHint {
+  color: var(--color-text-muted);
+}
+
+.lifecycleBadge {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.75rem;
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+}
+
+.lifecycleBadge[data-state="published"] {
+  background-color: var(--color-status-success-bg);
+  color: var(--color-status-success);
+}
+
+.lifecycleBadge[data-state="draft"] {
+  background-color: var(--color-status-warning-bg);
+  color: var(--color-status-warning);
+}
+
+.lifecycleBadge[data-state="paused"],
+.lifecycleBadge[data-state="expired"],
+.lifecycleBadge[data-state="filled"],
+.lifecycleBadge[data-state="withdrawn"] {
+  background-color: var(--color-action-subtle);
+  color: var(--color-text-primary);
+}
+
+.quietLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text-link);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  color: var(--color-text-link);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.detailBack {
+  margin: 0;
 }
 
 .header {
@@ -67,6 +205,7 @@
   line-height: var(--type-heading-line-height);
   letter-spacing: var(--type-heading-tracking);
   color: var(--color-text-primary);
+  overflow-wrap: anywhere;
 }
 
 .lead,
@@ -82,6 +221,7 @@
 .note {
   font-size: var(--type-body-supporting-size);
   color: var(--color-text-muted);
+  overflow-wrap: anywhere;
 }
 
 .warning {
@@ -116,9 +256,10 @@
 
 .listTitle {
   margin: 0;
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
+  overflow-wrap: anywhere;
 }
 
 .meta {
@@ -501,6 +642,8 @@
 .textarea:focus-visible,
 .button:focus-visible,
 .linkButton:focus-visible,
+.quietLink:focus-visible,
+.backLink:focus-visible,
 .appNavLink:focus-visible {
   outline: var(--focus-ring-width) solid var(--color-focus-ring);
   outline-offset: var(--focus-ring-offset);
@@ -604,15 +747,33 @@
 // Task I — narrow-width (< $breakpoint-sm) treatments. Required widths
 // 360/390/430 all fall below $breakpoint-sm (480px); 768/1280/1440 do not,
 // so none of this applies at the desktop/tablet widths.
+@media (min-width: $breakpoint-sm) {
+  .page {
+    padding-right: var(--layout-gutter-desktop);
+    padding-left: var(--layout-gutter-desktop);
+  }
+}
+
 @media (max-width: $breakpoint-sm) {
-  // `.listItem` is shared by the vacancy list, application list, and the
-  // employer-home mini-lists (all render `<ul class="list"><li
-  // class="listItem">`) — a single narrow-width card treatment covers all
-  // three surfaces without touching their markup. Replaces the desktop
-  // top-border-only row with a full bordered, padded card so each vacancy/
-  // application reads as a distinct stacked card, per Task I's per-surface
-  // brief for vacancy-list.tsx and application-list.tsx.
-  .listItem {
+  .pageIntro,
+  .vacancyRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pageIntroActions .button,
+  .rowActions > * {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .rowActions {
+    justify-content: stretch;
+  }
+
+  // Remaining `.listItem` usages that are not vacancy overview rows keep
+  // the original narrow-width card treatment.
+  .listItem:not(.vacancyRow) {
     padding: var(--space-4);
     border: var(--border-width-default) solid var(--color-border-default);
     border-radius: var(--radius-md);
