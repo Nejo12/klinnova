@@ -85,9 +85,7 @@ const SLOW_DELAY_MS = 3_000;
 const SKELETON_APPEAR_TIMEOUT_MS = SLOW_DELAY_MS + 3_000;
 
 async function expectReviewCurrentStatus(page: Page, status: string) {
-  const reviewSection = page
-    .getByRole("heading", { level: 2, name: "Review" })
-    .locator("..");
+  const reviewSection = page.getByRole("region", { name: "Review" });
   await expect(reviewSection.getByText("Current status")).toBeVisible();
   await expect(reviewSection.getByText(status, { exact: true })).toBeVisible();
 }

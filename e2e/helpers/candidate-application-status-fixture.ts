@@ -7,6 +7,7 @@ import {
   provisionLocalVerificationOperator,
 } from "./local-operator-proof";
 import {
+  applicationStatusLabel,
   employerApplicationActionLabel,
   type ApplicationStatus,
 } from "@/lib/employer/applications/status";
@@ -305,6 +306,33 @@ export async function registerAndApplyAsCandidate(
 
 const TERMINAL_TRANSITIONS = new Set(["accepted", "rejected"]);
 
+async function expectReviewStatusSettled(
+  employerPage: Page,
+  targetStatus: ApplicationStatus,
+): Promise<void> {
+  await expect(
+    employerPage
+      .getByRole("region", { name: "Review" })
+      .getByText(applicationStatusLabel(targetStatus), { exact: true }),
+  ).toBeVisible({ timeout: 20_000 });
+}
+
+async function submitEmployerStatusActionAndReload(
+  employerPage: Page,
+  click: () => Promise<void>,
+): Promise<void> {
+  const [response] = await Promise.all([
+    employerPage.waitForResponse(
+      (candidate) =>
+        candidate.request().method() === "POST" &&
+        /\/employer\/applications\//.test(candidate.url()),
+    ),
+    click(),
+  ]);
+  expect(response.status(), "status transition POST should succeed").toBe(200);
+  await employerPage.reload();
+}
+
 /**
  * Drives the employer's discrete status-action buttons on an already-open
  * detail page (`page` must already be at
@@ -325,7 +353,13 @@ export async function transitionApplicationStatusAsEmployer(
   );
 
   if (!TERMINAL_TRANSITIONS.has(targetStatus)) {
-    await employerPage.getByRole("button", { name: label }).click();
+    await submitEmployerStatusActionAndReload(employerPage, () =>
+      employerPage.getByRole("button", { name: label }).click(),
+    );
+    await expectReviewStatusSettled(
+      employerPage,
+      targetStatus as ApplicationStatus,
+    );
     return;
   }
 
@@ -350,5 +384,11 @@ export async function transitionApplicationStatusAsEmployer(
   if (reason !== undefined) {
     await dialog.getByLabel(/reason/i).fill(reason);
   }
-  await dialog.getByRole("button", { name: confirmLabel }).click();
+  await submitEmployerStatusActionAndReload(employerPage, () =>
+    dialog.getByRole("button", { name: confirmLabel }).click(),
+  );
+  await expectReviewStatusSettled(
+    employerPage,
+    targetStatus as ApplicationStatus,
+  );
 }

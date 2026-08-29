@@ -88,6 +88,9 @@ describe("PublicJobCard", () => {
       "href",
       "/jobs/11111111-1111-4111-8111-111111111111",
     );
+    expect(window.getComputedStyle(link).minHeight).toBe(
+      "var(--touch-target-min)",
+    );
   });
 
   it("renders the title as h2 by default", () => {
