@@ -74,7 +74,6 @@ export function ApplicationList({
   const summary = (
     <ApplicationSummary
       allLabel={summaryLabel}
-      total={applications.length}
       needsReview={needsReview.length}
       open={open.length}
       decided={decided.length}
@@ -174,22 +173,18 @@ export function ApplicationList({
 
 function ApplicationSummary({
   allLabel,
-  total,
   needsReview,
   open,
   decided,
 }: {
   allLabel: string;
-  total: number;
   needsReview: number;
   open: number;
   decided: number;
 }) {
   return (
     <ul className={styles.summaryList} aria-label="Application summary">
-      <li className={styles.summaryChip}>
-        {allLabel} {total}
-      </li>
+      <li className={styles.summaryChip}>{allLabel}</li>
       <li className={`${styles.summaryChip} ${styles.summaryChipAttention}`}>
         Needs review {needsReview}
       </li>

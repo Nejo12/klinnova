@@ -55,7 +55,7 @@ describe("ApplicationList", () => {
     render(<ApplicationList applications={[]} />);
     expect(
       screen.getByRole("list", { name: "Application summary" }),
-    ).toHaveTextContent("All vacancies 0Needs review 0Open 0Decided 0");
+    ).toHaveTextContent("All vacanciesNeeds review 0Open 0Decided 0");
     expect(screen.getByText(APPLICATION_EMPTY_LIST)).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "View vacancies" }),
@@ -74,6 +74,9 @@ describe("ApplicationList", () => {
         }}
       />,
     );
+    expect(
+      screen.getByRole("list", { name: "Application summary" }),
+    ).toHaveTextContent("Filtered vacancyNeeds review 0Open 0Decided 0");
     expect(
       screen.getByRole("heading", {
         level: 2,
@@ -279,7 +282,7 @@ describe("ApplicationList", () => {
 
     const summary = screen.getByRole("list", { name: "Application summary" });
     expect(summary).toHaveTextContent(
-      "All vacancies 1Needs review 0Open 1Decided 0",
+      "All vacanciesNeeds review 0Open 1Decided 0",
     );
     expect(within(summary).queryByRole("link")).toBeNull();
   });

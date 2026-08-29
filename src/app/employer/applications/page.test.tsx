@@ -149,7 +149,7 @@ describe("EmployerApplicationsPage empty states", () => {
 
     expect(
       screen.getByRole("list", { name: "Application summary" }),
-    ).toHaveTextContent("All vacancies 2Needs review 1Open 1Decided 1");
+    ).toHaveTextContent("All vacanciesNeeds review 1Open 1Decided 1");
   });
 
   it("shows the filtered-empty state with the vacancy's title for a published vacancy with zero results", async () => {
