@@ -10,8 +10,8 @@ import {
 // the task brief: candidate Matches -> job detail, candidate
 // Applications -> application detail, employer Home -> Vacancies,
 // employer Applications -> application detail, employer status-transition
-// pending state, and public jobs -> job detail (Task D built a loading.tsx
-// there, confirmed by `find src/app -name loading.tsx`).
+// pending state, and public jobs listing loading. Public job *detail* has
+// no loading.tsx so notFound() can set HTTP 404 for hidden vacancies.
 //
 // Technique: Next.js App Router client-side <Link> transitions fetch the
 // destination's RSC payload via a browser-visible `fetch()` request (query
@@ -416,9 +416,10 @@ test.describe("route-loading slow-path verification (Task G / P3.6)", () => {
       SLOW_DELAY_MS,
     );
     await jobLink.click();
-    await expect(page.locator(SKELETON_SELECTOR).first()).toBeVisible({
-      timeout: SKELETON_APPEAR_TIMEOUT_MS,
-    });
+    // Public job detail must not use loading.tsx: that Suspense shell
+    // commits HTTP 200 before notFound(), so hidden vacancies would look
+    // publicly available to curl/Playwright status checks (D-072). Slow
+    // navigations therefore wait for real content, not a skeleton.
     await expect(
       page.getByRole("heading", {
         level: 1,
