@@ -1,55 +1,112 @@
+@use "../../styles/breakpoints" as *;
+
 .page {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
-  max-width: 44rem;
+  width: 100%;
+  max-width: var(--layout-content-max);
+  min-height: 70vh;
   margin: 0 auto;
   padding: var(--space-8) var(--layout-gutter-mobile);
-  min-height: 70vh;
 }
 
 .heading {
   margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-text-primary);
   font-size: var(--type-heading-size);
   font-weight: var(--type-heading-weight);
   line-height: var(--type-heading-line-height);
   letter-spacing: var(--type-heading-tracking);
-  color: var(--color-text-primary);
 }
 
 .lead {
   margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-text-secondary);
   font-size: var(--type-body-size);
   line-height: var(--type-body-line-height);
-  color: var(--color-text-secondary);
 }
 
 .panel {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  max-width: 40rem;
   padding: var(--space-5);
   border: var(--border-width-default) solid var(--color-border-default);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   background-color: var(--color-bg-surface);
 }
 
-.statusHeading {
+.statusBadge {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  min-height: 1.75rem;
   margin: 0;
-  font-size: var(--font-size-md);
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+}
+
+.statusBadge[data-status="verified"] {
+  background-color: var(--color-status-success-bg);
+  color: var(--color-status-success);
+}
+
+.statusBadge[data-status="unverified"],
+.statusBadge[data-status="pending"] {
+  background-color: var(--color-status-warning-bg);
+  color: var(--color-status-warning);
+}
+
+.statusBadge[data-status="rejected"],
+.statusBadge[data-status="revoked"] {
+  background-color: var(--color-action-subtle);
   color: var(--color-text-primary);
 }
 
-.detailList {
+.stateHeading {
   margin: 0;
-  padding: 0;
-  list-style: none;
+  overflow-wrap: anywhere;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--type-heading-line-height);
+  letter-spacing: var(--type-heading-tracking);
+}
+
+.detailList {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  font-size: var(--type-body-supporting-size);
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+}
+
+.detailList > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.detailList dt {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.detailList dd {
+  margin: 0;
+  overflow-wrap: anywhere;
   color: var(--color-text-secondary);
+  font-size: var(--type-body-supporting-size);
+  white-space: pre-wrap;
 }
 
 .form {
@@ -59,20 +116,20 @@
 }
 
 .fieldset {
-  margin: 0;
-  padding: 0;
-  border: none;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: none;
 }
 
 .legend {
   margin: 0 0 var(--space-2);
   padding: 0;
+  color: var(--color-text-primary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
 }
 
 .option {
@@ -83,22 +140,22 @@
 }
 
 .option input {
-  margin-top: 0.25rem;
   width: 1.125rem;
   height: 1.125rem;
+  margin-top: 0.25rem;
   accent-color: var(--color-action-primary);
 }
 
 .optionLabel {
-  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
   align-items: center;
+  gap: var(--space-3);
 }
 
 .button {
@@ -116,12 +173,6 @@
 .button:disabled {
   opacity: 0.65;
   cursor: not-allowed;
-}
-
-.buttonSecondary {
-  background-color: transparent;
-  color: var(--color-text-primary);
-  border: var(--border-width-default) solid var(--color-border-strong);
 }
 
 .linkButton {
@@ -162,6 +213,7 @@
 .warning {
   margin: 0;
   padding: var(--space-3);
+  overflow-wrap: anywhere;
   border-radius: var(--radius-md);
   background-color: var(--color-support-subtle);
   color: var(--color-text-primary);
@@ -172,4 +224,34 @@
 .linkButton:focus-visible {
   outline: var(--focus-ring-width) solid var(--color-focus-ring);
   outline-offset: var(--focus-ring-offset);
+}
+
+@media (min-width: $breakpoint-sm) {
+  .page {
+    padding-right: var(--layout-gutter-desktop);
+    padding-left: var(--layout-gutter-desktop);
+  }
+
+  .detailList > div {
+    display: grid;
+    grid-template-columns: minmax(7rem, 0.32fr) minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: baseline;
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions > * {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .button {
+    width: 100%;
+  }
 }

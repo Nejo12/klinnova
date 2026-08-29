@@ -230,7 +230,7 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
       .check();
     await page.getByRole("button", { name: "Request verification" }).click();
     await expect(
-      page.getByRole("heading", { name: /Pending review/i }),
+      page.getByRole("status", { name: "Pending review" }),
     ).toBeVisible({ timeout: 15_000 });
 
     const employerId = await getLocalUserIdByEmail(employerEmail);
@@ -427,7 +427,7 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
       .check();
     await page.getByRole("button", { name: "Request verification" }).click();
     await expect(
-      page.getByRole("heading", { name: /Pending review/i }),
+      page.getByRole("status", { name: "Pending review" }),
     ).toBeVisible({ timeout: 15_000 });
 
     const employerId = await getLocalUserIdByEmail(employerEmail);

@@ -28,7 +28,12 @@ export function VerificationRequestForm({
   );
 
   return (
-    <form className={styles.form} action={formAction} noValidate>
+    <form
+      className={styles.form}
+      action={formAction}
+      noValidate
+      aria-busy={pending || undefined}
+    >
       <fieldset className={styles.fieldset}>
         <legend className={styles.legend}>Attestation</legend>
         <label className={styles.option}>

@@ -47,3 +47,21 @@ export const VERIFICATION_REVOKED_LEAD =
 
 export const VERIFICATION_REVOKED_NO_RESUBMIT =
   "Direct resubmission is not available after revocation. Contact support if you believe this is a mistake.";
+
+export const VERIFICATION_STATUS_UNVERIFIED = "Not requested";
+export const VERIFICATION_HEADING_UNVERIFIED =
+  "Verification has not been requested";
+
+export const VERIFICATION_STATUS_PENDING = "Pending review";
+export const VERIFICATION_HEADING_PENDING =
+  "Your verification request is being reviewed";
+
+export const VERIFICATION_STATUS_VERIFIED = "Verified";
+export const VERIFICATION_HEADING_VERIFIED =
+  "Your employer account is verified";
+
+export const VERIFICATION_STATUS_REJECTED = "Not approved";
+export const VERIFICATION_HEADING_REJECTED = "Verification was not approved";
+
+export const VERIFICATION_STATUS_REVOKED = "Revoked";
+export const VERIFICATION_HEADING_REVOKED = "Verification withdrawn";

@@ -92,7 +92,7 @@ test.describe("public jobs discovery journey", () => {
       .check();
     await page.getByRole("button", { name: "Request verification" }).click();
     await expect(
-      page.getByRole("heading", { name: /Pending review/i }),
+      page.getByRole("status", { name: "Pending review" }),
     ).toBeVisible({ timeout: 15_000 });
 
     // --- Operator: separate session approves ---
