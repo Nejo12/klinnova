@@ -43,9 +43,7 @@ async function submitEmployerApplicationActionAndReload(
 }
 
 async function expectReviewCurrentStatus(page: Page, status: string) {
-  const reviewSection = page
-    .getByRole("heading", { level: 2, name: "Review" })
-    .locator("..");
+  const reviewSection = page.getByRole("region", { name: "Review" });
   await expect(reviewSection.getByText("Current status")).toBeVisible();
   await expect(reviewSection.getByText(status, { exact: true })).toBeVisible();
 }

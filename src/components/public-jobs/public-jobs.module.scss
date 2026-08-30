@@ -177,7 +177,10 @@
 }
 
 .detailLink {
+  display: inline-flex;
+  align-items: center;
   align-self: flex-start;
+  min-height: var(--touch-target-min);
   margin-top: var(--space-1);
   color: var(--color-text-link);
   font-size: var(--font-size-sm);
