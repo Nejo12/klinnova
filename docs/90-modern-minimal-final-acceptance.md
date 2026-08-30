@@ -26,21 +26,21 @@ No product, matching, verification, vacancy-lifecycle, or application-transition
 | Shared design language | PASS | Warm paper/cream, oxblood for primary/active/link; tokens in `src/styles/tokens.css`. |
 | Candidate nav | PASS | Matches / Applications / Profile / Account; no hamburger; 360 grid; e2e overflow + keyboard. |
 | Candidate Matches | PASS WITH DOCUMENTED DEVIATION | Runtime fields only; no fake salary/shift/why-fit. |
-| Candidate Job Detail/Apply | PASS | Saved-profile apply; one H1; public vs candidate context preserved. |
+| Candidate Job Detail/Apply | PASS WITH DOCUMENTED DEVIATION | Saved-profile apply, one H1, and public vs candidate context remain intact. Dedicated candidate integration recorded 8/9: the Applied → “Back to matches” path can land a blank `/candidate/matches` (title set, no H1). Core apply semantics are not treated as broken; this is a known integration/navigation follow-up. |
 | Candidate Applications | PASS | Active vs closed from code vocabulary; rail + empty recovery. |
-| Employer nav | PASS | Two-tier explicit destinations; 390 continuity; e2e overflow + keyboard. |
-| Employer Home | PASS | Dynamic name; unseen before verification; no duplicate draft-readiness section; no application counts. |
-| Employer Applications | PASS | Needs review / Open / Decided from loaded data. |
-| Applicant Detail | PASS | Essentials, history, server-allowed transitions; Hired separate. |
-| Vacancies | PASS | Live = published+paused; Not live = draft+filled+expired+withdrawn. |
-| Draft/readiness | PASS | Checklist-authoritative; draft create not blocked by verification. |
-| Verification | PASS | Five states distinct; Berlin timestamps; restriction ≠ revoked. |
+| Employer nav | PASS | Two-tier explicit destinations; 390 continuity; e2e overflow + keyboard. Authenticated visual pixel review at 1280/1440 was not completed. |
+| Employer Home | PASS | Based on code + semantic/IA/lifecycle E2E. Dynamic name; unseen before verification; no duplicate draft-readiness section; no application counts. Responsive visual coverage is under Responsive, not claimed as a logged-in 1280/1440 pixel walk. |
+| Employer Applications | PASS | Based on code + semantic/IA/lifecycle E2E. Needs review / Open / Decided from loaded data. Responsive visual coverage is under Responsive. |
+| Applicant Detail | PASS | Based on code + semantic/IA/lifecycle E2E. Essentials, history, server-allowed transitions; Hired separate. Responsive visual coverage is under Responsive. |
+| Vacancies | PASS | Based on code + semantic/IA/lifecycle E2E. Live = published+paused; Not live = draft+filled+expired+withdrawn. Responsive visual coverage is under Responsive. |
+| Draft/readiness | PASS | Based on code + semantic/IA/lifecycle E2E. Checklist-authoritative; draft create not blocked by verification. Responsive visual coverage is under Responsive. |
+| Verification | PASS | Based on code + semantic/IA/lifecycle E2E. Five states distinct; Berlin timestamps; restriction ≠ revoked. Responsive visual coverage is under Responsive. |
 | Restricted states | PASS | Notices on affected actions; public hide via effective-public + HTTP 404. |
 | Public jobs | PASS | Listing + detail; not-found copy; 404 without detail `loading.tsx`. |
 | Loading | PASS WITH DOCUMENTED DEVIATION | Unknown fields skeletoned. Public detail has no skeleton (404). Employer applications list loading omits static header (capabilities unresolved); vacancies/verification loading include header. |
 | Empty/error | PASS | Real recovery (e.g. Vacancies from empty applications). |
-| Responsive | PASS WITH DOCUMENTED DEVIATION | Public listing live at 360–1440, no overflow. Candidate/employer nav e2e at 360/390/430 + desktop. P36 public + candidate width matrix passed. Employer-responsive screenshot spec and P36 employer-route matrix did not complete cleanly this pass (see follow-ups). |
-| Accessibility | PASS | Focus-visible global; status as text; 44px token on primary controls; public “View job” aligned to `--touch-target-min` in this pass. No axe/pa11y package in repo (not added). |
+| Responsive | PASS WITH DOCUMENTED DEVIATION | Public listing live at 360–1440, no overflow. P36 public width matrix passed. P36 candidate width matrix passed. Candidate and employer navigation responsive/overflow/keyboard e2e passed. Employer-responsive screenshot suite was not fully green. P36 employer-route matrix was not fully green. Employer visual pixel review at 1280/1440 was not completed. Employer responsive acceptance is therefore not fully proven. |
+| Accessibility | PASS | Scoped evidence only — not a WCAG certification. Proven: global `:focus-visible` in `globals.scss`; candidate/employer navigation keyboard E2E passed; public “View job” uses `--touch-target-min` (44px); status/non-color semantics covered by existing implementation and tests. No automated axe/pa11y audit was performed; no new a11y dependency was added. |
 | Reduced motion | PASS | Global `prefers-reduced-motion` in `globals.scss`; Pulse handoff respects reduce. |
 
 ## Intentional deviations (do not “fix”)
@@ -52,7 +52,7 @@ No product, matching, verification, vacancy-lifecycle, or application-transition
 
 ## Viewport evidence
 
-Live local `next dev` on 2026-08-29 (DOM `scrollWidth` vs `clientWidth`; View job measured 44px tall at 360). Authenticated candidate/employer pixels were not re-walked logged-in in the browser; overflow/keyboard/touch-target e2e remain the evidence for those surfaces.
+Live local `next dev` on 2026-08-29 (DOM `scrollWidth` vs `clientWidth`; View job measured 44px tall at 360). Authenticated candidate/employer visual pixel review at 1280/1440 was not completed. Overflow/keyboard/touch-target e2e remain the evidence for those authenticated surfaces.
 
 | Surface | Viewport | Overflow | Hierarchy | Actions | Nav |
 |---|---|---|---|---|---|
