@@ -1,8 +1,8 @@
 # GründungsBONUS Plus — Businessplan Assembly Draft
 
-**Status:** F6A working draft — internal application preparation only; IBT clarifications pending
+**Status:** F6A working draft — **DRAFT / RECONCILIATION REQUIRED** against `docs/68` (30.08.2026)
 
-**Date:** 2026-08-24
+**Date:** 2026-08-30
 
 **Authority:** Founder-authorized GründungsBONUS Plus preparation track. Documentation/drafting only. This file does not authorize grant submission, external outreach, procurement, spending, contracts, borrowing, hiring, pricing changes, Production Sentry activation, Cohort A external traffic, or other funded-project commencement.
 
@@ -15,6 +15,9 @@ Related durable records:
 - `docs/61-gruendungsbonus-plus-cost-financing-plan.md`
 - `docs/62-gruendungsbonus-plus-innovation-sustainability-berlin-impact.md`
 - `docs/63-gruendungsbonus-plus-ibt-clarification-request.md`
+- `docs/68-gruendungsbonus-plus-application-package-reconciliation.md`
+
+**Supersession (30.08.2026):** Controlling funding, liquidity, CV chronology, registration timing, funded-project boundary and commercial-position facts are in `docs/68`. This draft remains a synthesis layer and is **not** a frozen Businessplan. Do not invent early revenue. Electronic application is **not** submitted.
 
 ## 1. Purpose
 

@@ -1,8 +1,8 @@
 # GründungsBONUS Plus — 3-Year Financial & Liquidity Model
 
-**Status:** F3 provisional model structure complete — Founder financing inputs still required before application use
+**Status:** F3 model architecture retained — **REBUILD REQUIRED BEFORE SUBMISSION** (30.08.2026)
 
-**Date:** 2026-08-22
+**Date:** 2026-08-30
 
 **Authority:** Founder-authorized GründungsBONUS Plus preparation track. Documentation/modelling only. This record does not authorize spending, pricing implementation, contracts, purchases, employer/candidate outreach, Cohort A external traffic, Production Sentry activation, hiring, or any other funded-project commencement.
 
@@ -11,6 +11,9 @@ Related durable records:
 - `docs/57-gruendungsbonus-plus-application-preparation.md`
 - `docs/58-gruendungsbonus-plus-market-competition-research.md`
 - `docs/59-gruendungsbonus-plus-commercial-model-analysis.md`
+- `docs/68-gruendungsbonus-plus-application-package-reconciliation.md`
+
+**Supersession (30.08.2026):** Confirmed opening liquidity is **EUR 5,000** and monthly Founder contribution capacity is **EUR 400**. Founder remuneration remains **EUR 0**. Canonical envelope is approximately **EUR 40,000** eligible / **EUR 20,000** grant (`docs/68`). Combined nominal Founder capacity over 24 months (EUR 5,000 + up to EUR 9,600) is **EUR 14,600** and is **not** all available upfront. Any previous model based on **EUR 30,000 / EUR 15,000** is **STALE**. Do not fabricate cash-flow viability. Rebuild Year-1 monthly and Years-2/3 quarterly tables before submission.
 
 ## 1. Purpose
 

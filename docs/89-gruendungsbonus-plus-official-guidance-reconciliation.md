@@ -283,7 +283,9 @@ The 2026 Förderrichtlinie states that an account of the applicant company must 
 
 Current consequence:
 
-- a German account suitable for the applicant/funding process must be available;
+- a dedicated Klinnova business account is **not yet open** (30.08.2026, `docs/68`);
+- a German personal account of the Founder exists and may be available for application-stage information **only if** the programme/form permits — do not assume it satisfies the “account of the applicant company” wording;
+- a dedicated Klinnova business account remains **recommended** for bookkeeping, grant-payment traceability and separation of private/business transactions;
 - do not commit sensitive IBAN/account evidence to the public Git repository;
 - verify the live portal's exact account-holder/account-type requirement before submission;
 - do not assume from this record alone whether a particular existing personal/business account is acceptable for a sole proprietor.

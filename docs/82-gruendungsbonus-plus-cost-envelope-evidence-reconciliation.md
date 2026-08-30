@@ -2,7 +2,7 @@
 
 **Status:** F6S first full evidence reconciliation — application preparation only
 
-**Date:** 2026-08-25
+**Date:** 2026-08-25 (C01–C10 architecture). Coarse 30.08.2026 working grouping in `docs/68` §13 is **provisional** and must not overwrite this file.
 
 **Authority:** Founder-authorized GründungsBONUS Plus preparation track. This record reconciles the current EUR 40,000 planning envelope against the evidence work completed for C01–C10. It does not authorize application submission, procurement, contracts, spending, borrowing, hiring, external employer/candidate acquisition, paid campaigns, Production Sentry activation or any other funded-project commencement.
 

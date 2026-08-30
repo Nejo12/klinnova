@@ -1,8 +1,8 @@
 # GründungsBONUS Plus — Eligible-Cost and Financing Plan
 
-**Status:** F4 working plan — Founder financial constraints approved; exact vendor quotations and IBT eligibility confirmations still pending
+**Status:** F4 working plan — 30.08.2026 constraints in `docs/68`; exact vendor quotations still pending
 
-**Date:** 2026-08-22
+**Date:** 2026-08-30
 
 **Authority:** Founder-authorized GründungsBONUS Plus preparation track. Documentation/modelling only. This record does not authorize spending, contracts, hiring, borrowing, pricing changes, employer/candidate outreach, Cohort A external traffic, Sentry Production activation, or other funded-project commencement.
 
@@ -12,6 +12,9 @@ Related durable records:
 - `docs/58-gruendungsbonus-plus-market-competition-research.md`
 - `docs/59-gruendungsbonus-plus-commercial-model-analysis.md`
 - `docs/60-gruendungsbonus-plus-financial-liquidity-model.md`
+- `docs/68-gruendungsbonus-plus-application-package-reconciliation.md`
+
+**Supersession (30.08.2026):** Opening liquidity **EUR 5,000** and EUR **400**/month are confirmed (`docs/68`). Grant working request is approximately **EUR 20,000**. EUR 7,500 / EUR 20,000–25,000 stretch figures are not the current working baseline. Coarse EUR 40,000 grouping in `docs/68` §13 is provisional; **C01–C10 in `docs/82` remain more precise**. EUR 2,000 unallocated in §13 is not a generic contingency.
 
 ## 1. Purpose
 
@@ -27,9 +30,9 @@ The current working assumptions are:
 |---|---|
 | Founder employment | Remains in full-time employment during the initial Klinnova build-up |
 | Business structure | Founder-led sole proprietorship / Nebenerwerb direction |
-| Starting Klinnova liquidity | EUR 5,000 base; EUR 7,500 upper-safe sensitivity |
-| Founder monthly contribution | EUR 400 base; EUR 300–500 sensitivity |
-| Grant ambition | Approximately EUR 20,000–25,000, not the EUR 50,000 maximum |
+| Starting Klinnova liquidity | **EUR 5,000** confirmed (30.08.2026); EUR 7,500 is historical sensitivity only |
+| Founder monthly contribution | **EUR 400** confirmed (30.08.2026); EUR 300–500 is historical sensitivity only |
+| Grant ambition | Approximately **EUR 20,000** (working baseline); not the EUR 50,000 maximum |
 | Staffing | Founder + bounded contractors/specialists; no permanent employee initially |
 | Founder remuneration | EUR 0 in the base model |
 | Borrowing | Not core financing; only a limited reimbursement bridge after grant approval where justified and sustainable |
