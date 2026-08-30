@@ -54,21 +54,21 @@ Historical planning, discovery, implementation and closure documents intentional
 
 ## M5 targets
 
-| Metric | Target |
-| --- | ---: |
-| Participating employers | 20 |
-| Verified vacancies | 100 |
-| Candidates | 200 |
-| Completed interviews | 10 |
-| Confirmed hires | 3 |
+| Metric                  | Target |
+| ----------------------- | -----: |
+| Participating employers |     20 |
+| Verified vacancies      |    100 |
+| Candidates              |    200 |
+| Completed interviews    |     10 |
+| Confirmed hires         |      3 |
 
 ### Staged cohorts
 
-| Cohort | Employers | Legitimate vacancies | Candidates | Outcome gate |
-| --- | ---: | ---: | ---: | --- |
-| A — Proof | 3–5 | 10–20 | 20–30 | first completed interview |
-| B — Validation | 8–10 | 30–50 | 60–100 | repeated interviews + first confirmed hire |
-| C — Full M5 | 20 | 100 | 200 | 10 completed interviews + 3 confirmed hires |
+| Cohort         | Employers | Legitimate vacancies | Candidates | Outcome gate                                |
+| -------------- | --------: | -------------------: | ---------: | ------------------------------------------- |
+| A — Proof      |       3–5 |                10–20 |      20–30 | first completed interview                   |
+| B — Validation |      8–10 |                30–50 |     60–100 | repeated interviews + first confirmed hire  |
+| C — Full M5    |        20 |                  100 |        200 | 10 completed interviews + 3 confirmed hires |
 
 ## Delivered core product
 
