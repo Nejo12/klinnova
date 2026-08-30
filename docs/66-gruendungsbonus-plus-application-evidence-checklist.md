@@ -1,8 +1,8 @@
 # GründungsBONUS Plus — Application Evidence & Attachment Checklist
 
-**Status:** F6C working checklist — application preparation only; IBT clarification response still pending
+**Status:** F6C working checklist — application preparation only; current facts in `docs/68` (30.08.2026)
 
-**Date:** 2026-08-24
+**Date:** 2026-08-30
 
 **Authority:** Founder-authorized GründungsBONUS Plus preparation track. Documentation/readiness control only. This record does not authorize application submission, external market entry, procurement, spending, contracts, borrowing, hiring, Production Sentry activation, hosted changes or Cohort A external traffic.
 
@@ -17,6 +17,9 @@ Related durable records:
 - `docs/63-gruendungsbonus-plus-ibt-clarification-request.md`
 - `docs/64-gruendungsbonus-plus-businessplan-draft.md`
 - `docs/65-gruendungsbonus-plus-founder-profile-transition.md`
+- `docs/68-gruendungsbonus-plus-application-package-reconciliation.md`
+
+**Supersession (30.08.2026):** Use `docs/68` §16 for current readiness. Electronic application is **not** submitted. Funding is **not** approved. Dedicated business account is **not yet open**. Supplier quotations: **none**. Financial model: **rebuild required**. Stretch corridor EUR 45k–50k is not the current working baseline.
 
 ## 1. Purpose
 
@@ -72,21 +75,21 @@ Use the following statuses:
 | Competition analysis | READY — FINAL CHECK | `docs/58` | Recheck competitor pricing/features close to submission |
 | Commercial model | READY — FINAL CHECK | `docs/59`, `docs/60`, `docs/64` | Preserve Cohort A free position and identify later monetisation as validated direction, not implemented fact |
 | Market-entry / sales strategy | READY — FINAL CHECK | `docs/51`, `docs/54`, `docs/64` | Reconcile project-start boundary from IBT before describing external execution timing |
-| Founder profile / transition narrative | READY — FINAL CHECK | `docs/65` | Replace placeholders/general chronology with exact verified CV data |
-| Founder CV attachment | FOUNDER INPUT | structure in `docs/65` | Supply exact chronology, institution, titles and dates; create concise final CV attachment |
-| 3-year financial/liquidity plan | READY — FINAL CHECK | `docs/60`, canonical F4 baseline | Reconcile final cost plan, IBT treatment, exact application timing and final assumptions |
-| Eligible-cost / financing plan | READY — FINAL CHECK | `docs/61` | Replace planning allocations with final eligible categories, exact quotations/evidence and final financing proof |
+| Founder profile / transition narrative | READY — FINAL CHECK | `docs/65`, `docs/68` | Chronology confirmed 30.08.2026; produce formal CV attachment from that chronology |
+| Founder CV attachment | CONFIRMED CHRONOLOGY / ATTACHMENT STILL TO PRODUCE | `docs/65`, `docs/68` §11 | Do not invent gap employment; use Higher National Diploma, not B.Sc. unless later evidence supports it |
+| 3-year financial/liquidity plan | REBUILD REQUIRED | `docs/60`, `docs/70`, `docs/68` | Rebuild before submission; EUR 5,000 / EUR 400 confirmed; do not treat EUR 14,600 as upfront cash |
+| Eligible-cost / financing plan | RECONCILIATION REQUIRED | `docs/61`, `docs/82`, `docs/68` §13 | C01–C10 remain more precise; coarse EUR 40k grouping is provisional; EUR 2,000 is not a generic contingency |
 | Expenditure plan | FINAL FREEZE | `docs/61` | Freeze only after quotes/eligibility/boundary reconciliation |
-| Financing proof / closed financing evidence | QUOTE/EVIDENCE NEEDED | financing logic in `docs/61` | Determine exact evidence acceptable to IBT; assemble bank/business-funds evidence and any approved financing documents without inventing unavailable finance |
-| Gewerbeanmeldung evidence | FOUNDER INPUT / IBT PENDING | submission facts recorded in funding docs | Attach authority-issued/confirmed evidence when available; reconcile relevant founding date per IBT reply |
+| Financing proof / closed financing evidence | QUOTE/EVIDENCE NEEDED | financing logic in `docs/61` | Dedicated Klinnova business account **not yet open**; do not commit IBAN/BIC to Git |
+| Gewerbeanmeldung evidence | CONFIRMED | `docs/88` | Submitted 14.08.2026; confirmation 26.08.2026; commencement 01.09.2026 |
 | Identity document | FOUNDER INPUT | none stored in repository | Provide current required identity evidence directly to application process; do not commit sensitive copy to Git |
 | Meldebestätigung / residence evidence if required | FOUNDER INPUT | none stored in repository | Provide only if application instructions require it; do not commit sensitive copy to Git |
 | Residence/work authorization evidence if required | FOUNDER INPUT | none stored in repository | Provide directly to application portal if required; do not commit sensitive copy to Git |
-| Business bank / IBAN evidence | FOUNDER INPUT | not stored in repository | Provide exact application-required evidence; do not commit banking data to Git |
-| De-minimis declaration/evidence | FOUNDER INPUT / FINAL CHECK | programme note in funding docs | Confirm whether any prior de-minimis aid exists; complete current form if required |
+| Business bank / IBAN evidence | NOT YET OPEN (dedicated account) | not stored in repository | Personal German account may be usable only if the form permits; dedicated business account recommended; **no IBAN in Git** |
+| De-minimis declaration/evidence | NONE REPORTED | `docs/68` | Confirm on live form; none reported as of 30.08.2026 |
 | Transparency database evidence | NOT APPLICABLE / IF REQUESTED | current operating form is sole proprietor | Recheck portal instructions; likely legal-entity-specific, but do not assume if portal requests it |
 | Shareholder agreement / register extract | NOT APPLICABLE under current sole-proprietor structure | `docs/64`/registration direction | Recheck only if legal form changes before submission |
-| Vendor/specialist quotations | QUOTE/EVIDENCE NEEDED | candidate categories in `docs/61` | Obtain only when timing/procurement boundary is safe; avoid binding commitments before permissible boundary |
+| Vendor/specialist quotations | NONE YET | candidate categories in `docs/61` | Obtain only when timing/procurement boundary is safe; avoid binding commitments before permissible boundary |
 | VAT treatment | IBT/ACCOUNTING PENDING | F4 identifies open treatment | Confirm final tax/VAT position and how costs should be stated in application |
 | Application forms / portal declarations | FINAL FREEZE | none | Complete only against live portal/current forms close to submission |
 
@@ -113,13 +116,7 @@ The clarification email has been sent. Before final application freeze, reconcil
 
 ### 6.1 Founding/application timing
 
-Need final answer on whether the stated 01.09.2026 commencement is sufficient for application timing if final authority confirmation has not yet arrived, or whether confirmed Gewerbeanmeldung evidence must first exist.
-
-Consequence:
-
-- affects earliest safe submission date;
-- affects how founding date is represented in the application;
-- affects 18-month-period calculation.
+**30.08.2026:** Gewerbeanmeldung confirmation exists (`docs/88`). Controlling founding/commencement date remains **01.09.2026**. Application target is **01.09.2026**. Electronic application is **not** submitted. Written IBT plus `docs/67`/`docs/89` remain the source hierarchy; do not treat this subsection as still blocking on “confirmation not arrived”.
 
 ### 6.2 Existing MVP vs future funded project
 
@@ -244,20 +241,23 @@ The application should not be submitted until all **blocking** gates below are g
 
 | Gate | Current state |
 |---|---|
-| Founding/application timing resolved | IBT PENDING |
-| Official registration evidence available/acceptable | PENDING |
-| Existing-MVP/future-project boundary reconciled | IBT PENDING |
-| External Cohort A project-start treatment reconciled | IBT PENDING |
-| Businessplan final consistency review | PENDING |
-| Founder CV exact chronology attached | FOUNDER INPUT |
-| 3-year finance/liquidity model final | PENDING |
-| Eligible-cost plan final and evidence-backed | PENDING |
-| Applicant financing/closed-financing proof acceptable | PENDING |
+| Founding/application timing resolved | CONFIRMED FOR PLANNING (commencement 01.09.2026; target application 01.09.2026; not yet submitted) |
+| Official registration evidence available/acceptable | CONFIRMED (`docs/88`) |
+| Existing-MVP/future-project boundary reconciled | WORKING WORDING IN `docs/68`; not IBT/IBB pre-approved |
+| External Cohort A project-start treatment reconciled | HOLD until signed-application receipt boundary (`docs/89`) |
+| Businessplan final consistency review | DRAFT / RECONCILIATION REQUIRED |
+| Founder CV exact chronology | CONFIRMED; formal attachment still to produce |
+| 3-year finance/liquidity model final | REBUILD REQUIRED |
+| Eligible-cost plan final and evidence-backed | RECONCILIATION REQUIRED; quotations none yet |
+| Applicant financing/closed-financing proof acceptable | PENDING; dedicated business account not yet open |
 | VAT/tax presentation resolved | PENDING |
-| Required quotations/evidence collected safely | PENDING |
+| Required quotations/evidence collected safely | NONE YET |
 | Current official forms/rules rechecked | PENDING |
 | Sensitive personal attachments ready outside Git | PENDING |
 | Founder explicit GO to submit | REQUIRED |
+| Electronic application | NOT YET SUBMITTED |
+| Signed original | NOT YET SENT/RECEIVED |
+| Funding approval | NOT RECEIVED |
 
 ## 11. Work that may continue while IBT response is pending
 
@@ -289,8 +289,8 @@ F6C does **not** mean the application is submission-ready.
 
 The next application-preparation work should focus on the highest-value remaining gaps that do not require guessing:
 
-1. exact Founder CV chronology and final attachment structure;
+1. formal CV attachment from the confirmed chronology;
 2. cost-evidence/quotation strategy without triggering project start;
-3. final financial consistency controls;
-4. IBT response reconciliation when received;
-5. final package freeze only after those dependencies are resolved.
+3. rebuild of financial/liquidity tables (`docs/68`);
+4. dedicated business-account readiness without committing identifiers to Git;
+5. final package freeze only after those dependencies are resolved and Founder GO.

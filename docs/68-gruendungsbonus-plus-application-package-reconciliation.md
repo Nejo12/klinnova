@@ -1,26 +1,33 @@
 # GründungsBONUS Plus — Application Package Reconciliation
 
-**Status:** F6E consistency review complete — final package still requires evidence freeze and Founder CV later
+**Status:** 30.08.2026 working-assumption freeze — package is **not** submission-ready
 
-**Date:** 2026-08-25
+**Date:** 2026-08-30
 
-**Authority:** Founder-authorized GründungsBONUS Plus preparation track. Documentation/readiness control only. This record does not authorize application submission, external market entry, procurement, spending, contracts, borrowing, hiring, Production Sentry activation, hosted changes or Cohort A external traffic.
+**Authority:** Founder-authorized GründungsBONUS Plus preparation track. Documentation/readiness control only. This record does not authorize application submission, external market entry, procurement, spending, contracts, borrowing, hiring, Production Sentry activation, hosted changes or Cohort A external traffic. It does not constitute funding approval or eligibility confirmation.
 
 Related durable records:
 
 - `docs/60-gruendungsbonus-plus-financial-liquidity-model.md`
 - `docs/61-gruendungsbonus-plus-cost-financing-plan.md`
 - `docs/64-gruendungsbonus-plus-businessplan-draft.md`
+- `docs/65-gruendungsbonus-plus-founder-profile-transition.md`
 - `docs/66-gruendungsbonus-plus-application-evidence-checklist.md`
 - `docs/67-gruendungsbonus-plus-ibt-clarification-outcome.md`
+- `docs/70-gruendungsbonus-plus-financial-liquidity-tables.md`
+- `docs/82-gruendungsbonus-plus-cost-envelope-evidence-reconciliation.md`
+- `docs/88-gewerbeanmeldung-confirmation-and-official-guidance.md`
+- `docs/89-gruendungsbonus-plus-official-guidance-reconciliation.md`
+
+This file is the **canonical consistency checkpoint** for application-package facts. Historical F6E text below is preserved as chronology. Where it conflicts with §9–§18 (30.08.2026 Founder/application facts), **§9–§18 control**.
 
 ## 1. Purpose
 
-Reconcile the existing GründungsBONUS Plus preparation package against the written and Founder-reported telephone IBT clarification recorded in `docs/67`.
+Reconcile the GründungsBONUS Plus preparation package against IBT clarification (`docs/67`), official-guidance reconciliation (`docs/89`), Gewerbeanmeldung evidence (`docs/88`), and Founder-confirmed working assumptions of **30.08.2026**.
 
-This file is the controlling consistency checkpoint where older working documents contain now-stale pending items or historical modelling scenarios. It does not erase the historical records; it identifies which parts must no longer be treated as current application assumptions.
+This file does not erase historical records. It identifies which parts must no longer be treated as current application assumptions.
 
-## 2. Current controlling application state
+## 2. Current controlling application state (historical F6E, still valid except where §9 supersedes)
 
 ### 2.1 Founding date
 
@@ -28,7 +35,7 @@ The relevant founding date is the commencement date stated in the Gewerbeanmeldu
 
 > **2026-09-01**
 
-The Gewerbeanmeldung was submitted on 2026-08-14.
+The Gewerbeanmeldung was submitted on 2026-08-14. Official receipt/confirmation was issued on 2026-08-26 (`docs/88`).
 
 ### 2.2 Registration evidence for application timing
 
@@ -37,20 +44,21 @@ Founder-reported telephone IBT clarification:
 - final authority confirmation does not need to have arrived before application submission;
 - proof that the Gewerbeanmeldung was submitted is sufficient for this procedural point.
 
-This is verbal guidance reported by the Founder and must not be represented as a written funding decision or approval.
+This is verbal guidance reported by the Founder and must not be represented as a written funding decision or approval. Official confirmation is now also available (`docs/88`).
 
 ### 2.3 Project-start / external beta boundary
 
-Founder-reported telephone IBT clarification:
+Use the **safe Vorhabenbeginn rule** in `docs/89`, not a shorthand that electronic portal submit is enough:
 
-> Keep the external employer/candidate beta activities that belong to the proposed funded market-entry project on hold until the funding application has been submitted.
+- electronic application is only one part of the filing;
+- the legally signed original must follow within the applicable 7-day period;
+- funded measures must not have begun before the safe signed-application receipt boundary established in the official guidance;
+- do not order, contract or start grant-targeted supplier work before that boundary;
+- an IBT receipt confirmation is **not** a funding approval.
 
-Current operating consequence:
+External Cohort A employer/candidate acquisition remains HOLD before that boundary.
 
-- internal research/preparation may continue;
-- external Cohort A employer/candidate acquisition remains HOLD before application submission;
-- application submission still requires explicit Founder GO;
-- after submission, any activity begun before the funding decision remains subject to the programme rules and the applicant's own financial/eligibility risk.
+Application submission still requires explicit Founder GO. Electronic submission is **not** completed as of this record.
 
 ### 2.4 Founder remuneration
 
@@ -61,9 +69,7 @@ Written IBT clarification resolved this point:
 
 Current application treatment:
 
-> **Founder remuneration eligible-cost assumption: EUR 0.**
-
-This is no longer an IBT-pending option.
+> **Founder remuneration from Klinnova during the funded project: EUR 0.**
 
 ### 2.5 Existing MVP / future funded project
 
@@ -72,10 +78,11 @@ IBT did not pre-approve the proposed separation.
 Current treatment:
 
 - existing MVP and all historical/pre-application costs remain excluded from the requested funded costs;
-- the future funded project is described as a separate Berlin market-establishment, commercialisation and evidence-driven development phase;
+- historic MVP development is separate and will **not** be claimed;
+- the funded project is **not** retrospective financing of the existing MVP;
 - sufficiency of the separation will be assessed only during review of the complete application.
 
-Do not describe this boundary as approved by IBT.
+Do not describe this boundary as approved by IBT/IBB.
 
 ### 2.6 Existing SaaS / recurring infrastructure
 
@@ -87,120 +94,68 @@ Current treatment:
 - existing-account status does not create an assumption of eligibility;
 - final cost-plan treatment must remain conservative and evidence-backed.
 
-## 3. Canonical funding baseline
+## 3. Canonical funding baseline (30.08.2026 working assumptions)
 
-The only current baseline for application assembly is:
+The current confirmed working baseline is:
 
-- eligible project expenditure: approximately **EUR 40,000**;
-- requested grant: approximately **EUR 20,000**;
-- applicant share: approximately **EUR 20,000**.
-
-Stretch only if justified by quotations, eligibility and liquidity evidence:
-
-- eligible expenditure: **EUR 45,000–50,000**;
-- requested grant: **EUR 22,500–25,000**.
+- eligible project costs: approximately **EUR 40,000 net**;
+- requested GründungsBONUS Plus: approximately **EUR 20,000**;
+- opening Founder-provided Klinnova liquidity: **EUR 5,000**;
+- ongoing Founder contribution capacity: **EUR 400/month**;
+- Founder remuneration from Klinnova during the funded project: **EUR 0**;
+- previous De-minimis aid: **none reported**;
+- grant-targeted project activity: **not started**;
+- supplier quotations currently available: **none**.
 
 Historical EUR 70,000 / EUR 35,000 and EUR 100,000 / EUR 50,000 scenarios in earlier modelling documents are sensitivity/history only and must not be copied into the final application as Klinnova's current target.
 
-## 4. Reconciliation findings by durable document
+Earlier stretch wording (EUR 45,000–50,000 / EUR 22,500–25,000) is **not** the current working baseline.
+
+Any previous financial/liquidity model based on **EUR 30,000 / EUR 15,000** is **STALE** and must be rebuilt before submission. Do not fabricate cash-flow viability.
+
+## 4. Reconciliation findings by durable document (F6E, updated)
 
 ### 4.1 `docs/60` — 3-Year Financial & Liquidity Model
 
-The architecture remains useful, but several statements are stale.
+Architecture remains useful. **Status as of 30.08.2026: REBUILD REQUIRED BEFORE SUBMISSION.**
 
-Do not treat the following as current:
-
-- status saying Founder financing inputs are still required;
-- the EUR 70k / EUR 35k scenario labelled `Base`;
-- the EUR 100k / EUR 50k maximum scenario as an active application candidate;
-- Founder remuneration as an unresolved eligibility item;
-- §12 Founder inputs as still unanswered.
-
-Current controlling replacements:
-
-- starting Klinnova liquidity: EUR 5,000 base / EUR 7,500 upper-safe sensitivity;
-- Founder monthly contribution: EUR 400 base / EUR 300–500 sensitivity;
-- EUR 40k / EUR 20k canonical application baseline;
-- Founder + bounded contractors/specialists; no permanent employee initially;
-- Founder remuneration: EUR 0;
-- small reimbursement bridge only after approval if justified and sustainable;
-- private reserves excluded from project financing.
-
-The next financial-model work is therefore not to ask the Founder for these assumptions again. It is to convert the approved assumptions into the final Year-1 monthly and Years-2/3 quarterly application tables and reconcile them with evidence-backed costs.
+Do not treat Year-1/Years-2/3 tables as a frozen application workbook. Confirmed inputs (EUR 5,000 opening, EUR 400/month, EUR 0 remuneration, EUR 40k / EUR 20k envelope) must be rebuilt with staged expenditure and reimbursement timing. EUR 14,600 combined nominal Founder capacity over 24 months is **not** all available upfront.
 
 ### 4.2 `docs/61` — Eligible-Cost and Financing Plan
 
-The EUR 40k cost architecture remains the current working baseline.
+The EUR 40k architecture remains a working ceiling. Founder remuneration remains EUR 0.
 
-Stale items:
+`docs/82` C01–C10 evidence architecture remains **more precise** than the coarse 30.08.2026 grouping in §13. Do not overwrite C01–C10 with that grouping.
 
-- conditional language that Founder remuneration might later be included if IBT confirms eligibility;
-- the open question asking for sole-proprietor Founder-remuneration treatment.
-
-Current replacement:
-
-> Founder remuneration remains EUR 0 and is not an eligible cost in this sole-proprietor application model.
-
-The following remain genuinely open before final cost freeze:
-
-- exact eligibility of future recurring SaaS under existing accounts;
-- VAT presentation;
-- quotation/evidence standard where not otherwise clear;
-- exact eligible treatment of accounting/funding-administration costs;
-- final cost evidence and financing proof;
-- reimbursement timing assumptions for liquidity modelling.
+The EUR 2,000 unallocated amount in §13 is **not** an eligible generic contingency/reserve.
 
 ### 4.3 `docs/64` — Businessplan Assembly Draft
 
-The core Businessplan thesis remains valid.
-
-Stale/pending wording to supersede during final Businessplan freeze:
-
-1. `Pending IBT reconciliation` on founding/application timing is resolved for planning:
-   - relevant founding date: 2026-09-01;
-   - final authority confirmation need not arrive before submission if submission proof exists, per Founder-reported phone clarification.
-2. External Cohort A is no longer on hold because clarification is pending. It is on hold **until application submission**.
-3. Founder remuneration should be stated as EUR 0 without suggesting a possible later grant-funded proprietor salary.
-4. Existing-MVP separation must remain explicit, but must not be described as accepted or pre-approved by IBT.
-
-The current project-boundary narrative in §14 remains the basis for final drafting:
-
-- existing functional MVP = pre-application asset;
-- historical costs = excluded;
-- proposed funded phase = future market establishment, commercialisation, evidence-driven refinement and selected future project costs.
+Core thesis remains valid. Status: **DRAFT / RECONCILIATION REQUIRED** against §10–§12 of this file. Do not invent early revenue.
 
 ### 4.4 `docs/66` — Application Evidence & Attachment Checklist
 
-The checklist contains the largest number of statuses that changed after IBT clarification.
-
-The following should now be treated as resolved or reclassified:
-
-| Checklist item | Old state | Current state |
-|---|---|---|
-| Founding/application timing | IBT PENDING | **RESOLVED FOR PLANNING** |
-| Final Gewerbeanmeldung confirmation before submission | pending dependency | **NOT REQUIRED FOR THIS PROCEDURAL POINT if proof of submission exists, per Founder-reported phone clarification** |
-| External Cohort A / Vorhabenbeginn | IBT PENDING | **RESOLVED: HOLD UNTIL APPLICATION SUBMISSION** |
-| Founder remuneration | IBT PENDING | **RESOLVED: EUR 0 eligible Founder remuneration** |
-| Existing MVP / funded-project separation | IBT PENDING | **FULL-APPLICATION REVIEW ONLY; no pre-approval** |
-| Existing SaaS / recurring infrastructure | IBT PENDING | **STILL UNRESOLVED** |
-
-The submission checklist must still remain blocked by the genuinely outstanding items in §6 below.
+Treat 30.08.2026 facts in §18 as current readiness. Formal CV **attachment** is still to be produced from the confirmed chronology; chronology itself is no longer deferred.
 
 ### 4.5 `docs/67` — IBT Clarification Outcome
 
-This is the authoritative clarification record for the written and telephone outcomes.
+Authoritative for written and telephone IBT outcomes. Where older working checklists conflict with `docs/67` plus this file on an IBT-dependent point, use `docs/67` and this record.
 
-Where `docs/60`, `docs/61`, `docs/64` or `docs/66` conflict with `docs/67` on an IBT-dependent point, use `docs/67` plus this reconciliation record as the current planning state.
+### 4.6 `docs/65` — Founder profile
+
+Grant-CV chronology and Higher National Diploma wording in this file and the updated `docs/65` supersede earlier B.Sc. placeholders.
 
 ## 5. Earliest application timing
 
 Current planning logic:
 
-1. the relevant founding date is 2026-09-01;
-2. the application must not be treated as ready merely because the portal accepts input;
-3. final authority confirmation of the Gewerbeanmeldung is not required for the procedural point clarified by phone if proof of submission exists;
-4. all other blocking application documents and consistency checks still need to be ready;
-5. submission requires explicit Founder authorization.
+1. relevant founding / registered commencement date: **2026-09-01**;
+2. application **target:** **01.09.2026**;
+3. do **not** describe electronic submission as already completed;
+4. do not treat the package as ready merely because the portal accepts input;
+5. all blocking documents and consistency checks still need to be ready;
+6. submission requires explicit Founder authorization;
+7. after electronic filing, the legally signed original must follow within the applicable 7-day period (`docs/89`).
 
 Therefore:
 
@@ -208,83 +163,52 @@ Therefore:
 
 ## 6. Genuine remaining blockers before submission
 
-### 6.1 Founder CV / exact chronology
+### 6.1 Founder CV attachment
 
-Deferred by Founder decision for later.
-
-Still required before final package freeze.
+Chronology is **CONFIRMED** (§11). A concise formal CV attachment still needs to be produced outside Git from that chronology. Do not invent employment for the confirmed gaps.
 
 ### 6.2 Final 3-year finance/liquidity tables
 
-Need:
-
-- Year 1 monthly table;
-- Years 2–3 quarterly tables;
-- exact cost timing;
-- grant-tranche/reimbursement assumptions;
-- minimum-liquidity control;
-- conservative/base sensitivities;
-- consistency with EUR 40k / EUR 20k baseline.
+**REBUILD REQUIRED BEFORE SUBMISSION.** Need Year 1 monthly / Years 2–3 quarterly tables consistent with EUR 40k / EUR 20k, staged spend, and grant reimbursement — without treating EUR 14,600 as cash on day one.
 
 ### 6.3 Evidence-backed expenditure plan
 
-Need:
-
-- justified final cost blocks;
-- non-binding quotations / public pricing evidence where appropriate;
-- VAT treatment;
-- explicit project attribution;
-- no pre-application incurred costs;
-- no binding procurement that would violate the funding boundary.
+Quotations: **NONE YET**. Need justified final cost blocks, VAT treatment, project attribution, no pre-application incurred costs, no binding procurement that would violate the funding boundary.
 
 ### 6.4 Financing / closed-financing evidence
 
-Need final evidence acceptable for the application/payout process showing how the applicant share and reimbursement lag are financed.
-
-Do not represent an unapproved loan or facility as available.
+Need final evidence acceptable for the application/payout process. Dedicated Klinnova business account: **NOT YET OPEN**. Do not represent an unapproved loan as available.
 
 ### 6.5 Tax/VAT presentation
 
-The exact application treatment must be resolved from the actual business tax/VAT position and, where needed, qualified accounting/tax advice.
-
-Do not invent tax IDs or VAT status.
+Resolve from the actual business tax/VAT position and qualified advice where needed. Do not invent tax IDs or VAT status.
 
 ### 6.6 Sensitive application attachments
 
-Founder-held outside Git, as applicable:
-
-- identity evidence;
-- Meldebestätigung/residence evidence if required;
-- work/residence authorization if required;
-- proof of Gewerbeanmeldung submission and later official confirmation when available;
-- banking/IBAN evidence;
-- de-minimis documentation;
-- any portal-specific declarations.
+Founder-held **outside Git** (§17).
 
 ### 6.7 Final official-rule and live-portal check
 
-Immediately before submission, recheck current programme guidance and live application requirements for any changed forms, declarations or evidence requirements.
+Immediately before submission, recheck current programme guidance and live application requirements.
 
 ### 6.8 Founder explicit submission authorization
 
-No F-track documentation creates authorization to submit the application.
-
-Final submission remains a separate Founder GO/NO-GO decision.
+No F-track documentation creates authorization to submit. Final submission remains a separate Founder GO/NO-GO decision.
 
 ## 7. Work allowed now
 
 Safe preparation may continue on:
 
 - final Businessplan editing and consistency;
-- financial/liquidity tables;
-- non-binding quotation and pricing evidence research;
+- rebuilt financial/liquidity tables;
+- non-binding quotation and pricing evidence research (no grant-targeted orders);
 - cost-category evidence;
 - application attachment preparation;
-- CV later when Founder resumes that unit;
+- formal CV attachment from confirmed chronology;
 - internal market/competitor research;
 - technical maintenance unrelated to starting the funded external market-entry phase.
 
-Continue to hold before application submission:
+Continue to hold before the signed-application receipt boundary:
 
 - external employer outreach for Cohort A;
 - external candidate recruitment for Cohort A;
@@ -295,18 +219,192 @@ Continue to hold before application submission:
 - Production Sentry activation;
 - application submission without Founder GO.
 
-## 8. F6E verdict
+## 8. Verdict
 
-**Application-package consistency review: COMPLETE.**
+**Application-package consistency review remains in force; 30.08.2026 facts are locked as working assumptions.**
 
-The package is materially clearer after the IBT clarification, but it is **not yet submission-ready**.
+The package is **not yet submission-ready**. Preparation status is not an eligibility or grant-approval claim.
 
-The most valuable next non-CV work is:
+---
 
-1. final EUR 40k cost-evidence architecture and quotation plan;
-2. final 3-year monthly/quarterly financial and liquidity tables;
-3. final Businessplan reconciliation using those frozen numbers;
-4. Founder CV later;
-5. final submission-readiness review and Founder GO/NO-GO.
+## 9. Confirmed working assumptions — 30.08.2026
 
-No external execution or submission is authorized by this record.
+| Topic | Confirmed working assumption |
+|---|---|
+| Eligible project costs | approximately EUR 40,000 net |
+| Requested grant | approximately EUR 20,000 |
+| Opening Founder-provided Klinnova liquidity | EUR 5,000 |
+| Ongoing Founder contribution capacity | EUR 400/month |
+| Founder remuneration from Klinnova during funded project | EUR 0 |
+| Previous De-minimis aid | none reported |
+| Grant-targeted project activity | not started |
+| Supplier quotations | none |
+| Dedicated Klinnova business account | **NOT YET OPEN** |
+| German personal bank account of the Founder | exists and **may** be available for application-stage account information **if** the programme/form permits. Do not assume acceptability. A dedicated Klinnova business account remains **recommended** for bookkeeping, grant-payment traceability and separation of private/business transactions. |
+| IBAN / BIC / account numbers / statements | **not recorded in Git** |
+
+## 10. Funded-project boundary (working wording)
+
+The funded project is **not** retrospective financing of the existing MVP.
+
+A working MVP existed before the funded project. Historic MVP development costs are excluded from the grant request.
+
+The proposed funded project concerns the structured transition of Klinnova into a market-ready and validated Berlin market phase, including, **subject to final cost evidence and eligibility**:
+
+- targeted technical refinement / specialist engineering support;
+- quality/security/technical assurance;
+- legal/privacy/compliance professionalisation;
+- UX/accessibility/user research;
+- market validation;
+- employer/customer acquisition;
+- development of repeatable onboarding/sales processes;
+- SaaS/infrastructure required for the funded project;
+- preparation of an economically sustainable commercial model.
+
+Do **not** represent any category as finally approved by IBB/IBT.
+
+## 11. Founder grant-CV chronology (confirmed)
+
+Professional experience:
+
+| Period | Role | Organisation / context |
+|---|---|---|
+| 12/2023–present | Software Developer | Jonas und der Wolf, Berlin; full-time / hybrid |
+| 04/2023–09/2023 | Full-stack Developer | Freelance / remote; several freelance software projects, including dashboard/web application work |
+| 01/2022–12/2022 | Frontend Web Developer | mula. \| B2B Merchandise Platform; Berlin / hybrid / full-time |
+| 08/2021–11/2021 | Full Stack Developer | Handlewithcare.merchandise; Berlin / hybrid / freelance; website maintenance plus development/deployment/maintenance of an internal dashboard |
+
+Confirmed transition periods — **do not invent employment**:
+
+- no professional employment between November 2021 employment end and January 2022 start;
+- no professional employment between December 2022 employment end and April 2023 start.
+
+Education / training:
+
+| Period | Qualification / programme | Institution |
+|---|---|---|
+| 2018 | Full Stack Web Development | SPICED Academy |
+| 2006–2009 | **Higher National Diploma**, Computer Science | Lagos State University |
+| — | Advanced German Language / B2 | WIPA GmbH |
+
+Use **Higher National Diploma** as the current evidence-supported qualification. Do **not** describe it as a B.Sc. unless later documentary evidence supports that.
+
+## 12. Registration and commercial position
+
+Registration (`docs/88`):
+
+- Geschäftsbezeichnung: **Klinnova**;
+- individual / non-registered sole proprietorship;
+- **Nebenerwerb**;
+- Berlin establishment;
+- **0** employees;
+- commencement date: **01.09.2026**.
+
+Founder: technical Founder with practical software-development experience and current full-time employment, initially operating Klinnova as a side business.
+
+Product (working Businessplan wording): Klinnova is a digital platform for publishing vacancies and bringing employers and job seekers together.
+
+Cohort A / validation (unchanged):
+
+- Candidates: free;
+- Employers: free;
+- paid subscriptions: none during initial validation;
+- placement/commission fees: none;
+- other paid Cohort A services: none.
+
+Future monetisation may follow **only after market validation**. Potential future forms may include paid employer platform functionality, vacancy/posting packages, or recurring employer platform usage. Do **not** state that a final pricing model is validated or decided. Do **not** invent early revenue. Commercial ramp assumptions still require final financial-model reconciliation.
+
+Financing narrative: Founder provides EUR 5,000 opening liquidity plus up to EUR 400/month if needed. No Founder salary/remuneration is included.
+
+## 13. Provisional working cost envelope
+
+**Provisional / evidence-driven, not final.** Not approved by IBB/IBT.
+
+| Working group | Amount |
+|---|---:|
+| External development / specialist technical work | EUR 12,000 |
+| Market entry / marketing / employer acquisition | EUR 8,000 |
+| Legal, privacy, accounting and compliance | EUR 5,000 |
+| UX/design/user research/specialist support | EUR 4,000 |
+| Software/SaaS/infrastructure/professional tools | EUR 5,000 |
+| External business/sales/market services | EUR 4,000 |
+| Unallocated / evidence-to-be-reconciled | EUR 2,000 |
+| **Total** | **EUR 40,000** |
+
+The EUR 2,000 must either be allocated to evidence-supported eligible cost items **or** be removed / used to reduce the final project envelope. It is **not** an eligible generic contingency or reserve.
+
+Existing C01–C10 evidence architecture in `docs/82` (and related C-series files) remains authoritative where it is more precise. Do not overwrite those records with this coarse grouping.
+
+## 14. Liquidity position
+
+- Opening liquidity: **EUR 5,000**.
+- Founder monthly contribution capacity: **EUR 400**.
+- Founder contribution over 24 months if fully required: **up to EUR 9,600**.
+- Combined Founder-provided **nominal** liquidity capacity over 24 months: **EUR 14,600** before operating revenue/grant reimbursements.
+
+This does **not** mean EUR 14,600 is all available upfront. The project must use staged expenditure and reimbursement timing.
+
+Financial model status:
+
+> **REBUILD REQUIRED BEFORE SUBMISSION**
+
+Do not fabricate cash-flow viability.
+
+## 15. Businessplan working narrative — control points
+
+Reconcile `docs/64` to:
+
+- **Product:** digital platform for publishing vacancies and bringing employers and job seekers together.
+- **Existing MVP:** working MVP before the funded project; historic costs excluded.
+- **Funded objective:** market readiness, validation, professionalisation and controlled Berlin market-entry.
+- **Founder:** technical Founder, current full-time employment, Klinnova initially as side business.
+- **Financing:** EUR 5,000 opening plus up to EUR 400/month if needed; EUR 0 Founder remuneration.
+- **Revenue:** no invented early revenue; initial controlled validation remains free.
+
+## 16. Current-state table (preparation, not eligibility)
+
+| Item | Status |
+|---|---|
+| Founder CV chronology | CONFIRMED |
+| Gewerbeanmeldung | CONFIRMED |
+| Commencement date | CONFIRMED: 01.09.2026 |
+| Funding baseline | CONFIRMED WORKING BASELINE |
+| Opening liquidity | CONFIRMED: EUR 5,000 |
+| Monthly Founder contribution | CONFIRMED: EUR 400 |
+| De-minimis | NONE REPORTED |
+| Grant-targeted project started | NO |
+| Business account | NOT YET OPEN |
+| Supplier quotations | NONE YET |
+| Financial model | REBUILD REQUIRED |
+| 24-month cost plan | RECONCILIATION REQUIRED |
+| Revenue model | CONSERVATIVE ASSUMPTIONS TO FINALISE |
+| Businessplan | DRAFT / RECONCILIATION REQUIRED |
+| Electronic application | NOT YET SUBMITTED |
+| Signed original | NOT YET SENT/RECEIVED |
+| Funding approval | NOT RECEIVED |
+
+Do not treat this table as an eligibility or grant-approval claim.
+
+## 17. Sensitive data policy
+
+Repository documentation must **not** contain:
+
+- personal IBAN;
+- BIC / account number;
+- bank statements;
+- identity-document numbers;
+- unnecessary residential address details;
+- passwords / tokens / secrets;
+- other sensitive personal finance information.
+
+Only status-level evidence belongs in Git. Banking identifiers, if required by the portal, stay Founder-held outside the repository.
+
+## 18. Remaining application gates
+
+1. Rebuild 3-year financial/liquidity model and 24-month cost-plan reconciliation.
+2. Obtain quotations / evidence; allocate or remove the EUR 2,000 unallocated amount.
+3. Open (recommended) dedicated Klinnova business account when appropriate; keep identifiers out of Git.
+4. Produce formal CV attachment from confirmed chronology.
+5. Reconcile Businessplan draft to this file.
+6. Founder GO, then electronic application **and** timely signed original — **not** described as done.
+7. Funding approval: **not received**.

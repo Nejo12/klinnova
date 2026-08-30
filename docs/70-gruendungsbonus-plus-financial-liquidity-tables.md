@@ -1,8 +1,8 @@
 # GründungsBONUS Plus — 3-Year Financial & Liquidity Tables
 
-**Status:** F6G numerical planning layer — internally reconciled, not yet final application workbook
+**Status:** F6G numerical planning layer — **REBUILD REQUIRED BEFORE SUBMISSION** (30.08.2026)
 
-**Date:** 2026-08-25
+**Date:** 2026-08-30
 
 **Authority:** Founder-authorized GründungsBONUS Plus preparation track. Documentation/modelling only. This file does not authorize application submission, external Cohort A activity, procurement, spending, contracts, borrowing, hiring, Production Sentry activation, pricing changes or other funded-project commencement.
 
@@ -27,6 +27,8 @@ This record deliberately distinguishes:
 5. items that still require quotation, VAT/tax and application-form reconciliation.
 
 This is not yet the final IBB/IBT financial workbook.
+
+**Supersession (30.08.2026):** Tables in this file must be **rebuilt** against `docs/68`. Confirmed inputs: opening liquidity **EUR 5,000**; Founder contribution **EUR 400/month**; EUR 0 Founder remuneration; approximately EUR 40,000 / EUR 20,000 envelope. EUR 7,500 starting-liquidity sensitivity is **not** the current confirmed opening figure. Nominal 24-month Founder capacity of EUR 14,600 is not cash on day one. Prior EUR 30,000 / EUR 15,000 modelling is stale. Do not treat this file as a frozen application workbook.
 
 ## 2. Controlling assumptions
 

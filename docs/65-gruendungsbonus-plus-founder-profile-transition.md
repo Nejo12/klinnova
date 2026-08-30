@@ -1,8 +1,8 @@
 # GründungsBONUS Plus — Founder Profile and Haupterwerb Transition Narrative
 
-**Status:** F6B working draft — application preparation only; exact CV chronology still to be reconciled before submission
+**Status:** 30.08.2026 — grant-CV chronology and Higher National Diploma confirmed; formal CV attachment still to be produced; Haupterwerb transition remains a working narrative
 
-**Date:** 2026-08-24
+**Date:** 2026-08-30
 
 **Authority:** Founder-authorized GründungsBONUS Plus preparation track. Documentation/drafting only. This record does not authorize grant submission, resignation from employment, employer/candidate outreach, procurement, spending, contracts, borrowing, hiring, pricing, Production Sentry activation, hosted changes or Cohort A external traffic.
 
@@ -16,6 +16,9 @@ Related durable records:
 - `docs/62-gruendungsbonus-plus-innovation-sustainability-berlin-impact.md`
 - `docs/63-gruendungsbonus-plus-ibt-clarification-request.md`
 - `docs/64-gruendungsbonus-plus-businessplan-draft.md`
+- `docs/68-gruendungsbonus-plus-application-package-reconciliation.md`
+
+**Current controlling CV facts:** `docs/68` §11 (30.08.2026). Where this file previously used a B.Sc. placeholder, that wording is superseded.
 
 ## 1. Purpose
 
@@ -29,29 +32,48 @@ The following facts are sufficiently established for working-draft use:
 
 - Founder: Gabriel Aborisade;
 - location/business base: Berlin;
-- academic background: Bachelor of Science in Computer Science, completed in 2009;
+- academic background: **Higher National Diploma, Computer Science**, Lagos State University, 2006–2009 (do not describe as a B.Sc. unless later documentary evidence supports that);
+- additional training: SPICED Academy Full Stack Web Development (2018); WIPA GmbH Advanced German Language / B2;
 - professional direction: software development, with substantial front-end/product-development experience;
-- software-development career active since 2018;
-- current professional focus: front-end software development using React/TypeScript and related web technologies;
+- software-development career active since 2018, with the confirmed grant-CV chronology in §2.1;
+- current professional focus: software development (current role: Software Developer at Jonas und der Wolf, Berlin, full-time / hybrid, 12/2023–present);
 - currently remains in full-time employment while Klinnova is built up as a side business (`Nebenerwerb`);
 - Klinnova's current product has been built substantially Founder-led, including product definition, frontend implementation, application workflows, production deployment, operational preparation and funding preparation;
 - the Founder has practical experience across modern web-product delivery, including React, TypeScript/JavaScript, HTML/CSS, Next.js/Vite-style application architectures, Node.js tooling, automated tests, CI/CD and managed backend/infrastructure services;
 - the Founder is acting as product owner, primary technical implementer and initial operator for Klinnova;
 - the current operating model deliberately uses bounded external specialists only where independent review or specialist competence is justified.
 
-### 2.1 Facts that must still be reconciled from the final CV before application
+### 2.1 Confirmed grant-CV chronology (30.08.2026)
 
-Do not invent or infer these fields in the formal application:
+See also `docs/68` §11.
 
-- exact current-employer start date;
-- exact chronological list of prior employers;
-- exact job titles and dates for each historical role;
-- exact dates for non-software employment periods;
-- formal certificates/qualifications beyond the confirmed B.Sc.;
-- language-proficiency levels unless explicitly documented;
-- any claim of personnel-management, sales-management or startup-exit experience not separately evidenced.
+**Professional experience**
 
-The final CV attachment must supply the exact chronology.
+- **12/2023–present** — Software Developer, Jonas und der Wolf, Berlin; full-time / hybrid.
+- **04/2023–09/2023** — Full-stack Developer, freelance / remote; several freelance software projects, including dashboard/web application work.
+- **01/2022–12/2022** — Frontend Web Developer, mula. | B2B Merchandise Platform; Berlin / hybrid / full-time.
+- **08/2021–11/2021** — Full Stack Developer, Handlewithcare.merchandise; Berlin / hybrid / freelance; website maintenance plus development/deployment/maintenance of an internal dashboard.
+
+**Confirmed gaps — do not invent employment**
+
+- no professional employment between November 2021 employment end and January 2022 start;
+- no professional employment between December 2022 employment end and April 2023 start.
+
+**Education / training**
+
+- 2018 — SPICED Academy, Full Stack Web Development;
+- 2006–2009 — Lagos State University, Higher National Diploma, Computer Science;
+- WIPA GmbH — Advanced German Language / B2.
+
+### 2.2 Facts that must still be reconciled before the formal CV attachment is frozen
+
+Do not invent or infer these fields beyond the chronology above:
+
+- optional professional-profile links if intended for the application;
+- any additional roles the Founder later documents with evidence;
+- language-proficiency claims beyond the confirmed WIPA B2 programme unless separately evidenced.
+
+The formal CV attachment must follow the confirmed chronology and must not upgrade the Higher National Diploma to a B.Sc. without later documentary evidence.
 
 ## 3. Founder-to-Klinnova capability mapping
 
@@ -206,7 +228,7 @@ No exact resignation date is currently locked.
 
 ## 7. Application-ready Founder narrative — English working version
 
-> Gabriel Aborisade is the Founder of Klinnova and a software developer with a Bachelor of Science in Computer Science and professional web-development experience since 2018. His current technical focus is modern web-product development with React, TypeScript and related frontend, testing, deployment and managed-infrastructure technologies.
+> Gabriel Aborisade is the Founder of Klinnova and a software developer with a Higher National Diploma in Computer Science (Lagos State University, 2006–2009) and professional web-development experience since 2018. His current technical focus is modern web-product development with React, TypeScript and related frontend, testing, deployment and managed-infrastructure technologies.
 >
 > Klinnova has been developed substantially Founder-led. Gabriel has taken the product from concept through the implementation of candidate and employer onboarding, vacancy publication, structured matching, applications, employer review, outcome measurement, transactional communication and Production deployment. This existing MVP is treated as a pre-application asset and is not presented as future grant-funded development.
 >
@@ -216,7 +238,7 @@ No exact resignation date is currently locked.
 
 ## 8. Application-ready transition narrative — German working version
 
-> Gabriel Aborisade ist Gründer von Klinnova und Softwareentwickler mit einem Bachelor of Science in Computer Science sowie Berufserfahrung in der Webentwicklung seit 2018. Sein aktueller technischer Schwerpunkt liegt auf moderner Web-Produktentwicklung mit React, TypeScript sowie den dazugehörigen Test-, Deployment- und Managed-Infrastructure-Technologien.
+> Gabriel Aborisade ist Gründer von Klinnova und Softwareentwickler mit einem Higher National Diploma in Computer Science (Lagos State University, 2006–2009) sowie Berufserfahrung in der Webentwicklung seit 2018. Sein aktueller technischer Schwerpunkt liegt auf moderner Web-Produktentwicklung mit React, TypeScript sowie den dazugehörigen Test-, Deployment- und Managed-Infrastructure-Technologien.
 >
 > Klinnova wurde bislang in wesentlichen Teilen durch den Gründer selbst entwickelt. Gabriel hat das Produkt von der Konzeption bis zur Umsetzung zentraler Funktionen wie Bewerber- und Arbeitgeber-Onboarding, Stellenveröffentlichung, strukturiertem Matching, Bewerbungsprozess, Arbeitgeber-Review, Ergebnismessung, transaktionaler Kommunikation und Produktivbetrieb geführt. Dieses bestehende MVP wird als vor Antragstellung vorhandener Vermögenswert behandelt und nicht als zukünftige förderfinanzierte Entwicklung dargestellt.
 >
@@ -232,10 +254,10 @@ Recommended order:
 
 1. **Name / Berlin / business contact**
 2. **Founder role — Klinnova**
-3. **Current professional employment** — exact employer, title and dates from verified CV
-4. **Earlier software-development roles** — exact employers/titles/dates
+3. **Current professional employment** — Software Developer, Jonas und der Wolf, Berlin, 12/2023–present, full-time / hybrid
+4. **Earlier software-development roles** — confirmed chronology in §2.1, including documented gaps
 5. **Selected product/technical experience relevant to Klinnova**
-6. **Education** — B.Sc. Computer Science, 2009, exact institution from verified CV
+6. **Education** — Higher National Diploma, Computer Science, Lagos State University, 2006–2009; SPICED Academy 2018; WIPA GmbH B2
 7. **Core skills** — only those materially relevant to the venture
 
 Avoid:
@@ -249,13 +271,12 @@ Avoid:
 
 ## 10. Remaining Founder inputs before final CV freeze
 
-The F6B narrative can proceed now, but the formal CV attachment cannot be considered final until the following are supplied or reconciled from an existing verified CV:
+The F6B narrative can proceed, and the grant-CV chronology is confirmed in §2.1 / `docs/68`. The formal CV attachment still needs to be produced (outside Git) from that chronology. Remaining optional items:
 
-- exact university/institution name for the 2009 B.Sc.;
-- exact current employer name, title and start date;
-- prior software employers/roles and dates needed for a clean chronology;
-- any materially relevant entrepreneurship/product experience the Founder wants formally included;
-- optional professional-profile links if intended for the application.
+- optional professional-profile links if intended for the application;
+- any additional evidenced roles the Founder later supplies.
+
+Do not invent employment for the confirmed gaps. Do not describe the 2006–2009 qualification as a B.Sc. unless later documentary evidence supports that.
 
 These gaps do **not** block the rest of the Businessplan assembly. They block only the final CV freeze.
 
