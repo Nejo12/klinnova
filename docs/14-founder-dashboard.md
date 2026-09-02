@@ -9,6 +9,7 @@ M5 outcome proposal: `docs/50-m5-outcome-contract-proposal.md`.
 M5 operating plan: `docs/51-m5-operating-plan.md`.
 M5.1 execution/readiness closure: `docs/53-m5.1-beta-readiness-closure.md`.
 K6 durable Production-cutover closure: `docs/56-k6-production-cutover-durable-closure.md`.
+GründungsBONUS Plus post-submission control: `docs/100-gruendungsbonus-plus-post-submission-control.md`.
 Deferred ideas: `NOT_NOW.md`.
 Historical slice detail remains in the individual discovery/build-plan/closure documents.
 
@@ -19,16 +20,27 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 | Active milestone | **M5 — Berlin private beta** |
 | Previous milestone | **M4 — Complete** (Slices 7–8 closed; PR #73 merged) |
 | Product boundary | Merged M4 implementation under D-M5-1 feature freeze |
-| Active work unit | **K6 COMPLETE / CLOSED.** Klinnova Production/public-domain cutover is complete through K6-6. `https://klinnova.com` is canonical Production; old public-domain retirement is complete. **Operational readiness remains ON HOLD** until Founder resumption. See `docs/56-k6-production-cutover-durable-closure.md`. |
-| PR | K6-6 durable-closure documentation PR — documentation only; do not merge without Founder action |
-| Product/schema implementation | M5.1 work proceeds only through explicitly approved bounded units; no K6-6 product/schema change is authorized |
+| Active work unit | **K6 COMPLETE / CLOSED.** Klinnova Production/public-domain cutover is complete through K6-6. `https://klinnova.com` is canonical Production. **Operational readiness remains ON HOLD.** GründungsBONUS Plus application assembly/submission is complete; post-submission control is active. See `docs/56-k6-production-cutover-durable-closure.md` and `docs/100-gruendungsbonus-plus-post-submission-control.md`. |
+| PR | Post-submission funding-control documentation only; Founder manually merges. Never auto-merge. |
+| Funding / admin | **GB9185/2026 SUBMITTED.** Electronic submission complete; signed original dispatched; correction notice for generated EUR 15.00 → intended EUR 15,000.00 next-year drawdown sent by email and post; IBB receipt/review pending. Provider evidence planning is outreach-ready for C05/C01/C04/C03/C07, but outreach/procurement/grant-targeted work remain **NOT AUTHORIZED**. |
+| Product/schema implementation | M5.1 work proceeds only through explicitly approved bounded units; no funding submission event authorizes product/schema change |
 | Preview | Persistent isolated Supabase Preview project remains available through Vercel-generated Preview deployment URLs. Custom `preview.klinnova.com` project-domain attachment is retired. See `docs/52-preview-environment-runbook.md` and `docs/56-k6-production-cutover-durable-closure.md`. |
-| Monitoring | **Preview Sentry complete through G1/G2**. **Production Sentry remains OFF/unwired by deliberate Founder decision for Cohort A.** K6 did not activate it. |
+| Monitoring | **Preview Sentry complete through G1/G2**. **Production Sentry remains OFF/unwired by deliberate Founder decision for Cohort A.** Funding submission does not activate it. |
 | Production | **Canonical Production is `https://klinnova.com`.** `www.klinnova.com` permanently redirects to apex. `stint.company` permanently redirects to Klinnova and no longer serves the application directly. Production baseline after K6-4 merge: `0564a5e749b65f5589d1bd2dc32f926b848a5493`. |
-| Cohort A readiness | **ON HOLD / NOT STARTED** — employer acquisition, candidate recruitment, founder-assisted onboarding, support/moderation preparation, and other operational work are preserved for later resumption. K6 completion does not start Cohort A. |
+| Cohort A readiness | **ON HOLD / NOT STARTED** — employer acquisition, candidate recruitment, founder-assisted onboarding, support/moderation preparation, and other operational work are preserved for later resumption. Funding submission does not start Cohort A. |
 | Hosted destructive proof | Not authorized / not run |
 | Demo fixture deadline | Remove or explicitly re-authorize retained Production Demo fixtures by **2026-09-02** |
 | Legal readiness | Unit H is **CLOSED for current launch sequencing by Founder decision**. Current merged legal surfaces are accepted provisionally for this launch path; Founder will review/correct legal wording in the nearest future. No qualified legal-review, full legal-compliance, or GDPR-compliance claim is made. |
+
+## GründungsBONUS Plus post-submission gate
+
+- Application **GB9185/2026**: electronic submission complete.
+- Signed original: dispatched by post; actual IBB receipt/processing evidence is pending.
+- Correction notice: sent by email and post for the generated application display of `EUR 15.00`; controlling next-year grant drawdown is **EUR 15,000.00** and the EUR 30,000 / EUR 15,000 financing baseline is unchanged.
+- Sensitive submission artifacts, identity evidence, bank identifiers, tax identifiers and signatures remain outside Git.
+- Keep the grant-targeted project boundary closed until the legally relevant signed-original receipt / safe start boundary is evidenced or clarified by IBB.
+- Provider outreach remains separately Founder-gated; no quote outreach, order, contract, deposit, procurement, paid campaign, Cohort A external market entry or funded work is authorized by submission alone.
+- Current evidence-planning priority remains **C05 → C01 → C04 → C03 → C07**; `docs/95` is already outreach-ready and `docs/100` is the current administrative control record.
 
 ## K6 closure snapshot
 
@@ -118,7 +130,7 @@ A change may enter active work only when it is required to measure the beta, rem
 
 ## Immediate beta-readiness queue after K6
 
-This is a planning queue, **not automatic authorization**. Current execution status is authoritative in `docs/53-m5.1-beta-readiness-closure.md` and `docs/56-k6-production-cutover-durable-closure.md`.
+This is a planning queue, **not automatic authorization**. Current execution status is authoritative in `docs/53-m5.1-beta-readiness-closure.md`, `docs/56-k6-production-cutover-durable-closure.md` and `docs/100-gruendungsbonus-plus-post-submission-control.md`.
 
 ### Product / measurement
 
@@ -132,9 +144,16 @@ This is a planning queue, **not automatic authorization**. Current execution sta
 
 ### Operations
 
-1. Employer acquisition, candidate recruitment, founder-assisted onboarding, support/moderation operating preparation, and other Cohort A operational work remain **ON HOLD** until Founder resumes them.
+1. Employer acquisition, candidate recruitment, founder-assisted onboarding, support/moderation operating preparation, and other Cohort A operational work remain **ON HOLD** until Founder resumes them and the applicable funding/start boundary is clear.
 2. Preserve the existing plans and playbooks for later resumption; do not mark operational readiness complete.
 3. Run one structured M5 review using `Operate manually / Fix now / Watch / Defer` when operations resume.
+
+### Funding / administration
+
+1. Retain private evidence of postal dispatch and the sent correction email.
+2. Record the first IBB receipt acknowledgement, information request or decision when received.
+3. Record Steuernummer / W-IdNr / USt-IdNr privately when issued; update IBB only where required.
+4. Before any first funded expenditure, establish invoice → payment → cost-block → project-purpose evidence linkage.
 
 ## Cohort A readiness gates
 
@@ -146,10 +165,11 @@ Before intentional external Cohort A traffic, after Founder resumption:
 - isolated Preview remains available through Vercel-generated Preview deployments;
 - technical/moderation/privacy support procedures are resumed and understood;
 - demo-fixture cleanup/re-authorization obligations are satisfied as required;
+- applicable GründungsBONUS project-start / procurement boundaries are clear before any grant-targeted Cohort A work;
 - Cohort A employer/candidate acquisition and founder-assisted onboarding preparation are resumed and ready;
 - Founder explicitly returns GO.
 
-**Current verdict: K6 COMPLETE / OPERATIONAL READINESS ON HOLD.**
+**Current verdict: K6 COMPLETE / OPERATIONAL READINESS ON HOLD / FUNDING APPLICATION UNDER POST-SUBMISSION CONTROL.**
 
 This gate does not establish or claim full GDPR compliance.
 
@@ -176,12 +196,12 @@ Do not optimize M5 for larger test counts. The primary M5 numbers are participat
 | M2 Applications | Complete | Slice 3 |
 | M3 Employer flow | Implementation complete | Slices 4–6; Slice 6 hosted proof remains separately deferred |
 | M4 Trust and beta readiness | **Complete** | Slices 7–8; `docs/44`, `docs/48`; PR #73 |
-| M5 Berlin private beta | **Active** | `docs/49`–`docs/56`; K6 Production/public-domain cutover complete; operational readiness remains ON HOLD |
+| M5 Berlin private beta | **Active** | `docs/49`–`docs/56`; K6 Production/public-domain cutover complete; operational readiness remains ON HOLD; funding application is under post-submission control in `docs/100` |
 
 ## Decision discipline
 
 Founder-approved M5 operating/measurement decisions remain recorded in `docs/49-m5-beta-transition-and-measurement.md` and durable project decisions remain in `docs/10-decisions.md`.
 
-When current documentation and execution history conflict, merged Git/PR evidence determines implementation status; accepted hosted proof determines external-configuration status. Historical planning documents retain their original meaning unless explicitly superseded. `docs/53-m5.1-beta-readiness-closure.md` remains the durable M5.1 execution/readiness record; `docs/56-k6-production-cutover-durable-closure.md` is the durable K6 closure record.
+When current documentation and execution history conflict, merged Git/PR evidence determines implementation status; accepted hosted proof determines external-configuration status. Historical planning documents retain their original meaning unless explicitly superseded. `docs/53-m5.1-beta-readiness-closure.md` remains the durable M5.1 execution/readiness record; `docs/56-k6-production-cutover-durable-closure.md` is the durable K6 closure record; `docs/100-gruendungsbonus-plus-post-submission-control.md` is the current non-sensitive funding-administration control record.
 
 Normal beta fixes use evidence-first lightweight delivery. Changes affecting schema/database, authorization/RLS, privacy, security, matching authority, employment/legal boundaries, or major architecture require explicit discovery and founder approval before implementation.
