@@ -24,14 +24,9 @@ M5 is operational and product-led. The default beta loop is:
 
 > Observe problem → confirm it matters → smallest fix → test → deploy → observe again.
 
-Feature expansion is frozen under D-M5-1 unless the change:
+D-M5-23 replaces the blanket feature freeze with governed product development. New ideas move through discovery and are classified as **BUILD NOW**, **DESIGN / SPEC NOW**, **WAIT FOR BETA**, or **PARK / REJECT**. Only a bounded, explicitly Founder-approved work unit may enter implementation.
 
-1. is required to measure the beta;
-2. removes an observed blocker for a real user;
-3. fixes a bug, accessibility, security, or privacy problem; or
-4. is necessary for safe beta operation.
-
-Use heavier discovery/decision planning for schema/database, authorization/RLS, privacy, security, matching authority, employment/legal boundaries, or major architecture changes.
+Use heavier discovery/decision planning for schema/database, authorization/RLS, privacy, security, matching authority, employment/legal boundaries, or major architecture changes. Founder-built work before the safe funding boundary must be labelled **Founder-developed / pre-funding / excluded from grant reimbursement**.
 
 M5 boundary/measurement: `docs/49-m5-beta-transition-and-measurement.md`.
 Outcome-contract proposal: `docs/50-m5-outcome-contract-proposal.md`.
@@ -147,7 +142,7 @@ MVP account-data export/deletion controls are implemented and locally proven. Th
 | M2 Applications | 3 | Candidate applies and tracks status | Complete |
 | M3 Employer flow | 4–6 | Verified employer publishes and reviews | Implementation complete; Slice 6 hosted proof remains separately deferred |
 | M4 Trust and beta readiness | 7–8 | Ops and account-data/privacy basics work | **Complete** |
-| M5 Berlin private beta | operate | Validate outcomes; freeze feature expansion | **Active** |
+| M5 Berlin private beta | operate + design | Validate outcomes; governed product development | **Active** |
 
 ## M5 — Berlin private beta
 
@@ -230,12 +225,13 @@ The early domain-model list in prior planning documents is historical vocabulary
 
 ## Pull-request policy
 
-### Normal M5 beta fix
+### Normal bounded M5 product change
 
-A normal beta PR should:
+A normal M5 PR should:
 
-- cite the observed user/operational problem;
-- implement the smallest correction;
+- cite the observed problem, product rationale, or approved design;
+- state its BUILD NOW classification and funding treatment;
+- implement the smallest coherent change;
 - include tests appropriate to the risk;
 - preserve strict TypeScript without `any`;
 - contain no unrelated refactoring;
@@ -253,4 +249,4 @@ For schema/database, authorization/RLS, privacy, security, matching authority, e
 
 ## Deferred work
 
-Deferred capabilities are listed in `NOT_NOW.md`. D-M5-1/D-M5-6 explicitly freeze CV upload, save/unsave jobs, and other speculative expansion for the initial Berlin private beta unless beta evidence justifies promotion.
+Deferred and rejected capabilities are listed in `NOT_NOW.md`. Under D-M5-23, that file is a governed parking lot rather than a blanket freeze: an item moves only through explicit reclassification and Founder approval, with additional evidence required where risk or an accepted decision demands it.

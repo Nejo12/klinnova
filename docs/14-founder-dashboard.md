@@ -19,11 +19,11 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 |---|---|
 | Active milestone | **M5 — Berlin private beta** |
 | Previous milestone | **M4 — Complete** (Slices 7–8 closed; PR #73 merged) |
-| Product boundary | Merged M4 implementation under D-M5-1 feature freeze |
+| Product boundary | Merged M4 remains the Cohort A baseline; governed product development is unfrozen under D-M5-23 |
 | Active work unit | **K6 COMPLETE / CLOSED.** Klinnova Production/public-domain cutover is complete through K6-6. `https://klinnova.com` is canonical Production. **Operational readiness remains ON HOLD.** GründungsBONUS Plus application assembly/submission is complete; post-submission control is active. See `docs/56-k6-production-cutover-durable-closure.md` and `docs/100-gruendungsbonus-plus-post-submission-control.md`. |
 | PR | Post-submission funding-control documentation only; Founder manually merges. Never auto-merge. |
 | Funding / admin | **GB9185/2026 SUBMITTED.** Electronic submission complete; signed original dispatched; correction notice for generated EUR 15.00 → intended EUR 15,000.00 next-year drawdown sent by email and post; IBB receipt/review pending. Provider evidence planning is outreach-ready for C05/C01/C04/C03/C07, but outreach/procurement/grant-targeted work remain **NOT AUTHORIZED**. |
-| Product/schema implementation | M5.1 work proceeds only through explicitly approved bounded units; no funding submission event authorizes product/schema change |
+| Product/schema implementation | Product discovery/design is active. Implementation proceeds only through explicitly approved bounded BUILD NOW units, labelled Founder-developed / pre-funding / excluded from grant reimbursement while the funding boundary remains closed. |
 | Preview | Persistent isolated Supabase Preview project remains available through Vercel-generated Preview deployment URLs. Custom `preview.klinnova.com` project-domain attachment is retired. See `docs/52-preview-environment-runbook.md` and `docs/56-k6-production-cutover-durable-closure.md`. |
 | Monitoring | **Preview Sentry complete through G1/G2**. **Production Sentry remains OFF/unwired by deliberate Founder decision for Cohort A.** Funding submission does not activate it. |
 | Production | **Canonical Production is `https://klinnova.com`.** `www.klinnova.com` permanently redirects to apex. `stint.company` permanently redirects to Klinnova and no longer serves the application directly. Production baseline after K6-4 merge: `0564a5e749b65f5589d1bd2dc32f926b848a5493`. |
@@ -79,34 +79,25 @@ Cleaning-first is approved.
 
 Allow only **1–2 adjacent low-language-barrier employers** when founder access is strong and the hiring model remains simple. Do not deliberately run a broad multi-sector Cohort A.
 
-## M5 scope freeze
+## M5 product-development control
 
-Do not introduce without beta evidence:
+D-M5-23 ends the blanket feature freeze. Every idea is now classified as:
 
-- chat/messaging;
-- native apps;
-- reviews/ratings;
-- AI matching surfaces;
-- embeddings/vector search;
-- payroll/payments;
-- subscriptions/billing;
-- full ATS functionality;
-- video interviewing;
-- multi-city expansion;
-- unrestricted scraping;
-- CV upload;
-- save/unsave jobs;
-- sophisticated analytics dashboards;
-- PostHog/session replay.
+- **BUILD NOW** — bounded Founder implementation may be proposed; explicit approval is still required;
+- **DESIGN / SPEC NOW** — use the paid Figma window and product discovery without starting implementation;
+- **WAIT FOR BETA** — evidence is required before promotion;
+- **PARK / REJECT** — keep outside active work.
 
-A change may enter active work only when it is required to measure the beta, removes an observed blocker, fixes a bug/accessibility/security/privacy problem, or is necessary for safe beta operation.
+The unfreeze does not automatically promote chat/messaging, native apps, public reviews/ratings, identity-document verification, payments/payroll, subscriptions/billing, staffing-agency operations, broad scraping, sophisticated analytics, or PostHog/session replay. Existing anti-goals and accepted risk decisions remain in force until separately changed.
+
+The GründungsBONUS project-start boundary is independent and remains closed. Product work personally implemented before that boundary must be recorded as **Founder-developed / pre-funding / excluded from grant reimbursement**.
 
 ## M5.0 deliverables
 
 - [x] Slice 8 marked complete
 - [x] M4 marked complete
 - [x] M5 marked active
-- [x] Beta scope freeze recorded
+- [x] M5 product-development unfreeze recorded (D-M5-23)
 - [x] Staged Cohorts A/B/C recorded
 - [x] Participating-employer definition approved
 - [x] Verified-vacancy definition approved

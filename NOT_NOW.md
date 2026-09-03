@@ -8,15 +8,16 @@ For M5, the founder-approved beta boundary is in `docs/49-m5-beta-transition-and
 
 ## Rules
 
-- Add temptations here instead of expanding active beta work.
-- Do not implement items from this file merely because M5 has started.
-- Promote an item only with beta/user evidence, an update to the relevant product doc if scope changes, and explicit founder/decision approval where required.
+- This is a governed parking lot, not a blanket feature freeze.
+- Do not implement an item merely because D-M5-23 unfroze product development.
+- Reclassify each idea as BUILD NOW, DESIGN / SPEC NOW, WAIT FOR BETA, or PARK / REJECT.
+- BUILD NOW requires a bounded issue/work unit and explicit Founder approval.
+- Promote evidence-gated or high-risk items only with the required evidence and an updated recorded decision.
 - “Useful someday” is not a reason to start now.
-- Normal M5 fixes should solve an observed blocker, measurement gap, bug/accessibility/security/privacy issue, or safe-operation requirement.
 
-## Deferred until after Berlin beta evidence
+## Evidence-gated or parked capabilities
 
-These remain explicitly post-validation unless a recorded decision says otherwise:
+These remain outside automatic implementation unless a recorded decision explicitly reclassifies them:
 
 - native mobile applications
 - real-time chat / messaging
@@ -38,14 +39,14 @@ These remain explicitly post-validation unless a recorded decision says otherwis
 - sophisticated analytics dashboards
 - PostHog / session replay
 
-## Deferred for initial M5 Cohort A unless beta evidence promotes them
+## Previously deferred from the initial M5 Cohort A gate
 
-Founder-approved D-M5-6 keeps these as product capabilities but removes them from the initial private-beta entry gate:
+D-M5-6 kept these as product capabilities outside the initial private-beta entry gate. D-M5-23 removes the blanket freeze, but neither item is automatically BUILD NOW:
 
 - optional CV upload / private candidate document Storage
 - save and unsave jobs
 
-Other accepted implementation narrowings also remain authoritative until beta evidence justifies reopening them, including travel-time sophistication and experience-based matching.
+Other accepted implementation narrowings remain authoritative until a separate decision reopens them, including travel-time sophistication and experience-based matching.
 
 ## Beta-readiness exception: minimal Sentry
 

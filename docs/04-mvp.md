@@ -138,9 +138,9 @@ Founder-approved M5 boundary (D-M5-1 and D-M5-6; `docs/49-m5-beta-transition-and
 - optional CV upload and save/unsave jobs remain deferred product capabilities and do not block Cohort A;
 - broader matching intent such as travel-time sophistication and experience-based matching remains product direction, but accepted narrower matching contracts remain authoritative for the current beta until evidence justifies reopening them;
 - interview/hire outcome measurement is a beta-measurement requirement and is investigated separately from application workflow status in M5.0;
-- normal beta changes are evidence-driven rather than backlog-driven.
+- D-M5-23 ends the blanket product-development freeze: ideas now move through BUILD NOW, DESIGN / SPEC NOW, WAIT FOR BETA, or PARK / REJECT classification; implementation still requires a bounded Founder-approved unit.
 
-A deferred capability is not deleted from the longer-term product direction merely because it is outside the initial beta gate.
+A deferred capability is not deleted from the longer-term product direction merely because it is outside the initial beta gate. Design/specification may proceed under D-M5-23 without changing the current implementation or Cohort A entry baseline.
 
 ## Explicitly out of scope
 
