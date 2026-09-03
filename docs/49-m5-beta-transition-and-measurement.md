@@ -2,7 +2,7 @@
 
 ## Status
 
-**M5.0 — Approved founder decisions recorded; merged (PR #74).**
+**M5.0 — Approved founder decisions recorded; merged (PR #74). M5 product-development freeze superseded by D-M5-23 (2026-09-03).**
 
 M4 is complete. Slice 8 is complete. M5 — Berlin private beta — is the active milestone.
 
@@ -10,7 +10,7 @@ This document defines the initial M5 beta boundary and authoritative top-level c
 
 ## M5 objective
 
-Operate Stint as a controlled Berlin private beta and validate whether the current product can create real employment outcomes without broad feature expansion.
+Operate Klinnova as a controlled Berlin private beta, validate whether the current product can create real employment outcomes, and selectively advance bounded Founder product work.
 
 Overall M5 targets:
 
@@ -34,6 +34,8 @@ Feature expansion is frozen unless a change:
 **Status:** Approved
 
 The merged M4 implementation is the minimum product boundary for the initial M5 Berlin private beta. Capabilities deliberately deferred during implementation do not block beta unless observed beta evidence shows they are required.
+
+**Superseded in part by D-M5-23 on 2026-09-03.** The M4 implementation remains the minimum Cohort A baseline, but the blanket restriction on product discovery, design, and bounded Founder implementation no longer controls current work.
 
 The initial beta does not require speculative expansion into chat, native applications, reviews/ratings, AI matching, embeddings/vector search, payments/payroll, subscriptions, full ATS functionality, video interviews, multi-city expansion, broad scraping, CV upload, saved jobs, or sophisticated analytics dashboards.
 
@@ -431,6 +433,22 @@ It does not authorize:
 - broader product expansion.
 
 Any product/schema implementation must be selected explicitly after this PR's final founder review/merge.
+
+### D-M5-23 — Governed product-development unfreeze
+
+**Status:** Approved
+
+**Accepted:** 2026-09-03
+
+**Context:** The Founder explicitly ended the blanket M5 feature freeze so the post-submission waiting period can be used for product discovery, UX architecture, Figma design, prioritisation, and selective implementation. The GründungsBONUS Plus project-start boundary remains closed independently.
+
+**Decision:** D-M5-1 and D-M5-6 remain historical records of the initial Cohort A entry boundary, but no longer impose a blanket product-development freeze. New ideas are classified as **BUILD NOW**, **DESIGN / SPEC NOW**, **WAIT FOR BETA**, or **PARK / REJECT**. Design/specification may proceed without implying implementation. A BUILD NOW item still requires a bounded issue or work unit and explicit Founder approval; it is not authorized merely because it was proposed or designed.
+
+Accepted anti-goals, security/privacy/legal constraints, narrower implementation contracts, and production/hosted-change gates remain authoritative until separately revised. High-risk capabilities such as full realtime chat, public bilateral reviews, identity-document verification, payments/payroll, staffing-agency operations, native applications, and broad analytics remain evidence- or decision-gated rather than automatically promoted.
+
+This decision does **not** authorize provider outreach, procurement, paid campaigns, Cohort A external market entry, grant-targeted external work, Production Sentry activation, hosted mutations, or any expenditure intended for grant reimbursement. Until the safe funding boundary is evidenced or clarified, personally implemented product work must be recorded in its issue/PR as **Founder-developed / pre-funding / excluded from grant reimbursement** and must not later be represented as an external funded deliverable.
+
+**Consequences:** Product work may now move through discovery → classification → Figma → bounded GitHub issue → implementation → Founder-reviewed PR. Durable repository docs change only when a lasting decision changes. No feature receives automatic implementation priority from this unfreeze.
 
 ## Remaining founder decisions
 
