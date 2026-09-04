@@ -12,7 +12,7 @@ import styles from "./public-footer.module.scss";
  */
 export function PublicFooter() {
   return (
-    <footer className={styles.footer}>
+    <div className={styles.footer}>
       <ThemePreferenceControl />
       <nav className={styles.legalNav} aria-label="Legal">
         <Link className={styles.legalLink} href="/privacy">
@@ -25,6 +25,6 @@ export function PublicFooter() {
           Impressum
         </Link>
       </nav>
-    </footer>
+    </div>
   );
 }
