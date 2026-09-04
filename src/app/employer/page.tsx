@@ -6,6 +6,7 @@ import {
   statusLabel,
 } from "@/components/employer-vacancies/vacancy-list";
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
+import { ThemePreferenceControl } from "@/components/theme/theme-preference-control";
 import styles from "@/app/employer/employer-home.module.scss";
 import {
   EMPLOYER_EXPORT_BUTTON_LABEL,
@@ -255,17 +256,20 @@ export default async function EmployerHomePage() {
           </h2>
           <p className={styles.note}>{EMPLOYER_EXPORT_LEAD}</p>
         </div>
-        <div className={styles.accountActions}>
-          {/* Plain anchor, not next/link: this is a real file download from a
-              Route Handler, not a client-side page transition. The server's
-              Content-Disposition header is the authoritative download
-              mechanism, not this element. */}
-          <a className={styles.textLink} href="/employer/account/export">
-            {EMPLOYER_EXPORT_BUTTON_LABEL}
-          </a>
-          <Link className={styles.textLink} href="/employer/account/delete">
-            {DELETE_ACCOUNT_HEADING}
-          </Link>
+        <div className={styles.accountControls}>
+          <ThemePreferenceControl />
+          <div className={styles.accountActions}>
+            {/* Plain anchor, not next/link: this is a real file download from a
+                Route Handler, not a client-side page transition. The server's
+                Content-Disposition header is the authoritative download
+                mechanism, not this element. */}
+            <a className={styles.textLink} href="/employer/account/export">
+              {EMPLOYER_EXPORT_BUTTON_LABEL}
+            </a>
+            <Link className={styles.textLink} href="/employer/account/delete">
+              {DELETE_ACCOUNT_HEADING}
+            </Link>
+          </div>
         </div>
       </section>
     </main>

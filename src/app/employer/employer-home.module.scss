@@ -234,6 +234,13 @@
   padding-top: var(--space-4);
 }
 
+.accountControls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
 @media (min-width: $breakpoint-sm) {
   .page {
     padding-right: var(--layout-gutter-desktop);
@@ -267,5 +274,9 @@
   .vacancyState {
     align-items: stretch;
     min-width: 0;
+  }
+
+  .accountControls {
+    align-items: stretch;
   }
 }

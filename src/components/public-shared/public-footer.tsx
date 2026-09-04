@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { ThemePreferenceControl } from "@/components/theme/theme-preference-control";
+
 import styles from "./public-footer.module.scss";
 
 /**
@@ -10,16 +12,19 @@ import styles from "./public-footer.module.scss";
  */
 export function PublicFooter() {
   return (
-    <nav className={styles.legalNav} aria-label="Legal">
-      <Link className={styles.legalLink} href="/privacy">
-        Privacy
-      </Link>
-      <Link className={styles.legalLink} href="/terms">
-        Terms
-      </Link>
-      <Link className={styles.legalLink} href="/impressum">
-        Impressum
-      </Link>
-    </nav>
+    <div className={styles.footer}>
+      <ThemePreferenceControl />
+      <nav className={styles.legalNav} aria-label="Legal">
+        <Link className={styles.legalLink} href="/privacy">
+          Privacy
+        </Link>
+        <Link className={styles.legalLink} href="/terms">
+          Terms
+        </Link>
+        <Link className={styles.legalLink} href="/impressum">
+          Impressum
+        </Link>
+      </nav>
+    </div>
   );
 }

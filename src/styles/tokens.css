@@ -5,6 +5,8 @@
  */
 
 :root {
+  color-scheme: light;
+
   /* 1. Primitive colours */
   --color-oxblood-900: #4f121e;
   --color-oxblood-800: #601824;
@@ -30,6 +32,24 @@
   --color-line: #d8d0c5;
   --color-line-strong: #b8ada1;
   --color-white: #ffffff;
+
+  /* Dark-mode primitives (KDS-TM3.1) */
+  --color-night-950: #171315;
+  --color-night-900: #211b1d;
+  --color-night-800: #2c2427;
+  --color-night-700: #4a3e41;
+  --color-night-600: #6f6064;
+  --color-rose-400: #d87591;
+  --color-rose-300: #e88ba3;
+  --color-rose-200: #f0a3b7;
+  --color-rose-900: #4b2430;
+  --color-clay-300: #d88d70;
+  --color-clay-200: #efaf97;
+  --color-clay-900: #482b26;
+  --color-olive-300: #a7b594;
+  --color-olive-200: #c1ceb0;
+  --color-olive-900: #30372b;
+  --color-night-info-bg: #302a2b;
 
   /* 2. Semantic colours */
   --color-bg-page: var(--color-paper);
@@ -229,7 +249,55 @@
   --step-size: 0.625rem;
   --step-line-width: 2px;
   --step-gap: var(--space-2);
-  --step-color-complete: var(--color-oxblood-700);
-  --step-color-current: var(--color-clay-500);
-  --step-color-upcoming: var(--color-line-strong);
+  --step-color-complete: var(--color-action-primary);
+  --step-color-current: var(--color-accent-warm);
+  --step-color-upcoming: var(--color-border-strong);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-bg-page: var(--color-night-950);
+  --color-bg-surface: var(--color-night-900);
+  --color-bg-subtle: var(--color-night-800);
+  --color-bg-inverse: var(--color-cream);
+
+  --color-text-primary: var(--color-cream);
+  --color-text-secondary: var(--color-line);
+  --color-text-muted: var(--color-line-strong);
+  --color-text-inverse: var(--color-ink-900);
+  --color-text-link: var(--color-rose-200);
+
+  --color-border-default: var(--color-night-700);
+  --color-border-strong: var(--color-night-600);
+
+  --color-action-primary: var(--color-rose-300);
+  --color-action-primary-hover: var(--color-rose-200);
+  --color-action-primary-active: var(--color-rose-400);
+  --color-action-primary-text: var(--color-ink-900);
+  --color-action-subtle: var(--color-rose-900);
+
+  --color-accent-warm: var(--color-clay-300);
+  --color-accent-warm-strong: var(--color-clay-200);
+  --color-accent-warm-subtle: var(--color-clay-900);
+
+  --color-support: var(--color-olive-300);
+  --color-support-strong: var(--color-olive-200);
+  --color-support-subtle: var(--color-olive-900);
+
+  --color-focus-ring: var(--color-rose-200);
+  --color-selection-bg: var(--color-rose-900);
+  --color-selection-text: var(--color-cream);
+
+  --color-status-info: var(--color-line);
+  --color-status-info-bg: var(--color-night-info-bg);
+  --color-status-success: var(--color-olive-200);
+  --color-status-success-bg: var(--color-olive-900);
+  --color-status-warning: var(--color-clay-200);
+  --color-status-warning-bg: var(--color-clay-900);
+  --color-status-danger: var(--color-rose-200);
+  --color-status-danger-bg: var(--color-rose-900);
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.24);
+  --shadow-md: 0 8px 24px rgb(0 0 0 / 0.32), 0 2px 6px rgb(0 0 0 / 0.2);
 }
