@@ -3,6 +3,7 @@
 import { useFormStatus } from "react-dom";
 
 import { confirmAction } from "@/app/auth/confirm/actions";
+import { useLocale } from "@/components/i18n/locale-provider";
 
 import styles from "./auth-form.module.scss";
 
@@ -16,14 +17,15 @@ type ConfirmFormProps = {
 
 function SubmitButton({ isRecovery }: { isRecovery: boolean }) {
   const { pending } = useFormStatus();
+  const { t } = useLocale();
 
   return (
     <button className={styles.submit} type="submit" disabled={pending}>
       {pending
-        ? "Confirming…"
+        ? t("auth.confirming")
         : isRecovery
-          ? "Continue to password reset"
-          : "Confirm email address"}
+          ? t("auth.continuePasswordReset")
+          : t("auth.confirmEmail")}
     </button>
   );
 }

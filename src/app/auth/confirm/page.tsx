@@ -2,10 +2,8 @@ import Link from "next/link";
 
 import { ConfirmForm } from "@/components/auth/confirm-form";
 import styles from "@/components/auth/auth-form.module.scss";
-import {
-  AUTH_CONFIRM_FAILED,
-  AUTH_RESET_LINK_INVALID,
-} from "@/lib/auth/messages";
+import { LocalizedText } from "@/components/i18n/localized-text";
+import { PublicFooter } from "@/components/public-shared/public-footer";
 import { isAllowedConfirmOtpType } from "@/lib/auth/confirm";
 import { parseInternalNextPath } from "@/lib/auth/schemas";
 
@@ -63,10 +61,19 @@ export default async function AuthConfirmPage({
         <Link className={styles.brand} href="/">
           Klinnova
         </Link>
-        <h1 className={styles.heading}>We could not finish that step</h1>
+        <h1 className={styles.heading}>
+          <LocalizedText message="page.error.heading" />
+        </h1>
         <p className={styles.lead}>
-          {isRecoveryIntent ? AUTH_RESET_LINK_INVALID : AUTH_CONFIRM_FAILED}
+          <LocalizedText
+            message={
+              isRecoveryIntent
+                ? "authMessage.resetInvalid"
+                : "authMessage.confirmFailed"
+            }
+          />
         </p>
+        <PublicFooter />
       </main>
     );
   }
@@ -79,14 +86,22 @@ export default async function AuthConfirmPage({
         Klinnova
       </Link>
       <h1 className={styles.heading}>
-        {isRecoveryIntent
-          ? "Reset your password"
-          : "Confirm your email address"}
+        <LocalizedText
+          message={
+            isRecoveryIntent
+              ? "page.confirm.resetHeading"
+              : "page.confirm.emailHeading"
+          }
+        />
       </h1>
       <p className={styles.lead}>
-        {isRecoveryIntent
-          ? "Click below to continue to password reset."
-          : "Click below to finish confirming this email address."}
+        <LocalizedText
+          message={
+            isRecoveryIntent
+              ? "page.confirm.resetLead"
+              : "page.confirm.emailLead"
+          }
+        />
       </p>
       <ConfirmForm
         tokenHash={tokenHash}
@@ -95,6 +110,7 @@ export default async function AuthConfirmPage({
         next={safeNext}
         intent={isRecoveryIntent ? "recovery" : null}
       />
+      <PublicFooter />
     </main>
   );
 }

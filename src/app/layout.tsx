@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
+import { LocaleBootstrapScript } from "@/components/i18n/locale-bootstrap-script";
+import { LocaleProvider } from "@/components/i18n/locale-provider";
 import { ThemeBootstrapScript } from "@/components/theme/theme-bootstrap-script";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { assertServerEnv } from "@/lib/env/server";
@@ -23,10 +25,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <LocaleBootstrapScript />
         <ThemeBootstrapScript />
       </head>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <LocaleProvider>
+          <ThemeProvider>{children}</ThemeProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

@@ -3,9 +3,10 @@ import { redirect } from "next/navigation";
 
 import { LoginForm } from "@/components/auth/login-form";
 import styles from "@/components/auth/auth-form.module.scss";
+import { LocalizedText } from "@/components/i18n/localized-text";
+import { PublicFooter } from "@/components/public-shared/public-footer";
 import { isEmployerIntentPath } from "@/lib/auth/paths";
 import { parseInternalNextPath } from "@/lib/auth/schemas";
-import { PublicFooter } from "@/components/public-shared/public-footer";
 import { resolvePostAuthDestination } from "@/lib/employer/capability-routing";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -52,22 +53,26 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       <Link className={styles.brand} href="/">
         Klinnova
       </Link>
-      <h1 className={styles.heading}>Sign in</h1>
+      <h1 className={styles.heading}>
+        <LocalizedText message="page.login.heading" />
+      </h1>
       <p className={styles.lead}>
-        {employerIntent
-          ? "Use the email and password for your Klinnova account to continue as an employer."
-          : "Use the email and password for your Klinnova account."}
+        <LocalizedText
+          message={
+            employerIntent ? "page.login.employerLead" : "page.login.lead"
+          }
+        />
       </p>
       <LoginForm nextPath={nextPathForForm} />
       <p className={styles.footer}>
         <Link className={styles.link} href="/forgot-password">
-          Forgot password?
+          <LocalizedText message="page.login.forgot" />
         </Link>
       </p>
       <p className={styles.footer}>
-        New here?{" "}
+        <LocalizedText message="page.login.newHere" />{" "}
         <Link className={styles.link} href={registerHref}>
-          Create an account
+          <LocalizedText message="page.login.createAccount" />
         </Link>
       </p>
       <PublicFooter />

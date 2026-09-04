@@ -2,27 +2,30 @@
 
 import { useId } from "react";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import { useThemePreference } from "@/components/theme/theme-provider";
 import { THEME_PREFERENCES, type ThemePreference } from "@/lib/theme/theme";
+import type { MessageKey } from "@/lib/i18n/messages";
 
 import styles from "./theme-preference-control.module.scss";
 
-const LABELS: Record<ThemePreference, string> = {
-  system: "System",
-  light: "Light",
-  dark: "Dark",
+const LABEL_KEYS: Record<ThemePreference, MessageKey> = {
+  system: "theme.system",
+  light: "theme.light",
+  dark: "theme.dark",
 };
 
 export function ThemePreferenceControl() {
   const { preference, setPreference } = useThemePreference();
+  const { t } = useLocale();
   const descriptionId = useId();
   const name = useId();
 
   return (
     <fieldset className={styles.fieldset} aria-describedby={descriptionId}>
-      <legend className={styles.legend}>Appearance</legend>
+      <legend className={styles.legend}>{t("theme.legend")}</legend>
       <p className={styles.hint} id={descriptionId}>
-        Use your device setting or choose a theme for this browser.
+        {t("theme.hint")}
       </p>
       <div className={styles.options}>
         {THEME_PREFERENCES.map((option) => (
@@ -35,7 +38,7 @@ export function ThemePreferenceControl() {
               checked={preference === option}
               onChange={() => setPreference(option)}
             />
-            <span className={styles.optionLabel}>{LABELS[option]}</span>
+            <span className={styles.optionLabel}>{t(LABEL_KEYS[option])}</span>
           </label>
         ))}
       </div>

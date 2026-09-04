@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 
 import { registerAction, type AuthActionState } from "@/app/auth/actions";
+import { useLocale } from "@/components/i18n/locale-provider";
 
 import styles from "./auth-form.module.scss";
 
@@ -21,6 +22,7 @@ export function RegisterForm({ nextPath }: RegisterFormProps) {
     registerAction,
     initialState,
   );
+  const { t } = useLocale();
 
   return (
     <form className={styles.form} action={formAction} noValidate>
@@ -33,6 +35,7 @@ export function RegisterForm({ nextPath }: RegisterFormProps) {
           {state.error}
         </p>
       ) : null}
+
       {state.message !== null ? (
         <p className={styles.message} role="status">
           {state.message}
@@ -41,7 +44,7 @@ export function RegisterForm({ nextPath }: RegisterFormProps) {
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor="displayName">
-          Display name
+          {t("auth.displayName")}
         </label>
         <input
           className={styles.input}
@@ -57,7 +60,7 @@ export function RegisterForm({ nextPath }: RegisterFormProps) {
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor="email">
-          Email
+          {t("auth.email")}
         </label>
         <input
           className={styles.input}
@@ -72,7 +75,7 @@ export function RegisterForm({ nextPath }: RegisterFormProps) {
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor="password">
-          Password
+          {t("auth.password")}
         </label>
         <input
           className={styles.input}
@@ -87,7 +90,7 @@ export function RegisterForm({ nextPath }: RegisterFormProps) {
       </div>
 
       <button className={styles.submit} type="submit" disabled={pending}>
-        {pending ? "Creating account…" : "Create account"}
+        {pending ? t("auth.creatingAccount") : t("auth.createAccount")}
       </button>
     </form>
   );

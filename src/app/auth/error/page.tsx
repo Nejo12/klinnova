@@ -1,11 +1,8 @@
 import Link from "next/link";
 
 import styles from "@/components/auth/auth-form.module.scss";
-import {
-  AUTH_CONFIRM_FAILED,
-  AUTH_PROFILE_REQUIRED,
-  AUTH_RESET_LINK_INVALID,
-} from "@/lib/auth/messages";
+import { LocalizedText } from "@/components/i18n/localized-text";
+import { PublicFooter } from "@/components/public-shared/public-footer";
 
 export const metadata = {
   title: "Confirmation issue · Klinnova",
@@ -21,35 +18,40 @@ export default async function AuthErrorPage({
   const params = await searchParams;
   const message =
     params.reason === "profile"
-      ? AUTH_PROFILE_REQUIRED
+      ? "authMessage.profileRequired"
       : params.reason === "recovery"
-        ? AUTH_RESET_LINK_INVALID
-        : AUTH_CONFIRM_FAILED;
+        ? "authMessage.resetInvalid"
+        : "authMessage.confirmFailed";
 
   return (
     <main className={styles.page}>
       <Link className={styles.brand} href="/">
         Klinnova
       </Link>
-      <h1 className={styles.heading}>We could not finish that step</h1>
-      <p className={styles.lead}>{message}</p>
+      <h1 className={styles.heading}>
+        <LocalizedText message="page.error.heading" />
+      </h1>
+      <p className={styles.lead}>
+        <LocalizedText message={message} />
+      </p>
       {params.reason === "recovery" ? (
         <p className={styles.footer}>
           <Link className={styles.link} href="/forgot-password">
-            Request another reset
+            <LocalizedText message="page.error.requestAnother" />
           </Link>
         </p>
       ) : (
         <p className={styles.footer}>
           <Link className={styles.link} href="/login">
-            Sign in
+            <LocalizedText message="auth.signIn" />
           </Link>
           {" · "}
           <Link className={styles.link} href="/register">
-            Create an account
+            <LocalizedText message="page.login.createAccount" />
           </Link>
         </p>
       )}
+      <PublicFooter />
     </main>
   );
 }

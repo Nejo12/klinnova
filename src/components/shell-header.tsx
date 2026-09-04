@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
 import Link from "next/link";
+import { useEffect, useId, useState } from "react";
 
 import { BrandMark } from "@/components/brand-mark";
+import { useLocale } from "@/components/i18n/locale-provider";
 
 import styles from "./shell-header.module.scss";
 
 export function ShellHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const navId = useId();
+  const { t } = useLocale();
 
   useEffect(() => {
     if (!menuOpen) {
@@ -29,7 +31,11 @@ export function ShellHeader() {
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        <Link className={styles.brand} href="/" aria-label="Klinnova home">
+        <Link
+          className={styles.brand}
+          href="/"
+          aria-label={t("shell.homeLabel")}
+        >
           <BrandMark as="span" />
         </Link>
 
@@ -40,13 +46,13 @@ export function ShellHeader() {
           aria-controls={navId}
           onClick={() => setMenuOpen((open) => !open)}
         >
-          Menu
+          {t("shell.menu")}
         </button>
 
         <nav
           id={navId}
           className={menuOpen ? `${styles.nav} ${styles.navOpen}` : styles.nav}
-          aria-label="Site"
+          aria-label={t("shell.siteNav")}
         >
           <div className={styles.navLinks}>
             <Link
@@ -54,21 +60,21 @@ export function ShellHeader() {
               href="/jobs"
               onClick={() => setMenuOpen(false)}
             >
-              Jobs
+              {t("shell.jobs")}
             </Link>
             <a
               className={styles.navLink}
               href="#for-candidates"
               onClick={() => setMenuOpen(false)}
             >
-              For candidates
+              {t("shell.forCandidates")}
             </a>
             <a
               className={styles.navLink}
               href="#for-employers"
               onClick={() => setMenuOpen(false)}
             >
-              For employers
+              {t("shell.forEmployers")}
             </a>
           </div>
           <div className={styles.authActions}>
@@ -77,14 +83,14 @@ export function ShellHeader() {
               href="/login"
               onClick={() => setMenuOpen(false)}
             >
-              Sign in
+              {t("shell.signIn")}
             </Link>
             <Link
               className={styles.createAccountLink}
               href="/register"
               onClick={() => setMenuOpen(false)}
             >
-              Create account
+              {t("shell.createAccount")}
             </Link>
           </div>
         </nav>

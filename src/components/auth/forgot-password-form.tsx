@@ -6,6 +6,7 @@ import {
   requestPasswordResetAction,
   type ForgotPasswordActionState,
 } from "@/app/forgot-password/actions";
+import { useLocale } from "@/components/i18n/locale-provider";
 
 import styles from "./auth-form.module.scss";
 
@@ -19,6 +20,7 @@ export function ForgotPasswordForm() {
     requestPasswordResetAction,
     initialState,
   );
+  const { t } = useLocale();
 
   if (state.message !== null) {
     return (
@@ -38,7 +40,7 @@ export function ForgotPasswordForm() {
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor="email">
-          Email
+          {t("auth.email")}
         </label>
         <input
           className={styles.input}
@@ -52,7 +54,7 @@ export function ForgotPasswordForm() {
       </div>
 
       <button className={styles.submit} type="submit" disabled={pending}>
-        {pending ? "Sending…" : "Send reset instructions"}
+        {pending ? t("auth.sending") : t("auth.sendReset")}
       </button>
     </form>
   );
