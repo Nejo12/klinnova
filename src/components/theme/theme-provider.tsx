@@ -82,7 +82,7 @@ type ThemeProviderProps = {
 };
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const preference = useSyncExternalStore(
+  const preference = useSyncExternalStore<ThemePreference>(
     subscribeToPreference,
     readStampedPreference,
     () => "system",
