@@ -7,9 +7,17 @@ import { useLocale } from "@/components/i18n/locale-provider";
 
 import styles from "./auth-form.module.scss";
 
-const initialState: AuthActionState = { error: null, message: null };
+const initialState: AuthActionState = {
+  error: null,
+  message: null,
+};
 
-export function RegisterForm({ nextPath }: { nextPath?: string }) {
+type RegisterFormProps = {
+  /** Validated internal next path preserved through signup confirmation. */
+  nextPath?: string;
+};
+
+export function RegisterForm({ nextPath }: RegisterFormProps) {
   const [state, formAction, pending] = useActionState(
     registerAction,
     initialState,
@@ -21,16 +29,19 @@ export function RegisterForm({ nextPath }: { nextPath?: string }) {
       {nextPath !== undefined ? (
         <input type="hidden" name="next" value={nextPath} />
       ) : null}
+
       {state.error !== null ? (
         <p className={styles.error} role="alert">
           {state.error}
         </p>
       ) : null}
+
       {state.message !== null ? (
         <p className={styles.message} role="status">
           {state.message}
         </p>
       ) : null}
+
       <div className={styles.field}>
         <label className={styles.label} htmlFor="displayName">
           {t("auth.displayName")}
@@ -46,6 +57,7 @@ export function RegisterForm({ nextPath }: { nextPath?: string }) {
           disabled={pending}
         />
       </div>
+
       <div className={styles.field}>
         <label className={styles.label} htmlFor="email">
           {t("auth.email")}
@@ -60,6 +72,7 @@ export function RegisterForm({ nextPath }: { nextPath?: string }) {
           disabled={pending}
         />
       </div>
+
       <div className={styles.field}>
         <label className={styles.label} htmlFor="password">
           {t("auth.password")}
@@ -75,6 +88,7 @@ export function RegisterForm({ nextPath }: { nextPath?: string }) {
           disabled={pending}
         />
       </div>
+
       <button className={styles.submit} type="submit" disabled={pending}>
         {pending ? t("auth.creatingAccount") : t("auth.createAccount")}
       </button>

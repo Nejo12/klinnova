@@ -7,7 +7,10 @@ import { PublicFooter } from "@/components/public-shared/public-footer";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Set new password · Klinnova" };
+
+export const metadata = {
+  title: "Set new password · Klinnova",
+};
 
 export default async function ResetPasswordPage() {
   const supabase = await createServerSupabaseClient();
@@ -15,7 +18,7 @@ export default async function ResetPasswordPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user === null)
+  if (user === null) {
     return (
       <main className={styles.page}>
         <Link className={styles.brand} href="/">
@@ -35,6 +38,7 @@ export default async function ResetPasswordPage() {
         <PublicFooter />
       </main>
     );
+  }
 
   return (
     <main className={styles.page}>

@@ -16,13 +16,15 @@ export const metadata = {
   description: "Sign in to your Klinnova account.",
 };
 
-export default async function LoginPage({
-  searchParams,
-}: {
+type LoginPageProps = {
   searchParams: Promise<{ next?: string }>;
-}) {
+};
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams;
   const intentPath = parseInternalNextPath(params.next);
+  const nextPathForForm = intentPath ?? "";
+
   const supabase = await createServerSupabaseClient();
   const {
     data: { user },
@@ -61,7 +63,7 @@ export default async function LoginPage({
           }
         />
       </p>
-      <LoginForm nextPath={intentPath ?? ""} />
+      <LoginForm nextPath={nextPathForForm} />
       <p className={styles.footer}>
         <Link className={styles.link} href="/forgot-password">
           <LocalizedText message="page.login.forgot" />

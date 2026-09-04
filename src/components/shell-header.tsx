@@ -14,10 +14,14 @@ export function ShellHeader() {
   const { t } = useLocale();
 
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!menuOpen) {
+      return;
+    }
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setMenuOpen(false);
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+      }
     }
 
     document.addEventListener("keydown", handleKeyDown);

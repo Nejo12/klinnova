@@ -17,7 +17,9 @@ export default async function RegisterPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (user !== null) redirect("/candidate");
+  if (user !== null) {
+    redirect("/candidate");
+  }
 
   return (
     <main className={styles.page}>

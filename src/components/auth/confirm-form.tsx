@@ -18,6 +18,7 @@ type ConfirmFormProps = {
 function SubmitButton({ isRecovery }: { isRecovery: boolean }) {
   const { pending } = useFormStatus();
   const { t } = useLocale();
+
   return (
     <button className={styles.submit} type="submit" disabled={pending}>
       {pending
@@ -29,6 +30,11 @@ function SubmitButton({ isRecovery }: { isRecovery: boolean }) {
   );
 }
 
+/**
+ * The interstitial's own form. Rendering this component performs no
+ * Supabase Auth call — only the human's own submit triggers confirmAction,
+ * the one-time-token-consuming Server Action (C4G-R).
+ */
 export function ConfirmForm({
   tokenHash,
   type,

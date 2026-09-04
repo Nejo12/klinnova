@@ -11,7 +11,10 @@ import { useLocale } from "@/components/i18n/locale-provider";
 
 import styles from "./auth-form.module.scss";
 
-const initialState: ResetPasswordActionState = { error: null, message: null };
+const initialState: ResetPasswordActionState = {
+  error: null,
+  message: null,
+};
 
 export function ResetPasswordForm() {
   const [state, formAction, pending] = useActionState(
@@ -42,6 +45,7 @@ export function ResetPasswordForm() {
           {state.error}
         </p>
       ) : null}
+
       <div className={styles.field}>
         <label className={styles.label} htmlFor="password">
           {t("auth.newPassword")}
@@ -57,6 +61,7 @@ export function ResetPasswordForm() {
           disabled={pending}
         />
       </div>
+
       <div className={styles.field}>
         <label className={styles.label} htmlFor="confirmPassword">
           {t("auth.confirmNewPassword")}
@@ -72,6 +77,7 @@ export function ResetPasswordForm() {
           disabled={pending}
         />
       </div>
+
       <button className={styles.submit} type="submit" disabled={pending}>
         {pending ? t("auth.settingPassword") : t("auth.setNewPassword")}
       </button>

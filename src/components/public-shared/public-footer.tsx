@@ -8,7 +8,12 @@ import { ThemePreferenceControl } from "@/components/theme/theme-preference-cont
 
 import styles from "./public-footer.module.scss";
 
-/** Shared preferences and legal navigation for public/auth-facing routes. */
+/**
+ * Minimal legal footer nav shared across public/auth-facing routes
+ * (landing, /jobs, /login, /register, /employer/register, and the legal
+ * pages themselves). Not added to authenticated candidate/employer/
+ * internal dashboards, which have their own navigation.
+ */
 export function PublicFooter() {
   const { t } = useLocale();
 

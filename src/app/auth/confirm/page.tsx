@@ -22,12 +22,24 @@ type AuthConfirmPageProps = {
   }>;
 };
 
+/**
+ * Scanner-resistant Auth confirmation/recovery interstitial (C4G-R).
+ *
+ * This GET render performs zero Supabase Auth calls — no verifyOtp, no
+ * exchangeCodeForSession, no session/profile mutation of any kind. It only
+ * parses and structurally validates the incoming URL parameters and renders
+ * a page with a single explicit human action (ConfirmForm's own submit
+ * button), which alone triggers the token-consuming confirmAction Server
+ * Action. An automated email-link-prefetch/security scanner that fetches
+ * this URL sees only this static interstitial and consumes nothing.
+ */
 export default async function AuthConfirmPage({
   searchParams,
 }: AuthConfirmPageProps) {
   const params = await searchParams;
   const isRecoveryIntent =
     params.intent === "recovery" || params.type === "recovery";
+
   const tokenHash =
     typeof params.token_hash === "string" && params.token_hash.length > 0
       ? params.token_hash
@@ -39,10 +51,11 @@ export default async function AuthConfirmPage({
   const typeIsUsable =
     isRecoveryIntent ||
     (typeof params.type === "string" && isAllowedConfirmOtpType(params.type));
+
   const structurallyValid =
     (tokenHash !== null && typeIsUsable) || code !== null;
 
-  if (!structurallyValid)
+  if (!structurallyValid) {
     return (
       <main className={styles.page}>
         <Link className={styles.brand} href="/">
@@ -63,8 +76,10 @@ export default async function AuthConfirmPage({
         <PublicFooter />
       </main>
     );
+  }
 
   const safeNext = parseInternalNextPath(params.next ?? null);
+
   return (
     <main className={styles.page}>
       <Link className={styles.brand} href="/">

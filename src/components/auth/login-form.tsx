@@ -7,9 +7,17 @@ import { useLocale } from "@/components/i18n/locale-provider";
 
 import styles from "./auth-form.module.scss";
 
-const initialState: AuthActionState = { error: null, message: null };
+const initialState: AuthActionState = {
+  error: null,
+  message: null,
+};
 
-export function LoginForm({ nextPath }: { nextPath: string }) {
+type LoginFormProps = {
+  /** Empty string means no intent (role-choice may apply after sign-in). */
+  nextPath: string;
+};
+
+export function LoginForm({ nextPath }: LoginFormProps) {
   const [state, formAction, pending] = useActionState(
     loginAction,
     initialState,
@@ -19,11 +27,13 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
   return (
     <form className={styles.form} action={formAction} noValidate>
       <input type="hidden" name="next" value={nextPath} />
+
       {state.error !== null ? (
         <p className={styles.error} role="alert">
           {state.error}
         </p>
       ) : null}
+
       <div className={styles.field}>
         <label className={styles.label} htmlFor="email">
           {t("auth.email")}
@@ -38,6 +48,7 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
           disabled={pending}
         />
       </div>
+
       <div className={styles.field}>
         <label className={styles.label} htmlFor="password">
           {t("auth.password")}
@@ -52,6 +63,7 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
           disabled={pending}
         />
       </div>
+
       <button className={styles.submit} type="submit" disabled={pending}>
         {pending ? t("auth.signingIn") : t("auth.signIn")}
       </button>

@@ -11,6 +11,7 @@ export const metadata = {
   title: "Employer registration · Klinnova",
   description: "Create a Klinnova account to hire as an employer.",
 };
+
 const EMPLOYER_NEXT = "/employer/onboarding";
 
 export default async function EmployerRegisterPage() {
@@ -18,7 +19,9 @@ export default async function EmployerRegisterPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (user !== null) redirect(EMPLOYER_NEXT);
+  if (user !== null) {
+    redirect(EMPLOYER_NEXT);
+  }
 
   return (
     <main className={styles.page}>

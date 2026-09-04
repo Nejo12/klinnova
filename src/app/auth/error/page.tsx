@@ -4,13 +4,17 @@ import styles from "@/components/auth/auth-form.module.scss";
 import { LocalizedText } from "@/components/i18n/localized-text";
 import { PublicFooter } from "@/components/public-shared/public-footer";
 
-export const metadata = { title: "Confirmation issue · Klinnova" };
+export const metadata = {
+  title: "Confirmation issue · Klinnova",
+};
+
+type AuthErrorPageProps = {
+  searchParams: Promise<{ reason?: string }>;
+};
 
 export default async function AuthErrorPage({
   searchParams,
-}: {
-  searchParams: Promise<{ reason?: string }>;
-}) {
+}: AuthErrorPageProps) {
   const params = await searchParams;
   const message =
     params.reason === "profile"
