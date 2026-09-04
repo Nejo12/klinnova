@@ -21,7 +21,9 @@ function hasDeclaration(property: string): boolean {
 }
 
 function readDarkDeclaration(property: string): string {
-  const darkBlock = tokensCss.match(/:root\[data-theme="dark"\]\s*{([\s\S]*?)\n}/)?.[1];
+  const darkBlock = tokensCss.match(
+    /:root\[data-theme="dark"\]\s*{([\s\S]*?)\n}/,
+  )?.[1];
   if (darkBlock === undefined) {
     throw new Error("Dark theme selector not declared in tokens.css");
   }
@@ -116,9 +118,7 @@ describe("KDS-TM3.1 theme semantics", () => {
   });
 
   test("dark surfaces and text use the approved semantic mappings", () => {
-    expect(readDarkDeclaration("color-bg-page")).toBe(
-      "var(--color-night-950)",
-    );
+    expect(readDarkDeclaration("color-bg-page")).toBe("var(--color-night-950)");
     expect(readDarkDeclaration("color-bg-surface")).toBe(
       "var(--color-night-900)",
     );

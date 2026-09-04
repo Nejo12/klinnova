@@ -3,10 +3,7 @@
 import { useId } from "react";
 
 import { useThemePreference } from "@/components/theme/theme-provider";
-import {
-  THEME_PREFERENCES,
-  type ThemePreference,
-} from "@/lib/theme/theme";
+import { THEME_PREFERENCES, type ThemePreference } from "@/lib/theme/theme";
 
 import styles from "./theme-preference-control.module.scss";
 

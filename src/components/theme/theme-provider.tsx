@@ -65,8 +65,7 @@ type ThemeProviderProps = {
 };
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [preference, setPreferenceState] =
-    useState<ThemePreference>("system");
+  const [preference, setPreferenceState] = useState<ThemePreference>("system");
 
   useEffect(() => {
     setPreferenceState(readStampedPreference());
