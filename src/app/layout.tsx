@@ -22,7 +22,9 @@ type RootLayoutProps = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <ThemeBootstrapScript />
+      <head>
+        <ThemeBootstrapScript />
+      </head>
       <body>
         <ThemeProvider>{children}</ThemeProvider>
       </body>

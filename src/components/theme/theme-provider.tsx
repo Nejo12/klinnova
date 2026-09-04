@@ -7,7 +7,7 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useSyncExternalStore,
 } from "react";
 
 import {
@@ -31,7 +31,24 @@ const ThemePreferenceContext = createContext<ThemePreferenceContextValue>(
   defaultThemePreferenceContext,
 );
 
+const preferenceListeners = new Set<() => void>();
+
+function subscribeToPreference(listener: () => void): () => void {
+  preferenceListeners.add(listener);
+  return () => preferenceListeners.delete(listener);
+}
+
+function emitPreferenceChange(): void {
+  for (const listener of preferenceListeners) {
+    listener();
+  }
+}
+
 function readStampedPreference(): ThemePreference {
+  if (typeof document === "undefined") {
+    return "system";
+  }
+
   const preference = document.documentElement.dataset.themePreference;
   return isThemePreference(preference) ? preference : "system";
 }
@@ -65,11 +82,11 @@ type ThemeProviderProps = {
 };
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [preference, setPreferenceState] = useState<ThemePreference>("system");
-
-  useEffect(() => {
-    setPreferenceState(readStampedPreference());
-  }, []);
+  const preference = useSyncExternalStore(
+    subscribeToPreference,
+    readStampedPreference,
+    () => "system",
+  );
 
   useEffect(() => {
     if (readStampedPreference() !== "system") {
@@ -86,7 +103,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const setPreference = useCallback((nextPreference: ThemePreference) => {
     applyThemePreference(nextPreference);
     persistThemePreference(nextPreference);
-    setPreferenceState(nextPreference);
+    emitPreferenceChange();
   }, []);
 
   const value = useMemo(

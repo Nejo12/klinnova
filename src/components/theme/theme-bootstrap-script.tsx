@@ -1,5 +1,3 @@
-import Script from "next/script";
-
 import { THEME_STORAGE_KEY } from "@/lib/theme/theme";
 
 export const THEME_BOOTSTRAP_SCRIPT = `
@@ -28,9 +26,8 @@ export const THEME_BOOTSTRAP_SCRIPT = `
 
 export function ThemeBootstrapScript() {
   return (
-    <Script
+    <script
       id="klinnova-theme-bootstrap"
-      strategy="beforeInteractive"
       dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }}
     />
   );
