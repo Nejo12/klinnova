@@ -20,6 +20,20 @@ function hasDeclaration(property: string): boolean {
   return new RegExp(`--${property}:`).test(tokensCss);
 }
 
+function readDarkDeclaration(property: string): string {
+  const darkBlock = tokensCss.match(/:root\[data-theme="dark"\]\s*{([\s\S]*?)\n}/)?.[1];
+  if (darkBlock === undefined) {
+    throw new Error("Dark theme selector not declared in tokens.css");
+  }
+
+  const match = darkBlock.match(new RegExp(`--${property}:\\s*([^;]+);`, "s"));
+  const value = match?.[1];
+  if (value === undefined) {
+    throw new Error(`--${property} not declared in the dark theme`);
+  }
+  return value.replace(/\s+/g, " ").trim();
+}
+
 describe("KDS-TM2.1 font stack", () => {
   test("--font-family-ui leads with the native system stack", () => {
     const value = readDeclaration("font-family-ui");
@@ -90,5 +104,50 @@ describe("KDS-TM2.1 motion tokens", () => {
     expect(readDeclaration("ease-standard")).toBe("cubic-bezier(0.2, 0, 0, 1)");
     expect(readDeclaration("ease-enter")).toBe("cubic-bezier(0, 0, 0.2, 1)");
     expect(readDeclaration("ease-exit")).toBe("cubic-bezier(0.4, 0, 1, 1)");
+  });
+});
+
+describe("KDS-TM3.1 theme semantics", () => {
+  test("the document declares native light and dark colour schemes", () => {
+    expect(tokensCss).toContain("color-scheme: light;");
+    expect(tokensCss).toMatch(
+      /:root\[data-theme="dark"\][\s\S]*?color-scheme: dark;/,
+    );
+  });
+
+  test("dark surfaces and text use the approved semantic mappings", () => {
+    expect(readDarkDeclaration("color-bg-page")).toBe(
+      "var(--color-night-950)",
+    );
+    expect(readDarkDeclaration("color-bg-surface")).toBe(
+      "var(--color-night-900)",
+    );
+    expect(readDarkDeclaration("color-text-primary")).toBe(
+      "var(--color-cream)",
+    );
+    expect(readDarkDeclaration("color-text-secondary")).toBe(
+      "var(--color-line)",
+    );
+    expect(readDarkDeclaration("color-text-muted")).toBe(
+      "var(--color-line-strong)",
+    );
+  });
+
+  test("dark actions and status colours retain readable contrast", () => {
+    expect(readDarkDeclaration("color-action-primary")).toBe(
+      "var(--color-rose-300)",
+    );
+    expect(readDarkDeclaration("color-action-primary-text")).toBe(
+      "var(--color-ink-900)",
+    );
+    expect(readDarkDeclaration("color-status-success")).toBe(
+      "var(--color-olive-200)",
+    );
+    expect(readDarkDeclaration("color-status-warning")).toBe(
+      "var(--color-clay-200)",
+    );
+    expect(readDarkDeclaration("color-status-danger")).toBe(
+      "var(--color-rose-200)",
+    );
   });
 });

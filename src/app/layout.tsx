@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
+import { ThemeBootstrapScript } from "@/components/theme/theme-bootstrap-script";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 import { assertServerEnv } from "@/lib/env/server";
 import "@/styles/tokens.css";
 import "@/styles/pulse.css";
@@ -19,8 +21,11 @@ type RootLayoutProps = {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <ThemeBootstrapScript />
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }
