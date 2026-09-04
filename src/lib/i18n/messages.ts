@@ -1,0 +1,168 @@
+import type { Locale } from "@/lib/i18n/locale";
+
+const englishMessages = {
+  "shell.homeLabel": "Klinnova home",
+  "shell.menu": "Menu",
+  "shell.siteNav": "Site",
+  "shell.jobs": "Jobs",
+  "shell.forCandidates": "For candidates",
+  "shell.forEmployers": "For employers",
+  "shell.signIn": "Sign in",
+  "shell.createAccount": "Create account",
+  "footer.legalNav": "Legal",
+  "footer.privacy": "Privacy",
+  "footer.terms": "Terms",
+  "footer.impressum": "Impressum",
+  "theme.legend": "Appearance",
+  "theme.hint": "Use your device setting or choose a theme for this browser.",
+  "theme.system": "System",
+  "theme.light": "Light",
+  "theme.dark": "Dark",
+  "language.legend": "Interface language",
+  "language.hint":
+    "Choose the language used for Klinnova controls and guidance.",
+  "language.english": "English",
+  "language.german": "Deutsch",
+  "auth.email": "Email",
+  "auth.password": "Password",
+  "auth.displayName": "Display name",
+  "auth.newPassword": "New password",
+  "auth.confirmNewPassword": "Confirm new password",
+  "auth.signingIn": "Signing in…",
+  "auth.signIn": "Sign in",
+  "auth.creatingAccount": "Creating account…",
+  "auth.createAccount": "Create account",
+  "auth.sending": "Sending…",
+  "auth.sendReset": "Send reset instructions",
+  "auth.settingPassword": "Setting password…",
+  "auth.setNewPassword": "Set new password",
+  "auth.continueSignIn": "Continue to sign in",
+  "auth.confirming": "Confirming…",
+  "auth.continuePasswordReset": "Continue to password reset",
+  "auth.confirmEmail": "Confirm email address",
+  "authMessage.confirmFailed":
+    "That confirmation link is invalid or has expired. Request a new one by registering again, or log in if you already confirmed.",
+  "authMessage.profileRequired":
+    "Your account needs a display name before you can continue. Register again with a display name.",
+  "authMessage.resetInvalid":
+    "That password reset link is invalid or has expired. Request a new one.",
+  "page.login.heading": "Sign in",
+  "page.login.lead": "Use the email and password for your Klinnova account.",
+  "page.login.employerLead":
+    "Use the email and password for your Klinnova account to continue as an employer.",
+  "page.login.forgot": "Forgot password?",
+  "page.login.newHere": "New here?",
+  "page.login.createAccount": "Create an account",
+  "page.register.heading": "Create your account",
+  "page.register.lead":
+    "Start with an email and a name we can use to address you. You will confirm your email before continuing.",
+  "page.register.already": "Already have an account?",
+  "page.employerRegister.heading": "Create an employer account",
+  "page.employerRegister.lead":
+    "Register to set up your employer profile. You can also use an existing Klinnova account — candidate and employer capabilities can coexist.",
+  "page.forgot.heading": "Reset your password",
+  "page.forgot.lead":
+    "Enter your account email and we'll send you a link to set a new password.",
+  "page.forgot.back": "Back to sign in",
+  "page.reset.problem": "We could not finish that step",
+  "page.reset.requestAnother": "Request another reset",
+  "page.reset.heading": "Set a new password",
+  "page.reset.lead": "Choose a new password for your Klinnova account.",
+  "page.confirm.resetHeading": "Reset your password",
+  "page.confirm.emailHeading": "Confirm your email address",
+  "page.confirm.resetLead": "Click below to continue to password reset.",
+  "page.confirm.emailLead":
+    "Click below to finish confirming this email address.",
+  "page.error.heading": "We could not finish that step",
+  "page.error.requestAnother": "Request another reset",
+} as const;
+
+export type MessageKey = keyof typeof englishMessages;
+
+const germanMessages: Partial<Record<MessageKey, string>> = {
+  "shell.homeLabel": "Klinnova Startseite",
+  "shell.menu": "Menü",
+  "shell.siteNav": "Website",
+  "shell.jobs": "Jobs",
+  "shell.forCandidates": "Für Bewerbende",
+  "shell.forEmployers": "Für Arbeitgeber",
+  "shell.signIn": "Anmelden",
+  "shell.createAccount": "Konto erstellen",
+  "footer.legalNav": "Rechtliches",
+  "footer.privacy": "Datenschutz",
+  "footer.terms": "Bedingungen",
+  "theme.legend": "Darstellung",
+  "theme.hint":
+    "Nutze die Geräteeinstellung oder wähle ein Design für diesen Browser.",
+  "theme.system": "System",
+  "theme.light": "Hell",
+  "theme.dark": "Dunkel",
+  "language.legend": "Sprache der Oberfläche",
+  "language.hint":
+    "Wähle die Sprache für Bedienelemente und Hinweise von Klinnova.",
+  "language.english": "English",
+  "language.german": "Deutsch",
+  "auth.email": "E-Mail",
+  "auth.password": "Passwort",
+  "auth.displayName": "Anzeigename",
+  "auth.newPassword": "Neues Passwort",
+  "auth.confirmNewPassword": "Neues Passwort bestätigen",
+  "auth.signingIn": "Anmeldung läuft…",
+  "auth.signIn": "Anmelden",
+  "auth.creatingAccount": "Konto wird erstellt…",
+  "auth.createAccount": "Konto erstellen",
+  "auth.sending": "Wird gesendet…",
+  "auth.sendReset": "Anleitung zum Zurücksetzen senden",
+  "auth.settingPassword": "Passwort wird festgelegt…",
+  "auth.setNewPassword": "Neues Passwort festlegen",
+  "auth.continueSignIn": "Weiter zur Anmeldung",
+  "auth.confirming": "Bestätigung läuft…",
+  "auth.continuePasswordReset": "Weiter zum Zurücksetzen des Passworts",
+  "auth.confirmEmail": "E-Mail-Adresse bestätigen",
+  "authMessage.confirmFailed":
+    "Dieser Bestätigungslink ist ungültig oder abgelaufen. Registriere dich erneut, um einen neuen anzufordern, oder melde dich an, falls du deine E-Mail-Adresse bereits bestätigt hast.",
+  "authMessage.profileRequired":
+    "Dein Konto benötigt einen Anzeigenamen, bevor du fortfahren kannst. Registriere dich erneut mit einem Anzeigenamen.",
+  "authMessage.resetInvalid":
+    "Dieser Link zum Zurücksetzen des Passworts ist ungültig oder abgelaufen. Fordere einen neuen an.",
+  "page.login.heading": "Anmelden",
+  "page.login.lead":
+    "Verwende die E-Mail-Adresse und das Passwort deines Klinnova-Kontos.",
+  "page.login.employerLead":
+    "Verwende die E-Mail-Adresse und das Passwort deines Klinnova-Kontos, um als Arbeitgeber fortzufahren.",
+  "page.login.forgot": "Passwort vergessen?",
+  "page.login.newHere": "Neu hier?",
+  "page.login.createAccount": "Konto erstellen",
+  "page.register.heading": "Erstelle dein Konto",
+  "page.register.lead":
+    "Starte mit einer E-Mail-Adresse und einem Namen, mit dem wir dich ansprechen können. Bevor es weitergeht, bestätigst du deine E-Mail-Adresse.",
+  "page.register.already": "Du hast bereits ein Konto?",
+  "page.employerRegister.heading": "Arbeitgeberkonto erstellen",
+  "page.employerRegister.lead":
+    "Registriere dich, um dein Arbeitgeberprofil einzurichten. Du kannst auch ein bestehendes Klinnova-Konto verwenden — Bewerbenden- und Arbeitgeberfunktionen können nebeneinander bestehen.",
+  "page.forgot.heading": "Passwort zurücksetzen",
+  "page.forgot.lead":
+    "Gib die E-Mail-Adresse deines Kontos ein. Wir senden dir einen Link, mit dem du ein neues Passwort festlegen kannst.",
+  "page.forgot.back": "Zurück zur Anmeldung",
+  "page.reset.problem": "Dieser Schritt konnte nicht abgeschlossen werden",
+  "page.reset.requestAnother": "Neuen Link anfordern",
+  "page.reset.heading": "Neues Passwort festlegen",
+  "page.reset.lead": "Wähle ein neues Passwort für dein Klinnova-Konto.",
+  "page.confirm.resetHeading": "Passwort zurücksetzen",
+  "page.confirm.emailHeading": "E-Mail-Adresse bestätigen",
+  "page.confirm.resetLead":
+    "Klicke unten, um mit dem Zurücksetzen des Passworts fortzufahren.",
+  "page.confirm.emailLead":
+    "Klicke unten, um die Bestätigung dieser E-Mail-Adresse abzuschließen.",
+  "page.error.heading": "Dieser Schritt konnte nicht abgeschlossen werden",
+  "page.error.requestAnother": "Neuen Link anfordern",
+};
+
+const messages: Record<Locale, Partial<Record<MessageKey, string>>> = {
+  en: englishMessages,
+  de: germanMessages,
+};
+
+export function translate(locale: Locale, key: MessageKey): string {
+  return messages[locale][key] ?? englishMessages[key];
+}

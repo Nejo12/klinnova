@@ -2,14 +2,12 @@ import Link from "next/link";
 
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 import styles from "@/components/auth/auth-form.module.scss";
-import { AUTH_RESET_LINK_INVALID } from "@/lib/auth/messages";
+import { LocalizedText } from "@/components/i18n/localized-text";
+import { PublicFooter } from "@/components/public-shared/public-footer";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
-
-export const metadata = {
-  title: "Set new password · Klinnova",
-};
+export const metadata = { title: "Set new password · Klinnova" };
 
 export default async function ResetPasswordPage() {
   const supabase = await createServerSupabaseClient();
@@ -17,33 +15,40 @@ export default async function ResetPasswordPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user === null) {
+  if (user === null)
     return (
       <main className={styles.page}>
         <Link className={styles.brand} href="/">
           Klinnova
         </Link>
-        <h1 className={styles.heading}>We could not finish that step</h1>
-        <p className={styles.lead}>{AUTH_RESET_LINK_INVALID}</p>
+        <h1 className={styles.heading}>
+          <LocalizedText message="page.reset.problem" />
+        </h1>
+        <p className={styles.lead}>
+          <LocalizedText message="authMessage.resetInvalid" />
+        </p>
         <p className={styles.footer}>
           <Link className={styles.link} href="/forgot-password">
-            Request another reset
+            <LocalizedText message="page.reset.requestAnother" />
           </Link>
         </p>
+        <PublicFooter />
       </main>
     );
-  }
 
   return (
     <main className={styles.page}>
       <Link className={styles.brand} href="/">
         Klinnova
       </Link>
-      <h1 className={styles.heading}>Set a new password</h1>
+      <h1 className={styles.heading}>
+        <LocalizedText message="page.reset.heading" />
+      </h1>
       <p className={styles.lead}>
-        Choose a new password for your Klinnova account.
+        <LocalizedText message="page.reset.lead" />
       </p>
       <ResetPasswordForm />
+      <PublicFooter />
     </main>
   );
 }

@@ -7,19 +7,18 @@ import {
   updatePasswordAction,
   type ResetPasswordActionState,
 } from "@/app/reset-password/actions";
+import { useLocale } from "@/components/i18n/locale-provider";
 
 import styles from "./auth-form.module.scss";
 
-const initialState: ResetPasswordActionState = {
-  error: null,
-  message: null,
-};
+const initialState: ResetPasswordActionState = { error: null, message: null };
 
 export function ResetPasswordForm() {
   const [state, formAction, pending] = useActionState(
     updatePasswordAction,
     initialState,
   );
+  const { t } = useLocale();
 
   if (state.message !== null) {
     return (
@@ -29,7 +28,7 @@ export function ResetPasswordForm() {
         </p>
         <form action={continueToSignInAction}>
           <button className={styles.submit} type="submit">
-            Continue to sign in
+            {t("auth.continueSignIn")}
           </button>
         </form>
       </>
@@ -43,10 +42,9 @@ export function ResetPasswordForm() {
           {state.error}
         </p>
       ) : null}
-
       <div className={styles.field}>
         <label className={styles.label} htmlFor="password">
-          New password
+          {t("auth.newPassword")}
         </label>
         <input
           className={styles.input}
@@ -59,10 +57,9 @@ export function ResetPasswordForm() {
           disabled={pending}
         />
       </div>
-
       <div className={styles.field}>
         <label className={styles.label} htmlFor="confirmPassword">
-          Confirm new password
+          {t("auth.confirmNewPassword")}
         </label>
         <input
           className={styles.input}
@@ -75,9 +72,8 @@ export function ResetPasswordForm() {
           disabled={pending}
         />
       </div>
-
       <button className={styles.submit} type="submit" disabled={pending}>
-        {pending ? "Setting password…" : "Set new password"}
+        {pending ? t("auth.settingPassword") : t("auth.setNewPassword")}
       </button>
     </form>
   );

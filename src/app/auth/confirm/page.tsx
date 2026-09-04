@@ -2,10 +2,8 @@ import Link from "next/link";
 
 import { ConfirmForm } from "@/components/auth/confirm-form";
 import styles from "@/components/auth/auth-form.module.scss";
-import {
-  AUTH_CONFIRM_FAILED,
-  AUTH_RESET_LINK_INVALID,
-} from "@/lib/auth/messages";
+import { LocalizedText } from "@/components/i18n/localized-text";
+import { PublicFooter } from "@/components/public-shared/public-footer";
 import { isAllowedConfirmOtpType } from "@/lib/auth/confirm";
 import { parseInternalNextPath } from "@/lib/auth/schemas";
 
@@ -24,24 +22,12 @@ type AuthConfirmPageProps = {
   }>;
 };
 
-/**
- * Scanner-resistant Auth confirmation/recovery interstitial (C4G-R).
- *
- * This GET render performs zero Supabase Auth calls — no verifyOtp, no
- * exchangeCodeForSession, no session/profile mutation of any kind. It only
- * parses and structurally validates the incoming URL parameters and renders
- * a page with a single explicit human action (ConfirmForm's own submit
- * button), which alone triggers the token-consuming confirmAction Server
- * Action. An automated email-link-prefetch/security scanner that fetches
- * this URL sees only this static interstitial and consumes nothing.
- */
 export default async function AuthConfirmPage({
   searchParams,
 }: AuthConfirmPageProps) {
   const params = await searchParams;
   const isRecoveryIntent =
     params.intent === "recovery" || params.type === "recovery";
-
   const tokenHash =
     typeof params.token_hash === "string" && params.token_hash.length > 0
       ? params.token_hash
@@ -53,40 +39,54 @@ export default async function AuthConfirmPage({
   const typeIsUsable =
     isRecoveryIntent ||
     (typeof params.type === "string" && isAllowedConfirmOtpType(params.type));
-
   const structurallyValid =
     (tokenHash !== null && typeIsUsable) || code !== null;
 
-  if (!structurallyValid) {
+  if (!structurallyValid)
     return (
       <main className={styles.page}>
         <Link className={styles.brand} href="/">
           Klinnova
         </Link>
-        <h1 className={styles.heading}>We could not finish that step</h1>
+        <h1 className={styles.heading}>
+          <LocalizedText message="page.error.heading" />
+        </h1>
         <p className={styles.lead}>
-          {isRecoveryIntent ? AUTH_RESET_LINK_INVALID : AUTH_CONFIRM_FAILED}
+          <LocalizedText
+            message={
+              isRecoveryIntent
+                ? "authMessage.resetInvalid"
+                : "authMessage.confirmFailed"
+            }
+          />
         </p>
+        <PublicFooter />
       </main>
     );
-  }
 
   const safeNext = parseInternalNextPath(params.next ?? null);
-
   return (
     <main className={styles.page}>
       <Link className={styles.brand} href="/">
         Klinnova
       </Link>
       <h1 className={styles.heading}>
-        {isRecoveryIntent
-          ? "Reset your password"
-          : "Confirm your email address"}
+        <LocalizedText
+          message={
+            isRecoveryIntent
+              ? "page.confirm.resetHeading"
+              : "page.confirm.emailHeading"
+          }
+        />
       </h1>
       <p className={styles.lead}>
-        {isRecoveryIntent
-          ? "Click below to continue to password reset."
-          : "Click below to finish confirming this email address."}
+        <LocalizedText
+          message={
+            isRecoveryIntent
+              ? "page.confirm.resetLead"
+              : "page.confirm.emailLead"
+          }
+        />
       </p>
       <ConfirmForm
         tokenHash={tokenHash}
@@ -95,6 +95,7 @@ export default async function AuthConfirmPage({
         next={safeNext}
         intent={isRecoveryIntent ? "recovery" : null}
       />
+      <PublicFooter />
     </main>
   );
 }

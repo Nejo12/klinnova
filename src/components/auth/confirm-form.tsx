@@ -3,6 +3,7 @@
 import { useFormStatus } from "react-dom";
 
 import { confirmAction } from "@/app/auth/confirm/actions";
+import { useLocale } from "@/components/i18n/locale-provider";
 
 import styles from "./auth-form.module.scss";
 
@@ -16,23 +17,18 @@ type ConfirmFormProps = {
 
 function SubmitButton({ isRecovery }: { isRecovery: boolean }) {
   const { pending } = useFormStatus();
-
+  const { t } = useLocale();
   return (
     <button className={styles.submit} type="submit" disabled={pending}>
       {pending
-        ? "Confirming…"
+        ? t("auth.confirming")
         : isRecovery
-          ? "Continue to password reset"
-          : "Confirm email address"}
+          ? t("auth.continuePasswordReset")
+          : t("auth.confirmEmail")}
     </button>
   );
 }
 
-/**
- * The interstitial's own form. Rendering this component performs no
- * Supabase Auth call — only the human's own submit triggers confirmAction,
- * the one-time-token-consuming Server Action (C4G-R).
- */
 export function ConfirmForm({
   tokenHash,
   type,
