@@ -370,11 +370,11 @@ select ok(
   'internal evaluator ACL confirms no anon grant'
 );
 select ok(
-  has_function_privilege('authenticated', 'public.submit_candidate_application(uuid)', 'execute'),
+  has_function_privilege('authenticated', 'public.submit_candidate_application(uuid,text)', 'execute'),
   'submit_candidate_application remains executable by authenticated'
 );
 select ok(
-  not has_function_privilege('anon', 'public.submit_candidate_application(uuid)', 'execute'),
+  not has_function_privilege('anon', 'public.submit_candidate_application(uuid,text)', 'execute'),
   'submit_candidate_application remains denied to anon'
 );
 
@@ -761,48 +761,48 @@ set local role authenticated;
 select set_config('request.jwt.claim.sub','c5c00000-0000-4000-8000-000000000002',true);
 
 select is(
-  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000011')->>'result'),
+  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000011', null)->>'result'),
   'submitted', 'eligible employer-vacancy application succeeds'
 );
 select is(
-  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000011')->>'result'),
+  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000011', null)->>'result'),
   'already_applied', 'duplicate submission remains already_applied, not re-evaluated as ineligible'
 );
 select is(
-  (select public.submit_candidate_application('22222222-2222-4222-8222-222222222204')->>'result'),
+  (select public.submit_candidate_application('22222222-2222-4222-8222-222222222204', null)->>'result'),
   'submitted', 'eligible seed-vacancy application succeeds (parity with employer path)'
 );
 
 select is(
-  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000012')->>'result'),
+  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000012', null)->>'result'),
   'ineligible', 'category-ineligible application is rejected transactionally'
 );
 select is(
-  (select jsonb_array_length(public.submit_candidate_application('c5c00000-0000-4000-8000-000000000012')->'missing_requirements')),
+  (select jsonb_array_length(public.submit_candidate_application('c5c00000-0000-4000-8000-000000000012', null)->'missing_requirements')),
   1, 'category-ineligible rejection reports exactly one missing-requirement code'
 );
 select is(
-  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000013')->>'result'),
+  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000013', null)->>'result'),
   'ineligible', 'employment-type-ineligible application is rejected transactionally'
 );
 select is(
-  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000014')->>'result'),
+  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000014', null)->>'result'),
   'ineligible', 'shift-ineligible application is rejected transactionally'
 );
 select is(
-  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000015')->>'result'),
+  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000015', null)->>'result'),
   'ineligible', 'german-ineligible application is rejected transactionally'
 );
 select is(
-  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000016')->>'result'),
+  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000016', null)->>'result'),
   'ineligible', 'language-ineligible application is rejected transactionally'
 );
 select is(
-  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000018')->>'result'),
+  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000018', null)->>'result'),
   'ineligible', 'availability-ineligible application is rejected transactionally'
 );
 select is(
-  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000019')->>'result'),
+  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000019', null)->>'result'),
   'ineligible', 'multi-rule-ineligible application is rejected transactionally'
 );
 
@@ -826,7 +826,7 @@ reset role;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','c5c00000-0000-4000-8000-000000000003',true);
 select is(
-  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000011')->>'result'),
+  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000011', null)->>'result'),
   'incomplete', 'incomplete candidate cannot submit (unchanged)'
 );
 reset role;
@@ -869,7 +869,7 @@ update public.vacancies set publication_state = 'paused', paused_at = now()
 set local role authenticated;
 select set_config('request.jwt.claim.sub','c5c00000-0000-4000-8000-000000000006',true);
 select is(
-  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000023')->>'result'),
+  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000023', null)->>'result'),
   'unavailable', 'submission after the vacancy is paused mid-session fails safely, ignoring stale client state'
 );
 reset role;
@@ -901,7 +901,7 @@ select ok(
 set local role authenticated;
 select set_config('request.jwt.claim.sub','c5c00000-0000-4000-8000-000000000006',true);
 select is(
-  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000023')->>'result'),
+  (select public.submit_candidate_application('c5c00000-0000-4000-8000-000000000023', null)->>'result'),
   'unavailable', 'submission after employer verification is revoked fails safely'
 );
 reset role;

@@ -60,6 +60,7 @@ const readyPayload = {
     },
   ],
   employer_seen_at: null,
+  introduction_text: "Hello, I would like to apply.",
 };
 
 describe("loadEmployerApplication", () => {
@@ -91,6 +92,9 @@ describe("loadEmployerApplication", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.application.application_id).toBe(applicationId);
+    expect(result.application.introduction_text).toBe(
+      "Hello, I would like to apply.",
+    );
     expect(result.application.status_history[0]?.from_status).toBeNull();
   });
 
@@ -206,6 +210,7 @@ describe("loadEmployerApplication", () => {
           },
         ],
         employer_seen_at: null,
+        introduction_text: null,
       },
       error: null,
     });
@@ -236,6 +241,8 @@ describe("loadEmployerApplication", () => {
         candidate_display_name: "Deleted candidate",
         allowed_transitions: ["reviewing"],
         status_history: [],
+        employer_seen_at: null,
+        introduction_text: null,
       },
       error: null,
     });

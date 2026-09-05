@@ -128,6 +128,7 @@ export type Database = {
           created_at: string
           employer_seen_at: string | null
           id: string
+          introduction_text: string | null
           snapshot_version: number
           status: string
           submitted_at: string
@@ -141,6 +142,7 @@ export type Database = {
           created_at?: string
           employer_seen_at?: string | null
           id?: string
+          introduction_text?: string | null
           snapshot_version: number
           status: string
           submitted_at?: string
@@ -154,6 +156,7 @@ export type Database = {
           created_at?: string
           employer_seen_at?: string | null
           id?: string
+          introduction_text?: string | null
           snapshot_version?: number
           status?: string
           submitted_at?: string
@@ -1234,7 +1237,7 @@ export type Database = {
         Returns: Json
       }
       submit_candidate_application: {
-        Args: { p_vacancy_id: string }
+        Args: { p_introduction_text?: string; p_vacancy_id: string }
         Returns: Json
       }
       suspend_employer: {
@@ -1421,4 +1424,5 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
 

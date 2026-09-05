@@ -13,6 +13,7 @@ const validRow = {
   id: APPLICATION_ID,
   status: "submitted",
   submitted_at: "2026-08-03T14:30:00.000Z",
+  introduction_text: "Hello, I would like to apply.",
   snapshot_version: 1,
   candidate_snapshot: {
     display_name: "Ada Candidate",
@@ -86,6 +87,9 @@ describe("loadCandidateApplicationConfirmation", () => {
       );
       expect(result.confirmation.candidateDisplayName).toBe("Ada Candidate");
       expect(result.confirmation.statusLabel).toBe("Submitted");
+      expect(result.confirmation.introductionText).toBe(
+        "Hello, I would like to apply.",
+      );
       expect(result.confirmation.submittedAtLabel).not.toContain(
         APPLICATION_ID,
       );

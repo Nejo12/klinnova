@@ -32,9 +32,10 @@ import { initialSubmitCandidateApplicationState } from "@/lib/applications/submi
 const VACANCY_ID = "22222222-2222-4222-8222-222222222201";
 const APPLICATION_ID = "33333333-3333-4333-8333-333333333301";
 
-function form(vacancyId: string): FormData {
+function form(vacancyId: string, introductionText = ""): FormData {
   const formData = new FormData();
   formData.set("vacancyId", vacancyId);
+  formData.set("introductionText", introductionText);
   return formData;
 }
 
@@ -111,6 +112,7 @@ describe("submitCandidateApplicationAction", () => {
     ).rejects.toThrow(`REDIRECT:/candidate/applications/${APPLICATION_ID}`);
     expect(rpc).toHaveBeenCalledTimes(1);
     expect(rpc).toHaveBeenCalledWith("submit_candidate_application", {
+      p_introduction_text: "",
       p_vacancy_id: VACANCY_ID,
     });
     expect(notifyEmployerOfNewApplication).toHaveBeenCalledTimes(1);
@@ -118,6 +120,52 @@ describe("submitCandidateApplicationAction", () => {
       applicationId: APPLICATION_ID,
       vacancyId: VACANCY_ID,
     });
+  });
+
+  it("passes the trimmed final introduction to the authoritative RPC", async () => {
+    authed();
+    rpc.mockResolvedValue({
+      data: { result: "submitted", application_id: APPLICATION_ID },
+      error: null,
+    });
+
+    await expect(
+      submitCandidateApplicationAction(
+        initialSubmitCandidateApplicationState,
+        form(VACANCY_ID, "  Candidate-authored text.  "),
+      ),
+    ).rejects.toThrow(`REDIRECT:/candidate/applications/${APPLICATION_ID}`);
+
+    expect(rpc).toHaveBeenCalledWith("submit_candidate_application", {
+      p_introduction_text: "Candidate-authored text.",
+      p_vacancy_id: VACANCY_ID,
+    });
+  });
+
+  it("rejects an introduction over 1,000 trimmed characters before auth", async () => {
+    const state = await submitCandidateApplicationAction(
+      initialSubmitCandidateApplicationState,
+      form(VACANCY_ID, "x".repeat(1_001)),
+    );
+
+    expect(state).toEqual({ status: "validation_error" });
+    expect(getUser).not.toHaveBeenCalled();
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("maps the RPC validation guard to a safe validation state", async () => {
+    authed();
+    rpc.mockResolvedValue({
+      data: { result: "validation_error" },
+      error: null,
+    });
+
+    expect(
+      await submitCandidateApplicationAction(
+        initialSubmitCandidateApplicationState,
+        form(VACANCY_ID, "Valid client input"),
+      ),
+    ).toEqual({ status: "validation_error" });
   });
 
   it("redirects to the same confirmation after already_applied, without notifying the employer (N2: no false new-application email for a non-new row)", async () => {

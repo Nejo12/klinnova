@@ -30,6 +30,7 @@ describe("employerApplicationListRowSchema", () => {
     submitted_at: "2026-08-01T00:00:00Z",
     updated_at: "2026-08-01T00:00:00Z",
     employer_seen_at: null,
+    introduction_text: "Hello, I would like to apply.",
   };
 
   it("accepts a live-candidate row with every real attribute", () => {
@@ -52,6 +53,7 @@ describe("employerApplicationListRowSchema", () => {
       submitted_at: "2026-08-01T00:00:00Z",
       updated_at: "2026-08-01T00:00:00Z",
       employer_seen_at: null,
+      introduction_text: null,
     };
     const parsed = employerApplicationListRowSchema.safeParse(deletedRow);
     expect(parsed.success).toBe(true);
@@ -165,6 +167,7 @@ describe("employerApplicationDetailSchema", () => {
     allowed_transitions: ["reviewing", "shortlisted", "accepted", "rejected"],
     status_history: [],
     employer_seen_at: null,
+    introduction_text: "Hello, I would like to apply.",
   };
 
   it("accepts a live-candidate ready detail", () => {
@@ -186,6 +189,7 @@ describe("employerApplicationDetailSchema", () => {
       allowed_transitions: [],
       status_history: [],
       employer_seen_at: null,
+      introduction_text: null,
     };
     const parsed = employerApplicationDetailSchema.safeParse(deletedReady);
     expect(parsed.success).toBe(true);
@@ -210,6 +214,8 @@ describe("employerApplicationDetailSchema", () => {
       candidate_display_name: "Deleted candidate",
       allowed_transitions: ["reviewing"],
       status_history: [],
+      employer_seen_at: null,
+      introduction_text: null,
     });
     expect(parsed.success).toBe(false);
   });

@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(48);
+select plan(51);
 
 insert into auth.users (
   instance_id,
@@ -277,7 +277,17 @@ set local role authenticated;
 
 select is(
   public.submit_candidate_application(
-    '22222222-2222-4222-8222-222222222206'
+    '22222222-2222-4222-8222-222222222206',
+    repeat('x', 1001)
+  ) ->> 'result',
+  'validation_error',
+  'introduction over 1,000 characters is rejected atomically'
+);
+
+select is(
+  public.submit_candidate_application(
+    '22222222-2222-4222-8222-222222222206',
+    '  Candidate-authored introduction.  '
   ) ->> 'result',
   'submitted',
   'first submit on active seed vacancy returns submitted'
@@ -314,6 +324,17 @@ select is(
   ),
   'submitted',
   'stored status is submitted'
+);
+
+select is(
+  (
+    select introduction_text
+    from public.applications
+    where candidate_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+      and vacancy_id = '22222222-2222-4222-8222-222222222206'
+  ),
+  'Candidate-authored introduction.',
+  'final introduction is trimmed and stored with the application'
 );
 
 select is(
@@ -765,10 +786,22 @@ set local role authenticated;
 
 select is(
   public.submit_candidate_application(
-    '22222222-2222-4222-8222-222222222201'
+    '22222222-2222-4222-8222-222222222201',
+    E' \n\t '
   ) ->> 'result',
   'submitted',
   'second candidate can submit a different vacancy'
+);
+
+select is(
+  (
+    select introduction_text
+    from public.applications
+    where candidate_id = 'cccccccc-cccc-cccc-cccc-cccccccccccc'
+      and vacancy_id = '22222222-2222-4222-8222-222222222201'
+  ),
+  null,
+  'whitespace-only introduction is stored as null'
 );
 
 select is(
@@ -866,7 +899,8 @@ select ok(
     join pg_namespace n on n.oid = p.pronamespace
     where n.nspname = 'public'
       and p.proname = 'submit_candidate_application'
-      and pg_get_function_identity_arguments(p.oid) = 'p_vacancy_id uuid'
+      and pg_get_function_identity_arguments(p.oid) =
+        'p_vacancy_id uuid, p_introduction_text text'
   ),
   'submit RPC does not implement the full TypeScript matcher in SQL'
 );
