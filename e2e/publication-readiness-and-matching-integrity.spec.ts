@@ -364,7 +364,15 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
 
     await candidatePage.goto(`/candidate/jobs/${vacancyId}`);
     await candidatePage
-      .getByRole("button", { name: "Apply with profile" })
+      .getByRole("button", { name: "Preview application" })
+      .click();
+    await expect(
+      candidatePage.getByRole("heading", {
+        name: "Review before submitting",
+      }),
+    ).toBeVisible();
+    await candidatePage
+      .getByRole("button", { name: "Submit application" })
       .click();
     await expect(candidatePage).toHaveURL(
       /\/candidate\/applications\/[0-9a-f-]{36}$/,
