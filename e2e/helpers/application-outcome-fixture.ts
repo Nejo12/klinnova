@@ -84,7 +84,11 @@ export async function registerAndApplyAsCandidateWithCredentials(
   await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
 
   await page.goto(`/candidate/jobs/${vacancyId}`);
-  await page.getByRole("button", { name: "Apply with profile" }).click();
+  await page.getByRole("button", { name: "Preview application" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Review before submitting" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Submit application" }).click();
   await expect(page).toHaveURL(/\/candidate\/applications\/[0-9a-f-]{36}$/, {
     timeout: 15_000,
   });
