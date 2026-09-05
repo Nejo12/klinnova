@@ -899,7 +899,8 @@ select ok(
     join pg_namespace n on n.oid = p.pronamespace
     where n.nspname = 'public'
       and p.proname = 'submit_candidate_application'
-      and pg_get_function_identity_arguments(p.oid) = 'p_vacancy_id uuid'
+      and pg_get_function_identity_arguments(p.oid) =
+        'p_vacancy_id uuid, p_introduction_text text'
   ),
   'submit RPC does not implement the full TypeScript matcher in SQL'
 );
