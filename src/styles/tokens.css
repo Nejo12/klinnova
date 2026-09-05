@@ -56,6 +56,7 @@
   --color-bg-surface: var(--color-cream);
   --color-bg-subtle: #f1ebe1;
   --color-bg-inverse: var(--color-ink-900);
+  --color-bg-overlay: rgb(33 26 27 / 52%);
 
   --color-text-primary: var(--color-ink-900);
   --color-text-secondary: var(--color-ink-700);
@@ -261,6 +262,7 @@
   --color-bg-surface: var(--color-night-900);
   --color-bg-subtle: var(--color-night-800);
   --color-bg-inverse: var(--color-cream);
+  --color-bg-overlay: rgb(0 0 0 / 68%);
 
   --color-text-primary: var(--color-cream);
   --color-text-secondary: var(--color-line);
