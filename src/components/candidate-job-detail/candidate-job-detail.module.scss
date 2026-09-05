@@ -312,6 +312,113 @@
   gap: var(--space-4);
 }
 
+.suggestionLabel,
+.fieldLabel {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
+}
+
+.suggestionLabel {
+  color: var(--color-text-muted);
+}
+
+.introductionTextarea {
+  width: 100%;
+  min-height: 10rem;
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+  line-height: var(--type-body-line-height);
+  resize: vertical;
+}
+
+.introductionTextarea:focus-visible,
+.secondaryButton:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.fieldSupport {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  color: var(--color-text-secondary);
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-supporting-line-height);
+}
+
+.fieldSupport p {
+  margin: 0;
+}
+
+.applicationContext {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.applicationContext > div {
+  display: grid;
+  grid-template-columns: minmax(5rem, 7rem) minmax(0, 1fr);
+  gap: var(--space-3);
+}
+
+.applicationContext dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.applicationContext dd {
+  margin: 0;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.introductionPreview {
+  padding: var(--space-4);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-subtle);
+}
+
+.authoredText {
+  margin: 0;
+  color: var(--color-text-primary);
+  line-height: var(--type-body-line-height);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap-reverse;
+  gap: var(--space-3);
+}
+
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-5);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
 .disclosure {
   margin: 0;
   font-size: var(--type-body-supporting-size);

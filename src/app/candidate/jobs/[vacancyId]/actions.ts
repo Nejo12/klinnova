@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { notifyEmployerOfNewApplication } from "@/lib/applications/notify-employer-new-application";
+import { APPLICATION_INTRODUCTION_MAX_LENGTH } from "@/lib/applications/application-introduction";
 import { submitApplicationRpcResultSchema } from "@/lib/applications/submit-application-result";
 import type { SubmitCandidateApplicationState } from "@/lib/applications/submit-action-state";
 import { parseMissingRequirementCodes } from "@/lib/matching/missing-requirement-codes";
@@ -11,6 +12,10 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const vacancyIdSchema = z.string().uuid();
 const applicationIdSchema = z.string().uuid();
+const introductionTextSchema = z
+  .string()
+  .transform((value) => value.trim())
+  .refine((value) => value.length <= APPLICATION_INTRODUCTION_MAX_LENGTH);
 
 function formString(formData: FormData, key: string): string {
   const value = formData.get(key);
@@ -32,8 +37,11 @@ export async function submitCandidateApplicationAction(
   void _prev;
 
   const vacancyIdRaw = formString(formData, "vacancyId");
+  const introductionTextRaw = formString(formData, "introductionText");
   const parsedId = vacancyIdSchema.safeParse(vacancyIdRaw);
-  if (!parsedId.success) {
+  const parsedIntroduction =
+    introductionTextSchema.safeParse(introductionTextRaw);
+  if (!parsedId.success || !parsedIntroduction.success) {
     return { status: "validation_error" };
   }
 
@@ -50,6 +58,7 @@ export async function submitCandidateApplicationAction(
   }
 
   const { data, error } = await supabase.rpc("submit_candidate_application", {
+    p_introduction_text: parsedIntroduction.data,
     p_vacancy_id: vacancyId,
   });
 
@@ -95,6 +104,8 @@ export async function submitCandidateApplicationAction(
       redirect("/candidate/onboarding");
     case "unavailable":
       return { status: "unavailable" };
+    case "validation_error":
+      return { status: "validation_error" };
     case "ineligible": {
       const missingRequirements = parseMissingRequirementCodes(
         parsed.data.missing_requirements,

@@ -19,6 +19,7 @@ const confirmation: ApplicationConfirmation = {
   statusLabel: "Submitted",
   submittedAtIso: "2026-08-03T14:30:00.000Z",
   submittedAtLabel: "3 August 2026, 14:30 UTC",
+  introductionText: "Hello, I would like to apply.",
   vacancyId: VACANCY_ID,
   vacancyTitle: "Demo vacancy — Morning kitchen support",
   employerDisplayName: "Demo Berlin Work Co",
@@ -77,6 +78,9 @@ describe("ApplicationConfirmationPage", () => {
     expect(screen.getByText("3 August 2026, 14:30 UTC")).toBeInTheDocument();
     expect(screen.getByText("Demo Berlin Work Co")).toBeInTheDocument();
     expect(screen.getByText("Ada Candidate")).toBeInTheDocument();
+    expect(
+      screen.getByText("Hello, I would like to apply."),
+    ).toBeInTheDocument();
     expect(screen.getByText(WORK_AUTHORISATION_NOTICE)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "View job" })).toHaveAttribute(
       "href",

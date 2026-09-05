@@ -15,6 +15,9 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
 const applicationIdSchema = z.string().uuid();
+const introductionRowSchema = z.object({
+  introduction_text: z.string().max(1_000).nullable(),
+});
 
 export type LoadCandidateApplicationConfirmationResult =
   | { status: "unauthenticated" }
@@ -50,7 +53,7 @@ export function createSupabaseCandidateApplicationConfirmationDataAccess(
       const { data, error } = await supabase
         .from("applications")
         .select(
-          "id, status, submitted_at, snapshot_version, candidate_snapshot, vacancy_snapshot",
+          "id, status, submitted_at, introduction_text, snapshot_version, candidate_snapshot, vacancy_snapshot",
         )
         .eq("id", applicationId)
         .maybeSingle();
@@ -101,7 +104,10 @@ export async function loadCandidateApplicationConfirmation(
   }
 
   const parsed = parseApplicationSnapshots(applicationResult.row);
-  if (!parsed.ok) {
+  const introductionRow = introductionRowSchema.safeParse(
+    applicationResult.row,
+  );
+  if (!parsed.ok || !introductionRow.success) {
     return { status: "unavailable" };
   }
 
@@ -117,6 +123,7 @@ export async function loadCandidateApplicationConfirmation(
     applicationId: parsed.row.id,
     status: parsed.row.status,
     submittedAt: parsed.row.submitted_at,
+    introductionText: introductionRow.data.introduction_text,
     candidate: parsed.candidate,
     vacancy: parsed.vacancy,
   });

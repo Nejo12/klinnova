@@ -242,7 +242,15 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
           </Link>
         </section>
       ) : eligible ? (
-        <ApplicationSubmitForm vacancyId={vacancy.vacancyId} />
+        <ApplicationSubmitForm
+          employerDisplayName={
+            vacancy.employerDisplayName ??
+            vacancy.companyName ??
+            "Berlin employer"
+          }
+          vacancyId={vacancy.vacancyId}
+          vacancyTitle={vacancy.title}
+        />
       ) : (
         <section className={styles.section} aria-labelledby={missingHeadingId}>
           <h2 className={styles.sectionHeading} id={missingHeadingId}>

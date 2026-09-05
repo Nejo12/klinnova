@@ -169,7 +169,7 @@ select ok(
 select ok(
   has_function_privilege(
     'authenticated',
-    'public.submit_candidate_application(uuid)',
+    'public.submit_candidate_application(uuid,text)',
     'execute'
   ),
   'authenticated can execute submit_candidate_application'
@@ -178,7 +178,7 @@ select ok(
 select ok(
   not has_function_privilege(
     'anon',
-    'public.submit_candidate_application(uuid)',
+    'public.submit_candidate_application(uuid,text)',
     'execute'
   ),
   'anon cannot execute submit_candidate_application'
@@ -187,7 +187,7 @@ select ok(
 select ok(
   not has_function_privilege(
     'public',
-    'public.submit_candidate_application(uuid)',
+    'public.submit_candidate_application(uuid,text)',
     'execute'
   ),
   'PUBLIC cannot execute submit_candidate_application'

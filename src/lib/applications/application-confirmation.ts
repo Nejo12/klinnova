@@ -47,6 +47,7 @@ export type ApplicationConfirmation = {
   statusLabel: string;
   submittedAtIso: string;
   submittedAtLabel: string;
+  introductionText: string | null;
   vacancyId: string;
   vacancyTitle: string;
   employerDisplayName: string;
@@ -123,6 +124,7 @@ export function buildApplicationConfirmation(input: {
   applicationId: string;
   status: ApplicationStatus;
   submittedAt: string;
+  introductionText?: string | null;
   candidate: CandidateLiveSnapshotV1;
   vacancy: VacancySnapshotV1;
 }): ApplicationConfirmation | null {
@@ -159,6 +161,7 @@ export function buildApplicationConfirmation(input: {
     statusLabel: candidateStatusDisplayLabel(input.status),
     submittedAtIso: input.submittedAt,
     submittedAtLabel,
+    introductionText: input.introductionText ?? null,
     vacancyId: input.vacancy.vacancy_id,
     vacancyTitle: input.vacancy.title,
     employerDisplayName: input.vacancy.employer_display_name,

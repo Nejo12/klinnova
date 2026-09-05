@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(26);
+select plan(28);
 
 insert into auth.users (
   instance_id,
@@ -93,6 +93,18 @@ select has_column(
 );
 select has_column('public', 'applications', 'created_at', 'created_at exists');
 select has_column('public', 'applications', 'updated_at', 'updated_at exists');
+select has_column(
+  'public',
+  'applications',
+  'introduction_text',
+  'optional candidate introduction exists'
+);
+select col_is_null(
+  'public',
+  'applications',
+  'introduction_text',
+  'candidate introduction is nullable'
+);
 
 select col_not_null('public', 'applications', 'candidate_id', 'candidate_id not null');
 select col_not_null('public', 'applications', 'vacancy_id', 'vacancy_id not null');
@@ -281,8 +293,8 @@ select ok(
 select has_function(
   'public',
   'submit_candidate_application',
-  array['uuid'],
-  'submit_candidate_application(uuid) exists'
+  array['uuid', 'text'],
+  'submit_candidate_application(uuid, text) exists'
 );
 
 select * from finish();

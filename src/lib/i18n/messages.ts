@@ -75,6 +75,22 @@ const englishMessages = {
     "Click below to finish confirming this email address.",
   "page.error.heading": "We could not finish that step",
   "page.error.requestAnother": "Request another reset",
+  "application.introduction.heading": "Introduce yourself",
+  "application.introduction.suggested": "Suggested text · editable",
+  "application.introduction.hint":
+    "Edit or replace every word. This optional introduction is sent only when you submit the application.",
+  "application.introduction.label": "Introduction to the employer",
+  "application.introduction.characters": "characters remaining",
+  "application.introduction.preview": "Preview application",
+  "application.introduction.previewHeading": "Review before submitting",
+  "application.introduction.recipient": "Recipient",
+  "application.introduction.job": "Job",
+  "application.introduction.empty": "No introduction will be included.",
+  "application.introduction.edit": "Back to edit",
+  "application.introduction.submit": "Submit application",
+  "application.introduction.submitting": "Submitting…",
+  "application.introduction.submittedHeading": "Your introduction",
+  "application.introduction.employerHeading": "Candidate introduction",
 } as const;
 
 export type MessageKey = keyof typeof englishMessages;
@@ -156,6 +172,22 @@ const germanMessages: Partial<Record<MessageKey, string>> = {
     "Klicke unten, um die Bestätigung dieser E-Mail-Adresse abzuschließen.",
   "page.error.heading": "Dieser Schritt konnte nicht abgeschlossen werden",
   "page.error.requestAnother": "Neuen Link anfordern",
+  "application.introduction.heading": "Stell dich vor",
+  "application.introduction.suggested": "Textvorschlag · bearbeitbar",
+  "application.introduction.hint":
+    "Bearbeite oder ersetze jedes Wort. Diese optionale Vorstellung wird erst gesendet, wenn du die Bewerbung abschickst.",
+  "application.introduction.label": "Vorstellung für den Arbeitgeber",
+  "application.introduction.characters": "Zeichen verbleibend",
+  "application.introduction.preview": "Bewerbung prüfen",
+  "application.introduction.previewHeading": "Vor dem Absenden prüfen",
+  "application.introduction.recipient": "Empfänger",
+  "application.introduction.job": "Stelle",
+  "application.introduction.empty": "Es wird keine Vorstellung hinzugefügt.",
+  "application.introduction.edit": "Zurück zum Bearbeiten",
+  "application.introduction.submit": "Bewerbung absenden",
+  "application.introduction.submitting": "Wird gesendet…",
+  "application.introduction.submittedHeading": "Deine Vorstellung",
+  "application.introduction.employerHeading": "Vorstellung der Person",
 };
 
 const messages: Record<Locale, Partial<Record<MessageKey, string>>> = {

@@ -56,6 +56,7 @@ function buildApplication(overrides: Partial<LiveDetail> = {}): LiveDetail {
       },
     ],
     employer_seen_at: null,
+    introduction_text: "Hello, I would like to apply.",
     ...overrides,
   };
 }
@@ -82,6 +83,7 @@ function buildDeletedApplication(
       },
     ],
     employer_seen_at: null,
+    introduction_text: null,
     ...overrides,
   };
 }
@@ -106,6 +108,9 @@ describe("ApplicationDetail", () => {
       }),
     ).toBeInTheDocument();
     expect(screen.getByText("Declared")).toBeInTheDocument();
+    expect(
+      screen.getByText("Hello, I would like to apply."),
+    ).toBeInTheDocument();
     expect(
       screen.queryByText(
         /legally authorized|visa verified|work permit confirmed/i,

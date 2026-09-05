@@ -19,6 +19,9 @@ export const submitApplicationRpcResultSchema = z.discriminatedUnion("result", [
     result: z.literal("unavailable"),
   }),
   z.object({
+    result: z.literal("validation_error"),
+  }),
+  z.object({
     result: z.literal("ineligible"),
     missing_requirements: z.array(missingRequirementCodeSchema),
   }),

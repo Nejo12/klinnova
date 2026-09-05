@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { ApplicationIntroductionDisplay } from "@/components/application-introduction/application-introduction-display";
+
 import { ApplicationOutcomeHistory } from "@/components/employer-applications/application-outcome-history";
 import { ApplicationStatusActions } from "@/components/employer-applications/application-status-actions";
 import { ApplicationStatusHistory } from "@/components/employer-applications/application-status-history";
@@ -56,6 +58,11 @@ export function ApplicationDetail({
           {applicationStatusLabel(application.current_status)}
         </span>
       </header>
+
+      <ApplicationIntroductionDisplay
+        audience="employer"
+        text={application.introduction_text}
+      />
 
       <div className={styles.detailGrid}>
         <div className={styles.detailMain}>

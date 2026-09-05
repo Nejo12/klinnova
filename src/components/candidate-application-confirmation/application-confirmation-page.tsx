@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { ApplicationIntroductionDisplay } from "@/components/application-introduction/application-introduction-display";
+
 import {
   APPLICATION_CONFIRMATION_BODY,
   APPLICATION_CONFIRMATION_HEADING,
@@ -120,6 +122,11 @@ export function ApplicationConfirmationPage(
           </p>
         </section>
       ) : null}
+
+      <ApplicationIntroductionDisplay
+        audience="candidate"
+        text={confirmation.introductionText}
+      />
 
       <section
         className={styles.section}

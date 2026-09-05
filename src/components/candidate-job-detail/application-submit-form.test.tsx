@@ -1,24 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 const actionMock = vi.hoisted(() =>
-  vi.fn(
-    async (): Promise<{
-      status:
-        | "idle"
-        | "validation_error"
-        | "unavailable"
-        | "ineligible"
-        | "submitted"
-        | "already_applied"
-        | "failure";
-      applicationId?: string;
-      missingRequirements?: string[];
-    }> => ({
-      status: "failure",
-    }),
-  ),
+  vi.fn(async (): Promise<{ status: "failure" }> => ({ status: "failure" })),
 );
 
 vi.mock("@/app/candidate/jobs/[vacancyId]/actions", () => ({
@@ -26,115 +11,130 @@ vi.mock("@/app/candidate/jobs/[vacancyId]/actions", () => ({
 }));
 
 import { ApplicationSubmitForm } from "@/components/candidate-job-detail/application-submit-form";
-import {
-  APPLICATION_INELIGIBLE_HEADING,
-  APPLICATION_SUBMIT_DISCLOSURE,
-  APPLICATION_FAILURE_MESSAGE,
-} from "@/lib/applications/messages";
+import { APPLICATION_FAILURE_MESSAGE } from "@/lib/applications/messages";
 
 const VACANCY_ID = "22222222-2222-4222-8222-222222222201";
+const VACANCY_TITLE = "Morning kitchen support";
+const EMPLOYER_NAME = "Berlin Work Co";
+
+function renderForm() {
+  return render(
+    <ApplicationSubmitForm
+      employerDisplayName={EMPLOYER_NAME}
+      vacancyId={VACANCY_ID}
+      vacancyTitle={VACANCY_TITLE}
+    />,
+  );
+}
 
 describe("ApplicationSubmitForm", () => {
-  it("submits only vacancyId and shows disclosure without a checkbox", () => {
-    render(<ApplicationSubmitForm vacancyId={VACANCY_ID} />);
+  it("starts with a fully editable deterministic suggestion", async () => {
+    const user = userEvent.setup();
+    renderForm();
 
-    expect(screen.getByText(APPLICATION_SUBMIT_DISCLOSURE)).toBeInTheDocument();
-    expect(screen.queryByRole("checkbox")).toBeNull();
+    const introduction = screen.getByRole("textbox", {
+      name: "Introduction to the employer",
+    });
+    expect(introduction).toHaveValue(
+      "Hello, I’m interested in the Morning kitchen support role at Berlin Work Co. I’d be happy to discuss how my experience and availability fit the job.",
+    );
+    expect(introduction).toHaveAttribute("maxlength", "1000");
 
-    const vacancyInput = screen.getByDisplayValue(VACANCY_ID);
-    expect(vacancyInput).toHaveAttribute("type", "hidden");
-    expect(vacancyInput).toHaveAttribute("name", "vacancyId");
+    await user.clear(introduction);
+    await user.type(introduction, "My own words.");
+    expect(introduction).toHaveValue("My own words.");
+  });
 
-    const form = vacancyInput.closest("form");
-    expect(form).not.toBeNull();
-    expect(form?.querySelectorAll("input")).toHaveLength(1);
+  it("previews exact normalized text and context without submitting", async () => {
+    const user = userEvent.setup();
+    renderForm();
 
+    const introduction = screen.getByRole("textbox", {
+      name: "Introduction to the employer",
+    });
+    await user.clear(introduction);
+    await user.type(introduction, "  My exact introduction.  ");
+    await user.click(
+      screen.getByRole("button", { name: "Preview application" }),
+    );
+
+    expect(actionMock).not.toHaveBeenCalled();
+    expect(screen.getByText("My exact introduction.")).toBeInTheDocument();
+    expect(screen.getByText(EMPLOYER_NAME)).toBeInTheDocument();
+    expect(screen.getByText(VACANCY_TITLE)).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Apply with profile" }),
+      screen.getByRole("button", { name: "Submit application" }),
     ).toBeEnabled();
   });
 
-  it("disables the button while pending", async () => {
+  it("submits only after the separate final action", async () => {
     const user = userEvent.setup();
-    let finish: ((value: { status: "failure" }) => void) | undefined;
-    actionMock.mockImplementationOnce(
-      () =>
-        new Promise((resolve) => {
-          finish = resolve;
-        }),
-    );
+    renderForm();
 
-    render(<ApplicationSubmitForm vacancyId={VACANCY_ID} />);
     await user.click(
-      screen.getByRole("button", { name: "Apply with profile" }),
+      screen.getByRole("button", { name: "Preview application" }),
     );
+    expect(actionMock).not.toHaveBeenCalled();
 
-    const pendingButton = await screen.findByRole("button", {
-      name: "Applying…",
+    const submitButton = screen.getByRole("button", {
+      name: "Submit application",
     });
-    expect(pendingButton).toBeDisabled();
-
-    finish?.({ status: "failure" });
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      APPLICATION_FAILURE_MESSAGE,
-    );
-  });
-
-  it("does not show temporary submitted acknowledgement copy", async () => {
-    const user = userEvent.setup();
-    actionMock.mockResolvedValueOnce({
-      status: "submitted",
-      applicationId: "33333333-3333-4333-8333-333333333301",
-    });
-
-    render(<ApplicationSubmitForm vacancyId={VACANCY_ID} />);
-    await user.click(
-      screen.getByRole("button", { name: "Apply with profile" }),
-    );
-
-    expect(screen.queryByText("Application submitted.")).toBeNull();
-    expect(screen.queryByText("Application already submitted.")).toBeNull();
+    const form = submitButton.closest("form");
+    expect(form).not.toBeNull();
     expect(
-      screen.queryByText("33333333-3333-4333-8333-333333333301"),
-    ).toBeNull();
+      within(form as HTMLFormElement).getByDisplayValue(VACANCY_ID),
+    ).toHaveAttribute("name", "vacancyId");
+
+    await user.click(submitButton);
+    expect(actionMock).toHaveBeenCalledTimes(1);
   });
 
-  it("shows an ineligible alert with labelled missing requirements and a review link", async () => {
+  it("allows an optional blank introduction", async () => {
     const user = userEvent.setup();
-    actionMock.mockResolvedValueOnce({
-      status: "ineligible",
-      missingRequirements: ["category", "german"],
+    renderForm();
+
+    const introduction = screen.getByRole("textbox", {
+      name: "Introduction to the employer",
     });
-
-    render(<ApplicationSubmitForm vacancyId={VACANCY_ID} />);
+    await user.clear(introduction);
     await user.click(
-      screen.getByRole("button", { name: "Apply with profile" }),
+      screen.getByRole("button", { name: "Preview application" }),
     );
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      APPLICATION_INELIGIBLE_HEADING,
-    );
-    expect(screen.getByText("Preferred job category")).toBeInTheDocument();
-    expect(screen.getByText("German level")).toBeInTheDocument();
-    expect(screen.queryByText("category")).toBeNull();
-    expect(screen.queryByText("german")).toBeNull();
     expect(
-      screen.getByRole("link", { name: "Review your saved preferences" }),
-    ).toHaveAttribute("href", "/candidate/onboarding?group=review");
+      screen.getByText("No introduction will be included."),
+    ).toBeInTheDocument();
+    const introductionInput = document.querySelector(
+      'input[name="introductionText"]',
+    );
+    expect(introductionInput).toHaveValue("");
   });
 
-  it("shows a safe failure alert without internal details", async () => {
+  it("preserves unsent text after failure and when returning to edit", async () => {
     const user = userEvent.setup();
     actionMock.mockResolvedValueOnce({ status: "failure" });
+    renderForm();
 
-    render(<ApplicationSubmitForm vacancyId={VACANCY_ID} />);
+    const introduction = screen.getByRole("textbox", {
+      name: "Introduction to the employer",
+    });
+    await user.clear(introduction);
+    await user.type(introduction, "Please keep this text.");
     await user.click(
-      screen.getByRole("button", { name: "Apply with profile" }),
+      screen.getByRole("button", { name: "Preview application" }),
+    );
+    await user.click(
+      screen.getByRole("button", { name: "Submit application" }),
     );
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
       APPLICATION_FAILURE_MESSAGE,
     );
-    expect(screen.queryByText(/postgres|permission denied/i)).toBeNull();
+    expect(screen.getByText("Please keep this text.")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Back to edit" }));
+    expect(
+      screen.getByRole("textbox", { name: "Introduction to the employer" }),
+    ).toHaveValue("Please keep this text.");
   });
 });
