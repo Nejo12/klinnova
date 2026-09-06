@@ -133,6 +133,11 @@ describe("KDS-TM3.1 theme semantics", () => {
     );
   });
 
+  test("overlay uses the approved light and dark semantic values", () => {
+    expect(readDeclaration("color-bg-overlay")).toBe("rgb(33 26 27 / 52%)");
+    expect(readDarkDeclaration("color-bg-overlay")).toBe("rgb(0 0 0 / 68%)");
+  });
+
   test("dark actions and status colours retain readable contrast", () => {
     expect(readDarkDeclaration("color-action-primary")).toBe(
       "var(--color-rose-300)",
