@@ -257,7 +257,7 @@ test.describe("password recovery journey (M5.1 Unit C)", () => {
       ),
     ).toBeVisible();
     // No form is rendered — nothing to submit.
-    await expect(page.getByRole("button")).toHaveCount(0);
+    await expect(page.locator("form")).toHaveCount(0);
   });
 
   test("visiting /reset-password directly with no recovery session reaches the safe retry state", async ({

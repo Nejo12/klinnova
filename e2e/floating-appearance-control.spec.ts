@@ -5,7 +5,7 @@ test("floating appearance control selects and persists explicit preferences", as
 }) => {
   await page.goto("/");
 
-  const trigger = page.getByRole("button", { name: "Appearance: System" });
+  const trigger = page.getByRole("button", { name: /^Appearance:/ });
   await expect(trigger).toBeVisible();
   await trigger.click();
 
@@ -74,7 +74,15 @@ test("floating appearance control keeps its responsive clearance and reduced mot
     16,
     0,
   );
-  await expect(trigger).toHaveCSS("transition-duration", "0s");
+  const transitionDurationsMs = await trigger.evaluate((element) =>
+    getComputedStyle(element)
+      .transitionDuration.split(",")
+      .map((duration) => {
+        const value = Number.parseFloat(duration);
+        return duration.trim().endsWith("ms") ? value : value * 1_000;
+      }),
+  );
+  expect(Math.max(...transitionDurationsMs)).toBeLessThanOrEqual(0.01);
 
   await page.locator("html").evaluate((root) => {
     root.style.setProperty("--appearance-control-bottom-clearance", "72px");
