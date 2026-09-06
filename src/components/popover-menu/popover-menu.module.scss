@@ -1,0 +1,113 @@
+.root {
+  position: relative;
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.surface {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  z-index: var(--z-dropdown);
+  max-width: calc(100vw - var(--space-8));
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.surface[data-align="end"] {
+  right: 0;
+  left: auto;
+}
+
+.surface[data-kind="popover"] {
+  width: min(22.5rem, calc(100vw - var(--space-8)));
+  padding: var(--space-5);
+}
+
+.surface[data-kind="menu"] {
+  display: flex;
+  width: min(18.75rem, calc(100vw - var(--space-8)));
+  padding: var(--space-4);
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-md);
+}
+
+.body {
+  margin-top: var(--space-2);
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.popoverAction {
+  max-width: 100%;
+  margin-top: var(--space-5);
+}
+
+.menuItem {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.menuItem:hover,
+.menuItem:focus-visible {
+  background: var(--color-bg-subtle);
+}
+
+.menuItem:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: calc(-1 * var(--focus-ring-width));
+}
+
+.menuItem[data-tone="danger"] {
+  color: var(--color-status-danger);
+}
+
+.menuItem:disabled {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+}
+
+.shortcut {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-xs);
+}
+
+@media (max-width: 30rem) {
+  .surface[data-kind="popover"] {
+    padding: var(--space-4);
+  }
+
+  .surface[data-kind="menu"] {
+    padding: var(--space-3);
+  }
+}
