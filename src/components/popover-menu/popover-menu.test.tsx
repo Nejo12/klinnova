@@ -123,7 +123,9 @@ describe("Popover", () => {
 });
 
 describe("Menu", () => {
-  function renderMenu(actions = [vi.fn(), vi.fn(), vi.fn()]) {
+  function renderMenu(
+    actions: [() => void, () => void, () => void] = [vi.fn(), vi.fn(), vi.fn()],
+  ) {
     render(
       <Menu
         trigger={<button type="button">More actions</button>}
