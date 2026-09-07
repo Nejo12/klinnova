@@ -80,7 +80,7 @@ export async function registerAndApplyAsCandidateWithCredentials(
   await page.getByRole("button", { name: "Save and review" }).click();
   await expect(page).toHaveURL(/group=review/);
 
-  await page.getByRole("button", { name: "Confirm essentials" }).click();
+  await page.getByRole("button", { name: "Complete profile" }).click();
   await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
 
   await page.goto(`/candidate/jobs/${vacancyId}`);

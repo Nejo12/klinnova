@@ -352,7 +352,7 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     await expect(candidatePage).toHaveURL(/group=review/);
 
     await candidatePage
-      .getByRole("button", { name: "Confirm essentials" })
+      .getByRole("button", { name: "Complete profile" })
       .click();
     await expect(candidatePage).toHaveURL(/\/candidate\/matches$/, {
       timeout: 15_000,
@@ -551,7 +551,7 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     await expect(candidatePage).toHaveURL(/group=review/);
 
     await candidatePage
-      .getByRole("button", { name: "Confirm essentials" })
+      .getByRole("button", { name: "Complete profile" })
       .click();
     await expect(candidatePage).toHaveURL(/\/candidate\/matches$/, {
       timeout: 15_000,

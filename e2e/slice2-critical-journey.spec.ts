@@ -140,7 +140,7 @@ test.describe("Slice 2 critical exit journey", () => {
 
     await page.goto("/candidate");
     await completeMatchingEssentials(page);
-    await page.getByRole("button", { name: "Confirm essentials" }).click();
+    await page.getByRole("button", { name: "Complete profile" }).click();
     await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
     await expectDemoMatchInventory(page);
 
@@ -174,7 +174,7 @@ test.describe("Slice 2 critical exit journey", () => {
     await expect(page).toHaveURL(/group=location/, { timeout: 15_000 });
 
     await page.goto("/candidate/onboarding?group=review");
-    await page.getByRole("button", { name: "Confirm essentials" }).click();
+    await page.getByRole("button", { name: "Complete profile" }).click();
     await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
     await expectDemoMatchInventory(page);
   });

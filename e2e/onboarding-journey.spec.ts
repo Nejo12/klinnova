@@ -34,7 +34,7 @@ async function registerAndConfirm(
   await page.getByRole("button", { name: "Confirm email address" }).click();
   await expect(page).toHaveURL(/\/candidate$/, { timeout: 15_000 });
 
-  return { email, password, displayName };
+  return { email, password };
 }
 
 test.describe("local onboarding persistence journey", () => {
@@ -48,12 +48,23 @@ test.describe("local onboarding persistence journey", () => {
   }) => {
     expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
     const stamp = Date.now();
-    const { email, password, displayName } = await registerAndConfirm(
-      page,
-      stamp,
-    );
+    const { email, password } = await registerAndConfirm(page, stamp);
 
     await page.getByRole("link", { name: "Continue onboarding" }).click();
+    await expect(page).toHaveURL(/group=languages/);
+
+    await page.goto("/candidate/onboarding?group=review");
+    await expect(
+      page.getByRole("heading", { name: "Finish your profile" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("6 essentials still need an answer."),
+    ).toBeVisible();
+    await expect(page.getByText("Ready for matching")).toHaveCount(0);
+    await expect(
+      page.getByRole("link", { name: "Continue profile" }),
+    ).toHaveAttribute("href", "/candidate/onboarding?group=languages");
+    await page.getByRole("link", { name: "Continue profile" }).click();
     await expect(page).toHaveURL(/group=languages/);
 
     await page
@@ -105,12 +116,10 @@ test.describe("local onboarding persistence journey", () => {
     await page.getByRole("button", { name: "Save and review" }).click();
     await expect(page).toHaveURL(/group=review/);
     await expect(
-      page.getByRole("heading", {
-        name: new RegExp(`Essentials look complete, ${displayName}`, "i"),
-      }),
+      page.getByRole("heading", { name: "Review your profile" }),
     ).toBeVisible();
     await expect(
-      page.getByText(/After you confirm, you can view jobs/i),
+      page.getByText(/Complete your profile to start matching/i),
     ).toBeVisible();
 
     await page.goto("/candidate/onboarding?group=location");
@@ -169,12 +178,10 @@ test.describe("local onboarding persistence journey", () => {
       .click();
     await expect(page).toHaveURL(/group=review/);
     await expect(
-      page.getByRole("heading", {
-        name: new RegExp(`Essentials look complete, ${displayName}`, "i"),
-      }),
+      page.getByRole("heading", { name: "Review your profile" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Confirm essentials" }),
+      page.getByRole("button", { name: "Complete profile" }),
     ).toBeVisible();
   });
 });

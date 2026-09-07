@@ -6,12 +6,14 @@ import {
   completeOnboardingAction,
   type OnboardingActionState,
 } from "@/app/candidate/onboarding/actions";
+import { useLocale } from "@/components/i18n/locale-provider";
 
 import styles from "./onboarding.module.scss";
 
 const initialState: OnboardingActionState = { error: null, message: null };
 
 export function CompleteOnboardingForm() {
+  const { t } = useLocale();
   const [state, formAction, pending] = useActionState(
     completeOnboardingAction,
     initialState,
@@ -25,7 +27,9 @@ export function CompleteOnboardingForm() {
         </p>
       ) : null}
       <button className={styles.button} disabled={pending} type="submit">
-        {pending ? "Confirming…" : "Confirm essentials"}
+        {pending
+          ? t("candidateReview.completing")
+          : t("candidateReview.completeProfile")}
       </button>
     </form>
   );

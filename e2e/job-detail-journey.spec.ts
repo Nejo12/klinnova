@@ -89,7 +89,7 @@ async function completeMatchingEssentials(
 }
 
 async function openMorningKitchenDetail(page: import("@playwright/test").Page) {
-  await page.getByRole("button", { name: "Confirm essentials" }).click();
+  await page.getByRole("button", { name: "Complete profile" }).click();
   await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
 
   await page
@@ -249,7 +249,7 @@ test.describe("Slice 3 candidate job detail journey", () => {
     const stamp = Date.now() + 11;
     await registerAndConfirm(page, stamp);
     await completeMatchingEssentials(page);
-    await page.getByRole("button", { name: "Confirm essentials" }).click();
+    await page.getByRole("button", { name: "Complete profile" }).click();
     await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
 
     await page.goto("/candidate/applications/not-a-uuid");
@@ -295,7 +295,7 @@ test.describe("Slice 3 candidate job detail journey", () => {
     const stamp = Date.now() + 2;
     await registerAndConfirm(page, stamp);
     await completeMatchingEssentials(page);
-    await page.getByRole("button", { name: "Confirm essentials" }).click();
+    await page.getByRole("button", { name: "Complete profile" }).click();
     await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
 
     await page.goto("/candidate/jobs/not-a-uuid");

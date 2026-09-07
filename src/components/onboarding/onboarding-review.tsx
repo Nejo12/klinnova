@@ -1,11 +1,14 @@
+"use client";
+
 import Link from "next/link";
 
+import { InlineAlert } from "@/components/inline-alert/inline-alert";
 import { CompleteOnboardingForm } from "@/components/onboarding/complete-onboarding-form";
-import { OnboardingReviewTable } from "@/components/onboarding/onboarding-review-table";
-import {
-  ONBOARDING_GROUP_LABELS,
-  type OnboardingGroupId,
-} from "@/lib/onboarding/allow-lists";
+import { OnboardingReviewSummary } from "@/components/onboarding/onboarding-review-summary";
+import { StateSuccess } from "@/components/state-success/state-success";
+import { useLocale } from "@/components/i18n/locale-provider";
+import { type OnboardingGroupId } from "@/lib/onboarding/allow-lists";
+import type { MessageKey } from "@/lib/i18n/messages";
 import { onboardingGroupHref } from "@/lib/onboarding/navigation";
 import type {
   OnboardingProgress,
@@ -17,46 +20,56 @@ import styles from "./onboarding.module.scss";
 
 type OnboardingReviewProps = {
   progress: OnboardingProgress;
-  displayName: string;
   onboardingCompleted: boolean;
   profile: ProgressProfile;
   languages: readonly ProgressLanguage[];
 };
 
+const GROUP_MESSAGE_KEYS: Record<OnboardingGroupId, MessageKey> = {
+  languages: "candidateReview.group.languages",
+  work_authorisation: "candidateReview.group.workAuthorisation",
+  location: "candidateReview.group.location",
+  categories: "candidateReview.group.categories",
+  availability: "candidateReview.group.availability",
+  employment: "candidateReview.group.workPreferences",
+};
+
 export function OnboardingReview({
   progress,
-  displayName,
   onboardingCompleted,
   profile,
   languages,
 }: OnboardingReviewProps) {
+  const { locale, t } = useLocale();
+  const savedCount = `${progress.completeCount} ${
+    locale === "de" ? "von" : "of"
+  } ${progress.totalGroups} ${t("candidateReview.essentialsSaved")}`;
+
   if (onboardingCompleted) {
     return (
-      <section className={styles.form} aria-labelledby="review-heading">
-        <h1 className={styles.heading} id="review-heading">
-          Essentials confirmed, {displayName}
-        </h1>
-        <p className={styles.lead}>
-          Your essential answers are complete. You can view jobs that match your
-          saved preferences, or review your answers any time.
-        </p>
-        <p className={styles.reviewSummary}>
-          {progress.completeCount} of {progress.totalGroups} sections saved
-        </p>
-        <OnboardingReviewTable profile={profile} languages={languages} />
-        <p className={styles.note}>
-          Updating answers can clear completion when essentials are no longer
-          met. Completion stays server-controlled.
-        </p>
-        <div className={styles.actions}>
+      <section className={styles.reviewForm} aria-labelledby="review-heading">
+        <header className={styles.reviewHeader}>
+          <h1 className={styles.heading} id="review-heading">
+            {t("candidateReview.heading")}
+          </h1>
+          <p className={styles.lead}>{t("candidateReview.lead")}</p>
+        </header>
+        <StateSuccess
+          className={styles.readinessState}
+          title={t("candidateReview.readyTitle")}
+        >
+          {savedCount}
+        </StateSuccess>
+        <OnboardingReviewSummary profile={profile} languages={languages} />
+        <div className={styles.reviewActions}>
           <Link className={styles.button} href="/candidate/matches">
-            View matching jobs
+            {t("candidateReview.viewMatches")}
           </Link>
           <Link
             className={`${styles.button} ${styles.buttonSecondary}`}
             href={onboardingGroupHref("languages")}
           >
-            Review answers
+            {t("candidateReview.editProfile")}
           </Link>
         </div>
       </section>
@@ -65,66 +78,59 @@ export function OnboardingReview({
 
   if (progress.essentialsValid) {
     return (
-      <section className={styles.form} aria-labelledby="review-heading">
-        <h1 className={styles.heading} id="review-heading">
-          Essentials look complete, {displayName}
-        </h1>
-        <p className={styles.lead}>
-          Your answers are saved. Confirm when you are ready — the server checks
-          your saved essentials before marking onboarding complete.
-        </p>
-        <p className={styles.reviewSummary}>
-          {progress.completeCount} of {progress.totalGroups} sections saved
-        </p>
-        <OnboardingReviewTable profile={profile} languages={languages} />
-        <p className={styles.note}>
-          After you confirm, you can view jobs that match your saved
-          preferences.
-        </p>
+      <section className={styles.reviewForm} aria-labelledby="review-heading">
+        <header className={styles.reviewHeader}>
+          <h1 className={styles.heading} id="review-heading">
+            {t("candidateReview.heading")}
+          </h1>
+          <p className={styles.lead}>{t("candidateReview.lead")}</p>
+        </header>
+        <InlineAlert
+          tone="info"
+          title={t("candidateReview.readyToCompleteTitle")}
+        >
+          {t("candidateReview.readyToCompleteBody")}
+        </InlineAlert>
+        <OnboardingReviewSummary profile={profile} languages={languages} />
         <CompleteOnboardingForm />
-        <div className={styles.actions}>
-          <Link className={styles.linkButton} href="/candidate">
-            Return to candidate home
-          </Link>
-          <Link
-            className={`${styles.button} ${styles.buttonSecondary}`}
-            href={onboardingGroupHref("languages")}
-          >
-            Review answers
-          </Link>
-        </div>
       </section>
     );
   }
 
+  const incompleteCount = progress.incompleteGroups.length;
+  const incompleteCountLabel = `${incompleteCount} ${t(
+    incompleteCount === 1
+      ? "candidateReview.essentialStillNeeded"
+      : "candidateReview.essentialsStillNeeded",
+  )}`;
+
   return (
-    <section className={styles.form} aria-labelledby="review-heading">
-      <h1 className={styles.heading} id="review-heading">
-        A few essentials still need answers
-      </h1>
-      <p className={styles.lead}>
-        Progress is saved after each section. Continue from the first unfinished
-        section when you are ready.
-      </p>
-      <p className={styles.reviewSummary}>
-        {progress.completeCount} of {progress.totalGroups} sections saved
-      </p>
-      <ul className={styles.reviewList}>
-        {progress.incompleteGroups.map((group: OnboardingGroupId) => (
-          <li key={group}>
-            <Link href={onboardingGroupHref(group)}>
-              {ONBOARDING_GROUP_LABELS[group]}
-            </Link>
-          </li>
-        ))}
-      </ul>
+    <section className={styles.reviewForm} aria-labelledby="review-heading">
+      <header className={styles.reviewHeader}>
+        <h1 className={styles.heading} id="review-heading">
+          {t("candidateReview.finishHeading")}
+        </h1>
+        <p className={styles.lead}>{incompleteCountLabel}</p>
+      </header>
+      <InlineAlert tone="warning" title={t("candidateReview.stillNeeded")}>
+        <ul className={styles.missingList}>
+          {progress.incompleteGroups.map((group: OnboardingGroupId) => (
+            <li key={group}>
+              <Link href={onboardingGroupHref(group)}>
+                {t(GROUP_MESSAGE_KEYS[group])}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </InlineAlert>
+      <OnboardingReviewSummary profile={profile} languages={languages} />
       {progress.firstIncompleteGroup !== null ? (
-        <div className={styles.actions}>
+        <div className={styles.reviewActions}>
           <Link
             className={styles.button}
             href={onboardingGroupHref(progress.firstIncompleteGroup)}
           >
-            Continue onboarding
+            {t("candidateReview.continueProfile")}
           </Link>
         </div>
       ) : null}

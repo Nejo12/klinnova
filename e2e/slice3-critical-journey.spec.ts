@@ -128,7 +128,7 @@ test.describe("Slice 3 critical exit journey", () => {
       "main",
     );
     await completeMatchingEssentials(page);
-    await page.getByRole("button", { name: "Confirm essentials" }).click();
+    await page.getByRole("button", { name: "Complete profile" }).click();
     await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
 
     await expect(page.getByText(/Demo vacancy/i).first()).toBeVisible();
@@ -275,7 +275,7 @@ test.describe("Slice 3 critical exit journey", () => {
       "hist",
     );
     await completeMatchingEssentials(page);
-    await page.getByRole("button", { name: "Confirm essentials" }).click();
+    await page.getByRole("button", { name: "Complete profile" }).click();
     await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
 
     await page.goto(`/candidate/jobs/${MORNING_KITCHEN_ID}`);
@@ -385,7 +385,7 @@ test.describe("Slice 3 critical exit journey", () => {
 
     const owner = await registerAndConfirm(page, stamp, "owner");
     await completeMatchingEssentials(page);
-    await page.getByRole("button", { name: "Confirm essentials" }).click();
+    await page.getByRole("button", { name: "Complete profile" }).click();
     await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
 
     await page.goto(`/candidate/jobs/${MORNING_KITCHEN_ID}`);
@@ -418,7 +418,7 @@ test.describe("Slice 3 critical exit journey", () => {
     await context.clearCookies();
     const stranger = await registerAndConfirm(page, stamp + 3, "stranger");
     await completeMatchingEssentials(page);
-    await page.getByRole("button", { name: "Confirm essentials" }).click();
+    await page.getByRole("button", { name: "Complete profile" }).click();
     await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
 
     await page.goto(ownerConfirmationUrl);
@@ -450,7 +450,7 @@ test.describe("Slice 3 critical exit journey", () => {
     await context.clearCookies();
     await registerAndConfirm(page, stamp + 5, "nomatch");
     await completeMatchingEssentials(page, { category: "Cleaning" });
-    await page.getByRole("button", { name: "Confirm essentials" }).click();
+    await page.getByRole("button", { name: "Complete profile" }).click();
     await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
     await expect(
       page.getByRole("link", {

@@ -34,7 +34,7 @@ async function registerAndConfirm(
   await page.getByRole("button", { name: "Confirm email address" }).click();
   await expect(page).toHaveURL(/\/candidate$/, { timeout: 15_000 });
 
-  return { email, password, displayName };
+  return { email, password };
 }
 
 async function fillEssentials(page: import("@playwright/test").Page) {
@@ -90,19 +90,14 @@ test.describe("Slice 1 completion gate journey", () => {
   }) => {
     expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
     const stamp = Date.now();
-    const { email, password, displayName } = await registerAndConfirm(
-      page,
-      stamp,
-    );
+    const { email, password } = await registerAndConfirm(page, stamp);
 
     await fillEssentials(page);
     await expect(
-      page.getByRole("heading", {
-        name: new RegExp(`Essentials look complete, ${displayName}`, "i"),
-      }),
+      page.getByRole("heading", { name: "Review your profile" }),
     ).toBeVisible();
 
-    await page.getByRole("button", { name: "Confirm essentials" }).click();
+    await page.getByRole("button", { name: "Complete profile" }).click();
     await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
     await expect(
       page.getByRole("heading", {
@@ -145,11 +140,7 @@ test.describe("Slice 1 completion gate journey", () => {
       }),
     ).toBeVisible();
     await page.goto("/candidate/onboarding?group=review");
-    await expect(
-      page.getByRole("heading", {
-        name: new RegExp(`Essentials confirmed, ${displayName}`, "i"),
-      }),
-    ).toBeVisible();
+    await expect(page.getByText("Ready for matching")).toBeVisible();
     await expect(
       page.getByRole("link", { name: /View matching jobs/i }),
     ).toBeVisible();

@@ -15,6 +15,9 @@ const REPRESENTATIVE_PUBLIC_MESSAGES: Array<[MessageKey, string]> = [
   ["workspace.alsoEmployer", "Klinnova auch als Arbeitgeber nutzen"],
   ["auth.logOut", "Abmelden"],
   ["auth.logOutAll", "Von allen Geräten abmelden"],
+  ["candidateReview.readyTitle", "Bereit fürs Matching"],
+  ["candidateReview.continueProfile", "Profil fortsetzen"],
+  ["candidateReview.group.workPreferences", "Arbeitswünsche"],
 ];
 
 describe("public and shared locale messages", () => {
