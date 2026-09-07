@@ -5,14 +5,15 @@ test("floating interface preferences keep language and appearance independent", 
 }) => {
   await page.goto("/");
 
-  const trigger = page.getByRole("button", { name: "Interface preferences" });
+  const trigger = page.locator("[data-overlay-trigger]");
+  await expect(trigger).toHaveAccessibleName("Interface preferences");
   await expect(trigger).toBeVisible();
   await expect(
     trigger.locator("[data-interface-preferences-icon]"),
   ).toBeVisible();
   await trigger.click();
 
-  const panel = page.getByRole("dialog", { name: "Interface preferences" });
+  const panel = page.locator('[role="dialog"]');
   await expect(panel).toBeVisible();
   await expect(panel.getByRole("button", { name: /English/ })).toHaveAttribute(
     "aria-pressed",
