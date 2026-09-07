@@ -1,3 +1,6 @@
+"use client";
+
+import { useLocale } from "@/components/i18n/locale-provider";
 import {
   DelayedReveal,
   Skeleton,
@@ -5,10 +8,6 @@ import {
 } from "@/components/shared/skeleton";
 import factStyles from "@/components/public-jobs/vacancy-fact-chips.module.scss";
 import styles from "@/components/public-jobs/public-jobs.module.scss";
-import {
-  PUBLIC_JOBS_HEADING,
-  PUBLIC_JOBS_LEAD,
-} from "@/lib/public-jobs/messages";
 
 // Representative count, not a claim about how many vacancies actually
 // exist — the real count is exactly what's unknown until
@@ -37,14 +36,14 @@ function MetaRowSkeleton({
 
 /**
  * Route-loading state for /jobs. Renders the static heading/lead for real
- * (imported straight from the same source PublicJobsPage uses) and
+ * (resolved through the same locale catalog PublicJobsPage uses) and
  * skeletons only the genuinely data-driven part of the page: the result
  * count and the vacancy card list.
  *
  * Next.js wraps the whole /jobs page.tsx subtree in a single Suspense
  * boundary — there is no nested Suspense inside PublicJobsPage — so this
- * fallback and the real tree swap atomically, in one shot. PUBLIC_JOBS_
- * HEADING/PUBLIC_JOBS_LEAD never depend on loadPublicVacancies' outcome,
+ * fallback and the real tree swap atomically, in one shot. The heading
+ * and lead never depend on loadPublicVacancies' outcome,
  * so rendering them here (rather than skeletoning or omitting them) means
  * the real h1/lead never pops in above the count/list on swap, and this
  * copy can't drift out of sync with the real page since it's the same
@@ -70,19 +69,21 @@ function MetaRowSkeleton({
  * them, rather than collapsing to 0 under one shared wrapper.
  */
 export default function Loading() {
+  const { t } = useLocale();
+
   return (
     <main className={styles.page}>
-      <h1 className={styles.heading}>{PUBLIC_JOBS_HEADING}</h1>
-      <p className={styles.lead}>{PUBLIC_JOBS_LEAD}</p>
+      <h1 className={styles.heading}>{t("publicJobs.heading")}</h1>
+      <p className={styles.lead}>{t("publicJobs.lead")}</p>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading job count">
+        <SkeletonRegion label={t("publicJobs.loadingCount")}>
           <Skeleton height="1.125rem" width="9rem" radius="sm" />
         </SkeletonRegion>
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading jobs">
+        <SkeletonRegion label={t("publicJobs.loadingJobs")}>
           <ul className={styles.list}>
             {Array.from({ length: JOB_CARD_SKELETON_COUNT }, (_, index) => (
               <li key={index}>

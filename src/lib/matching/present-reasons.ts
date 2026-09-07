@@ -5,6 +5,7 @@ import {
   languageLabel,
   shiftLabel,
 } from "@/lib/matching/labels";
+import type { Locale } from "@/lib/i18n/locale";
 import type { MatchReason } from "@/lib/matching/types";
 
 export const MAX_DISPLAYED_MATCH_REASONS = 4;
@@ -14,70 +15,110 @@ export type PresentedMatchReason = {
   text: string;
 };
 
-export function presentMatchReason(reason: MatchReason): PresentedMatchReason {
+export function presentMatchReason(
+  reason: MatchReason,
+  locale: Locale = "en",
+): PresentedMatchReason {
   switch (reason.code) {
     case "category_match":
       return {
         key: reason.code,
-        text: `Matches your ${jobCategoryLabel(reason.category).toLowerCase()} preference`,
+        text:
+          locale === "de"
+            ? `Passt zu deiner Präferenz: ${jobCategoryLabel(reason.category, locale)}`
+            : `Matches your ${jobCategoryLabel(reason.category).toLowerCase()} preference`,
       };
     case "employment_type_match": {
-      const labels = reason.employmentTypes.map(employmentTypeLabel);
+      const labels = reason.employmentTypes.map((code) =>
+        employmentTypeLabel(code, locale),
+      );
       if (labels.length === 1) {
         return {
           key: reason.code,
-          text: `${labels[0]} work matches your preference`,
+          text:
+            locale === "de"
+              ? `${labels[0]} passt zu deiner Präferenz`
+              : `${labels[0]} work matches your preference`,
         };
       }
       return {
         key: reason.code,
-        text: `${joinLabels(labels)} work matches your preference`,
+        text:
+          locale === "de"
+            ? `${joinLabels(labels, locale)} passen zu deiner Präferenz`
+            : `${joinLabels(labels)} work matches your preference`,
       };
     }
     case "shift_match":
       if (reason.viaFlexible) {
         return {
           key: reason.code,
-          text: "Your flexible shift preference fits",
+          text:
+            locale === "de"
+              ? "Deine flexible Schichtpräferenz passt"
+              : "Your flexible shift preference fits",
         };
       }
       return {
         key: reason.code,
-        text: `${joinLabels(reason.shifts.map(shiftLabel))} shifts fit your preference`,
+        text:
+          locale === "de"
+            ? `${joinLabels(
+                reason.shifts.map((code) => shiftLabel(code, locale)),
+                locale,
+              )} ${reason.shifts.length === 1 ? "passt" : "passen"} zu deiner Schichtpräferenz`
+            : `${joinLabels(reason.shifts.map((code) => shiftLabel(code)))} shifts fit your preference`,
       };
     case "german_requirement_met":
       return {
         key: `${reason.code}:${reason.germanRequirement}`,
-        text: "Your German level meets the requirement",
+        text:
+          locale === "de"
+            ? "Deine Deutschkenntnisse erfüllen die Anforderung"
+            : "Your German level meets the requirement",
       };
     case "additional_languages_met": {
-      const labels = reason.languageCodes.map(languageLabel);
+      const labels = reason.languageCodes.map((code) =>
+        languageLabel(code, locale),
+      );
       if (labels.length === 1) {
         return {
           key: `${reason.code}:${reason.languageCodes[0]}`,
-          text: `Your listed ${labels[0]} meets the requirement`,
+          text:
+            locale === "de"
+              ? `Deine angegebene Sprache ${labels[0]} erfüllt die Anforderung`
+              : `Your listed ${labels[0]} meets the requirement`,
         };
       }
       return {
         key: reason.code,
-        text: "Your listed languages meet the requirement",
+        text:
+          locale === "de"
+            ? "Deine angegebenen Sprachen erfüllen die Anforderung"
+            : "Your listed languages meet the requirement",
       };
     }
     case "availability_match":
       if (reason.kind === "flexible_start") {
         return {
           key: reason.code,
-          text: "Start date fits your availability",
+          text:
+            locale === "de"
+              ? "Der Starttermin passt zu deiner Verfügbarkeit"
+              : "Start date fits your availability",
         };
       }
       return {
         key: reason.code,
-        text: "Start date fits your availability",
+        text:
+          locale === "de"
+            ? "Der Starttermin passt zu deiner Verfügbarkeit"
+            : "Start date fits your availability",
       };
     case "berlin_job":
       return {
         key: reason.code,
-        text: "Based in Berlin",
+        text: locale === "de" ? "In Berlin" : "Based in Berlin",
       };
   }
 }
@@ -85,6 +126,9 @@ export function presentMatchReason(reason: MatchReason): PresentedMatchReason {
 /** Preserve matcher order; display at most four reasons (docs/20). */
 export function presentMatchReasons(
   reasons: readonly MatchReason[],
+  locale: Locale = "en",
 ): PresentedMatchReason[] {
-  return reasons.slice(0, MAX_DISPLAYED_MATCH_REASONS).map(presentMatchReason);
+  return reasons
+    .slice(0, MAX_DISPLAYED_MATCH_REASONS)
+    .map((reason) => presentMatchReason(reason, locale));
 }

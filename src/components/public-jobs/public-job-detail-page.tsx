@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import { ApplicationEntryNotice } from "@/components/public-jobs/application-entry-notice";
 import { PublicFooter } from "@/components/public-shared/public-footer";
 import type {
@@ -16,11 +19,6 @@ import {
   workFrequencyLabel,
   workplaceTypeLabel,
 } from "@/lib/public-jobs/labels";
-import {
-  DEMO_VACANCY_LABEL,
-  PUBLIC_JOBS_LOAD_FAILURE_BODY,
-  PUBLIC_JOBS_LOAD_FAILURE_HEADING,
-} from "@/lib/public-jobs/messages";
 
 import styles from "./public-job-detail.module.scss";
 
@@ -34,6 +32,8 @@ type PublicJobDetailPageProps =
   | { status: "failure" };
 
 export function PublicJobDetailPage(props: PublicJobDetailPageProps) {
+  const { locale, t } = useLocale();
+
   if (props.status !== "ready") {
     return (
       <>
@@ -45,9 +45,9 @@ export function PublicJobDetailPage(props: PublicJobDetailPageProps) {
           </div>
           <section aria-labelledby="public-job-detail-error-heading">
             <h1 id="public-job-detail-error-heading">
-              {PUBLIC_JOBS_LOAD_FAILURE_HEADING}
+              {t("publicJobs.failureHeading")}
             </h1>
-            <p>{PUBLIC_JOBS_LOAD_FAILURE_BODY}</p>
+            <p>{t("publicJobs.failureBody")}</p>
           </section>
         </main>
         <footer className={styles.footer}>
@@ -63,7 +63,7 @@ export function PublicJobDetailPage(props: PublicJobDetailPageProps) {
     vacancy.description !== null
       ? splitDescriptionParagraphs(vacancy.description)
       : [];
-  const closingDate = formatListingDate(vacancy.expiresAt);
+  const closingDate = formatListingDate(vacancy.expiresAt, locale);
 
   return (
     <>
@@ -75,18 +75,18 @@ export function PublicJobDetailPage(props: PublicJobDetailPageProps) {
         </div>
 
         <Link className={styles.backLink} href="/jobs">
-          Back to jobs
+          {t("publicJobs.back")}
         </Link>
 
         <div className={styles.titleRow}>
           <h1 className={styles.heading}>{vacancy.title}</h1>
           {vacancy.source === "seed" ? (
-            <p className={styles.demoLabel}>{DEMO_VACANCY_LABEL}</p>
+            <p className={styles.demoLabel}>{t("publicJobs.demo")}</p>
           ) : null}
         </div>
 
         <p className={styles.company}>
-          {vacancy.employerDisplayName ?? "Berlin employer"}
+          {vacancy.employerDisplayName ?? t("publicJobs.defaultEmployer")}
           {vacancy.companyName !== null ? ` · ${vacancy.companyName}` : ""}
         </p>
 
@@ -95,18 +95,18 @@ export function PublicJobDetailPage(props: PublicJobDetailPageProps) {
           aria-labelledby="public-job-details-heading"
         >
           <h2 className={styles.sectionHeading} id="public-job-details-heading">
-            Job details
+            {t("publicJobs.details")}
           </h2>
           <dl className={styles.meta}>
             <div className={styles.metaRow}>
-              <dt className={styles.metaLabel}>Category</dt>
+              <dt className={styles.metaLabel}>{t("publicJobs.category")}</dt>
               <dd className={styles.metaValue}>
-                {jobCategoryLabel(vacancy.jobCategory)}
+                {jobCategoryLabel(vacancy.jobCategory, locale)}
               </dd>
             </div>
             {vacancy.publicLocality !== null ? (
               <div className={styles.metaRow}>
-                <dt className={styles.metaLabel}>Location</dt>
+                <dt className={styles.metaLabel}>{t("publicJobs.location")}</dt>
                 <dd className={styles.metaValue}>
                   {vacancy.publicLocality}, Berlin
                 </dd>
@@ -114,41 +114,53 @@ export function PublicJobDetailPage(props: PublicJobDetailPageProps) {
             ) : null}
             {vacancy.workplaceType !== null ? (
               <div className={styles.metaRow}>
-                <dt className={styles.metaLabel}>Workplace</dt>
+                <dt className={styles.metaLabel}>
+                  {t("publicJobs.workplace")}
+                </dt>
                 <dd className={styles.metaValue}>
-                  {workplaceTypeLabel(vacancy.workplaceType)}
+                  {workplaceTypeLabel(vacancy.workplaceType, locale)}
                 </dd>
               </div>
             ) : null}
             {vacancy.workFrequency !== null ? (
               <div className={styles.metaRow}>
-                <dt className={styles.metaLabel}>Frequency</dt>
+                <dt className={styles.metaLabel}>
+                  {t("publicJobs.frequency")}
+                </dt>
                 <dd className={styles.metaValue}>
-                  {workFrequencyLabel(vacancy.workFrequency)}
+                  {workFrequencyLabel(vacancy.workFrequency, locale)}
                 </dd>
               </div>
             ) : null}
             {vacancy.cvRequired !== null ? (
               <div className={styles.metaRow}>
-                <dt className={styles.metaLabel}>CV</dt>
+                <dt className={styles.metaLabel}>{t("publicJobs.cv")}</dt>
                 <dd className={styles.metaValue}>
-                  {vacancy.cvRequired ? "CV required" : "CV not required"}
+                  {t(
+                    vacancy.cvRequired
+                      ? "publicJobs.cvRequired"
+                      : "publicJobs.cvNotRequired",
+                  )}
                 </dd>
               </div>
             ) : null}
             {vacancy.interviewEnglishOk !== null ? (
               <div className={styles.metaRow}>
-                <dt className={styles.metaLabel}>Interview</dt>
+                <dt className={styles.metaLabel}>
+                  {t("publicJobs.interview")}
+                </dt>
                 <dd className={styles.metaValue}>
-                  {vacancy.interviewEnglishOk
-                    ? "Interview can be in English"
-                    : "Interview in German"}
+                  {t(
+                    vacancy.interviewEnglishOk
+                      ? "publicJobs.interviewEnglish"
+                      : "publicJobs.interviewGerman",
+                  )}
                 </dd>
               </div>
             ) : null}
             {closingDate !== null ? (
               <div className={styles.metaRow}>
-                <dt className={styles.metaLabel}>Closes</dt>
+                <dt className={styles.metaLabel}>{t("publicJobs.closes")}</dt>
                 <dd className={styles.metaValue}>{closingDate}</dd>
               </div>
             ) : null}
@@ -164,13 +176,13 @@ export function PublicJobDetailPage(props: PublicJobDetailPageProps) {
               className={styles.sectionHeading}
               id="public-job-languages-heading"
             >
-              Additional languages
+              {t("publicJobs.additionalLanguages")}
             </h2>
             <ul className={styles.languageList}>
               {languages.map((language) => (
                 <li key={language.languageCode} className={styles.languageItem}>
-                  {languageLabel(language.languageCode)} —{" "}
-                  {languageProficiencyLabel(language.minProficiency)}
+                  {languageLabel(language.languageCode, locale)} —{" "}
+                  {languageProficiencyLabel(language.minProficiency, locale)}
                 </li>
               ))}
             </ul>
@@ -186,7 +198,7 @@ export function PublicJobDetailPage(props: PublicJobDetailPageProps) {
               className={styles.sectionHeading}
               id="public-job-description-heading"
             >
-              About this job
+              {t("publicJobs.about")}
             </h2>
             {paragraphs.map((paragraph, index) => (
               <p key={index} className={styles.descriptionParagraph}>
@@ -204,8 +216,10 @@ export function PublicJobDetailPage(props: PublicJobDetailPageProps) {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Employer website
-              <span className={styles.srOnly}> (opens in a new tab)</span>
+              {t("publicJobs.employerWebsite")}
+              <span className={styles.srOnly}>
+                {` (${t("publicJobs.newTab")})`}
+              </span>
             </a>
           </p>
         ) : null}

@@ -24,6 +24,21 @@ describe("matching labels", () => {
     );
   });
 
+  it("maps structured labels to German without changing their codes", () => {
+    expect(jobCategoryLabel("food_production", "de")).toBe(
+      "Lebensmittelproduktion",
+    );
+    expect(employmentTypeLabel("mini_job", "de")).toBe("Minijob");
+    expect(shiftLabel("evening", "de")).toBe("Abends");
+    expect(languageLabel("en", "de")).toBe("Englisch");
+    expect(languageProficiencyLabel("conversational", "de")).toBe(
+      "Alltagssicher",
+    );
+    expect(germanRequirementLabel("conversational", "de")).toBe(
+      "Alltagssicheres Deutsch",
+    );
+  });
+
   it("formats ISO calendar dates without timezone shift", () => {
     expect(formatIsoCalendarDate("2026-09-01")).toBe("1 September 2026");
     expect(formatIsoCalendarDate("2026-03-01")).toBe("1 March 2026");
@@ -36,6 +51,15 @@ describe("matching labels", () => {
     );
     expect(joinLabels(["Part time", "Mini-job", "Temporary"])).toBe(
       "Part time, Mini-job, and Temporary",
+    );
+  });
+
+  it("joins German labels without changing list order", () => {
+    expect(joinLabels(["Teilzeit", "Minijob"], "de")).toBe(
+      "Teilzeit und Minijob",
+    );
+    expect(joinLabels(["Morgens", "Abends", "Wochenende"], "de")).toBe(
+      "Morgens, Abends und Wochenende",
     );
   });
 });

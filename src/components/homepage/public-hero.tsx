@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import { presentMatchReasons } from "@/lib/matching/present-reasons";
 import type { MatchReason } from "@/lib/matching/types";
 import {
@@ -10,7 +13,6 @@ import {
   workplaceTypeLabel,
 } from "@/lib/public-jobs/labels";
 
-import { ILLUSTRATIVE_CAPTION } from "./homepage-messages";
 import styles from "./public-hero.module.scss";
 
 /**
@@ -25,31 +27,33 @@ const HERO_MATCH_REASONS: MatchReason[] = [
 ];
 
 export function PublicHero() {
-  const reasons = presentMatchReasons(HERO_MATCH_REASONS);
+  const { locale, t } = useLocale();
+  const reasons = presentMatchReasons(HERO_MATCH_REASONS, locale);
 
   return (
     <section className={styles.hero} aria-labelledby="hero-heading">
       <div className={styles.copy}>
-        <p className={styles.eyebrow}>Berlin · working now</p>
+        <p className={styles.eyebrow}>{t("homepage.hero.eyebrow")}</p>
         <h1 className={styles.heading} id="hero-heading">
-          Jobs that match your situation.{" "}
-          <span className={styles.accent}>In Berlin.</span>
+          {t("homepage.hero.heading")}{" "}
+          <span className={styles.accent}>{t("homepage.hero.accent")}</span>
         </h1>
-        <p className={styles.lead}>
-          Language level, availability and location — checked against what each
-          vacancy needs.
-        </p>
+        <p className={styles.lead}>{t("homepage.hero.lead")}</p>
         <div className={styles.ctas}>
           <Link className={styles.primaryCta} href="/register">
-            I&apos;m a candidate
+            {t("homepage.hero.candidateCta")}
           </Link>
           <Link className={styles.secondaryCta} href="/employer/register">
-            I&apos;m an employer
+            {t("homepage.hero.employerCta")}
           </Link>
         </div>
         <ul className={styles.trustList}>
-          <li className={styles.trustItem}>Verified employers only</li>
-          <li className={styles.trustItem}>Built for Berlin</li>
+          <li className={styles.trustItem}>
+            {t("homepage.hero.verifiedOnly")}
+          </li>
+          <li className={styles.trustItem}>
+            {t("homepage.hero.builtForBerlin")}
+          </li>
         </ul>
       </div>
 
@@ -65,24 +69,31 @@ export function PublicHero() {
             </p>
             <p className={styles.previewCompany}>Hauswerk Berlin · Mitte</p>
           </div>
-          <span className={styles.verifiedBadge}>Verified employer</span>
+          <span className={styles.verifiedBadge}>
+            {t("homepage.hero.verifiedEmployer")}
+          </span>
         </div>
 
         <ul className={styles.previewChips}>
-          <li className={styles.previewChip}>{jobCategoryLabel("cleaning")}</li>
           <li className={styles.previewChip}>
-            {workplaceTypeLabel("private_home")}
+            {jobCategoryLabel("cleaning", locale)}
           </li>
           <li className={styles.previewChip}>
-            {workFrequencyLabel("recurring")}
+            {workplaceTypeLabel("private_home", locale)}
           </li>
           <li className={styles.previewChip}>
-            {languageLabel("de")} — {languageProficiencyLabel("basic")}
+            {workFrequencyLabel("recurring", locale)}
+          </li>
+          <li className={styles.previewChip}>
+            {languageLabel("de", locale)} —{" "}
+            {languageProficiencyLabel("basic", locale)}
           </li>
         </ul>
 
         <div className={styles.previewReasons}>
-          <p className={styles.previewReasonsHeading}>Why this fits you</p>
+          <p className={styles.previewReasonsHeading}>
+            {t("homepage.hero.reasonsHeading")}
+          </p>
           <ul className={styles.reasonsList}>
             {reasons.map((reason) => (
               <li key={reason.key} className={styles.reasonItem}>
@@ -92,10 +103,10 @@ export function PublicHero() {
           </ul>
         </div>
 
-        <p className={styles.previewNote}>
-          Sign in to check your fit and apply.
+        <p className={styles.previewNote}>{t("homepage.hero.signInNote")}</p>
+        <p className={styles.illustrativeCaption}>
+          {t("homepage.illustrative")}
         </p>
-        <p className={styles.illustrativeCaption}>{ILLUSTRATIVE_CAPTION}</p>
       </div>
     </section>
   );

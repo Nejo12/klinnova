@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import { PublicJobDetailPage } from "@/components/public-jobs/public-job-detail-page";
+import { LocaleProvider } from "@/components/i18n/locale-provider";
 import type { PublicVacancy } from "@/lib/public-jobs/domain";
 
 const baseVacancy: PublicVacancy = {
@@ -22,6 +23,11 @@ const baseVacancy: PublicVacancy = {
 };
 
 describe("PublicJobDetailPage", () => {
+  beforeEach(() => {
+    document.documentElement.dataset.locale = "en";
+    document.documentElement.lang = "en";
+  });
+
   it("renders title, employer, category, and description paragraphs", () => {
     render(
       <PublicJobDetailPage
@@ -160,5 +166,40 @@ describe("PublicJobDetailPage", () => {
       screen.getByRole("heading", { name: "Jobs are unavailable" }),
     ).toBeInTheDocument();
     expect(screen.queryByText("Evening cleaner")).not.toBeInTheDocument();
+  });
+
+  it("localizes interface presentation without translating vacancy content", () => {
+    document.documentElement.dataset.locale = "de";
+    document.documentElement.lang = "de";
+    render(
+      <LocaleProvider>
+        <PublicJobDetailPage
+          status="ready"
+          vacancy={baseVacancy}
+          languages={[{ languageCode: "en", minProficiency: "basic" }]}
+          authenticated={false}
+        />
+      </LocaleProvider>,
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Evening cleaner", level: 1 }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Line one.")).toBeInTheDocument();
+    expect(screen.getByText("Reinigung")).toBeInTheDocument();
+    expect(screen.getByText("Privathaushalt")).toBeInTheDocument();
+    expect(screen.getByText("Wiederkehrend")).toBeInTheDocument();
+    expect(screen.getByText("Englisch — Grundkenntnisse")).toBeInTheDocument();
+    expect(
+      screen.getByText("Kein Lebenslauf erforderlich"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Das Vorstellungsgespräch kann auf Englisch geführt werden",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /Website des Arbeitgebers/ }),
+    ).toBeInTheDocument();
   });
 });

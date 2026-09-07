@@ -1,6 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
-import { APPLICATION_ENTRY_NOTICE } from "@/lib/public-jobs/messages";
+import { useLocale } from "@/components/i18n/locale-provider";
 
 import styles from "./public-job-detail.module.scss";
 
@@ -18,6 +20,7 @@ export function ApplicationEntryNotice({
   vacancyId,
   authenticated,
 }: ApplicationEntryNoticeProps) {
+  const { t } = useLocale();
   const href = authenticated
     ? "/candidate"
     : `/login?next=${encodeURIComponent(`/jobs/${vacancyId}`)}`;
@@ -28,11 +31,11 @@ export function ApplicationEntryNotice({
       aria-labelledby="application-entry-heading"
     >
       <h2 className={styles.sectionHeading} id="application-entry-heading">
-        Apply
+        {t("publicJobs.apply")}
       </h2>
-      <p>{APPLICATION_ENTRY_NOTICE}</p>
+      <p>{t("publicJobs.applyNotice")}</p>
       <Link className={styles.cta} href={href}>
-        {authenticated ? "Go to your candidate account" : "Sign in"}
+        {t(authenticated ? "publicJobs.candidateAccount" : "publicJobs.signIn")}
       </Link>
     </section>
   );

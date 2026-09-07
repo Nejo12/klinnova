@@ -1,3 +1,6 @@
+"use client";
+
+import { useLocale } from "@/components/i18n/locale-provider";
 import {
   jobCategoryLabel,
   workFrequencyLabel,
@@ -20,33 +23,35 @@ type VacancyFactChipsProps = {
  * rendered inline.
  */
 export function VacancyFactChips({ vacancy }: VacancyFactChipsProps) {
+  const { locale, t } = useLocale();
+
   return (
     <dl className={styles.meta}>
       <div className={styles.metaRow}>
-        <dt className={styles.metaLabel}>Category</dt>
+        <dt className={styles.metaLabel}>{t("publicJobs.category")}</dt>
         <dd className={styles.metaValue}>
-          {jobCategoryLabel(vacancy.jobCategory)}
+          {jobCategoryLabel(vacancy.jobCategory, locale)}
         </dd>
       </div>
       {vacancy.publicLocality !== null ? (
         <div className={styles.metaRow}>
-          <dt className={styles.metaLabel}>Location</dt>
+          <dt className={styles.metaLabel}>{t("publicJobs.location")}</dt>
           <dd className={styles.metaValue}>{vacancy.publicLocality}, Berlin</dd>
         </div>
       ) : null}
       {vacancy.workplaceType !== null ? (
         <div className={styles.metaRow}>
-          <dt className={styles.metaLabel}>Workplace</dt>
+          <dt className={styles.metaLabel}>{t("publicJobs.workplace")}</dt>
           <dd className={styles.metaValue}>
-            {workplaceTypeLabel(vacancy.workplaceType)}
+            {workplaceTypeLabel(vacancy.workplaceType, locale)}
           </dd>
         </div>
       ) : null}
       {vacancy.workFrequency !== null ? (
         <div className={styles.metaRow}>
-          <dt className={styles.metaLabel}>Frequency</dt>
+          <dt className={styles.metaLabel}>{t("publicJobs.frequency")}</dt>
           <dd className={styles.metaValue}>
-            {workFrequencyLabel(vacancy.workFrequency)}
+            {workFrequencyLabel(vacancy.workFrequency, locale)}
           </dd>
         </div>
       ) : null}

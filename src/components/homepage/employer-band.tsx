@@ -1,19 +1,21 @@
+"use client";
+
 import Link from "next/link";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import {
   applicationStatusLabel,
   type ApplicationStatus,
 } from "@/lib/applications/status";
 
-import { ILLUSTRATIVE_CAPTION } from "./homepage-messages";
 import styles from "./employer-band.module.scss";
 
-const WORKFLOW_STEPS = [
-  applicationStatusLabel("submitted"),
-  applicationStatusLabel("reviewing"),
-  applicationStatusLabel("shortlisted"),
-  applicationStatusLabel("accepted"),
-  applicationStatusLabel("rejected"),
+const WORKFLOW_STATUSES: ApplicationStatus[] = [
+  "submitted",
+  "reviewing",
+  "shortlisted",
+  "accepted",
+  "rejected",
 ];
 
 type SampleApplicant = {
@@ -46,6 +48,8 @@ const SAMPLE_APPLICANTS: SampleApplicant[] = [
 ];
 
 export function EmployerBand() {
+  const { locale, t } = useLocale();
+
   return (
     <section
       className={styles.section}
@@ -54,38 +58,42 @@ export function EmployerBand() {
     >
       <div className={styles.inner}>
         <div className={styles.copy}>
-          <p className={styles.eyebrow}>For employers</p>
+          <p className={styles.eyebrow}>{t("homepage.employer.eyebrow")}</p>
           <h2 className={styles.heading} id="employer-band-heading">
-            Reach people who can start
+            {t("homepage.employer.heading")}
           </h2>
           <ul className={styles.benefits}>
-            <li>Post what the role actually needs</li>
-            <li>Every application in one place</li>
-            <li>Shortlist and decide faster</li>
+            <li>{t("homepage.employer.benefitRequirements")}</li>
+            <li>{t("homepage.employer.benefitApplications")}</li>
+            <li>{t("homepage.employer.benefitDecide")}</li>
           </ul>
           <Link className={styles.cta} href="/employer/register">
-            Create an employer account
+            {t("homepage.employer.cta")}
           </Link>
         </div>
 
         <div className={styles.panel}>
           <ol
             className={styles.workflowStrip}
-            aria-label="Application workflow"
+            aria-label={t("homepage.employer.workflow")}
           >
-            {WORKFLOW_STEPS.map((label, index) => (
-              <li key={label} className={styles.workflowStep}>
+            {WORKFLOW_STATUSES.map((status, index) => (
+              <li key={status} className={styles.workflowStep}>
                 {index > 0 ? (
                   <span className={styles.workflowArrow} aria-hidden="true">
                     →
                   </span>
                 ) : null}
-                <span className={styles.workflowChip}>{label}</span>
+                <span className={styles.workflowChip}>
+                  {applicationStatusLabel(status, locale)}
+                </span>
               </li>
             ))}
           </ol>
 
-          <p className={styles.panelTitle}>Applications</p>
+          <p className={styles.panelTitle}>
+            {t("homepage.employer.applications")}
+          </p>
           <ul className={styles.applicantList}>
             {SAMPLE_APPLICANTS.map((applicant) => (
               <li key={applicant.name} className={styles.applicantRow}>
@@ -95,12 +103,14 @@ export function EmployerBand() {
                 <span className={styles.applicantName}>{applicant.name}</span>
                 <span className={styles.applicantRole}>{applicant.role}</span>
                 <span className={styles.applicantStatus}>
-                  {applicationStatusLabel(applicant.status)}
+                  {applicationStatusLabel(applicant.status, locale)}
                 </span>
               </li>
             ))}
           </ul>
-          <p className={styles.illustrativeCaption}>{ILLUSTRATIVE_CAPTION}</p>
+          <p className={styles.illustrativeCaption}>
+            {t("homepage.illustrative")}
+          </p>
         </div>
       </div>
     </section>

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import type { Locale } from "@/lib/i18n/locale";
+
 /**
  * Matches `applications_status_chk` in
  * supabase/migrations/20260806140000_application_status_and_review_contract.sql.
@@ -28,8 +30,21 @@ const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
   rejected: "Rejected",
 };
 
-export function applicationStatusLabel(status: ApplicationStatus): string {
-  return APPLICATION_STATUS_LABELS[status];
+const APPLICATION_STATUS_LABELS_DE: Record<ApplicationStatus, string> = {
+  submitted: "Eingereicht",
+  reviewing: "In Prüfung",
+  shortlisted: "In engerer Auswahl",
+  accepted: "Angenommen",
+  rejected: "Abgelehnt",
+};
+
+export function applicationStatusLabel(
+  status: ApplicationStatus,
+  locale: Locale = "en",
+): string {
+  return locale === "de"
+    ? APPLICATION_STATUS_LABELS_DE[status]
+    : APPLICATION_STATUS_LABELS[status];
 }
 
 export function isApplicationStatus(value: string): value is ApplicationStatus {

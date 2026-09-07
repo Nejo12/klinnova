@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import { PublicJobCard } from "@/components/public-jobs/public-job-card";
 import type { LoadPublicVacanciesResult } from "@/lib/public-jobs/load-public-vacancies";
 
@@ -12,16 +15,17 @@ type OpenJobsPreviewProps = {
 };
 
 export function OpenJobsPreview({ result }: OpenJobsPreviewProps) {
+  const { t } = useLocale();
   const items = result.ok ? result.vacancies.slice(0, PREVIEW_COUNT) : [];
 
   return (
     <section className={styles.section} aria-labelledby="open-jobs-heading">
       <div className={styles.header}>
         <h2 className={styles.heading} id="open-jobs-heading">
-          Open in Berlin right now
+          {t("homepage.jobs.heading")}
         </h2>
         <Link className={styles.seeAllLink} href="/jobs">
-          See all jobs
+          {t("homepage.jobs.seeAll")}
         </Link>
       </div>
 
@@ -35,9 +39,7 @@ export function OpenJobsPreview({ result }: OpenJobsPreviewProps) {
         </ul>
       ) : (
         <p className={styles.fallback}>
-          {result.ok
-            ? "No vacancies are open right now — check back soon."
-            : "Jobs are temporarily unavailable."}
+          {t(result.ok ? "homepage.jobs.empty" : "homepage.jobs.failure")}
         </p>
       )}
     </section>

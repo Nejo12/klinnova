@@ -1,12 +1,13 @@
+"use client";
+
 import Link from "next/link";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import styles from "@/components/public-jobs/public-job-detail.module.scss";
-import {
-  PUBLIC_JOB_NOT_FOUND_BODY,
-  PUBLIC_JOB_NOT_FOUND_HEADING,
-} from "@/lib/public-jobs/messages";
 
 export function PublicJobsNotFound() {
+  const { t } = useLocale();
+
   return (
     <main className={styles.page}>
       <div className={styles.header}>
@@ -16,11 +17,11 @@ export function PublicJobsNotFound() {
       </div>
       <section aria-labelledby="public-job-not-found-heading">
         <h1 id="public-job-not-found-heading">
-          {PUBLIC_JOB_NOT_FOUND_HEADING}
+          {t("publicJobs.notFoundHeading")}
         </h1>
-        <p>{PUBLIC_JOB_NOT_FOUND_BODY}</p>
+        <p>{t("publicJobs.notFoundBody")}</p>
         <Link className={styles.cta} href="/jobs">
-          Browse open jobs
+          {t("publicJobs.browse")}
         </Link>
       </section>
     </main>

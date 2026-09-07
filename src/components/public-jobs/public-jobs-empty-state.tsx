@@ -1,20 +1,21 @@
-import {
-  PUBLIC_JOBS_EMPTY_BODY,
-  PUBLIC_JOBS_EMPTY_HEADING,
-} from "@/lib/public-jobs/messages";
+"use client";
+
+import { useLocale } from "@/components/i18n/locale-provider";
 
 import styles from "./public-jobs.module.scss";
 
 export function PublicJobsEmptyState() {
+  const { t } = useLocale();
+
   return (
     <section
       className={styles.empty}
       aria-labelledby="public-jobs-empty-heading"
     >
       <h2 className={styles.emptyHeading} id="public-jobs-empty-heading">
-        {PUBLIC_JOBS_EMPTY_HEADING}
+        {t("publicJobs.emptyHeading")}
       </h2>
-      <p className={styles.emptyBody}>{PUBLIC_JOBS_EMPTY_BODY}</p>
+      <p className={styles.emptyBody}>{t("publicJobs.emptyBody")}</p>
     </section>
   );
 }
