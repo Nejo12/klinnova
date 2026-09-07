@@ -68,6 +68,14 @@ describe("CandidateAccountPage (M5.1 Unit B)", () => {
     );
   });
 
+  it("does not render a duplicate appearance preferences section", async () => {
+    render(await CandidateAccountPage());
+
+    expect(
+      screen.queryByRole("region", { name: "Appearance settings" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("shows the capability switcher for a dual-capability account", async () => {
     loadAccountCapabilities.mockResolvedValue({
       hasCandidateProfile: true,
