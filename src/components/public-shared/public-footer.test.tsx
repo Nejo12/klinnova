@@ -7,6 +7,13 @@ describe("PublicFooter", () => {
   it("renders a labelled legal nav with links to all three placeholder pages", () => {
     render(<PublicFooter />);
 
+    expect(
+      screen.queryByRole("group", { name: "Interface language" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("group", { name: "Appearance" }),
+    ).not.toBeInTheDocument();
+
     const nav = screen.getByRole("navigation", { name: "Legal" });
     expect(nav).toBeInTheDocument();
 
