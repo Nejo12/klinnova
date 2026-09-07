@@ -134,7 +134,7 @@ test.describe("password recovery journey (M5.1 Unit C)", () => {
     // Log out so the recovery flow is proven from a signed-out state, per
     // the required journey.
     await page.goto("/candidate/account");
-    await page.getByRole("button", { name: "Log out" }).click();
+    await page.getByRole("button", { name: "Log out", exact: true }).click();
     await expect(page).toHaveURL(/\/$/);
 
     // Open Forgot password from login.
