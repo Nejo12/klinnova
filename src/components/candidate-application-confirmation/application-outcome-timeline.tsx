@@ -1,3 +1,7 @@
+"use client";
+
+import { useLocale } from "@/components/i18n/locale-provider";
+
 import { outcomeTypeLabel } from "@/lib/applications/outcome-type";
 import type { CandidateApplicationOutcomeEntry } from "@/lib/applications/load-candidate-application-outcomes";
 import { formatSubmittedAtUtc } from "@/lib/applications/application-confirmation";
@@ -25,24 +29,28 @@ type ApplicationOutcomeTimelineProps = {
 export function ApplicationOutcomeTimeline({
   outcomes,
 }: ApplicationOutcomeTimelineProps) {
+  const { locale, t } = useLocale();
   return (
     <section
       className={styles.section}
       aria-labelledby="confirmation-outcome-heading"
     >
       <h2 className={styles.sectionHeading} id="confirmation-outcome-heading">
-        Interview and hire updates
+        {t("candidate.applications.outcomeTimeline")}
       </h2>
       <ul className={styles.timeline}>
         {outcomes.map((entry, index) => {
-          const occurredAtLabel = formatSubmittedAtUtc(entry.occurred_at);
+          const occurredAtLabel = formatSubmittedAtUtc(
+            entry.occurred_at,
+            locale,
+          );
           return (
             <li
               key={`${entry.outcome_type}-${entry.occurred_at}-${index}`}
               className={styles.timelineItem}
             >
               <p className={styles.timelineStatus}>
-                {outcomeTypeLabel(entry.outcome_type)}
+                {outcomeTypeLabel(entry.outcome_type, locale)}
               </p>
               <time
                 className={styles.timelineTime}

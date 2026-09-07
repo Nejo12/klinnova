@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { ApplicationConfirmationPage } from "@/components/candidate-application-confirmation/application-confirmation-page";
+import { LocaleProvider } from "@/components/i18n/locale-provider";
 import {
   APPLICATION_CONFIRMATION_BODY,
   APPLICATION_CONFIRMATION_HEADING,
@@ -48,6 +49,55 @@ const history = [
 ];
 
 describe("ApplicationConfirmationPage", () => {
+  it("localizes receipt chrome and structured snapshot values while preserving authored text", () => {
+    document.documentElement.dataset.locale = "de";
+    document.documentElement.lang = "de";
+    const localizedConfirmation: ApplicationConfirmation = {
+      ...confirmation,
+      vacancyJobCategory: "hospitality",
+      vacancyEmploymentTypes: ["part_time"],
+      vacancyShiftRequirements: ["morning"],
+      vacancyGermanRequirement: "basic",
+      vacancyAvailableFrom: null,
+      candidateMatchedCategory: "hospitality",
+      candidateGermanComfort: "basic",
+      candidateWorkAuthorisation: true,
+      candidateAvailableFrom: "2026-08-04",
+      candidateEmploymentPreferences: ["part_time"],
+      candidateShiftPreferences: ["morning"],
+    };
+
+    render(
+      <LocaleProvider>
+        <ApplicationConfirmationPage
+          status="ready"
+          showEmployerNav={false}
+          confirmation={localizedConfirmation}
+          history={history}
+          outcomes={[]}
+        />
+      </LocaleProvider>,
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Du bist einen Schritt weiter." }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("Eingereicht").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Gastronomie").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Teilzeit").length).toBeGreaterThan(0);
+    expect(
+      screen.getByText(confirmation.introductionText ?? ""),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByText(confirmation.vacancyTitle).length,
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(confirmation.employerDisplayName).length,
+    ).toBeGreaterThan(0);
+
+    document.documentElement.dataset.locale = "en";
+    document.documentElement.lang = "en";
+  });
   it("renders factual confirmation content without the application UUID", () => {
     render(
       <ApplicationConfirmationPage

@@ -7,13 +7,11 @@ import { EmploymentGroupForm } from "@/components/onboarding/employment-group-fo
 import { LanguagesGroupForm } from "@/components/onboarding/languages-group-form";
 import { LocationGroupForm } from "@/components/onboarding/location-group-form";
 import { OnboardingProgressNav } from "@/components/onboarding/onboarding-progress";
+import { OnboardingGroupIntro } from "@/components/onboarding/onboarding-group-intro";
 import { OnboardingReview } from "@/components/onboarding/onboarding-review";
 import { WorkAuthorisationGroupForm } from "@/components/onboarding/work-authorisation-group-form";
 import styles from "@/components/onboarding/onboarding.module.scss";
-import {
-  ONBOARDING_GROUP_LABELS,
-  type OnboardingGroupId,
-} from "@/lib/onboarding/allow-lists";
+import { type OnboardingGroupId } from "@/lib/onboarding/allow-lists";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadCandidateOnboarding } from "@/lib/onboarding/load-candidate";
 import { onboardingGroupHref } from "@/lib/onboarding/navigation";
@@ -80,11 +78,7 @@ export default async function CandidateOnboardingPage({
         />
       ) : (
         <>
-          <h1 className={styles.heading}>{ONBOARDING_GROUP_LABELS[current]}</h1>
-          <p className={styles.lead}>
-            Progress is saved when you continue. You can go back or reload
-            without losing what you already saved.
-          </p>
+          <OnboardingGroupIntro group={current} />
           {current === "languages" ? (
             <LanguagesGroupForm
               germanComfort={profile.germanComfort}

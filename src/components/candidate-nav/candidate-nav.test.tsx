@@ -2,8 +2,34 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { CandidateNav } from "@/components/candidate-nav/candidate-nav";
+import { LocaleProvider } from "@/components/i18n/locale-provider";
 
 describe("CandidateNav (M5.1 Unit B)", () => {
+  it("renders the Candidate navigation in German without changing routes", () => {
+    document.documentElement.dataset.locale = "de";
+    document.documentElement.lang = "de";
+
+    render(
+      <LocaleProvider>
+        <CandidateNav current="matches" />
+      </LocaleProvider>,
+    );
+
+    expect(
+      screen.getByRole("navigation", { name: "Bewerbendenbereich" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Passende Jobs" })).toHaveAttribute(
+      "href",
+      "/candidate/matches",
+    );
+    expect(screen.getByRole("link", { name: "Bewerbungen" })).toHaveAttribute(
+      "href",
+      "/candidate/applications",
+    );
+
+    document.documentElement.dataset.locale = "en";
+    document.documentElement.lang = "en";
+  });
   it("renders all four destinations with the correct hrefs", () => {
     render(<CandidateNav />);
 

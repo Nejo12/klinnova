@@ -17,13 +17,18 @@ import {
   EMPLOYMENT_TYPE_CODES,
   SHIFT_PREFERENCE_CODES,
   type EmploymentTypeCode,
+  type GermanComfortCode,
+  type JobCategoryCode,
+  type LanguageCode,
+  type LanguageProficiencyCode,
   type ShiftPreferenceCode,
 } from "@/lib/onboarding/allow-lists";
 
 export type ApplicationPreviewLanguage = {
-  languageCode: string;
+  languageCode: LanguageCode;
   languageLabel: string;
   proficiencyLabel: string;
+  proficiency?: LanguageProficiencyCode;
 };
 
 /**
@@ -36,14 +41,20 @@ export type ApplicationPreview = {
   employerDisplayName: string;
   candidateDisplayName: string;
   matchedJobCategoryLabel: string;
+  matchedJobCategory?: JobCategoryCode;
   germanComfortLabel: string;
+  germanComfort?: GermanComfortCode;
   relevantLanguages: ApplicationPreviewLanguage[];
   /** Set when the vacancy has no additional language requirements. */
   noAdditionalLanguagesLabel: string | null;
   workAuthorisationDeclaredLabel: string;
+  workAuthorisationDeclared?: boolean | null;
   availableFromLabel: string | null;
+  availableFrom?: string | null;
   employmentPreferencesLabel: string;
+  employmentPreferences?: EmploymentTypeCode[];
   shiftPreferencesLabel: string;
+  shiftPreferences?: ShiftPreferenceCode[];
 };
 
 export type BuildApplicationPreviewInput = {
@@ -96,6 +107,7 @@ export function buildApplicationPreview(
             languageCode: language.languageCode,
             languageLabel: languageLabel(language.languageCode),
             proficiencyLabel: languageProficiencyLabel(language.proficiency),
+            proficiency: language.proficiency,
           }));
 
   const employmentOrdered = orderByAllowList(
@@ -116,20 +128,26 @@ export function buildApplicationPreview(
     employerDisplayName: vacancy.company.name,
     candidateDisplayName: displayName,
     matchedJobCategoryLabel: jobCategoryLabel(vacancy.jobCategory),
+    matchedJobCategory: vacancy.jobCategory,
     germanComfortLabel: germanComfortLabel(candidate.germanComfort),
+    germanComfort: candidate.germanComfort,
     relevantLanguages,
     noAdditionalLanguagesLabel:
       vacancy.languageRequirements.length === 0
         ? NO_ADDITIONAL_LANGUAGE_REQUIREMENTS
         : null,
     workAuthorisationDeclaredLabel,
+    workAuthorisationDeclared,
     availableFromLabel:
       candidate.availableFrom.length > 0
         ? formatIsoCalendarDate(candidate.availableFrom)
         : null,
+    availableFrom: candidate.availableFrom || null,
     employmentPreferencesLabel: joinLabels(
       employmentOrdered.map(employmentTypeLabel),
     ),
+    employmentPreferences: employmentOrdered,
     shiftPreferencesLabel: joinLabels(shiftOrdered.map(shiftLabel)),
+    shiftPreferences: shiftOrdered,
   };
 }

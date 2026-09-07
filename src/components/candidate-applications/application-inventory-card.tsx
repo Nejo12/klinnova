@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import { ApplicationStatusRail } from "@/components/candidate-applications/application-status-rail";
 import styles from "@/components/candidate-applications/candidate-applications.module.scss";
 import { formatSubmittedAtUtc } from "@/lib/applications/application-confirmation";
@@ -23,9 +26,13 @@ export function ApplicationInventoryCard({
   emphasis = "default",
   headingLevel = "h2",
 }: ApplicationInventoryCardProps) {
+  const { locale, t } = useLocale();
   const titleId = `application-title-${application.id}`;
-  const submittedAtLabel = formatSubmittedAtUtc(application.submitted_at);
-  const statusLabel = candidateStatusDisplayLabel(application.status);
+  const submittedAtLabel = formatSubmittedAtUtc(
+    application.submitted_at,
+    locale,
+  );
+  const statusLabel = candidateStatusDisplayLabel(application.status, locale);
   const cardClassName =
     emphasis === "reduced"
       ? `${styles.card} ${styles.cardReducedEmphasis}`
@@ -56,13 +63,17 @@ export function ApplicationInventoryCard({
 
       <dl className={styles.meta}>
         <div className={styles.metaRow}>
-          <dt className={styles.metaLabel}>Location</dt>
+          <dt className={styles.metaLabel}>
+            {t("candidate.applications.location")}
+          </dt>
           <dd className={styles.metaValue}>
             {application.vacancy_snapshot.city}
           </dd>
         </div>
         <div className={styles.metaRow}>
-          <dt className={styles.metaLabel}>Submitted</dt>
+          <dt className={styles.metaLabel}>
+            {t("candidate.applications.submitted")}
+          </dt>
           <dd className={styles.metaValue}>
             {submittedAtLabel !== null ? (
               <time dateTime={application.submitted_at}>
@@ -79,9 +90,9 @@ export function ApplicationInventoryCard({
         <Link
           className={styles.detailLink}
           href={`/candidate/applications/${application.id}`}
-          aria-label={`View application: ${application.vacancy_snapshot.title}`}
+          aria-label={`${t("candidate.matches.viewApplication")}: ${application.vacancy_snapshot.title}`}
         >
-          View application
+          {t("candidate.matches.viewApplication")}
         </Link>
       </div>
     </article>

@@ -1,19 +1,32 @@
+"use client";
+
 import Link from "next/link";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import { ApplicationIntroductionDisplay } from "@/components/application-introduction/application-introduction-display";
 
 import {
-  APPLICATION_CONFIRMATION_BODY,
-  APPLICATION_CONFIRMATION_HEADING,
-  APPLICATION_CONFIRMATION_MARKER,
+  formatSubmittedAtUtc,
   type ApplicationConfirmation,
 } from "@/lib/applications/application-confirmation";
+import { candidateStatusDisplayLabel } from "@/lib/applications/candidate-status-labels";
+import {
+  employmentTypeLabel,
+  formatIsoCalendarDate,
+  germanComfortLabel,
+  germanRequirementLabel,
+  jobCategoryLabel,
+  joinLabels,
+  languageLabel,
+  languageProficiencyLabel,
+  shiftLabel,
+} from "@/lib/matching/labels";
 import type { CandidateApplicationHistoryEntry } from "@/lib/applications/load-candidate-application-history";
 import type { CandidateApplicationOutcomeEntry } from "@/lib/applications/load-candidate-application-outcomes";
 import { ApplicationOutcomeTimeline } from "@/components/candidate-application-confirmation/application-outcome-timeline";
 import { ApplicationStatusTimeline } from "@/components/candidate-application-confirmation/application-status-timeline";
 import { CandidateApplicationsPageHeader } from "@/components/candidate-applications/candidate-applications-page-header";
-import { WORK_AUTHORISATION_NOTICE } from "@/components/candidate-matches/work-authorisation-notice";
+import { WorkAuthorisationNotice } from "@/components/candidate-matches/work-authorisation-notice";
 
 import styles from "./application-confirmation.module.scss";
 
@@ -31,6 +44,7 @@ type ApplicationConfirmationPageProps = { showEmployerNav: boolean } & (
 export function ApplicationConfirmationPage(
   props: ApplicationConfirmationPageProps,
 ) {
+  const { locale, t } = useLocale();
   if (props.status !== "ready") {
     return (
       <main className={styles.page}>
@@ -42,14 +56,13 @@ export function ApplicationConfirmationPage(
           aria-labelledby="unavailable-heading"
         >
           <h1 className={styles.unavailableHeading} id="unavailable-heading">
-            Application not available
+            {t("candidate.applications.notAvailableHeading")}
           </h1>
           <p className={styles.unavailableBody}>
-            This application could not be shown. It may not exist or you may not
-            have access.
+            {t("candidate.applications.notAvailableBody")}
           </p>
           <Link className={styles.cta} href="/candidate/matches">
-            Back to matches
+            {t("candidate.applications.backMatches")}
           </Link>
         </section>
       </main>
@@ -57,6 +70,75 @@ export function ApplicationConfirmationPage(
   }
 
   const { confirmation, history, outcomes } = props;
+  const statusLabel = candidateStatusDisplayLabel(confirmation.status, locale);
+  const submittedAtLabel =
+    formatSubmittedAtUtc(confirmation.submittedAtIso, locale) ??
+    confirmation.submittedAtLabel;
+  const vacancyCategoryLabel = confirmation.vacancyJobCategory
+    ? jobCategoryLabel(confirmation.vacancyJobCategory, locale)
+    : confirmation.vacancyJobCategoryLabel;
+  const vacancyEmploymentLabel = confirmation.vacancyEmploymentTypes
+    ? joinLabels(
+        confirmation.vacancyEmploymentTypes.map((code) =>
+          employmentTypeLabel(code, locale),
+        ),
+        locale,
+      )
+    : confirmation.vacancyEmploymentTypesLabel;
+  const vacancyShiftsLabel = confirmation.vacancyShiftRequirements
+    ? joinLabels(
+        confirmation.vacancyShiftRequirements.map((code) =>
+          shiftLabel(code, locale),
+        ),
+        locale,
+      )
+    : confirmation.vacancyShiftRequirementsLabel;
+  const vacancyGermanLabel = confirmation.vacancyGermanRequirement
+    ? germanRequirementLabel(confirmation.vacancyGermanRequirement, locale)
+    : confirmation.vacancyGermanRequirementLabel;
+  const vacancyAvailableLabel =
+    confirmation.vacancyAvailableFrom === undefined
+      ? confirmation.vacancyAvailableFromLabel
+      : confirmation.vacancyAvailableFrom === null
+        ? t("candidate.applications.flexibleStart")
+        : `${t("candidate.applications.from")} ${formatIsoCalendarDate(
+            confirmation.vacancyAvailableFrom,
+            locale,
+          )}`;
+  const candidateCategoryLabel = confirmation.candidateMatchedCategory
+    ? jobCategoryLabel(confirmation.candidateMatchedCategory, locale)
+    : confirmation.candidateMatchedCategoryLabel;
+  const candidateGermanLabel = confirmation.candidateGermanComfort
+    ? germanComfortLabel(confirmation.candidateGermanComfort, locale)
+    : confirmation.candidateGermanComfortLabel;
+  const candidateAuthorisationLabel =
+    confirmation.candidateWorkAuthorisation === undefined
+      ? confirmation.candidateWorkAuthorisationLabel
+      : confirmation.candidateWorkAuthorisation
+        ? t("candidate.onboarding.yes")
+        : t("candidate.onboarding.notSure");
+  const candidateAvailableLabel =
+    confirmation.candidateAvailableFrom === undefined
+      ? confirmation.candidateAvailableFromLabel
+      : confirmation.candidateAvailableFrom === null
+        ? null
+        : formatIsoCalendarDate(confirmation.candidateAvailableFrom, locale);
+  const candidateEmploymentLabel = confirmation.candidateEmploymentPreferences
+    ? joinLabels(
+        confirmation.candidateEmploymentPreferences.map((code) =>
+          employmentTypeLabel(code, locale),
+        ),
+        locale,
+      )
+    : confirmation.candidateEmploymentPreferencesLabel;
+  const candidateShiftsLabel = confirmation.candidateShiftPreferences
+    ? joinLabels(
+        confirmation.candidateShiftPreferences.map((code) =>
+          shiftLabel(code, locale),
+        ),
+        locale,
+      )
+    : confirmation.candidateShiftPreferencesLabel;
   const vacancyLanguagesHeadingId = "confirmation-vacancy-languages";
   const candidateLanguagesHeadingId = "confirmation-candidate-languages";
 
@@ -67,37 +149,47 @@ export function ApplicationConfirmationPage(
       />
 
       <section className={styles.hero} aria-labelledby="confirmation-heading">
-        <p className={styles.eyebrow}>{APPLICATION_CONFIRMATION_MARKER}</p>
+        <p className={styles.eyebrow}>
+          {t("candidate.applications.receiptMarker")}
+        </p>
         <div className={styles.titleRow}>
           <h1 className={styles.heading} id="confirmation-heading">
-            {APPLICATION_CONFIRMATION_HEADING}
+            {t("candidate.applications.receiptHeading")}
           </h1>
           {confirmation.demoLabel !== null ? (
-            <p className={styles.demoLabel}>{confirmation.demoLabel}</p>
+            <p className={styles.demoLabel}>{t("publicJobs.demo")}</p>
           ) : null}
         </div>
         <p className={styles.lead}>
-          Your application for {confirmation.vacancyTitle} is now with{" "}
+          {locale === "de" ? "Deine Bewerbung für " : "Your application for "}
+          {confirmation.vacancyTitle}
+          {locale === "de" ? " ist jetzt bei " : " is now with "}
           {confirmation.employerDisplayName}.
         </p>
       </section>
 
       <section className={styles.statusPanel} aria-labelledby="status-heading">
         <h2 className={styles.statusHeading} id="status-heading">
-          Current status
+          {t("candidate.applications.currentStatus")}
         </h2>
-        <p className={styles.statusValue}>{confirmation.statusLabel}</p>
-        <p className={styles.support}>{APPLICATION_CONFIRMATION_BODY}</p>
+        <p className={styles.statusValue}>{statusLabel}</p>
+        <p className={styles.support}>
+          {t("candidate.applications.receiptBody")}
+        </p>
         <dl className={styles.meta}>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Status</dt>
-            <dd className={styles.metaValue}>{confirmation.statusLabel}</dd>
+            <dt className={styles.metaLabel}>
+              {t("candidate.applications.status")}
+            </dt>
+            <dd className={styles.metaValue}>{statusLabel}</dd>
           </div>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Submitted</dt>
+            <dt className={styles.metaLabel}>
+              {t("candidate.applications.submitted")}
+            </dt>
             <dd className={styles.metaValue}>
               <time dateTime={confirmation.submittedAtIso}>
-                {confirmation.submittedAtLabel}
+                {submittedAtLabel}
               </time>
             </dd>
           </div>
@@ -113,12 +205,10 @@ export function ApplicationConfirmationPage(
             className={styles.acceptedBannerHeading}
             id="accepted-banner-heading"
           >
-            Application accepted
+            {t("candidate.applications.acceptedHeading")}
           </h2>
           <p className={styles.acceptedBannerBody}>
-            This application has been accepted. Accepted is a status on this
-            application only — it is separate from being hired, employment
-            starting, or a contract being signed.
+            {t("candidate.applications.acceptedBody")}
           </p>
         </section>
       ) : null}
@@ -133,61 +223,63 @@ export function ApplicationConfirmationPage(
         aria-labelledby="confirmation-vacancy-heading"
       >
         <h2 className={styles.sectionHeading} id="confirmation-vacancy-heading">
-          Job details
+          {t("candidate.applications.jobDetails")}
         </h2>
         <dl className={styles.meta}>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Job</dt>
+            <dt className={styles.metaLabel}>{t("candidate.jobs.job")}</dt>
             <dd className={styles.metaValue}>{confirmation.vacancyTitle}</dd>
           </div>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Employer</dt>
+            <dt className={styles.metaLabel}>{t("candidate.jobs.employer")}</dt>
             <dd className={styles.metaValue}>
               {confirmation.employerDisplayName}
             </dd>
           </div>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Location</dt>
+            <dt className={styles.metaLabel}>
+              {t("candidate.applications.location")}
+            </dt>
             <dd className={styles.metaValue}>{confirmation.city}</dd>
           </div>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Category</dt>
-            <dd className={styles.metaValue}>
-              {confirmation.vacancyJobCategoryLabel}
-            </dd>
+            <dt className={styles.metaLabel}>
+              {t("candidate.matches.category")}
+            </dt>
+            <dd className={styles.metaValue}>{vacancyCategoryLabel}</dd>
           </div>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Employment</dt>
-            <dd className={styles.metaValue}>
-              {confirmation.vacancyEmploymentTypesLabel}
-            </dd>
+            <dt className={styles.metaLabel}>
+              {t("candidate.applications.employment")}
+            </dt>
+            <dd className={styles.metaValue}>{vacancyEmploymentLabel}</dd>
           </div>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Shifts</dt>
-            <dd className={styles.metaValue}>
-              {confirmation.vacancyShiftRequirementsLabel}
-            </dd>
+            <dt className={styles.metaLabel}>
+              {t("candidate.applications.shifts")}
+            </dt>
+            <dd className={styles.metaValue}>{vacancyShiftsLabel}</dd>
           </div>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>German</dt>
-            <dd className={styles.metaValue}>
-              {confirmation.vacancyGermanRequirementLabel}
-            </dd>
+            <dt className={styles.metaLabel}>
+              {t("candidate.applications.german")}
+            </dt>
+            <dd className={styles.metaValue}>{vacancyGermanLabel}</dd>
           </div>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Available</dt>
-            <dd className={styles.metaValue}>
-              {confirmation.vacancyAvailableFromLabel}
-            </dd>
+            <dt className={styles.metaLabel}>
+              {t("candidate.applications.available")}
+            </dt>
+            <dd className={styles.metaValue}>{vacancyAvailableLabel}</dd>
           </div>
         </dl>
 
         <h3 className={styles.subHeading} id={vacancyLanguagesHeadingId}>
-          Additional languages
+          {t("candidate.jobs.additionalLanguages")}
         </h3>
         {confirmation.vacancyNoAdditionalLanguagesLabel !== null ? (
           <p className={styles.support}>
-            {confirmation.vacancyNoAdditionalLanguagesLabel}
+            {t("candidate.applications.noAdditionalLanguages")}
           </p>
         ) : (
           <ul
@@ -199,7 +291,10 @@ export function ApplicationConfirmationPage(
                 key={requirement.languageCode}
                 className={styles.languageItem}
               >
-                {requirement.languageLabel} — {requirement.minProficiencyLabel}
+                {languageLabel(requirement.languageCode, locale)} —{" "}
+                {requirement.minProficiency
+                  ? languageProficiencyLabel(requirement.minProficiency, locale)
+                  : requirement.minProficiencyLabel}
               </li>
             ))}
           </ul>
@@ -214,61 +309,61 @@ export function ApplicationConfirmationPage(
           className={styles.sectionHeading}
           id="confirmation-candidate-heading"
         >
-          Your submitted profile
+          {t("candidate.applications.yourSubmittedProfile")}
         </h2>
         <dl className={styles.meta}>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Your name</dt>
+            <dt className={styles.metaLabel}>{t("candidate.jobs.yourName")}</dt>
             <dd className={styles.metaValue}>
               {confirmation.candidateDisplayName}
             </dd>
           </div>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Matched category</dt>
-            <dd className={styles.metaValue}>
-              {confirmation.candidateMatchedCategoryLabel}
-            </dd>
+            <dt className={styles.metaLabel}>
+              {t("candidate.jobs.matchedCategory")}
+            </dt>
+            <dd className={styles.metaValue}>{candidateCategoryLabel}</dd>
           </div>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>German comfort</dt>
-            <dd className={styles.metaValue}>
-              {confirmation.candidateGermanComfortLabel}
-            </dd>
+            <dt className={styles.metaLabel}>
+              {t("candidate.jobs.germanComfort")}
+            </dt>
+            <dd className={styles.metaValue}>{candidateGermanLabel}</dd>
           </div>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Work authorisation</dt>
-            <dd className={styles.metaValue}>
-              {confirmation.candidateWorkAuthorisationLabel}
-            </dd>
+            <dt className={styles.metaLabel}>
+              {t("candidate.jobs.workAuthorisation")}
+            </dt>
+            <dd className={styles.metaValue}>{candidateAuthorisationLabel}</dd>
           </div>
-          {confirmation.candidateAvailableFromLabel !== null ? (
+          {candidateAvailableLabel !== null ? (
             <div className={styles.metaRow}>
-              <dt className={styles.metaLabel}>Available from</dt>
-              <dd className={styles.metaValue}>
-                {confirmation.candidateAvailableFromLabel}
-              </dd>
+              <dt className={styles.metaLabel}>
+                {t("candidate.jobs.availableFrom")}
+              </dt>
+              <dd className={styles.metaValue}>{candidateAvailableLabel}</dd>
             </div>
           ) : null}
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Employment preferences</dt>
-            <dd className={styles.metaValue}>
-              {confirmation.candidateEmploymentPreferencesLabel}
-            </dd>
+            <dt className={styles.metaLabel}>
+              {t("candidate.jobs.employmentPreferences")}
+            </dt>
+            <dd className={styles.metaValue}>{candidateEmploymentLabel}</dd>
           </div>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Shift preferences</dt>
-            <dd className={styles.metaValue}>
-              {confirmation.candidateShiftPreferencesLabel}
-            </dd>
+            <dt className={styles.metaLabel}>
+              {t("candidate.jobs.shiftPreferences")}
+            </dt>
+            <dd className={styles.metaValue}>{candidateShiftsLabel}</dd>
           </div>
         </dl>
 
         <h3 className={styles.subHeading} id={candidateLanguagesHeadingId}>
-          Additional languages
+          {t("candidate.jobs.additionalLanguages")}
         </h3>
         {confirmation.candidateNoAdditionalLanguagesLabel !== null ? (
           <p className={styles.support}>
-            {confirmation.candidateNoAdditionalLanguagesLabel}
+            {t("candidate.applications.noAdditionalLanguages")}
           </p>
         ) : (
           <ul
@@ -277,13 +372,16 @@ export function ApplicationConfirmationPage(
           >
             {confirmation.candidateLanguages.map((language) => (
               <li key={language.languageCode} className={styles.languageItem}>
-                {language.languageLabel} — {language.proficiencyLabel}
+                {languageLabel(language.languageCode, locale)} —{" "}
+                {language.proficiency
+                  ? languageProficiencyLabel(language.proficiency, locale)
+                  : language.proficiencyLabel}
               </li>
             ))}
           </ul>
         )}
 
-        <p className={styles.notice}>{WORK_AUTHORISATION_NOTICE}</p>
+        <WorkAuthorisationNotice />
       </section>
 
       <ApplicationStatusTimeline history={history} />
@@ -292,15 +390,18 @@ export function ApplicationConfirmationPage(
         <ApplicationOutcomeTimeline outcomes={outcomes} />
       ) : null}
 
-      <nav className={styles.nav} aria-label="Application next steps">
+      <nav
+        className={styles.nav}
+        aria-label={t("candidate.applications.nextSteps")}
+      >
         <Link
           className={styles.cta}
           href={`/candidate/jobs/${confirmation.vacancyId}`}
         >
-          View job
+          {t("candidate.applications.viewJob")}
         </Link>
         <Link className={styles.secondaryLink} href="/candidate/matches">
-          Back to matches
+          {t("candidate.applications.backMatches")}
         </Link>
       </nav>
     </main>

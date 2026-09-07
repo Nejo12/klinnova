@@ -19,19 +19,41 @@ describe("buildCandidatePulseProfile", () => {
         ],
       }),
     ).toEqual([
-      { key: "categories", label: "Roles", value: "Cleaning, Logistics" },
-      { key: "employment", label: "Employment", value: "Part time" },
-      { key: "shifts", label: "Shifts", value: "Morning, Flexible" },
+      {
+        key: "categories",
+        label: "Roles",
+        value: "Cleaning, Logistics",
+        rawValues: ["cleaning", "logistics"],
+      },
+      {
+        key: "employment",
+        label: "Employment",
+        value: "Part time",
+        rawValues: ["part_time"],
+      },
+      {
+        key: "shifts",
+        label: "Shifts",
+        value: "Morning, Flexible",
+        rawValues: ["morning", "flexible"],
+      },
       {
         key: "german",
         label: "German",
         value: "Conversational German",
+        rawValue: "conversational",
       },
-      { key: "languages", label: "Languages", value: "English, German" },
+      {
+        key: "languages",
+        label: "Languages",
+        value: "English, German",
+        rawValues: ["en", "de"],
+      },
       {
         key: "availability",
         label: "Available from",
         value: "1 Sept 2026",
+        rawValue: "2026-09-01",
       },
     ]);
   });

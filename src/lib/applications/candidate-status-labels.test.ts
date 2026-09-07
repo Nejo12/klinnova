@@ -23,4 +23,11 @@ describe("candidateStatusDisplayLabel", () => {
     expect(candidateStatusDisplayLabel("rejected")).toBe("Not selected");
     expect(applicationStatusLabel("rejected")).toBe("Rejected");
   });
+
+  it("presents Candidate status labels in German without changing status codes", () => {
+    expect(candidateStatusDisplayLabel("submitted", "de")).toBe("Eingereicht");
+    expect(candidateStatusDisplayLabel("rejected", "de")).toBe(
+      "Nicht ausgewählt",
+    );
+  });
 });

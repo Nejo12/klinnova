@@ -1,14 +1,14 @@
+"use client";
+
 import Link from "next/link";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import { ApplicationSubmitForm } from "@/components/candidate-job-detail/application-submit-form";
 import { CandidateAppHeader } from "@/components/candidate-nav/candidate-app-header";
 import { JobDetailUnavailable } from "@/components/candidate-job-detail/job-detail-unavailable";
 import { MissingRequirementsList } from "@/components/candidate-job-detail/missing-requirements-list";
 import { WorkAuthorisationNotice } from "@/components/candidate-matches/work-authorisation-notice";
-import {
-  APPLIED_STATUS_LABEL,
-  formatSubmittedAtUtc,
-} from "@/lib/applications/application-confirmation";
+import { formatSubmittedAtUtc } from "@/lib/applications/application-confirmation";
 import type { OwnedApplicationSummary } from "@/lib/applications/owned-application";
 import type { MissingRequirementCode } from "@/lib/matching/missing-requirement-codes";
 import type {
@@ -25,7 +25,6 @@ import {
   workplaceTypeLabel,
   workFrequencyLabel,
 } from "@/lib/public-jobs/labels";
-import { DEMO_VACANCY_LABEL } from "@/lib/public-jobs/messages";
 import { onboardingGroupHref } from "@/lib/onboarding/navigation";
 
 import styles from "./candidate-job-detail.module.scss";
@@ -43,8 +42,8 @@ type CandidateJobDetailPageProps =
   | { status: "unavailable"; showEmployerNav?: boolean }
   | { status: "failure"; showEmployerNav?: boolean };
 
-function employerLine(vacancy: PublicVacancy): string {
-  const employerName = vacancy.employerDisplayName ?? "Berlin employer";
+function employerLine(vacancy: PublicVacancy, defaultEmployer: string): string {
+  const employerName = vacancy.employerDisplayName ?? defaultEmployer;
   const locality =
     vacancy.publicLocality === null
       ? "Berlin"
@@ -55,6 +54,7 @@ function employerLine(vacancy: PublicVacancy): string {
 }
 
 export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
+  const { locale, t } = useLocale();
   const showEmployerNav = props.showEmployerNav === true;
 
   if (props.status !== "ready") {
@@ -71,20 +71,22 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
   const languagesHeadingId = `job-languages-${vacancy.vacancyId}`;
   const missingHeadingId = `job-missing-requirements-${vacancy.vacancyId}`;
   const submittedAtLabel =
-    application === null ? null : formatSubmittedAtUtc(application.submittedAt);
+    application === null
+      ? null
+      : formatSubmittedAtUtc(application.submittedAt, locale);
   const externalHref = safeExternalHref(vacancy.website);
   const paragraphs =
     vacancy.description !== null
       ? splitDescriptionParagraphs(vacancy.description)
       : [];
-  const closingDate = formatListingDate(vacancy.expiresAt);
+  const closingDate = formatListingDate(vacancy.expiresAt, locale);
 
   return (
     <main className={styles.page}>
       <CandidateAppHeader showEmployerNav={showEmployerNav} />
 
       <Link className={styles.backLink} href="/candidate/matches">
-        Back to matches
+        {t("candidate.jobs.back")}
       </Link>
 
       <section className={styles.hero} aria-labelledby="job-detail-heading">
@@ -94,69 +96,81 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
           </h1>
           <div className={styles.badgeGroup}>
             {vacancy.source === "seed" ? (
-              <p className={styles.demoLabel}>{DEMO_VACANCY_LABEL}</p>
+              <p className={styles.demoLabel}>{t("publicJobs.demo")}</p>
             ) : null}
             {vacancy.source === "employer" ? (
-              <p className={styles.verifiedBadge}>Verified employer</p>
+              <p className={styles.verifiedBadge}>
+                {t("candidate.matches.verifiedEmployer")}
+              </p>
             ) : null}
             {application !== null ? (
-              <p className={styles.appliedLabel}>{APPLIED_STATUS_LABEL}</p>
+              <p className={styles.appliedLabel}>
+                {t("candidate.matches.applied")}
+              </p>
             ) : null}
           </div>
         </div>
-        <p className={styles.company}>{employerLine(vacancy)}</p>
+        <p className={styles.company}>
+          {employerLine(vacancy, t("publicJobs.defaultEmployer"))}
+        </p>
       </section>
 
       <WorkAuthorisationNotice />
 
       <section className={styles.section} aria-labelledby="job-details-heading">
         <h2 className={styles.sectionHeading} id="job-details-heading">
-          Job details
+          {t("candidate.jobs.details")}
         </h2>
         <dl className={styles.meta}>
           <div className={styles.metaRow}>
-            <dt className={styles.metaLabel}>Category</dt>
+            <dt className={styles.metaLabel}>{t("publicJobs.category")}</dt>
             <dd className={styles.metaValue}>
-              {jobCategoryLabel(vacancy.jobCategory)}
+              {jobCategoryLabel(vacancy.jobCategory, locale)}
             </dd>
           </div>
           {vacancy.workplaceType !== null ? (
             <div className={styles.metaRow}>
-              <dt className={styles.metaLabel}>Workplace</dt>
+              <dt className={styles.metaLabel}>{t("publicJobs.workplace")}</dt>
               <dd className={styles.metaValue}>
-                {workplaceTypeLabel(vacancy.workplaceType)}
+                {workplaceTypeLabel(vacancy.workplaceType, locale)}
               </dd>
             </div>
           ) : null}
           {vacancy.workFrequency !== null ? (
             <div className={styles.metaRow}>
-              <dt className={styles.metaLabel}>Frequency</dt>
+              <dt className={styles.metaLabel}>{t("publicJobs.frequency")}</dt>
               <dd className={styles.metaValue}>
-                {workFrequencyLabel(vacancy.workFrequency)}
+                {workFrequencyLabel(vacancy.workFrequency, locale)}
               </dd>
             </div>
           ) : null}
           {vacancy.cvRequired !== null ? (
             <div className={styles.metaRow}>
-              <dt className={styles.metaLabel}>CV</dt>
+              <dt className={styles.metaLabel}>{t("publicJobs.cv")}</dt>
               <dd className={styles.metaValue}>
-                {vacancy.cvRequired ? "CV required" : "CV not required"}
+                {t(
+                  vacancy.cvRequired
+                    ? "publicJobs.cvRequired"
+                    : "publicJobs.cvNotRequired",
+                )}
               </dd>
             </div>
           ) : null}
           {vacancy.interviewEnglishOk !== null ? (
             <div className={styles.metaRow}>
-              <dt className={styles.metaLabel}>Interview</dt>
+              <dt className={styles.metaLabel}>{t("publicJobs.interview")}</dt>
               <dd className={styles.metaValue}>
-                {vacancy.interviewEnglishOk
-                  ? "Interview can be in English"
-                  : "Interview in German"}
+                {t(
+                  vacancy.interviewEnglishOk
+                    ? "publicJobs.interviewEnglish"
+                    : "publicJobs.interviewGerman",
+                )}
               </dd>
             </div>
           ) : null}
           {closingDate !== null ? (
             <div className={styles.metaRow}>
-              <dt className={styles.metaLabel}>Closes</dt>
+              <dt className={styles.metaLabel}>{t("publicJobs.closes")}</dt>
               <dd className={styles.metaValue}>{closingDate}</dd>
             </div>
           ) : null}
@@ -169,13 +183,13 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
           aria-labelledby={languagesHeadingId}
         >
           <h2 className={styles.sectionHeading} id={languagesHeadingId}>
-            Additional languages
+            {t("candidate.jobs.additionalLanguages")}
           </h2>
           <ul className={styles.languageList}>
             {languages.map((language) => (
               <li key={language.languageCode} className={styles.languageItem}>
-                {languageLabel(language.languageCode)} —{" "}
-                {languageProficiencyLabel(language.minProficiency)}
+                {languageLabel(language.languageCode, locale)} —{" "}
+                {languageProficiencyLabel(language.minProficiency, locale)}
               </li>
             ))}
           </ul>
@@ -188,7 +202,7 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
           aria-labelledby="job-description-heading"
         >
           <h2 className={styles.sectionHeading} id="job-description-heading">
-            About this job
+            {t("candidate.jobs.about")}
           </h2>
           {paragraphs.map((paragraph, index) => (
             <p key={index} className={styles.metaValue}>
@@ -206,7 +220,7 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Employer website
+            {t("candidate.jobs.employerWebsite")}
           </a>
         </p>
       ) : null}
@@ -220,10 +234,10 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
             className={styles.sectionHeading}
             id="application-applied-heading"
           >
-            Application
+            {t("candidate.jobs.application")}
           </h2>
           <p className={styles.appliedStatus}>
-            {APPLIED_STATUS_LABEL}
+            {t("candidate.matches.applied")}
             {submittedAtLabel !== null ? (
               <>
                 {" · "}
@@ -236,9 +250,9 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
           <Link
             className={styles.cta}
             href={`/candidate/applications/${application.applicationId}`}
-            aria-label={`View application: ${vacancy.title}`}
+            aria-label={`${t("candidate.matches.viewApplication")}: ${vacancy.title}`}
           >
-            View application
+            {t("candidate.matches.viewApplication")}
           </Link>
         </section>
       ) : eligible ? (
@@ -246,7 +260,7 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
           employerDisplayName={
             vacancy.employerDisplayName ??
             vacancy.companyName ??
-            "Berlin employer"
+            t("publicJobs.defaultEmployer")
           }
           vacancyId={vacancy.vacancyId}
           vacancyTitle={vacancy.title}
@@ -254,14 +268,14 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
       ) : (
         <section className={styles.section} aria-labelledby={missingHeadingId}>
           <h2 className={styles.sectionHeading} id={missingHeadingId}>
-            You don&rsquo;t currently meet these requirements
+            {t("candidate.jobs.missingHeading")}
           </h2>
           <MissingRequirementsList
             codes={missingRequirements}
             labelledBy={missingHeadingId}
           />
           <Link className={styles.cta} href={onboardingGroupHref("review")}>
-            Review your saved preferences
+            {t("candidate.jobs.reviewPreferences")}
           </Link>
         </section>
       )}

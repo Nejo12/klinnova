@@ -1,3 +1,7 @@
+"use client";
+
+import { useLocale } from "@/components/i18n/locale-provider";
+
 import {
   missingRequirementLabel,
   type MissingRequirementCode,
@@ -19,11 +23,12 @@ export function MissingRequirementsList({
   codes,
   labelledBy,
 }: MissingRequirementsListProps) {
+  const { locale } = useLocale();
   return (
     <ul className={styles.missingRequirementsList} aria-labelledby={labelledBy}>
       {codes.map((code) => (
         <li key={code} className={styles.missingRequirementItem}>
-          {missingRequirementLabel(code)}
+          {missingRequirementLabel(code, locale)}
         </li>
       ))}
     </ul>

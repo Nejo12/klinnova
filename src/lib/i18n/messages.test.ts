@@ -20,6 +20,20 @@ const REPRESENTATIVE_PUBLIC_MESSAGES: Array<[MessageKey, string]> = [
   ["candidateReview.group.workPreferences", "Arbeitswünsche"],
 ];
 
+const REPRESENTATIVE_CANDIDATE_MESSAGES: Array<[MessageKey, string]> = [
+  ["candidate.nav.matches", "Passende Jobs"],
+  ["candidate.home.continue", "Onboarding fortsetzen"],
+  ["candidate.onboarding.germanComfort", "Deutschkenntnisse"],
+  ["candidate.onboarding.validation.date", "Gib ein gültiges Datum ein."],
+  ["candidate.matches.emptyHeading", "Zurzeit keine passenden Jobs"],
+  ["candidate.jobs.details", "Jobdetails"],
+  ["candidate.applications.heading", "Bewerbungen"],
+  ["candidate.applications.notSelected", "Nicht ausgewählt"],
+  ["candidate.account.exportAction", "Bewerbendendaten herunterladen"],
+  ["candidate.account.deleteHeading", "Mein Klinnova-Konto löschen"],
+  ["candidate.loading.statusTimeline", "Statusverlauf wird geladen"],
+];
+
 describe("public and shared locale messages", () => {
   it.each(REPRESENTATIVE_PUBLIC_MESSAGES)(
     "resolves %s in English and German",
@@ -31,5 +45,20 @@ describe("public and shared locale messages", () => {
 
   it("keeps the established English fallback for a missing German value", () => {
     expect(translate("de", "footer.impressum")).toBe("Impressum");
+  });
+});
+
+describe("Candidate locale messages", () => {
+  it.each(REPRESENTATIVE_CANDIDATE_MESSAGES)(
+    "resolves %s in English and German",
+    (key, german) => {
+      expect(translate("en", key)).not.toHaveLength(0);
+      expect(translate("de", key)).toBe(german);
+    },
+  );
+
+  it("uses deterministic English fallback for Candidate copy", () => {
+    expect(translate("de", "candidate.matches.retry")).toBe("Erneut versuchen");
+    expect(translate("en", "candidate.matches.retry")).toBe("Try again");
   });
 });

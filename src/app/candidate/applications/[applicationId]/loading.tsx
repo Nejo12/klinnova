@@ -1,3 +1,7 @@
+"use client";
+
+import { useLocale } from "@/components/i18n/locale-provider";
+
 import {
   DelayedReveal,
   Skeleton,
@@ -61,10 +65,11 @@ function MetaRowSkeleton({
  * them. One pair per genuinely distinct region restores it.
  */
 export default function Loading() {
+  const { t } = useLocale();
   return (
     <main className={styles.page}>
       <DelayedReveal>
-        <SkeletonRegion label="Loading application title">
+        <SkeletonRegion label={t("candidate.loading.applicationTitle")}>
           <div className={styles.titleRow}>
             <Skeleton height="2.25rem" width="55%" radius="sm" />
           </div>
@@ -72,13 +77,13 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading application summary">
+        <SkeletonRegion label={t("candidate.loading.applicationSummary")}>
           <Skeleton height="1.125rem" width="70%" radius="sm" />
         </SkeletonRegion>
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading application status">
+        <SkeletonRegion label={t("candidate.loading.applicationStatus")}>
           <div className={styles.meta}>
             <MetaRowSkeleton labelWidth="5rem" valueWidth="8rem" />
             <MetaRowSkeleton labelWidth="6rem" valueWidth="10rem" />
@@ -87,7 +92,7 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading job details">
+        <SkeletonRegion label={t("candidate.loading.jobDetails")}>
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="9rem" radius="sm" />
             <div className={styles.meta}>
@@ -107,7 +112,7 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading your submitted profile">
+        <SkeletonRegion label={t("candidate.loading.submittedProfile")}>
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="11rem" radius="sm" />
             <div className={styles.meta}>
@@ -127,7 +132,7 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading status timeline">
+        <SkeletonRegion label={t("candidate.loading.statusTimeline")}>
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="8rem" radius="sm" />
             <ul className={styles.timeline}>

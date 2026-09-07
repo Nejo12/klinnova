@@ -15,6 +15,8 @@ export type CandidatePulseProfileItem = {
     | "availability";
   label: string;
   value: string;
+  rawValues?: string[];
+  rawValue?: string | null;
 };
 
 type CandidatePulseProfileInput = {
@@ -95,6 +97,7 @@ export function buildCandidatePulseProfile(
       key: "categories",
       label: "Roles",
       value: optionLabels(input.profile.jobCategories, JOB_CATEGORY_OPTIONS),
+      rawValues: [...(input.profile.jobCategories ?? [])],
     },
     {
       key: "employment",
@@ -103,6 +106,7 @@ export function buildCandidatePulseProfile(
         input.profile.employmentTypes,
         EMPLOYMENT_TYPE_OPTIONS,
       ),
+      rawValues: [...(input.profile.employmentTypes ?? [])],
     },
     {
       key: "shifts",
@@ -111,21 +115,25 @@ export function buildCandidatePulseProfile(
         input.profile.shiftPreferences,
         SHIFT_PREFERENCE_OPTIONS,
       ),
+      rawValues: [...(input.profile.shiftPreferences ?? [])],
     },
     {
       key: "german",
       label: "German",
       value: germanComfortLabel(input.profile.germanComfort),
+      rawValue: input.profile.germanComfort,
     },
     {
       key: "languages",
       label: "Languages",
       value: languageLabels.length > 0 ? languageLabels.join(", ") : "Not set",
+      rawValues: input.languages.map((language) => language.languageCode),
     },
     {
       key: "availability",
       label: "Available from",
       value: formatAvailability(input.profile.availableFrom),
+      rawValue: input.profile.availableFrom,
     },
   ];
 }

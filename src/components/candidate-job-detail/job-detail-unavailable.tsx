@@ -1,11 +1,15 @@
+"use client";
+
+import { useLocale } from "@/components/i18n/locale-provider";
+
 import Link from "next/link";
 
 import styles from "./candidate-job-detail.module.scss";
 
 export function JobDetailUnavailable() {
-  const heading = "This job is not available";
-  const body =
-    "This vacancy is not available to view right now. Return to your matches to see current options.";
+  const { t } = useLocale();
+  const heading = t("candidate.jobs.unavailableHeading");
+  const body = t("candidate.jobs.unavailableBody");
 
   return (
     <section className={styles.unavailable} aria-labelledby="job-unavailable">

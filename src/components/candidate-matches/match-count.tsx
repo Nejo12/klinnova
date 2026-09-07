@@ -1,3 +1,7 @@
+"use client";
+
+import { useLocale } from "@/components/i18n/locale-provider";
+
 import styles from "./candidate-matches.module.scss";
 
 type MatchCountProps = {
@@ -12,5 +16,15 @@ export function formatMatchCount(count: number): string {
 }
 
 export function MatchCount({ count }: MatchCountProps) {
-  return <p className={styles.count}>{formatMatchCount(count)}</p>;
+  const { t } = useLocale();
+  return (
+    <p className={styles.count}>
+      {count}{" "}
+      {t(
+        count === 1
+          ? "candidate.matches.countOne"
+          : "candidate.matches.countMany",
+      )}
+    </p>
+  );
 }

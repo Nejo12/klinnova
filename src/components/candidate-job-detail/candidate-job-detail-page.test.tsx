@@ -8,6 +8,7 @@ vi.mock("@/components/candidate-job-detail/application-submit-form", () => ({
 }));
 
 import { CandidateJobDetailPage } from "@/components/candidate-job-detail/candidate-job-detail-page";
+import { LocaleProvider } from "@/components/i18n/locale-provider";
 import { WORK_AUTHORISATION_NOTICE } from "@/components/candidate-matches/work-authorisation-notice";
 import type {
   PublicVacancy,
@@ -36,6 +37,37 @@ const languages: PublicVacancyLanguage[] = [
 ];
 
 describe("CandidateJobDetailPage", () => {
+  it("localizes Candidate chrome and structured facts while preserving employer-authored content", () => {
+    document.documentElement.dataset.locale = "de";
+    document.documentElement.lang = "de";
+
+    render(
+      <LocaleProvider>
+        <CandidateJobDetailPage
+          status="ready"
+          eligible={true}
+          missingRequirements={[]}
+          vacancy={vacancy}
+          languages={languages}
+          application={null}
+        />
+      </LocaleProvider>,
+    );
+
+    expect(
+      screen.getByRole("link", { name: "Zurück zu passenden Jobs" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Gastronomie")).toBeInTheDocument();
+    expect(screen.getByText("Englisch — Alltagssicher")).toBeInTheDocument();
+    expect(screen.getByText(vacancy.title)).toBeInTheDocument();
+    expect(screen.getByText(vacancy.description ?? "")).toBeInTheDocument();
+    expect(
+      screen.getByText("Demo Berlin Work Co · Mitte, Berlin"),
+    ).toBeInTheDocument();
+
+    document.documentElement.dataset.locale = "en";
+    document.documentElement.lang = "en";
+  });
   it("renders ready eligible detail with a submission mount point", () => {
     render(
       <CandidateJobDetailPage

@@ -2,14 +2,12 @@
 
 import { useActionState } from "react";
 
+import { useLocale } from "@/components/i18n/locale-provider";
+import { localizeOnboardingError } from "@/lib/onboarding/localize-error";
 import {
   saveWorkAuthorisationGroupAction,
   type OnboardingActionState,
 } from "@/app/candidate/onboarding/actions";
-import {
-  WORK_AUTHORISATION_NOT_SURE_GUIDANCE,
-  WORK_AUTHORISATION_SUPPORT,
-} from "@/lib/onboarding/messages";
 
 import { GroupNav } from "./group-nav";
 import styles from "./onboarding.module.scss";
@@ -23,6 +21,7 @@ const initialState: OnboardingActionState = { error: null, message: null };
 export function WorkAuthorisationGroupForm({
   workAuthorisationDeclared,
 }: WorkAuthorisationGroupFormProps) {
+  const { t } = useLocale();
   const [state, formAction, pending] = useActionState(
     saveWorkAuthorisationGroupAction,
     initialState,
@@ -32,9 +31,11 @@ export function WorkAuthorisationGroupForm({
     <form className={styles.form} action={formAction} noValidate>
       <fieldset className={styles.fieldset}>
         <legend className={styles.legend}>
-          Are you currently allowed to work in Germany?
+          {t("candidate.onboarding.workAuthorisationQuestion")}
         </legend>
-        <p className={styles.support}>{WORK_AUTHORISATION_SUPPORT}</p>
+        <p className={styles.support}>
+          {t("candidate.onboarding.workAuthorisationHelp")}
+        </p>
         <div className={styles.optionList}>
           <label className={styles.option}>
             <input
@@ -44,7 +45,9 @@ export function WorkAuthorisationGroupForm({
               defaultChecked={workAuthorisationDeclared === true}
               required
             />
-            <span className={styles.optionLabel}>Yes</span>
+            <span className={styles.optionLabel}>
+              {t("candidate.onboarding.yes")}
+            </span>
           </label>
           <label className={styles.option}>
             <input
@@ -54,15 +57,19 @@ export function WorkAuthorisationGroupForm({
               defaultChecked={workAuthorisationDeclared === false}
               required
             />
-            <span className={styles.optionLabel}>Not sure</span>
+            <span className={styles.optionLabel}>
+              {t("candidate.onboarding.notSure")}
+            </span>
           </label>
         </div>
-        <p className={styles.note}>{WORK_AUTHORISATION_NOT_SURE_GUIDANCE}</p>
+        <p className={styles.note}>
+          {t("candidate.onboarding.workAuthorisationNotSure")}
+        </p>
       </fieldset>
 
       {state.error !== null ? (
         <p className={styles.error} role="alert">
-          {state.error}
+          {localizeOnboardingError(state.error, t)}
         </p>
       ) : null}
 

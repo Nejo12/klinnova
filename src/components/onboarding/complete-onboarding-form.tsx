@@ -7,6 +7,7 @@ import {
   type OnboardingActionState,
 } from "@/app/candidate/onboarding/actions";
 import { useLocale } from "@/components/i18n/locale-provider";
+import { localizeOnboardingError } from "@/lib/onboarding/localize-error";
 
 import styles from "./onboarding.module.scss";
 
@@ -23,7 +24,7 @@ export function CompleteOnboardingForm() {
     <form action={formAction} className={styles.actions}>
       {state.error !== null ? (
         <p className={styles.error} role="alert">
-          {state.error}
+          {localizeOnboardingError(state.error, t)}
         </p>
       ) : null}
       <button className={styles.button} disabled={pending} type="submit">

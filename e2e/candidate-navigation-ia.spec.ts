@@ -241,8 +241,31 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
           .click();
         await page.getByRole("button", { name: "Deutsch" }).click();
         await page.keyboard.press("Escape");
+        await expect(page.locator("html")).toHaveAttribute("lang", "de");
         await expect(
           page.getByRole("heading", { name: "Profil prüfen" }),
+        ).toBeVisible();
+        const germanNav = page.getByLabel("Bewerbendenbereich");
+        await expect(
+          germanNav.getByRole("link", { name: "Passende Jobs" }),
+        ).toBeVisible();
+        await expect(
+          germanNav.getByRole("link", { name: "Bewerbungen" }),
+        ).toBeVisible();
+        await expect(
+          germanNav.getByRole("link", { name: "Profil" }),
+        ).toBeVisible();
+        await expect(
+          germanNav.getByRole("link", { name: "Konto" }),
+        ).toBeVisible();
+
+        await germanNav.getByRole("link", { name: "Bewerbungen" }).click();
+        await expect(
+          page.getByRole("heading", { name: "Bewerbungen" }),
+        ).toBeVisible();
+        await germanNav.getByRole("link", { name: "Passende Jobs" }).click();
+        await expect(
+          page.getByRole("heading", { name: "Passende Jobs" }),
         ).toBeVisible();
       }
 

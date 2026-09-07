@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import { ApplicationInventoryCard } from "@/components/candidate-applications/application-inventory-card";
 import styles from "@/components/candidate-applications/candidate-applications.module.scss";
 import type { ApplicationInventoryRow } from "@/lib/applications/snapshot-schemas";
@@ -20,11 +23,17 @@ export function ApplicationInventoryList({
   active,
   closed,
 }: ApplicationInventoryListProps) {
+  const { t } = useLocale();
   return (
     <div className={styles.groups}>
       {active.length > 0 ? (
-        <section className={styles.group} aria-label="Active applications">
-          <h2 className={styles.groupHeading}>Active</h2>
+        <section
+          className={styles.group}
+          aria-label={t("candidate.applications.activeLabel")}
+        >
+          <h2 className={styles.groupHeading}>
+            {t("candidate.applications.active")}
+          </h2>
           <ul className={styles.list}>
             {active.map((application) => (
               <li key={application.id}>
@@ -39,8 +48,13 @@ export function ApplicationInventoryList({
       ) : null}
 
       {closed.length > 0 ? (
-        <section className={styles.group} aria-label="Closed applications">
-          <h2 className={styles.groupHeading}>Closed</h2>
+        <section
+          className={styles.group}
+          aria-label={t("candidate.applications.closedLabel")}
+        >
+          <h2 className={styles.groupHeading}>
+            {t("candidate.applications.closed")}
+          </h2>
           <ul className={styles.list}>
             {closed.map((application) => (
               <li key={application.id}>
@@ -56,7 +70,7 @@ export function ApplicationInventoryList({
       ) : null}
 
       <Link className={styles.findMoreLink} href="/candidate/matches">
-        Find more matches
+        {t("candidate.applications.findMore")}
       </Link>
     </div>
   );

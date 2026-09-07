@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 
 import { logoutAction } from "@/app/auth/actions";
+import { useLocale } from "@/components/i18n/locale-provider";
 import {
   initialCancelDeletionActionState,
   initialDeleteAccountActionState,
@@ -13,28 +14,7 @@ import {
   ACCOUNT_DELETION_CONFIRMATION_FIELD,
   ACCOUNT_DELETION_CONFIRMATION_VALUE,
 } from "@/lib/account-deletion/confirmation";
-import {
-  CANCEL_DELETION_CANCELLED_MESSAGE,
-  CANCEL_DELETION_NOT_CANCELLABLE_MESSAGE,
-  CANCEL_DELETION_UNAUTHENTICATED_MESSAGE,
-  DELETE_ACCOUNT_BUTTON_LABEL,
-  DELETE_ACCOUNT_BUTTON_PENDING_LABEL,
-  DELETE_ACCOUNT_CANCEL_BUTTON_LABEL,
-  DELETE_ACCOUNT_CANCEL_HEADING,
-  DELETE_ACCOUNT_CANCEL_LEAD,
-  DELETE_ACCOUNT_COMPLETED_MESSAGE,
-  DELETE_ACCOUNT_CONFIRM_LABEL,
-  DELETE_ACCOUNT_CONFIRMATION_REQUIRED_MESSAGE,
-  DELETE_ACCOUNT_CONTINUE_LABEL,
-  DELETE_ACCOUNT_DUAL_CAPABILITY_NOTE,
-  DELETE_ACCOUNT_FAILURE_MESSAGE,
-  DELETE_ACCOUNT_HEADING,
-  DELETE_ACCOUNT_LEAD,
-  DELETE_ACCOUNT_PROCESSING_MESSAGE,
-  DELETE_ACCOUNT_RETENTION_NOTE,
-  DELETE_ACCOUNT_UNAUTHENTICATED_MESSAGE,
-  DELETE_ACCOUNT_UNAVAILABLE_MESSAGE,
-} from "@/lib/account-deletion/messages";
+import type { MessageKey } from "@/lib/i18n/messages";
 
 import styles from "./delete-account-panel.module.scss";
 
@@ -50,31 +30,35 @@ type DeleteAccountPanelProps = {
   ) => Promise<CancelDeletionActionState>;
 };
 
-function confirmMessage(status: DeleteAccountActionState["status"]) {
+function confirmMessageKey(
+  status: DeleteAccountActionState["status"],
+): MessageKey | null {
   switch (status) {
     case "confirmation_required":
-      return DELETE_ACCOUNT_CONFIRMATION_REQUIRED_MESSAGE;
+      return "candidate.account.confirmDeleteError";
     case "unauthenticated":
-      return DELETE_ACCOUNT_UNAUTHENTICATED_MESSAGE;
+      return "candidate.account.deleteUnauthenticated";
     case "unavailable":
-      return DELETE_ACCOUNT_UNAVAILABLE_MESSAGE;
+      return "candidate.account.deleteUnavailable";
     case "processing":
-      return DELETE_ACCOUNT_PROCESSING_MESSAGE;
+      return "candidate.account.deleting";
     case "failure":
-      return DELETE_ACCOUNT_FAILURE_MESSAGE;
+      return "candidate.account.deleteFailure";
     default:
       return null;
   }
 }
 
-function cancelMessage(status: CancelDeletionActionState["status"]) {
+function cancelMessageKey(
+  status: CancelDeletionActionState["status"],
+): MessageKey | null {
   switch (status) {
     case "unauthenticated":
-      return CANCEL_DELETION_UNAUTHENTICATED_MESSAGE;
+      return "candidate.account.cancelUnauthenticated";
     case "not_cancellable":
-      return CANCEL_DELETION_NOT_CANCELLABLE_MESSAGE;
+      return "candidate.account.cancelUnavailable";
     case "cancelled":
-      return CANCEL_DELETION_CANCELLED_MESSAGE;
+      return "candidate.account.cancelled";
     default:
       return null;
   }
@@ -85,6 +69,7 @@ export function DeleteAccountPanel({
   confirmAction,
   cancelAction,
 }: DeleteAccountPanelProps) {
+  const { t } = useLocale();
   const [confirmState, confirmFormAction, confirmPending] = useActionState(
     confirmAction,
     initialDeleteAccountActionState,
@@ -113,50 +98,56 @@ export function DeleteAccountPanel({
   if (confirmState.status === "completed") {
     return (
       <main className={styles.page}>
-        <h1 className={styles.heading}>{DELETE_ACCOUNT_HEADING}</h1>
+        <h1 className={styles.heading}>
+          {t("candidate.account.deleteHeading")}
+        </h1>
         <p className={styles.success} role="status">
-          {DELETE_ACCOUNT_COMPLETED_MESSAGE}
+          {t("candidate.account.deleteCompleted")}
         </p>
         {/* Deliberate separate step (D-081/PART S): the user has already
             seen the success message above; signing out here — as its own
             explicit action — now terminates the local session. */}
         <form action={logoutAction}>
           <button className={styles.linkButton} type="submit">
-            {DELETE_ACCOUNT_CONTINUE_LABEL}
+            {t("candidate.account.return")}
           </button>
         </form>
       </main>
     );
   }
 
-  const confirmResultMessage = confirmMessage(confirmState.status);
-  const cancelResultMessage = cancelMessage(cancelState.status);
+  const confirmResultKey = confirmMessageKey(confirmState.status);
+  const cancelResultKey = cancelMessageKey(cancelState.status);
 
   return (
     <main className={styles.page}>
-      <h1 className={styles.heading}>{DELETE_ACCOUNT_HEADING}</h1>
-      <p className={styles.lead}>{DELETE_ACCOUNT_LEAD}</p>
+      <h1 className={styles.heading}>{t("candidate.account.deleteHeading")}</h1>
+      <p className={styles.lead}>{t("candidate.account.deleteLead")}</p>
       {dualCapability ? (
-        <p className={styles.note}>{DELETE_ACCOUNT_DUAL_CAPABILITY_NOTE}</p>
+        <p className={styles.note}>{t("candidate.account.deleteDual")}</p>
       ) : null}
-      <p className={styles.note}>{DELETE_ACCOUNT_RETENTION_NOTE}</p>
+      <p className={styles.note}>{t("candidate.account.deleteRetention")}</p>
 
       <section className={styles.section}>
-        <h2 className={styles.heading}>{DELETE_ACCOUNT_CANCEL_HEADING}</h2>
-        <p className={styles.note}>{DELETE_ACCOUNT_CANCEL_LEAD}</p>
+        <h2 className={styles.heading}>
+          {t("candidate.account.pendingDeleteHeading")}
+        </h2>
+        <p className={styles.note}>
+          {t("candidate.account.pendingDeleteLead")}
+        </p>
         <form action={cancelFormAction}>
           <button
             className={styles.buttonSecondary}
             type="submit"
             disabled={cancelPending}
           >
-            {DELETE_ACCOUNT_CANCEL_BUTTON_LABEL}
+            {t("candidate.account.cancelDelete")}
           </button>
         </form>
         <p ref={cancelResultRef} tabIndex={-1}>
-          {cancelResultMessage !== null ? (
+          {cancelResultKey !== null ? (
             <span className={styles.status} role="status">
-              {cancelResultMessage}
+              {t(cancelResultKey)}
             </span>
           ) : null}
         </p>
@@ -165,7 +156,7 @@ export function DeleteAccountPanel({
       <form
         className={styles.form}
         action={confirmFormAction}
-        aria-label={DELETE_ACCOUNT_HEADING}
+        aria-label={t("candidate.account.deleteHeading")}
         noValidate
       >
         <label className={styles.option}>
@@ -178,18 +169,18 @@ export function DeleteAccountPanel({
             disabled={confirmPending}
           />
           <span className={styles.optionLabel}>
-            {DELETE_ACCOUNT_CONFIRM_LABEL}
+            {t("candidate.account.deleteConfirm")}
           </span>
         </label>
         <p ref={resultRef} tabIndex={-1}>
-          {confirmResultMessage !== null ? (
+          {confirmResultKey !== null ? (
             <span
               className={
                 confirmState.status === "failure" ? styles.error : styles.status
               }
               role={confirmState.status === "failure" ? "alert" : "status"}
             >
-              {confirmResultMessage}
+              {t(confirmResultKey)}
             </span>
           ) : null}
         </p>
@@ -200,8 +191,8 @@ export function DeleteAccountPanel({
             disabled={!acknowledged || confirmPending}
           >
             {confirmPending
-              ? DELETE_ACCOUNT_BUTTON_PENDING_LABEL
-              : DELETE_ACCOUNT_BUTTON_LABEL}
+              ? t("candidate.account.deleting")
+              : t("candidate.account.deleteAction")}
           </button>
         </div>
       </form>
