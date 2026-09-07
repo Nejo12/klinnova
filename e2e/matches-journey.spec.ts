@@ -109,7 +109,7 @@ test.describe("Slice 2 candidate matches journey", () => {
     await registerAndConfirm(page, stamp);
     await completeBroadEssentials(page);
 
-    await page.getByRole("button", { name: "Confirm essentials" }).click();
+    await page.getByRole("button", { name: "Complete profile" }).click();
     await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
     await expect(
       page.getByRole("heading", {

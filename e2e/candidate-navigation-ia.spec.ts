@@ -66,7 +66,7 @@ async function registerAndCompleteCandidateOnboarding(
   await page.getByRole("button", { name: "Save and review" }).click();
   await expect(page).toHaveURL(/group=review/);
 
-  await page.getByRole("button", { name: "Confirm essentials" }).click();
+  await page.getByRole("button", { name: "Complete profile" }).click();
   await expect(page).toHaveURL(/\/candidate\/matches$/, { timeout: 15_000 });
 
   return { email, displayName };
@@ -109,9 +109,17 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
       .getByRole("link", { name: "Profile" })
       .click();
     await expect(page).toHaveURL(/\/candidate\/onboarding\?group=review$/);
+    await expect(page.getByText("Ready for matching")).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: /Essentials confirmed/i }),
+      page.getByRole("region", { name: "Saved profile" }),
     ).toBeVisible();
+    await expect(page.getByRole("link", { name: /: Edit$/ })).toHaveCount(6);
+    await expect(
+      page.getByRole("link", { name: "View matching jobs" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/Completion stays server-controlled/i),
+    ).toHaveCount(0);
     await expect(
       page.getByLabel("Candidate").getByRole("link", { name: "Profile" }),
     ).toHaveAttribute("aria-current", "page");
@@ -182,7 +190,7 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
       .getByRole("link", { name: "Profile" })
       .click();
     await expect(page).toHaveURL(/\/candidate\/onboarding\?group=review$/);
-    await page.getByRole("link", { name: "Review answers" }).click();
+    await page.getByRole("link", { name: "Edit profile" }).click();
     await expect(page).toHaveURL(/group=languages/);
 
     // The previously-saved answer must still be selected, not reset.
@@ -223,6 +231,25 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
       const accountLink = nav.getByRole("link", { name: "Account" });
       await accountLink.focus();
       await expect(accountLink).toBeFocused();
+
+      await nav.getByRole("link", { name: "Profile" }).click();
+      await expect(page).toHaveURL(/group=review/);
+
+      if (width === 360) {
+        await page
+          .getByRole("button", { name: "Interface preferences" })
+          .click();
+        await page.getByRole("button", { name: "Deutsch" }).click();
+        await page.keyboard.press("Escape");
+        await expect(
+          page.getByRole("heading", { name: "Profil prüfen" }),
+        ).toBeVisible();
+      }
+
+      const reviewOverflow = await page.evaluate(
+        () => document.documentElement.scrollWidth > window.innerWidth,
+      );
+      expect(reviewOverflow).toBe(false);
     });
   }
 
