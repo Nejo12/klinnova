@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import type { OnboardingGroupId } from "@/lib/onboarding/allow-lists";
 import {
   onboardingGroupHref,
@@ -11,14 +14,15 @@ import styles from "./onboarding.module.scss";
 type GroupNavProps = {
   current: OnboardingGroupId;
   pending: boolean;
-  continueLabel?: string;
+  continueToReview?: boolean;
 };
 
 export function GroupNav({
   current,
   pending,
-  continueLabel = "Save and continue",
+  continueToReview = false,
 }: GroupNavProps) {
+  const { t } = useLocale();
   const previous = previousOnboardingGroup(current);
 
   return (
@@ -28,15 +32,21 @@ export function GroupNav({
           className={styles.linkButton}
           href={onboardingGroupHref(previous)}
         >
-          Back to previous section
+          {t("candidate.onboarding.backPrevious")}
         </Link>
       ) : (
         <Link className={styles.linkButton} href="/candidate">
-          Back to candidate home
+          {t("candidate.onboarding.backHome")}
         </Link>
       )}
       <button className={styles.button} type="submit" disabled={pending}>
-        {pending ? "Saving…" : continueLabel}
+        {pending
+          ? t("candidate.onboarding.saving")
+          : t(
+              continueToReview
+                ? "candidate.onboarding.saveReview"
+                : "candidate.onboarding.saveContinue",
+            )}
       </button>
     </div>
   );

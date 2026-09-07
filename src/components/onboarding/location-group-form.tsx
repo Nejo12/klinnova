@@ -2,11 +2,13 @@
 
 import { useActionState } from "react";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import {
   saveLocationGroupAction,
   type OnboardingActionState,
 } from "@/app/candidate/onboarding/actions";
 import { TRAVEL_TIME_OPTIONS } from "@/lib/onboarding/allow-lists";
+import { localizeOnboardingError } from "@/lib/onboarding/localize-error";
 
 import { GroupNav } from "./group-nav";
 import styles from "./onboarding.module.scss";
@@ -20,6 +22,7 @@ const initialState: OnboardingActionState = { error: null, message: null };
 export function LocationGroupForm({
   travelRadiusMinutes,
 }: LocationGroupFormProps) {
+  const { locale, t } = useLocale();
   const [state, formAction, pending] = useActionState(
     saveLocationGroupAction,
     initialState,
@@ -29,13 +32,16 @@ export function LocationGroupForm({
     <form className={styles.form} action={formAction} noValidate>
       <input type="hidden" name="city" value="Berlin" />
       <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>Where you can work</legend>
+        <legend className={styles.legend}>
+          {t("candidate.onboarding.locationQuestion")}
+        </legend>
         <p className={styles.support}>
-          Klinnova starts in Berlin. Choose the longest one-way travel time you
-          are willing to take.
+          {t("candidate.onboarding.locationHelp")}
         </p>
         <p className={styles.option}>
-          <span className={styles.optionLabel}>City: Berlin</span>
+          <span className={styles.optionLabel}>
+            {t("candidate.onboarding.cityBerlin")}
+          </span>
         </p>
         <div
           className={styles.optionList}
@@ -51,7 +57,11 @@ export function LocationGroupForm({
                 defaultChecked={travelRadiusMinutes === option.minutes}
                 required
               />
-              <span className={styles.optionLabel}>{option.label}</span>
+              <span className={styles.optionLabel}>
+                {locale === "de"
+                  ? `Bis zu ${option.minutes} Minuten pro Strecke`
+                  : option.label}
+              </span>
             </label>
           ))}
         </div>
@@ -59,7 +69,7 @@ export function LocationGroupForm({
 
       {state.error !== null ? (
         <p className={styles.error} role="alert">
-          {state.error}
+          {localizeOnboardingError(state.error, t)}
         </p>
       ) : null}
 

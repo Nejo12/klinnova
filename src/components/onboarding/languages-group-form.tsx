@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import {
   saveLanguagesGroupAction,
   type OnboardingActionState,
@@ -12,6 +13,12 @@ import {
   LANGUAGE_PROFICIENCY_OPTIONS,
 } from "@/lib/onboarding/allow-lists";
 import type { CandidateLanguageRow } from "@/lib/onboarding/load-candidate";
+import { localizeOnboardingError } from "@/lib/onboarding/localize-error";
+import {
+  germanComfortLabel,
+  languageLabel,
+  languageProficiencyLabel,
+} from "@/lib/matching/labels";
 
 import { GroupNav } from "./group-nav";
 import styles from "./onboarding.module.scss";
@@ -33,6 +40,7 @@ export function LanguagesGroupForm({
   germanComfort,
   languages,
 }: LanguagesGroupFormProps) {
+  const { locale, t } = useLocale();
   const [state, formAction, pending] = useActionState(
     saveLanguagesGroupAction,
     initialState,
@@ -67,9 +75,11 @@ export function LanguagesGroupForm({
   return (
     <form className={styles.form} action={formAction} noValidate>
       <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>German comfort</legend>
+        <legend className={styles.legend}>
+          {t("candidate.onboarding.germanComfort")}
+        </legend>
         <p className={styles.support}>
-          Self-reported comfort using German at work — not a certificate.
+          {t("candidate.onboarding.germanComfortHelp")}
         </p>
         <div
           className={styles.optionList}
@@ -85,23 +95,26 @@ export function LanguagesGroupForm({
                 defaultChecked={germanComfort === option.code}
                 required
               />
-              <span className={styles.optionLabel}>{option.label}</span>
+              <span className={styles.optionLabel}>
+                {germanComfortLabel(option.code, locale)}
+              </span>
             </label>
           ))}
         </div>
       </fieldset>
 
       <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>Languages you speak</legend>
+        <legend className={styles.legend}>
+          {t("candidate.onboarding.languagesSpoken")}
+        </legend>
         <p className={styles.support}>
-          Add every language that helps you work. “Another language” records
-          that the list is incomplete — no free-text name in this step.
+          {t("candidate.onboarding.languagesHelp")}
         </p>
         {rows.map((row, index) => (
           <div className={styles.languageRow} key={row.key}>
             <div className={styles.field}>
               <label className={styles.label} htmlFor={`language-${row.key}`}>
-                Language {index + 1}
+                {t("candidate.onboarding.language")} {index + 1}
               </label>
               <select
                 className={styles.select}
@@ -111,11 +124,11 @@ export function LanguagesGroupForm({
                 required
               >
                 <option value="" disabled>
-                  Choose a language
+                  {t("candidate.onboarding.chooseLanguage")}
                 </option>
                 {LANGUAGE_OPTIONS.map((option) => (
                   <option key={option.code} value={option.code}>
-                    {option.label}
+                    {languageLabel(option.code, locale)}
                   </option>
                 ))}
               </select>
@@ -125,7 +138,7 @@ export function LanguagesGroupForm({
                 className={styles.label}
                 htmlFor={`proficiency-${row.key}`}
               >
-                Proficiency {index + 1}
+                {t("candidate.onboarding.proficiency")} {index + 1}
               </label>
               <select
                 className={styles.select}
@@ -136,7 +149,7 @@ export function LanguagesGroupForm({
               >
                 {LANGUAGE_PROFICIENCY_OPTIONS.map((option) => (
                   <option key={option.code} value={option.code}>
-                    {option.label}
+                    {languageProficiencyLabel(option.code, locale)}
                   </option>
                 ))}
               </select>
@@ -147,10 +160,10 @@ export function LanguagesGroupForm({
               onClick={() => {
                 removeRow(row.key);
               }}
-              aria-label={`Remove language entry ${index + 1}`}
+              aria-label={`${t("candidate.onboarding.removeLanguage")} ${index + 1}`}
               disabled={rows.length <= 1}
             >
-              Remove
+              {t("candidate.onboarding.remove")}
             </button>
           </div>
         ))}
@@ -159,13 +172,13 @@ export function LanguagesGroupForm({
           type="button"
           onClick={addRow}
         >
-          Add another language
+          {t("candidate.onboarding.addLanguage")}
         </button>
       </fieldset>
 
       {state.error !== null ? (
         <p className={styles.error} role="alert">
-          {state.error}
+          {localizeOnboardingError(state.error, t)}
         </p>
       ) : null}
 

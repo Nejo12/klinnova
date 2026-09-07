@@ -2,11 +2,13 @@
 
 import { useActionState } from "react";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import {
   saveAvailabilityGroupAction,
   type OnboardingActionState,
 } from "@/app/candidate/onboarding/actions";
 import { berlinTodayIso } from "@/lib/onboarding/schemas";
+import { localizeOnboardingError } from "@/lib/onboarding/localize-error";
 
 import { GroupNav } from "./group-nav";
 import styles from "./onboarding.module.scss";
@@ -20,6 +22,7 @@ const initialState: OnboardingActionState = { error: null, message: null };
 export function AvailabilityGroupForm({
   availableFrom,
 }: AvailabilityGroupFormProps) {
+  const { t } = useLocale();
   const [state, formAction, pending] = useActionState(
     saveAvailabilityGroupAction,
     initialState,
@@ -32,11 +35,10 @@ export function AvailabilityGroupForm({
     <form className={styles.form} action={formAction} noValidate>
       <div className={styles.field}>
         <label className={styles.label} htmlFor="availableFrom">
-          Earliest date you can start
+          {t("candidate.onboarding.availabilityLabel")}
         </label>
         <p className={styles.support}>
-          Choose today or a future date (Berlin calendar). Weekly schedules come
-          later.
+          {t("candidate.onboarding.availabilityHelp")}
         </p>
         <input
           className={styles.input}
@@ -51,7 +53,7 @@ export function AvailabilityGroupForm({
 
       {state.error !== null ? (
         <p className={styles.error} role="alert">
-          {state.error}
+          {localizeOnboardingError(state.error, t)}
         </p>
       ) : null}
 

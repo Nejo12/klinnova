@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { Locale } from "@/lib/i18n/locale";
 
 /**
  * M5.1 Unit E. The outcome-type vocabulary belongs to the application
@@ -23,8 +24,18 @@ const OUTCOME_TYPE_LABELS: Record<OutcomeType, string> = {
   hired: "Hired",
 };
 
-export function outcomeTypeLabel(outcomeType: OutcomeType): string {
-  return OUTCOME_TYPE_LABELS[outcomeType];
+const OUTCOME_TYPE_LABELS_DE: Record<OutcomeType, string> = {
+  interview_completed: "Vorstellungsgespräch abgeschlossen",
+  hired: "Eingestellt",
+};
+
+export function outcomeTypeLabel(
+  outcomeType: OutcomeType,
+  locale: Locale = "en",
+): string {
+  return locale === "de"
+    ? OUTCOME_TYPE_LABELS_DE[outcomeType]
+    : OUTCOME_TYPE_LABELS[outcomeType];
 }
 
 /** Berlin calendar day as YYYY-MM-DD — re-exported so callers needing both

@@ -48,24 +48,32 @@ describe("buildApplicationPreview", () => {
       employerDisplayName: "Demo Berlin Work Co",
       candidateDisplayName: "Ada Candidate",
       matchedJobCategoryLabel: "Hospitality",
+      matchedJobCategory: "hospitality",
       germanComfortLabel: "I can understand and use some basic German",
+      germanComfort: "basic",
       relevantLanguages: [
         {
           languageCode: "en",
           languageLabel: "English",
           proficiencyLabel: "Native",
+          proficiency: "native",
         },
         {
           languageCode: "tr",
           languageLabel: "Turkish",
           proficiencyLabel: "Basic",
+          proficiency: "basic",
         },
       ],
       noAdditionalLanguagesLabel: null,
       workAuthorisationDeclaredLabel: "Yes",
+      workAuthorisationDeclared: true,
       availableFromLabel: "15 August 2026",
+      availableFrom: "2026-08-15",
       employmentPreferencesLabel: "Full time, Part time, and Mini-job",
+      employmentPreferences: ["full_time", "part_time", "mini_job"],
       shiftPreferencesLabel: "Morning, Daytime, and Weekend",
+      shiftPreferences: ["morning", "daytime", "weekend"],
     });
 
     const serialized = JSON.stringify(preview);

@@ -7,8 +7,34 @@ vi.mock("@/app/candidate/onboarding/actions", () => ({
 }));
 
 import { LanguagesGroupForm } from "@/components/onboarding/languages-group-form";
+import { LocaleProvider } from "@/components/i18n/locale-provider";
 
 describe("LanguagesGroupForm", () => {
+  it("localizes labels and option presentation without changing stored values", () => {
+    document.documentElement.dataset.locale = "de";
+    document.documentElement.lang = "de";
+
+    render(
+      <LocaleProvider>
+        <LanguagesGroupForm
+          germanComfort="basic"
+          languages={[{ id: "1", languageCode: "en", proficiency: "native" }]}
+        />
+      </LocaleProvider>,
+    );
+
+    expect(
+      screen.getByRole("group", { name: "Deutschkenntnisse" }),
+    ).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Englisch")).toHaveValue("en");
+    expect(screen.getByDisplayValue("Muttersprache")).toHaveValue("native");
+    expect(
+      screen.getByRole("button", { name: "Speichern und fortfahren" }),
+    ).toBeEnabled();
+
+    document.documentElement.dataset.locale = "en";
+    document.documentElement.lang = "en";
+  });
   it("renders accessible heading controls and persisted defaults", async () => {
     const user = userEvent.setup();
     render(

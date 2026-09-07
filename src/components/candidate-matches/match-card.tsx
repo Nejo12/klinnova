@@ -1,6 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
-import { APPLIED_STATUS_LABEL } from "@/lib/applications/application-confirmation";
+import { useLocale } from "@/components/i18n/locale-provider";
 import type { OwnedApplicationSummary } from "@/lib/applications/owned-application";
 import {
   jobCategoryLabel,
@@ -8,7 +10,6 @@ import {
   workplaceTypeLabel,
 } from "@/lib/public-jobs/labels";
 import type { PublicVacancy } from "@/lib/public-jobs/domain";
-import { DEMO_VACANCY_LABEL } from "@/lib/public-jobs/messages";
 
 import styles from "./candidate-matches.module.scss";
 
@@ -39,13 +40,16 @@ function uniqueNonEmpty(values: readonly (string | null)[]): string[] {
   return result;
 }
 
-function formatEmployerLine(vacancy: PublicVacancy): string {
+function formatEmployerLine(
+  vacancy: PublicVacancy,
+  defaultEmployer: string,
+): string {
   const nameParts = uniqueNonEmpty([
     vacancy.companyName,
     vacancy.employerDisplayName,
   ]);
   const employerName =
-    nameParts.length > 0 ? nameParts.join(" · ") : "Berlin employer";
+    nameParts.length > 0 ? nameParts.join(" · ") : defaultEmployer;
   const locality =
     vacancy.publicLocality !== null
       ? `${vacancy.publicLocality}, Berlin`
@@ -54,25 +58,29 @@ function formatEmployerLine(vacancy: PublicVacancy): string {
   return [employerName, locality].filter(Boolean).join(" · ");
 }
 
-function getMatchFacts(vacancy: PublicVacancy): MatchFact[] {
+function getMatchFacts(
+  vacancy: PublicVacancy,
+  locale: "en" | "de",
+  labels: { category: string; workplace: string; frequency: string },
+): MatchFact[] {
   const facts: MatchFact[] = [
     {
-      label: "Category",
-      value: jobCategoryLabel(vacancy.jobCategory),
+      label: labels.category,
+      value: jobCategoryLabel(vacancy.jobCategory, locale),
     },
   ];
 
   if (vacancy.workplaceType !== null) {
     facts.push({
-      label: "Workplace",
-      value: workplaceTypeLabel(vacancy.workplaceType),
+      label: labels.workplace,
+      value: workplaceTypeLabel(vacancy.workplaceType, locale),
     });
   }
 
   if (vacancy.workFrequency !== null) {
     facts.push({
-      label: "Frequency",
-      value: workFrequencyLabel(vacancy.workFrequency),
+      label: labels.frequency,
+      value: workFrequencyLabel(vacancy.workFrequency, locale),
     });
   }
 
@@ -80,9 +88,14 @@ function getMatchFacts(vacancy: PublicVacancy): MatchFact[] {
 }
 
 export function MatchCard({ vacancy, application }: MatchCardProps) {
+  const { locale, t } = useLocale();
   const titleId = `match-title-${vacancy.vacancyId}`;
   const detailHref = `/candidate/jobs/${vacancy.vacancyId}`;
-  const facts = getMatchFacts(vacancy);
+  const facts = getMatchFacts(vacancy, locale, {
+    category: t("candidate.matches.category"),
+    workplace: t("candidate.matches.workplace"),
+    frequency: t("candidate.matches.frequency"),
+  });
   const applicationHref =
     application !== null
       ? `/candidate/applications/${application.applicationId}`
@@ -92,13 +105,17 @@ export function MatchCard({ vacancy, application }: MatchCardProps) {
     <article className={styles.card} aria-labelledby={titleId}>
       <div className={styles.badgeGroup}>
         {vacancy.source === "seed" ? (
-          <p className={styles.demoLabel}>{DEMO_VACANCY_LABEL}</p>
+          <p className={styles.demoLabel}>{t("publicJobs.demo")}</p>
         ) : null}
         {vacancy.source === "employer" ? (
-          <p className={styles.verifiedBadge}>Verified employer</p>
+          <p className={styles.verifiedBadge}>
+            {t("candidate.matches.verifiedEmployer")}
+          </p>
         ) : null}
         {application !== null ? (
-          <p className={styles.appliedLabel}>{APPLIED_STATUS_LABEL}</p>
+          <p className={styles.appliedLabel}>
+            {t("candidate.matches.applied")}
+          </p>
         ) : null}
       </div>
 
@@ -108,7 +125,9 @@ export function MatchCard({ vacancy, application }: MatchCardProps) {
         </h2>
       </div>
 
-      <p className={styles.company}>{formatEmployerLine(vacancy)}</p>
+      <p className={styles.company}>
+        {formatEmployerLine(vacancy, t("publicJobs.defaultEmployer"))}
+      </p>
       {vacancy.description !== null && vacancy.description.trim().length > 0 ? (
         <p className={styles.summary}>{vacancy.description}</p>
       ) : null}
@@ -127,9 +146,9 @@ export function MatchCard({ vacancy, application }: MatchCardProps) {
           <Link
             className={styles.applicationLink}
             href={applicationHref}
-            aria-label={`View application: ${vacancy.title}`}
+            aria-label={`${t("candidate.matches.viewApplication")}: ${vacancy.title}`}
           >
-            View application
+            {t("candidate.matches.viewApplication")}
           </Link>
         ) : null}
         <Link
@@ -137,9 +156,9 @@ export function MatchCard({ vacancy, application }: MatchCardProps) {
             applicationHref === null ? styles.detailLink : styles.secondaryLink
           }
           href={detailHref}
-          aria-label={`View job: ${vacancy.title}`}
+          aria-label={`${t("candidate.matches.viewJob")}: ${vacancy.title}`}
         >
-          View job
+          {t("candidate.matches.viewJob")}
         </Link>
       </div>
     </article>

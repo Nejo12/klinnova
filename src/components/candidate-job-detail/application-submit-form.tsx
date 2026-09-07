@@ -12,15 +12,6 @@ import {
   normalizeApplicationIntroduction,
 } from "@/lib/applications/application-introduction";
 import {
-  APPLICATION_FAILURE_MESSAGE,
-  APPLICATION_INELIGIBLE_BODY,
-  APPLICATION_INELIGIBLE_HEADING,
-  APPLICATION_SUBMIT_DISCLOSURE,
-  APPLICATION_UNAVAILABLE_BODY,
-  APPLICATION_UNAVAILABLE_HEADING,
-  APPLICATION_VALIDATION_MESSAGE,
-} from "@/lib/applications/messages";
-import {
   initialSubmitCandidateApplicationState,
   type SubmitCandidateApplicationState,
 } from "@/lib/applications/submit-action-state";
@@ -54,7 +45,10 @@ function SubmitButton() {
   );
 }
 
-function resultCopy(state: SubmitCandidateApplicationState): {
+function resultCopy(
+  state: SubmitCandidateApplicationState,
+  t: ReturnType<typeof useLocale>["t"],
+): {
   heading: string;
   body: string;
 } | null {
@@ -64,23 +58,23 @@ function resultCopy(state: SubmitCandidateApplicationState): {
       return null;
     case "ineligible":
       return {
-        heading: APPLICATION_INELIGIBLE_HEADING,
-        body: APPLICATION_INELIGIBLE_BODY,
+        heading: t("candidate.jobs.ineligibleHeading"),
+        body: t("candidate.jobs.ineligibleBody"),
       };
     case "unavailable":
       return {
-        heading: APPLICATION_UNAVAILABLE_HEADING,
-        body: APPLICATION_UNAVAILABLE_BODY,
+        heading: t("candidate.jobs.unavailableHeading"),
+        body: t("candidate.jobs.unavailableApplyBody"),
       };
     case "validation_error":
       return {
-        heading: APPLICATION_UNAVAILABLE_HEADING,
-        body: APPLICATION_VALIDATION_MESSAGE,
+        heading: t("candidate.jobs.unavailableHeading"),
+        body: t("candidate.jobs.validationBody"),
       };
     case "failure":
       return {
-        heading: "Submission failed",
-        body: APPLICATION_FAILURE_MESSAGE,
+        heading: t("candidate.jobs.submitFailure"),
+        body: t("candidate.jobs.failureBody"),
       };
     case "idle":
       return null;
@@ -109,7 +103,7 @@ export function ApplicationSubmitForm({
     initialSubmitCandidateApplicationState,
   );
   const resultRef = useRef<HTMLDivElement>(null);
-  const result = resultCopy(state);
+  const result = resultCopy(state, t);
   const remaining = APPLICATION_INTRODUCTION_MAX_LENGTH - introduction.length;
 
   useEffect(() => {
@@ -155,7 +149,7 @@ export function ApplicationSubmitForm({
                 labelledBy="application-submit-result-heading"
               />
               <Link className={styles.cta} href={onboardingGroupHref("review")}>
-                Review your saved preferences
+                {t("candidate.jobs.reviewPreferences")}
               </Link>
             </>
           ) : null}
@@ -186,7 +180,7 @@ export function ApplicationSubmitForm({
             )}
           </div>
           <p className={styles.disclosure} id="application-submit-disclosure">
-            {APPLICATION_SUBMIT_DISCLOSURE}
+            {t("candidate.jobs.submitDisclosure")}
           </p>
           <div className={styles.formActions}>
             <button

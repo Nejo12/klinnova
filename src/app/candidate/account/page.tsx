@@ -2,12 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { CandidateAppHeader } from "@/components/candidate-nav/candidate-app-header";
+import { LocalizedText } from "@/components/i18n/localized-text";
 import { SessionSecurity } from "@/components/auth/session-security";
-import {
-  CANDIDATE_EXPORT_BUTTON_LABEL,
-  CANDIDATE_EXPORT_LEAD,
-} from "@/lib/account-export/messages";
-import { DELETE_ACCOUNT_HEADING } from "@/lib/account-deletion/messages";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -36,9 +32,11 @@ export default async function CandidateAccountPage() {
     <main className={styles.page}>
       <CandidateAppHeader current="account" showEmployerNav={showEmployerNav} />
 
-      <h1 className={styles.heading}>Account</h1>
+      <h1 className={styles.heading}>
+        <LocalizedText message="candidate.account.heading" />
+      </h1>
       <p className={styles.lead}>
-        Download your data, delete your account, or sign out.
+        <LocalizedText message="candidate.account.lead" />
       </p>
 
       <section
@@ -46,16 +44,18 @@ export default async function CandidateAccountPage() {
         aria-labelledby="account-export-heading"
       >
         <h2 className={styles.heading} id="account-export-heading">
-          Your data
+          <LocalizedText message="candidate.account.yourData" />
         </h2>
-        <p className={styles.note}>{CANDIDATE_EXPORT_LEAD}</p>
+        <p className={styles.note}>
+          <LocalizedText message="candidate.account.exportLead" />
+        </p>
         <p>
           {/* Plain anchor, not next/link: this is a real file download from
               a Route Handler, not a client-side page transition. The
               server's Content-Disposition header is the authoritative
               download mechanism, not this element. */}
           <a className={styles.secondaryLink} href="/candidate/account/export">
-            {CANDIDATE_EXPORT_BUTTON_LABEL}
+            <LocalizedText message="candidate.account.exportAction" />
           </a>
         </p>
       </section>
@@ -65,14 +65,14 @@ export default async function CandidateAccountPage() {
         aria-labelledby="account-delete-heading"
       >
         <h2 className={styles.heading} id="account-delete-heading">
-          Delete account
+          <LocalizedText message="candidate.account.deleteSection" />
         </h2>
         <p>
           <Link
             className={styles.secondaryLink}
             href="/candidate/account/delete"
           >
-            {DELETE_ACCOUNT_HEADING}
+            <LocalizedText message="candidate.account.deleteHeading" />
           </Link>
         </p>
       </section>

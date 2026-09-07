@@ -103,6 +103,13 @@ const GERMAN_COMFORT_LABELS = Object.fromEntries(
   GERMAN_COMFORT_OPTIONS.map((option) => [option.code, option.label]),
 ) as Record<GermanComfortCode, string>;
 
+const GERMAN_COMFORT_LABELS_DE: Record<GermanComfortCode, string> = {
+  none: "Ich spreche noch kein Deutsch",
+  basic: "Ich verstehe und spreche etwas Deutsch",
+  conversational: "Ich kann Alltagsgespräche führen",
+  comfortable: "Ich kann sicher auf Deutsch arbeiten",
+};
+
 /** Short vacancy-facing German requirement labels (not long onboarding sentences). */
 const GERMAN_REQUIREMENT_LABELS: Record<GermanComfortCode, string> = {
   none: "No German required",
@@ -184,8 +191,13 @@ export function languageProficiencyLabel(
     : LANGUAGE_PROFICIENCY_LABELS[code];
 }
 
-export function germanComfortLabel(code: GermanComfortCode): string {
-  return GERMAN_COMFORT_LABELS[code];
+export function germanComfortLabel(
+  code: GermanComfortCode,
+  locale: Locale = "en",
+): string {
+  return locale === "de"
+    ? GERMAN_COMFORT_LABELS_DE[code]
+    : GERMAN_COMFORT_LABELS[code];
 }
 
 export function germanRequirementLabel(
@@ -198,7 +210,10 @@ export function germanRequirementLabel(
 }
 
 /** Format validated `YYYY-MM-DD` without timezone Date conversion. */
-export function formatIsoCalendarDate(isoDate: string): string {
+export function formatIsoCalendarDate(
+  isoDate: string,
+  locale: Locale = "en",
+): string {
   const [yearText, monthText, dayText] = isoDate.split("-");
   const year = Number(yearText);
   const month = Number(monthText);
@@ -211,6 +226,12 @@ export function formatIsoCalendarDate(isoDate: string): string {
     monthName === undefined
   ) {
     return isoDate;
+  }
+  if (locale === "de") {
+    return new Intl.DateTimeFormat("de-DE", {
+      dateStyle: "long",
+      timeZone: "UTC",
+    }).format(new Date(Date.UTC(year, month - 1, day)));
   }
   return `${day} ${monthName} ${year}`;
 }

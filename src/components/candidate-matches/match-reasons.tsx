@@ -1,3 +1,7 @@
+"use client";
+
+import { useLocale } from "@/components/i18n/locale-provider";
+
 import { presentMatchReasons } from "@/lib/matching/present-reasons";
 import type { MatchReason } from "@/lib/matching/types";
 
@@ -9,7 +13,8 @@ type MatchReasonsProps = {
 };
 
 export function MatchReasons({ reasons, labelledBy }: MatchReasonsProps) {
-  const presented = presentMatchReasons(reasons);
+  const { locale, t } = useLocale();
+  const presented = presentMatchReasons(reasons, locale);
   if (presented.length === 0) {
     return null;
   }
@@ -17,7 +22,7 @@ export function MatchReasons({ reasons, labelledBy }: MatchReasonsProps) {
   return (
     <>
       <h3 className={styles.reasonsHeading} id={labelledBy}>
-        Why this matches
+        {t("candidate.matches.why")}
       </h3>
       <ul className={styles.reasons} aria-labelledby={labelledBy}>
         {presented.map((reason) => (

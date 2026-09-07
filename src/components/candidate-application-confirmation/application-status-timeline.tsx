@@ -1,3 +1,7 @@
+"use client";
+
+import { useLocale } from "@/components/i18n/locale-provider";
+
 import { formatSubmittedAtUtc } from "@/lib/applications/application-confirmation";
 import { candidateStatusDisplayLabel } from "@/lib/applications/candidate-status-labels";
 import type { CandidateApplicationHistoryEntry } from "@/lib/applications/load-candidate-application-history";
@@ -18,17 +22,21 @@ type ApplicationStatusTimelineProps = {
 export function ApplicationStatusTimeline({
   history,
 }: ApplicationStatusTimelineProps) {
+  const { locale, t } = useLocale();
   return (
     <section
       className={styles.section}
       aria-labelledby="confirmation-timeline-heading"
     >
       <h2 className={styles.sectionHeading} id="confirmation-timeline-heading">
-        Status timeline
+        {t("candidate.applications.statusTimeline")}
       </h2>
       <ul className={styles.timeline}>
         {history.map((entry, index) => {
-          const occurredAtLabel = formatSubmittedAtUtc(entry.occurred_at);
+          const occurredAtLabel = formatSubmittedAtUtc(
+            entry.occurred_at,
+            locale,
+          );
           return (
             <li
               key={`${entry.to_status}-${entry.occurred_at}-${index}`}
@@ -39,7 +47,7 @@ export function ApplicationStatusTimeline({
               </span>
               <div className={styles.timelineContent}>
                 <p className={styles.timelineStatus}>
-                  {candidateStatusDisplayLabel(entry.to_status)}
+                  {candidateStatusDisplayLabel(entry.to_status, locale)}
                 </p>
                 <time
                   className={styles.timelineTime}

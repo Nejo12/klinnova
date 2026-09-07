@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { Locale } from "@/lib/i18n/locale";
 
 /**
  * Canonical missing-requirement codes returned by the PR 5.5c database
@@ -44,8 +45,22 @@ const MISSING_REQUIREMENT_LABELS: Record<MissingRequirementCode, string> = {
   availability: "Availability date",
 };
 
-export function missingRequirementLabel(code: MissingRequirementCode): string {
-  return MISSING_REQUIREMENT_LABELS[code];
+const MISSING_REQUIREMENT_LABELS_DE: Record<MissingRequirementCode, string> = {
+  category: "Bevorzugte Jobkategorie",
+  employment_type: "Bevorzugte Beschäftigungsart",
+  shift: "Bevorzugte Schicht",
+  german: "Deutschkenntnisse",
+  language: "Sprachprofil",
+  availability: "Verfügbarkeitsdatum",
+};
+
+export function missingRequirementLabel(
+  code: MissingRequirementCode,
+  locale: Locale = "en",
+): string {
+  return locale === "de"
+    ? MISSING_REQUIREMENT_LABELS_DE[code]
+    : MISSING_REQUIREMENT_LABELS[code];
 }
 
 /**

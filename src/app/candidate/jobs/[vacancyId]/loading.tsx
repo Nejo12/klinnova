@@ -1,3 +1,7 @@
+"use client";
+
+import { useLocale } from "@/components/i18n/locale-provider";
+
 import {
   DelayedReveal,
   Skeleton,
@@ -46,10 +50,11 @@ function MetaRowSkeleton({
  * pair per genuinely distinct region restores it.
  */
 export default function Loading() {
+  const { t } = useLocale();
   return (
     <main className={styles.page}>
       <DelayedReveal>
-        <SkeletonRegion label="Loading job title">
+        <SkeletonRegion label={t("candidate.loading.jobTitle")}>
           <div className={styles.titleRow}>
             <Skeleton height="2.25rem" width="60%" radius="sm" />
             <div className={styles.badgeGroup}>
@@ -60,13 +65,13 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading employer name">
+        <SkeletonRegion label={t("candidate.loading.employer")}>
           <Skeleton height="1.25rem" width="45%" radius="sm" />
         </SkeletonRegion>
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading job details">
+        <SkeletonRegion label={t("candidate.loading.jobDetails")}>
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="9rem" radius="sm" />
             <div className={styles.meta}>
@@ -79,7 +84,7 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading job description">
+        <SkeletonRegion label={t("candidate.loading.jobDescription")}>
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="10rem" radius="sm" />
             <Skeleton height="1rem" width="100%" radius="sm" />

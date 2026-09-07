@@ -33,6 +33,280 @@ const englishMessages = {
   "account.logOutLocalHint": "End only this browser session.",
   "account.logOutAllHint":
     "Use this only if you need to end every Klinnova session.",
+  "candidate.navLabel": "Candidate",
+  "candidate.nav.matches": "Matches",
+  "candidate.nav.applications": "Applications",
+  "candidate.nav.profile": "Profile",
+  "candidate.nav.account": "Account",
+  "candidate.home.welcome": "Welcome",
+  "candidate.home.readyLead":
+    "Your essential answers are saved. Confirm completion from review when you are ready.",
+  "candidate.home.incompleteLead":
+    "Continue essential onboarding so we can match you carefully. Progress is saved after each section.",
+  "candidate.home.sectionsSaved": "sections saved",
+  "candidate.home.progressLabel": "Onboarding sections saved",
+  "candidate.home.review": "Review and confirm essentials",
+  "candidate.home.continue": "Continue onboarding",
+  "candidate.onboarding.savedLead":
+    "Progress is saved when you continue. You can go back or reload without losing what you already saved.",
+  "candidate.onboarding.progress": "Onboarding progress",
+  "candidate.onboarding.saved": "Saved",
+  "candidate.onboarding.current": "Current",
+  "candidate.onboarding.next": "Next",
+  "candidate.onboarding.backPrevious": "Back to previous section",
+  "candidate.onboarding.backHome": "Back to candidate home",
+  "candidate.onboarding.saveContinue": "Save and continue",
+  "candidate.onboarding.saveReview": "Save and review",
+  "candidate.onboarding.saving": "Saving…",
+  "candidate.onboarding.group.languages": "Languages and German comfort",
+  "candidate.onboarding.group.workAuthorisation": "Work authorisation",
+  "candidate.onboarding.group.location": "Berlin and travel time",
+  "candidate.onboarding.group.categories": "Job categories",
+  "candidate.onboarding.group.availability": "Earliest availability",
+  "candidate.onboarding.group.employment": "Employment types and shifts",
+  "candidate.onboarding.germanComfort": "German comfort",
+  "candidate.onboarding.germanComfortHelp":
+    "Self-reported comfort using German at work — not a certificate.",
+  "candidate.onboarding.languagesSpoken": "Languages you speak",
+  "candidate.onboarding.languagesHelp":
+    "Add every language that helps you work. “Another language” records that the list is incomplete — no free-text name in this step.",
+  "candidate.onboarding.language": "Language",
+  "candidate.onboarding.proficiency": "Proficiency",
+  "candidate.onboarding.chooseLanguage": "Choose a language",
+  "candidate.onboarding.removeLanguage": "Remove language entry",
+  "candidate.onboarding.remove": "Remove",
+  "candidate.onboarding.addLanguage": "Add another language",
+  "candidate.onboarding.workAuthorisationQuestion":
+    "Are you currently allowed to work in Germany?",
+  "candidate.onboarding.workAuthorisationHelp":
+    "This is your own declaration. Klinnova is not verifying documents at this step.",
+  "candidate.onboarding.workAuthorisationNotSure":
+    "That is fine. You can continue other questions and return when you are ready. Matching will wait until you can declare that you are allowed to work in Germany.",
+  "candidate.onboarding.yes": "Yes",
+  "candidate.onboarding.notSure": "Not sure",
+  "candidate.onboarding.locationQuestion": "Where you can work",
+  "candidate.onboarding.locationHelp":
+    "Klinnova starts in Berlin. Choose the longest one-way travel time you are willing to take.",
+  "candidate.onboarding.cityBerlin": "City: Berlin",
+  "candidate.onboarding.categoriesHelp":
+    "Choose every kind of work you want to be considered for.",
+  "candidate.onboarding.availabilityLabel": "Earliest date you can start",
+  "candidate.onboarding.availabilityHelp":
+    "Choose today or a future date (Berlin calendar). Weekly schedules come later.",
+  "candidate.onboarding.employmentTypes": "Employment types",
+  "candidate.onboarding.shiftPreferences": "Shift preferences",
+  "candidate.onboarding.notAnswered": "Not answered",
+  "candidate.onboarding.upToTravel": "up to {minutes} minutes travel",
+  "candidate.onboarding.failure":
+    "We could not save that just now. Please try again.",
+  "candidate.onboarding.sessionExpired":
+    "Your session has ended. Log in again to continue.",
+  "candidate.onboarding.completeFailure":
+    "We could not confirm your essentials just now. Please try again.",
+  "candidate.onboarding.validation.duplicates": "Remove duplicate selections.",
+  "candidate.onboarding.validation.german":
+    "Choose how comfortable you are using German.",
+  "candidate.onboarding.validation.language":
+    "Choose a language from the list.",
+  "candidate.onboarding.validation.proficiency": "Choose a proficiency level.",
+  "candidate.onboarding.validation.addLanguage": "Add at least one language.",
+  "candidate.onboarding.validation.uniqueLanguage":
+    "Each language can only be listed once.",
+  "candidate.onboarding.validation.option": "Choose an option to continue.",
+  "candidate.onboarding.validation.travel":
+    "Choose a maximum one-way travel time.",
+  "candidate.onboarding.validation.category":
+    "Choose at least one job category.",
+  "candidate.onboarding.validation.date": "Enter a valid date.",
+  "candidate.onboarding.validation.futureDate":
+    "Choose today or a future date.",
+  "candidate.onboarding.validation.employment":
+    "Choose at least one employment type.",
+  "candidate.onboarding.validation.shift":
+    "Choose at least one shift preference.",
+  "candidate.matches.heading": "Matches",
+  "candidate.matches.lead": "Matches use your saved profile.",
+  "candidate.matches.countOne": "current role",
+  "candidate.matches.countMany": "current roles",
+  "candidate.matches.workAuthorisation":
+    "Matches are shown using the work-authorisation declaration you provided during onboarding. Klinnova has not verified documents.",
+  "candidate.matches.emptyHeading": "No matches right now",
+  "candidate.matches.emptyBody":
+    "No jobs match all of your saved preferences right now.",
+  "candidate.matches.emptyActionHeading": "What you can do",
+  "candidate.matches.emptyActionBody":
+    "Review your saved preferences. Opening them does not clear your completion on its own.",
+  "candidate.matches.emptyAction": "Review your saved preferences",
+  "candidate.matches.errorHeading": "We could not load your matches",
+  "candidate.matches.errorSubheading": "If loading fails",
+  "candidate.matches.errorBody":
+    "Something went wrong on our side. Please try again later.",
+  "candidate.matches.retry": "Try again",
+  "candidate.matches.errorAction": "Review saved preferences",
+  "candidate.matches.verifiedEmployer": "Verified employer",
+  "candidate.matches.applied": "Applied",
+  "candidate.matches.viewJob": "View job",
+  "candidate.matches.viewApplication": "View application",
+  "candidate.matches.category": "Category",
+  "candidate.matches.workplace": "Workplace",
+  "candidate.matches.frequency": "Frequency",
+  "candidate.matches.why": "Why this matches",
+  "candidate.pulse.label": "Klinnova matching journey",
+  "candidate.pulse.stages": "Journey stages",
+  "candidate.pulse.understanding": "Understanding",
+  "candidate.pulse.connecting": "Connecting",
+  "candidate.pulse.progressing": "Progressing",
+  "candidate.pulse.profileReady": "Profile ready",
+  "candidate.pulse.ready": "Ready for matching",
+  "candidate.pulse.readyBody":
+    "Your saved essentials are complete. Klinnova can now use them to identify current opportunities that fit.",
+  "candidate.pulse.showNow": "Show matches now",
+  "candidate.pulse.matching": "Matching with your profile",
+  "candidate.pulse.guidance":
+    "These matches use the profile you just confirmed.",
+  "candidate.pulse.roles": "Roles",
+  "candidate.pulse.employment": "Employment",
+  "candidate.pulse.shifts": "Shifts",
+  "candidate.pulse.german": "German",
+  "candidate.pulse.languages": "Languages",
+  "candidate.pulse.available": "Available from",
+  "candidate.pulse.notSet": "Not set",
+  "candidate.jobs.back": "Back to matches",
+  "candidate.jobs.details": "Job details",
+  "candidate.jobs.additionalLanguages": "Additional languages",
+  "candidate.jobs.about": "About this job",
+  "candidate.jobs.employerWebsite": "Employer website",
+  "candidate.jobs.application": "Application",
+  "candidate.jobs.missingHeading":
+    "You don’t currently meet these requirements",
+  "candidate.jobs.reviewPreferences": "Review your saved preferences",
+  "candidate.jobs.unavailableHeading": "This job is not available",
+  "candidate.jobs.unavailableBody":
+    "This vacancy is not available to view right now. Return to your matches to see current options.",
+  "candidate.jobs.applicationPreview": "Application preview",
+  "candidate.jobs.previewLeadStart":
+    "This is the profile information that will be stored with your application for",
+  "candidate.jobs.previewLeadAt": "at",
+  "candidate.jobs.yourName": "Your name",
+  "candidate.jobs.job": "Job",
+  "candidate.jobs.employer": "Employer",
+  "candidate.jobs.matchedCategory": "Matched category",
+  "candidate.jobs.germanComfort": "German comfort",
+  "candidate.jobs.workAuthorisation": "Work authorisation",
+  "candidate.jobs.availableFrom": "Available from",
+  "candidate.jobs.employmentPreferences": "Employment preferences",
+  "candidate.jobs.shiftPreferences": "Shift preferences",
+  "candidate.jobs.submitFailure": "Submission failed",
+  "candidate.jobs.submitDisclosure":
+    "You are applying with your saved Klinnova profile. The profile information shown here will be stored with your application and made available for employer review.",
+  "candidate.jobs.ineligibleHeading": "This job needs an updated profile",
+  "candidate.jobs.ineligibleBody":
+    "Your saved preferences no longer meet the requirements below for this vacancy.",
+  "candidate.jobs.unavailableApplyBody":
+    "This vacancy is not available for application right now.",
+  "candidate.jobs.validationBody":
+    "This job could not be submitted. Check the link and try again.",
+  "candidate.jobs.failureBody":
+    "We could not submit your application. Please try again.",
+  "candidate.applications.heading": "Applications",
+  "candidate.applications.lead":
+    "Your active and closed applications in one place.",
+  "candidate.applications.active": "Active",
+  "candidate.applications.closed": "Closed",
+  "candidate.applications.activeLabel": "Active applications",
+  "candidate.applications.closedLabel": "Closed applications",
+  "candidate.applications.location": "Location",
+  "candidate.applications.submitted": "Submitted",
+  "candidate.applications.inReview": "In review",
+  "candidate.applications.shortlisted": "Shortlisted",
+  "candidate.applications.decision": "Decision",
+  "candidate.applications.notSelected": "Not selected",
+  "candidate.applications.emptyHeading": "You haven't applied to any jobs yet",
+  "candidate.applications.browseMatches": "Browse matching jobs",
+  "candidate.applications.findMore": "Find more matches",
+  "candidate.applications.errorHeading": "We could not load your applications",
+  "candidate.applications.errorBody":
+    "Something went wrong on our side. Please try again later.",
+  "candidate.applications.backAccount": "Back to your account",
+  "candidate.applications.receiptMarker": "APPLICATION SUBMITTED",
+  "candidate.applications.receiptHeading": "You're one step closer.",
+  "candidate.applications.receiptBody":
+    "Your application is now with the employer.",
+  "candidate.applications.status": "Status",
+  "candidate.applications.currentStatus": "Current status",
+  "candidate.applications.employment": "Employment",
+  "candidate.applications.shifts": "Shifts",
+  "candidate.applications.german": "German",
+  "candidate.applications.available": "Available",
+  "candidate.applications.noAdditionalLanguages":
+    "No additional language requirements",
+  "candidate.applications.flexibleStart": "Flexible start",
+  "candidate.applications.from": "From",
+  "candidate.applications.jobDetails": "Job details",
+  "candidate.applications.yourSubmittedProfile": "Your submitted profile",
+  "candidate.applications.statusTimeline": "Status timeline",
+  "candidate.applications.outcomeTimeline": "Interview and hire updates",
+  "candidate.applications.nextSteps": "Application next steps",
+  "candidate.applications.acceptedHeading": "Application accepted",
+  "candidate.applications.acceptedBody":
+    "This application has been accepted. Accepted is a status on this application only — it is separate from being hired, employment starting, or a contract being signed.",
+  "candidate.applications.viewJob": "View job",
+  "candidate.applications.backMatches": "Back to matches",
+  "candidate.applications.notAvailableHeading": "Application not available",
+  "candidate.applications.notAvailableBody":
+    "This application could not be shown. It may not exist or you may not have access.",
+  "candidate.account.heading": "Account",
+  "candidate.account.lead":
+    "Download your data, delete your account, or sign out.",
+  "candidate.account.yourData": "Your data",
+  "candidate.account.exportLead":
+    "Download a copy of your Klinnova candidate data as JSON.",
+  "candidate.account.exportAction": "Download candidate data",
+  "candidate.account.deleteSection": "Delete account",
+  "candidate.account.deleteHeading": "Delete my Klinnova account",
+  "candidate.account.deleteLead":
+    "This deletes your Klinnova account across candidate and employer access. Your account information will be anonymized and you will lose access.",
+  "candidate.account.deleteDual":
+    "This account has both candidate and employer access. Deleting it ends both — there is no way to delete only one.",
+  "candidate.account.deleteRetention":
+    "Personal account data is anonymized where the service must preserve structural application or vacancy history.",
+  "candidate.account.deleteConfirm":
+    "I understand that this deletes my whole Klinnova account.",
+  "candidate.account.deleteAction": "Delete my account",
+  "candidate.account.deleting": "Deleting your account…",
+  "candidate.account.pendingDeleteHeading": "Pending deletion request",
+  "candidate.account.pendingDeleteLead":
+    "If you started deleting your account and did not finish, you can cancel it here before it is processed.",
+  "candidate.account.cancelDelete": "Cancel any pending deletion request",
+  "candidate.account.confirmDeleteError":
+    "Please confirm that you understand the account deletion.",
+  "candidate.account.deleteUnauthenticated":
+    "You must be signed in to delete your account.",
+  "candidate.account.deleteUnavailable":
+    "Account deletion is not available for this account.",
+  "candidate.account.deleteCompleted":
+    "Your Klinnova account has been deleted.",
+  "candidate.account.deleteFailure":
+    "We couldn’t complete account deletion. Please try again.",
+  "candidate.account.cancelUnauthenticated":
+    "You must be signed in to manage account deletion.",
+  "candidate.account.cancelUnavailable":
+    "There is no pending deletion request to cancel.",
+  "candidate.account.cancelled":
+    "Your account deletion request has been cancelled.",
+  "candidate.account.return": "Return to Klinnova",
+  "candidate.loading.applications": "Loading applications",
+  "candidate.loading.matches": "Loading matches",
+  "candidate.loading.jobTitle": "Loading job title",
+  "candidate.loading.employer": "Loading employer name",
+  "candidate.loading.jobDetails": "Loading job details",
+  "candidate.loading.jobDescription": "Loading job description",
+  "candidate.loading.applicationTitle": "Loading application title",
+  "candidate.loading.applicationSummary": "Loading application summary",
+  "candidate.loading.applicationStatus": "Loading application status",
+  "candidate.loading.submittedProfile": "Loading your submitted profile",
+  "candidate.loading.statusTimeline": "Loading status timeline",
+  "candidate.loading.matchesNote": "Match data is still loading.",
   "candidateReview.heading": "Review your profile",
   "candidateReview.lead": "Check the details Klinnova uses for matching.",
   "candidateReview.readyTitle": "Ready for matching",
@@ -271,6 +545,284 @@ const germanMessages: Partial<Record<MessageKey, string>> = {
   "account.logOutLocalHint": "Nur diese Browsersitzung beenden.",
   "account.logOutAllHint":
     "Nutze diese Option nur, wenn du alle Klinnova-Sitzungen beenden möchtest.",
+  "candidate.navLabel": "Bewerbendenbereich",
+  "candidate.nav.matches": "Passende Jobs",
+  "candidate.nav.applications": "Bewerbungen",
+  "candidate.nav.profile": "Profil",
+  "candidate.nav.account": "Konto",
+  "candidate.home.welcome": "Willkommen",
+  "candidate.home.readyLead":
+    "Deine wesentlichen Angaben sind gespeichert. Wenn du bereit bist, bestätige den Abschluss in der Profilübersicht.",
+  "candidate.home.incompleteLead":
+    "Vervollständige die wesentlichen Angaben, damit wir passende Jobs für dich finden können. Jeder Abschnitt wird einzeln gespeichert.",
+  "candidate.home.sectionsSaved": "Abschnitte gespeichert",
+  "candidate.home.progressLabel": "Gespeicherte Onboarding-Abschnitte",
+  "candidate.home.review": "Angaben prüfen und bestätigen",
+  "candidate.home.continue": "Onboarding fortsetzen",
+  "candidate.onboarding.savedLead":
+    "Deine Angaben werden beim Fortfahren gespeichert. Du kannst zurückgehen oder die Seite neu laden, ohne bereits Gespeichertes zu verlieren.",
+  "candidate.onboarding.progress": "Onboarding-Fortschritt",
+  "candidate.onboarding.saved": "Gespeichert",
+  "candidate.onboarding.current": "Aktuell",
+  "candidate.onboarding.next": "Als Nächstes",
+  "candidate.onboarding.backPrevious": "Zurück zum vorherigen Abschnitt",
+  "candidate.onboarding.backHome": "Zurück zum Bewerbendenbereich",
+  "candidate.onboarding.saveContinue": "Speichern und fortfahren",
+  "candidate.onboarding.saveReview": "Speichern und prüfen",
+  "candidate.onboarding.saving": "Wird gespeichert…",
+  "candidate.onboarding.group.languages": "Sprachen und Deutschkenntnisse",
+  "candidate.onboarding.group.workAuthorisation": "Arbeitserlaubnis",
+  "candidate.onboarding.group.location": "Berlin und Fahrtzeit",
+  "candidate.onboarding.group.categories": "Jobkategorien",
+  "candidate.onboarding.group.availability": "Früheste Verfügbarkeit",
+  "candidate.onboarding.group.employment": "Beschäftigungsarten und Schichten",
+  "candidate.onboarding.germanComfort": "Deutschkenntnisse",
+  "candidate.onboarding.germanComfortHelp":
+    "Deine eigene Einschätzung für Deutsch bei der Arbeit — kein Sprachnachweis.",
+  "candidate.onboarding.languagesSpoken": "Sprachen, die du sprichst",
+  "candidate.onboarding.languagesHelp":
+    "Füge jede Sprache hinzu, die dir bei der Arbeit hilft. „Weitere Sprache“ zeigt an, dass die Liste nicht vollständig ist; in diesem Schritt gibt es kein Freitextfeld.",
+  "candidate.onboarding.language": "Sprache",
+  "candidate.onboarding.proficiency": "Sprachniveau",
+  "candidate.onboarding.chooseLanguage": "Sprache auswählen",
+  "candidate.onboarding.removeLanguage": "Spracheintrag entfernen",
+  "candidate.onboarding.remove": "Entfernen",
+  "candidate.onboarding.addLanguage": "Weitere Sprache hinzufügen",
+  "candidate.onboarding.workAuthorisationQuestion":
+    "Darfst du derzeit in Deutschland arbeiten?",
+  "candidate.onboarding.workAuthorisationHelp":
+    "Dies ist deine eigene Angabe. Klinnova prüft in diesem Schritt keine Dokumente.",
+  "candidate.onboarding.workAuthorisationNotSure":
+    "Das ist in Ordnung. Du kannst die anderen Fragen beantworten und später zurückkehren. Das Matching beginnt, sobald du angeben kannst, dass du in Deutschland arbeiten darfst.",
+  "candidate.onboarding.yes": "Ja",
+  "candidate.onboarding.notSure": "Nicht sicher",
+  "candidate.onboarding.locationQuestion": "Wo du arbeiten kannst",
+  "candidate.onboarding.locationHelp":
+    "Klinnova startet in Berlin. Wähle die längste einfache Fahrtzeit, die für dich infrage kommt.",
+  "candidate.onboarding.cityBerlin": "Stadt: Berlin",
+  "candidate.onboarding.categoriesHelp":
+    "Wähle alle Tätigkeitsbereiche aus, für die du berücksichtigt werden möchtest.",
+  "candidate.onboarding.availabilityLabel": "Frühestes Startdatum",
+  "candidate.onboarding.availabilityHelp":
+    "Wähle heute oder ein zukünftiges Datum im Berliner Kalender. Wochenpläne folgen später.",
+  "candidate.onboarding.employmentTypes": "Beschäftigungsarten",
+  "candidate.onboarding.shiftPreferences": "Bevorzugte Schichten",
+  "candidate.onboarding.notAnswered": "Nicht beantwortet",
+  "candidate.onboarding.upToTravel": "bis zu {minutes} Minuten Fahrtzeit",
+  "candidate.onboarding.failure":
+    "Das konnte gerade nicht gespeichert werden. Bitte versuche es erneut.",
+  "candidate.onboarding.sessionExpired":
+    "Deine Sitzung ist abgelaufen. Melde dich erneut an, um fortzufahren.",
+  "candidate.onboarding.completeFailure":
+    "Deine Angaben konnten gerade nicht bestätigt werden. Bitte versuche es erneut.",
+  "candidate.onboarding.validation.duplicates": "Entferne doppelte Auswahlen.",
+  "candidate.onboarding.validation.german":
+    "Wähle aus, wie sicher du Deutsch verwendest.",
+  "candidate.onboarding.validation.language":
+    "Wähle eine Sprache aus der Liste.",
+  "candidate.onboarding.validation.proficiency": "Wähle ein Sprachniveau.",
+  "candidate.onboarding.validation.addLanguage":
+    "Füge mindestens eine Sprache hinzu.",
+  "candidate.onboarding.validation.uniqueLanguage":
+    "Jede Sprache kann nur einmal angegeben werden.",
+  "candidate.onboarding.validation.option":
+    "Wähle eine Option, um fortzufahren.",
+  "candidate.onboarding.validation.travel":
+    "Wähle eine maximale einfache Fahrtzeit.",
+  "candidate.onboarding.validation.category":
+    "Wähle mindestens eine Jobkategorie.",
+  "candidate.onboarding.validation.date": "Gib ein gültiges Datum ein.",
+  "candidate.onboarding.validation.futureDate":
+    "Wähle heute oder ein zukünftiges Datum.",
+  "candidate.onboarding.validation.employment":
+    "Wähle mindestens eine Beschäftigungsart.",
+  "candidate.onboarding.validation.shift": "Wähle mindestens eine Schicht aus.",
+  "candidate.matches.heading": "Passende Jobs",
+  "candidate.matches.lead":
+    "Passende Jobs verwenden dein gespeichertes Profil.",
+  "candidate.matches.countOne": "passender Job",
+  "candidate.matches.countMany": "passende Jobs",
+  "candidate.matches.workAuthorisation":
+    "Die passenden Jobs basieren auf deiner Angabe zur Arbeitserlaubnis. Klinnova hat keine Dokumente geprüft.",
+  "candidate.matches.emptyHeading": "Zurzeit keine passenden Jobs",
+  "candidate.matches.emptyBody":
+    "Zurzeit passen keine Jobs zu allen deinen gespeicherten Angaben.",
+  "candidate.matches.emptyActionHeading": "Das kannst du tun",
+  "candidate.matches.emptyActionBody":
+    "Prüfe deine gespeicherten Angaben. Allein durch das Öffnen wird dein Profilabschluss nicht aufgehoben.",
+  "candidate.matches.emptyAction": "Gespeicherte Angaben prüfen",
+  "candidate.matches.errorHeading":
+    "Passende Jobs konnten nicht geladen werden",
+  "candidate.matches.errorSubheading": "Wenn das Laden fehlschlägt",
+  "candidate.matches.errorBody":
+    "Bei uns ist etwas schiefgelaufen. Bitte versuche es später erneut.",
+  "candidate.matches.retry": "Erneut versuchen",
+  "candidate.matches.errorAction": "Gespeicherte Angaben prüfen",
+  "candidate.matches.verifiedEmployer": "Geprüfter Arbeitgeber",
+  "candidate.matches.applied": "Beworben",
+  "candidate.matches.viewJob": "Job ansehen",
+  "candidate.matches.viewApplication": "Bewerbung ansehen",
+  "candidate.matches.category": "Kategorie",
+  "candidate.matches.workplace": "Arbeitsort",
+  "candidate.matches.frequency": "Häufigkeit",
+  "candidate.matches.why": "Warum dieser Job passt",
+  "candidate.pulse.label": "Klinnova-Matching-Verlauf",
+  "candidate.pulse.stages": "Schritte",
+  "candidate.pulse.understanding": "Verstehen",
+  "candidate.pulse.connecting": "Verbinden",
+  "candidate.pulse.progressing": "Weiterkommen",
+  "candidate.pulse.profileReady": "Profil bereit",
+  "candidate.pulse.ready": "Bereit fürs Matching",
+  "candidate.pulse.readyBody":
+    "Deine wesentlichen Angaben sind vollständig. Klinnova kann damit jetzt aktuelle passende Möglichkeiten finden.",
+  "candidate.pulse.showNow": "Passende Jobs jetzt anzeigen",
+  "candidate.pulse.matching": "Abgleich mit deinem Profil",
+  "candidate.pulse.guidance":
+    "Diese Ergebnisse verwenden das Profil, das du gerade bestätigt hast.",
+  "candidate.pulse.roles": "Tätigkeitsbereiche",
+  "candidate.pulse.employment": "Beschäftigung",
+  "candidate.pulse.shifts": "Schichten",
+  "candidate.pulse.german": "Deutsch",
+  "candidate.pulse.languages": "Sprachen",
+  "candidate.pulse.available": "Verfügbar ab",
+  "candidate.pulse.notSet": "Nicht angegeben",
+  "candidate.jobs.back": "Zurück zu passenden Jobs",
+  "candidate.jobs.details": "Jobdetails",
+  "candidate.jobs.additionalLanguages": "Weitere Sprachen",
+  "candidate.jobs.about": "Über diesen Job",
+  "candidate.jobs.employerWebsite": "Website des Arbeitgebers",
+  "candidate.jobs.application": "Bewerbung",
+  "candidate.jobs.missingHeading":
+    "Diese Anforderungen erfüllst du derzeit nicht",
+  "candidate.jobs.reviewPreferences": "Gespeicherte Angaben prüfen",
+  "candidate.jobs.unavailableHeading": "Dieser Job ist nicht verfügbar",
+  "candidate.jobs.unavailableBody":
+    "Diese Stelle kann gerade nicht angezeigt werden. Kehre zu deinen passenden Jobs zurück, um aktuelle Angebote zu sehen.",
+  "candidate.jobs.applicationPreview": "Bewerbungsvorschau",
+  "candidate.jobs.previewLeadStart":
+    "Diese Profildaten werden mit deiner Bewerbung für",
+  "candidate.jobs.previewLeadAt": "bei",
+  "candidate.jobs.yourName": "Dein Name",
+  "candidate.jobs.job": "Stelle",
+  "candidate.jobs.employer": "Arbeitgeber",
+  "candidate.jobs.matchedCategory": "Passende Kategorie",
+  "candidate.jobs.germanComfort": "Deutschkenntnisse",
+  "candidate.jobs.workAuthorisation": "Arbeitserlaubnis",
+  "candidate.jobs.availableFrom": "Verfügbar ab",
+  "candidate.jobs.employmentPreferences": "Bevorzugte Beschäftigungsarten",
+  "candidate.jobs.shiftPreferences": "Bevorzugte Schichten",
+  "candidate.jobs.submitFailure": "Senden fehlgeschlagen",
+  "candidate.jobs.submitDisclosure":
+    "Du bewirbst dich mit deinem gespeicherten Klinnova-Profil. Die hier gezeigten Profildaten werden mit deiner Bewerbung gespeichert und dem Arbeitgeber zur Prüfung bereitgestellt.",
+  "candidate.jobs.ineligibleHeading":
+    "Für diesen Job musst du dein Profil aktualisieren",
+  "candidate.jobs.ineligibleBody":
+    "Deine gespeicherten Angaben erfüllen die folgenden Anforderungen dieser Stelle nicht mehr.",
+  "candidate.jobs.unavailableApplyBody":
+    "Für diese Stelle ist derzeit keine Bewerbung möglich.",
+  "candidate.jobs.validationBody":
+    "Die Bewerbung konnte nicht gesendet werden. Prüfe den Link und versuche es erneut.",
+  "candidate.jobs.failureBody":
+    "Deine Bewerbung konnte nicht gesendet werden. Bitte versuche es erneut.",
+  "candidate.applications.heading": "Bewerbungen",
+  "candidate.applications.lead":
+    "Deine laufenden und abgeschlossenen Bewerbungen an einem Ort.",
+  "candidate.applications.active": "Laufend",
+  "candidate.applications.closed": "Abgeschlossen",
+  "candidate.applications.activeLabel": "Laufende Bewerbungen",
+  "candidate.applications.closedLabel": "Abgeschlossene Bewerbungen",
+  "candidate.applications.location": "Ort",
+  "candidate.applications.submitted": "Eingereicht",
+  "candidate.applications.inReview": "In Prüfung",
+  "candidate.applications.shortlisted": "In engerer Auswahl",
+  "candidate.applications.decision": "Entscheidung",
+  "candidate.applications.notSelected": "Nicht ausgewählt",
+  "candidate.applications.emptyHeading": "Noch keine Bewerbungen",
+  "candidate.applications.browseMatches": "Passende Jobs ansehen",
+  "candidate.applications.findMore": "Weitere passende Jobs finden",
+  "candidate.applications.errorHeading":
+    "Bewerbungen konnten nicht geladen werden",
+  "candidate.applications.errorBody":
+    "Bei uns ist etwas schiefgelaufen. Bitte versuche es später erneut.",
+  "candidate.applications.backAccount": "Zurück zu deinem Konto",
+  "candidate.applications.receiptMarker": "BEWERBUNG EINGEREICHT",
+  "candidate.applications.receiptHeading": "Du bist einen Schritt weiter.",
+  "candidate.applications.receiptBody":
+    "Deine Bewerbung ist jetzt beim Arbeitgeber.",
+  "candidate.applications.status": "Status",
+  "candidate.applications.currentStatus": "Aktueller Status",
+  "candidate.applications.employment": "Beschäftigung",
+  "candidate.applications.shifts": "Schichten",
+  "candidate.applications.german": "Deutsch",
+  "candidate.applications.available": "Verfügbar",
+  "candidate.applications.noAdditionalLanguages":
+    "Keine weiteren Sprachkenntnisse erforderlich",
+  "candidate.applications.flexibleStart": "Flexibler Start",
+  "candidate.applications.from": "Ab",
+  "candidate.applications.jobDetails": "Jobdetails",
+  "candidate.applications.yourSubmittedProfile": "Dein eingereichtes Profil",
+  "candidate.applications.statusTimeline": "Statusverlauf",
+  "candidate.applications.outcomeTimeline":
+    "Updates zu Gespräch und Einstellung",
+  "candidate.applications.nextSteps": "Nächste Schritte der Bewerbung",
+  "candidate.applications.acceptedHeading": "Bewerbung angenommen",
+  "candidate.applications.acceptedBody":
+    "Diese Bewerbung wurde angenommen. „Angenommen“ ist nur der Status dieser Bewerbung und bedeutet nicht, dass du bereits eingestellt wurdest, die Beschäftigung begonnen hat oder ein Vertrag unterschrieben wurde.",
+  "candidate.applications.viewJob": "Job ansehen",
+  "candidate.applications.backMatches": "Zurück zu passenden Jobs",
+  "candidate.applications.notAvailableHeading": "Bewerbung nicht verfügbar",
+  "candidate.applications.notAvailableBody":
+    "Diese Bewerbung konnte nicht angezeigt werden. Möglicherweise existiert sie nicht oder du hast keinen Zugriff.",
+  "candidate.account.heading": "Konto",
+  "candidate.account.lead":
+    "Lade deine Daten herunter, lösche dein Konto oder melde dich ab.",
+  "candidate.account.yourData": "Deine Daten",
+  "candidate.account.exportLead":
+    "Lade eine Kopie der Bewerbendendaten herunter, die mit deinem Klinnova-Konto verknüpft sind.",
+  "candidate.account.exportAction": "Bewerbendendaten herunterladen",
+  "candidate.account.deleteSection": "Konto löschen",
+  "candidate.account.deleteHeading": "Mein Klinnova-Konto löschen",
+  "candidate.account.deleteLead":
+    "Damit löschst du dein Klinnova-Konto für den Bewerbenden- und Arbeitgeberbereich. Deine Kontodaten werden anonymisiert und du verlierst den Zugriff.",
+  "candidate.account.deleteDual":
+    "Dieses Konto hat Zugriff auf den Bewerbenden- und Arbeitgeberbereich. Beim Löschen werden beide beendet; nur einen Bereich zu löschen ist nicht möglich.",
+  "candidate.account.deleteRetention":
+    "Persönliche Kontodaten werden anonymisiert, wenn der Dienst strukturelle Bewerbungs- oder Stellenverläufe aufbewahren muss.",
+  "candidate.account.deleteConfirm":
+    "Ich verstehe, dass dadurch mein gesamtes Klinnova-Konto gelöscht wird.",
+  "candidate.account.deleteAction": "Mein Konto löschen",
+  "candidate.account.deleting": "Konto wird gelöscht…",
+  "candidate.account.pendingDeleteHeading": "Ausstehender Löschantrag",
+  "candidate.account.pendingDeleteLead":
+    "Wenn du die Kontolöschung begonnen, aber nicht abgeschlossen hast, kannst du sie hier vor der Verarbeitung abbrechen.",
+  "candidate.account.cancelDelete": "Ausstehenden Löschantrag abbrechen",
+  "candidate.account.confirmDeleteError":
+    "Bitte bestätige, dass du die Folgen der Kontolöschung verstanden hast.",
+  "candidate.account.deleteUnauthenticated":
+    "Du musst angemeldet sein, um dein Konto zu löschen.",
+  "candidate.account.deleteUnavailable":
+    "Die Kontolöschung ist für dieses Konto nicht verfügbar.",
+  "candidate.account.deleteCompleted": "Dein Klinnova-Konto wurde gelöscht.",
+  "candidate.account.deleteFailure":
+    "Die Kontolöschung konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
+  "candidate.account.cancelUnauthenticated":
+    "Du musst angemeldet sein, um die Kontolöschung zu verwalten.",
+  "candidate.account.cancelUnavailable":
+    "Es gibt keinen ausstehenden Löschantrag zum Abbrechen.",
+  "candidate.account.cancelled": "Dein Löschantrag wurde abgebrochen.",
+  "candidate.account.return": "Zurück zu Klinnova",
+  "candidate.loading.applications": "Bewerbungen werden geladen",
+  "candidate.loading.matches": "Passende Jobs werden geladen",
+  "candidate.loading.jobTitle": "Jobtitel wird geladen",
+  "candidate.loading.employer": "Arbeitgebername wird geladen",
+  "candidate.loading.jobDetails": "Jobdetails werden geladen",
+  "candidate.loading.jobDescription": "Jobbeschreibung wird geladen",
+  "candidate.loading.applicationTitle": "Bewerbungstitel wird geladen",
+  "candidate.loading.applicationSummary": "Bewerbungsübersicht wird geladen",
+  "candidate.loading.applicationStatus": "Bewerbungsstatus wird geladen",
+  "candidate.loading.submittedProfile": "Eingereichtes Profil wird geladen",
+  "candidate.loading.statusTimeline": "Statusverlauf wird geladen",
+  "candidate.loading.matchesNote": "Daten zu passenden Jobs werden geladen.",
   "candidateReview.heading": "Profil prüfen",
   "candidateReview.lead":
     "Prüfe die Angaben, die Klinnova für das Matching verwendet.",

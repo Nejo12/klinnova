@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import { onboardingGroupHref } from "@/lib/onboarding/navigation";
 
 import styles from "./candidate-nav.module.scss";
@@ -19,35 +22,37 @@ type CandidateNavProps = {
  * cannot become an accidental primary-navigation target.
  */
 export function CandidateNav({ current }: CandidateNavProps) {
+  const { t } = useLocale();
+
   return (
-    <nav aria-label="Candidate" className={styles.nav}>
+    <nav aria-label={t("candidate.navLabel")} className={styles.nav}>
       <Link
         className={styles.navLink}
         href="/candidate/matches"
         aria-current={current === "matches" ? "page" : undefined}
       >
-        Matches
+        {t("candidate.nav.matches")}
       </Link>
       <Link
         className={styles.navLink}
         href="/candidate/applications"
         aria-current={current === "applications" ? "page" : undefined}
       >
-        Applications
+        {t("candidate.nav.applications")}
       </Link>
       <Link
         className={styles.navLink}
         href={onboardingGroupHref("review")}
         aria-current={current === "profile" ? "page" : undefined}
       >
-        Profile
+        {t("candidate.nav.profile")}
       </Link>
       <Link
         className={styles.navLink}
         href="/candidate/account"
         aria-current={current === "account" ? "page" : undefined}
       >
-        Account
+        {t("candidate.nav.account")}
       </Link>
     </nav>
   );

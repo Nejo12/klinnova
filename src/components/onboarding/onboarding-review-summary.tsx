@@ -35,7 +35,7 @@ export function OnboardingReviewSummary({
   profile,
   languages,
 }: OnboardingReviewSummaryProps) {
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
 
   return (
     <section
@@ -47,7 +47,7 @@ export function OnboardingReviewSummary({
       </h2>
       <dl className={styles.reviewDefinitionList}>
         {ONBOARDING_GROUPS.map((group: OnboardingGroupId) => {
-          const row = formatReviewRow(group, profile, languages);
+          const row = formatReviewRow(group, profile, languages, locale);
           const label = t(GROUP_MESSAGE_KEYS[group]);
 
           return (

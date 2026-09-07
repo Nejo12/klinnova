@@ -16,6 +16,15 @@ import {
   languageProficiencyLabel,
   shiftLabel,
 } from "@/lib/matching/labels";
+import type { Locale } from "@/lib/i18n/locale";
+import type {
+  EmploymentTypeCode,
+  GermanComfortCode,
+  JobCategoryCode,
+  LanguageCode,
+  LanguageProficiencyCode,
+  ShiftPreferenceCode,
+} from "@/lib/onboarding/allow-lists";
 
 export const APPLICATION_CONFIRMATION_MARKER = "APPLICATION SUBMITTED";
 export const APPLICATION_CONFIRMATION_HEADING = "You're one step closer.";
@@ -25,15 +34,17 @@ export const APPLICATION_STATUS_SUBMITTED_LABEL = "Submitted";
 export const APPLIED_STATUS_LABEL = "Applied";
 
 export type ConfirmationLanguage = {
-  languageCode: string;
+  languageCode: LanguageCode;
   languageLabel: string;
   proficiencyLabel: string;
+  proficiency?: LanguageProficiencyCode;
 };
 
 export type ConfirmationLanguageRequirement = {
-  languageCode: string;
+  languageCode: LanguageCode;
   languageLabel: string;
   minProficiencyLabel: string;
+  minProficiency?: LanguageProficiencyCode;
 };
 
 /**
@@ -54,21 +65,32 @@ export type ApplicationConfirmation = {
   demoLabel: "Demo vacancy" | null;
   city: "Berlin";
   vacancyJobCategoryLabel: string;
+  vacancyJobCategory?: JobCategoryCode;
   vacancyEmploymentTypesLabel: string;
+  vacancyEmploymentTypes?: EmploymentTypeCode[];
   vacancyShiftRequirementsLabel: string;
+  vacancyShiftRequirements?: ShiftPreferenceCode[];
   vacancyGermanRequirementLabel: string;
+  vacancyGermanRequirement?: GermanComfortCode;
   vacancyLanguageRequirements: ConfirmationLanguageRequirement[];
   vacancyNoAdditionalLanguagesLabel: string | null;
   vacancyAvailableFromLabel: string;
+  vacancyAvailableFrom?: string | null;
   candidateDisplayName: string;
   candidateMatchedCategoryLabel: string;
+  candidateMatchedCategory?: JobCategoryCode;
   candidateGermanComfortLabel: string;
+  candidateGermanComfort?: GermanComfortCode;
   candidateLanguages: ConfirmationLanguage[];
   candidateNoAdditionalLanguagesLabel: string | null;
   candidateWorkAuthorisationLabel: string;
+  candidateWorkAuthorisation?: boolean;
   candidateAvailableFromLabel: string | null;
+  candidateAvailableFrom?: string | null;
   candidateEmploymentPreferencesLabel: string;
+  candidateEmploymentPreferences?: EmploymentTypeCode[];
   candidateShiftPreferencesLabel: string;
+  candidateShiftPreferences?: ShiftPreferenceCode[];
 };
 
 const MONTH_NAMES = [
@@ -90,7 +112,10 @@ const MONTH_NAMES = [
  * Format an ISO timestamptz as a factual UTC label without inventing local TZ.
  * Example: `3 August 2026, 14:30 UTC`
  */
-export function formatSubmittedAtUtc(isoTimestamp: string): string | null {
+export function formatSubmittedAtUtc(
+  isoTimestamp: string,
+  locale: Locale = "en",
+): string | null {
   const date = new Date(isoTimestamp);
   if (Number.isNaN(date.getTime())) {
     return null;
@@ -106,6 +131,13 @@ export function formatSubmittedAtUtc(isoTimestamp: string): string | null {
     return null;
   }
 
+  if (locale === "de") {
+    const dateLabel = new Intl.DateTimeFormat("de-DE", {
+      dateStyle: "long",
+      timeZone: "UTC",
+    }).format(date);
+    return `${dateLabel}, ${hours}:${minutes} UTC`;
+  }
   return `${day} ${monthName} ${year}, ${hours}:${minutes} UTC`;
 }
 
@@ -143,6 +175,7 @@ export function buildApplicationConfirmation(input: {
       minProficiencyLabel: languageProficiencyLabel(
         requirement.min_proficiency,
       ),
+      minProficiency: requirement.min_proficiency,
     }));
 
   const candidateLanguages = [...input.candidate.languages]
@@ -153,6 +186,7 @@ export function buildApplicationConfirmation(input: {
       languageCode: language.language_code,
       languageLabel: languageLabel(language.language_code),
       proficiencyLabel: languageProficiencyLabel(language.proficiency),
+      proficiency: language.proficiency,
     }));
 
   return {
@@ -168,15 +202,19 @@ export function buildApplicationConfirmation(input: {
     demoLabel: input.vacancy.demo_label,
     city: input.vacancy.city,
     vacancyJobCategoryLabel: jobCategoryLabel(input.vacancy.job_category),
+    vacancyJobCategory: input.vacancy.job_category,
     vacancyEmploymentTypesLabel: joinLabels(
       input.vacancy.employment_types.map(employmentTypeLabel),
     ),
+    vacancyEmploymentTypes: [...input.vacancy.employment_types],
     vacancyShiftRequirementsLabel: joinLabels(
       input.vacancy.shift_requirements.map(shiftLabel),
     ),
+    vacancyShiftRequirements: [...input.vacancy.shift_requirements],
     vacancyGermanRequirementLabel: germanRequirementLabel(
       input.vacancy.german_requirement,
     ),
+    vacancyGermanRequirement: input.vacancy.german_requirement,
     vacancyLanguageRequirements: vacancyLanguages,
     vacancyNoAdditionalLanguagesLabel:
       vacancyLanguages.length === 0
@@ -186,13 +224,16 @@ export function buildApplicationConfirmation(input: {
       input.vacancy.available_from === null
         ? "Flexible start"
         : `From ${formatIsoCalendarDate(input.vacancy.available_from)}`,
+    vacancyAvailableFrom: input.vacancy.available_from,
     candidateDisplayName: input.candidate.display_name,
     candidateMatchedCategoryLabel: jobCategoryLabel(
       input.candidate.job_category,
     ),
+    candidateMatchedCategory: input.candidate.job_category,
     candidateGermanComfortLabel: germanComfortLabel(
       input.candidate.german_comfort,
     ),
+    candidateGermanComfort: input.candidate.german_comfort,
     candidateLanguages,
     candidateNoAdditionalLanguagesLabel:
       candidateLanguages.length === 0
@@ -201,15 +242,19 @@ export function buildApplicationConfirmation(input: {
     candidateWorkAuthorisationLabel: workAuthorisationLabel(
       input.candidate.work_authorisation_declared,
     ),
+    candidateWorkAuthorisation: input.candidate.work_authorisation_declared,
     candidateAvailableFromLabel:
       input.candidate.available_from === null
         ? null
         : formatIsoCalendarDate(input.candidate.available_from),
+    candidateAvailableFrom: input.candidate.available_from,
     candidateEmploymentPreferencesLabel: joinLabels(
       input.candidate.employment_types.map(employmentTypeLabel),
     ),
+    candidateEmploymentPreferences: [...input.candidate.employment_types],
     candidateShiftPreferencesLabel: joinLabels(
       input.candidate.shift_preferences.map(shiftLabel),
     ),
+    candidateShiftPreferences: [...input.candidate.shift_preferences],
   };
 }

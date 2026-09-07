@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   employmentTypeLabel,
   formatIsoCalendarDate,
+  germanComfortLabel,
   germanRequirementLabel,
   jobCategoryLabel,
   joinLabels,
@@ -37,6 +38,10 @@ describe("matching labels", () => {
     expect(germanRequirementLabel("conversational", "de")).toBe(
       "Alltagssicheres Deutsch",
     );
+    expect(germanComfortLabel("basic", "de")).toBe(
+      "Ich verstehe und spreche etwas Deutsch",
+    );
+    expect(formatIsoCalendarDate("2026-09-01", "de")).toBe("1. September 2026");
   });
 
   it("formats ISO calendar dates without timezone shift", () => {

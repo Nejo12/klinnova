@@ -1,3 +1,7 @@
+"use client";
+
+import { useLocale } from "@/components/i18n/locale-provider";
+
 import {
   DelayedReveal,
   Skeleton,
@@ -43,17 +47,18 @@ function MetaRowSkeleton({
  * that would fabricate structure the real query hasn't resolved yet.
  */
 export default function Loading() {
+  const { t } = useLocale();
   return (
     <main className={styles.page}>
       <CandidateApplicationsPageHeader showEmployerNav={false} />
       <div className={styles.headingCluster}>
-        <h1 className={styles.heading}>Applications</h1>
-        <p className={styles.lead}>
-          Your active and closed applications in one place.
-        </p>
+        <h1 className={styles.heading}>
+          {t("candidate.applications.heading")}
+        </h1>
+        <p className={styles.lead}>{t("candidate.applications.lead")}</p>
       </div>
       <DelayedReveal>
-        <SkeletonRegion label="Loading applications">
+        <SkeletonRegion label={t("candidate.loading.applications")}>
           <ul className={styles.list}>
             {Array.from(
               { length: APPLICATION_CARD_SKELETON_COUNT },

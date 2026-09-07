@@ -1,3 +1,7 @@
+"use client";
+
+import { useLocale } from "@/components/i18n/locale-provider";
+
 import {
   DelayedReveal,
   Skeleton,
@@ -5,10 +9,6 @@ import {
 } from "@/components/shared/skeleton";
 import { CandidateAppHeader } from "@/components/candidate-nav/candidate-app-header";
 import styles from "@/components/candidate-matches/candidate-matches.module.scss";
-import {
-  CANDIDATE_MATCHES_HEADING,
-  CANDIDATE_MATCHES_LEAD,
-} from "@/lib/candidate-matches/messages";
 
 // A representative count, not a claim about how many matches actually
 // exist — the real count is exactly the thing that's unknown here.
@@ -33,16 +33,17 @@ export const MATCH_CARD_SKELETON_COUNT = 3;
  * not part of the approved candidate navigation/state continuity slice.
  */
 export default function Loading() {
+  const { t } = useLocale();
   return (
     <main className={styles.page}>
       <CandidateAppHeader current="matches" showEmployerNav={false} />
       <div className={styles.headingCluster}>
-        <h1 className={styles.heading}>{CANDIDATE_MATCHES_HEADING}</h1>
-        <p className={styles.lead}>{CANDIDATE_MATCHES_LEAD}</p>
+        <h1 className={styles.heading}>{t("candidate.matches.heading")}</h1>
+        <p className={styles.lead}>{t("candidate.matches.lead")}</p>
       </div>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading matches">
+        <SkeletonRegion label={t("candidate.loading.matches")}>
           <ul className={`${styles.list} ${styles.loadingList}`}>
             {Array.from({ length: MATCH_CARD_SKELETON_COUNT }, (_, index) => (
               <li key={index}>
@@ -56,7 +57,7 @@ export default function Loading() {
             ))}
           </ul>
           <p className={styles.loadingNote}>
-            Skeleton only where match data is still loading.
+            {t("candidate.loading.matchesNote")}
           </p>
         </SkeletonRegion>
       </DelayedReveal>

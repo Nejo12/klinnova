@@ -75,4 +75,17 @@ describe("formatReviewRow", () => {
       value: "I can understand and use some basic German",
     });
   });
+
+  it("localizes structured Review values to German without changing stored codes", () => {
+    expect(formatReviewRow("categories", profile, [], "de").value).toBe(
+      "Reinigung, Logistik",
+    );
+    expect(formatReviewRow("employment", profile, [], "de").value).toBe(
+      "Teilzeit · Morgens, Wochenende",
+    );
+    expect(formatReviewRow("availability", profile, [], "de").value).toBe(
+      "1. September 2026",
+    );
+    expect(profile.jobCategories).toEqual(["cleaning", "logistics"]);
+  });
 });
