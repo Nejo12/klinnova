@@ -106,6 +106,32 @@ test.describe("local Auth journey", () => {
       page.getByRole("heading", { level: 1, name: `Welcome, ${displayName}` }),
     ).toBeVisible();
 
+    await page.goto("/");
+    await expect(
+      page.getByRole("link", { name: "Dashboard" }).first(),
+    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Sign in" })).toHaveCount(0);
+    await expect(
+      page.getByRole("link", { name: "Create account" }),
+    ).toHaveCount(0);
+
+    await page.goto("/candidate/account");
+    await page.getByRole("button", { name: "Log out all devices" }).click();
+    const allDevicesDialog = page.getByRole("dialog", {
+      name: "Log out all devices",
+    });
+    await expect(allDevicesDialog).toBeVisible();
+    await allDevicesDialog.getByRole("button", { name: "Cancel" }).click();
+    await expect(page).toHaveURL(/\/candidate\/account$/);
+
+    await page.getByRole("button", { name: "Log out all devices" }).click();
+    await allDevicesDialog
+      .getByRole("button", { name: "Log out all devices" })
+      .click();
+    await expect(page).toHaveURL(/\/$/);
+    await page.goto("/candidate");
+    await expect(page).toHaveURL(/\/login/);
+
     // Keep request fixture referenced so Playwright injects it if needed later.
     expect(request).toBeTruthy();
   });

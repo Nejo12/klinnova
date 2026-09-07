@@ -4,6 +4,11 @@
  */
 
 import { isCandidateIntentPath, isEmployerIntentPath } from "@/lib/auth/paths";
+import {
+  resolveActiveWorkspace,
+  type ActiveWorkspace,
+  workspaceHref,
+} from "@/lib/workspace/active-workspace";
 
 export type AccountCapabilities = {
   hasCandidateProfile: boolean;
@@ -20,8 +25,9 @@ export type PostAuthDestination =
 export function resolvePostAuthDestination(options: {
   intentPath: string | null;
   capabilities: AccountCapabilities;
+  activeWorkspace?: ActiveWorkspace | null;
 }): PostAuthDestination {
-  const { intentPath, capabilities } = options;
+  const { intentPath, capabilities, activeWorkspace = null } = options;
 
   if (intentPath !== null) {
     return { kind: "redirect", href: intentPath };
@@ -30,7 +36,13 @@ export function resolvePostAuthDestination(options: {
   const { hasCandidateProfile, hasEmployerProfile } = capabilities;
 
   if (hasCandidateProfile && hasEmployerProfile) {
-    return { kind: "role_choice" };
+    const resolved = resolveActiveWorkspace({
+      capabilities,
+      preference: activeWorkspace,
+    });
+    return resolved === null
+      ? { kind: "role_choice" }
+      : { kind: "redirect", href: workspaceHref(resolved) };
   }
 
   if (hasEmployerProfile && !hasCandidateProfile) {

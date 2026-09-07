@@ -97,6 +97,11 @@ describe("candidate applications Loading", () => {
     expect(
       screen.queryByRole("link", { name: "Find more matches" }),
     ).toBeNull();
-    expect(screen.queryAllByRole("button")).toHaveLength(0);
+    expect(screen.getAllByRole("button")).toHaveLength(1);
+    expect(
+      screen.getByRole("button", {
+        name: "Workspace and account: Candidate",
+      }),
+    ).toBeInTheDocument();
   });
 });

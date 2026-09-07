@@ -26,7 +26,11 @@ const HERO_MATCH_REASONS: MatchReason[] = [
   { code: "berlin_job", city: "Berlin" },
 ];
 
-export function PublicHero() {
+export function PublicHero({
+  authenticatedDestination,
+}: {
+  authenticatedDestination?: string;
+}) {
   const { locale, t } = useLocale();
   const reasons = presentMatchReasons(HERO_MATCH_REASONS, locale);
 
@@ -40,12 +44,20 @@ export function PublicHero() {
         </h1>
         <p className={styles.lead}>{t("homepage.hero.lead")}</p>
         <div className={styles.ctas}>
-          <Link className={styles.primaryCta} href="/register">
-            {t("homepage.hero.candidateCta")}
-          </Link>
-          <Link className={styles.secondaryCta} href="/employer/register">
-            {t("homepage.hero.employerCta")}
-          </Link>
+          {authenticatedDestination === undefined ? (
+            <>
+              <Link className={styles.primaryCta} href="/register">
+                {t("homepage.hero.candidateCta")}
+              </Link>
+              <Link className={styles.secondaryCta} href="/employer/register">
+                {t("homepage.hero.employerCta")}
+              </Link>
+            </>
+          ) : (
+            <Link className={styles.primaryCta} href={authenticatedDestination}>
+              {t("shell.dashboard")}
+            </Link>
+          )}
         </div>
         <ul className={styles.trustList}>
           <li className={styles.trustItem}>
@@ -103,7 +115,13 @@ export function PublicHero() {
           </ul>
         </div>
 
-        <p className={styles.previewNote}>{t("homepage.hero.signInNote")}</p>
+        <p className={styles.previewNote}>
+          {t(
+            authenticatedDestination === undefined
+              ? "homepage.hero.signInNote"
+              : "homepage.hero.dashboardNote",
+          )}
+        </p>
         <p className={styles.illustrativeCaption}>
           {t("homepage.illustrative")}
         </p>

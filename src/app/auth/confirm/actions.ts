@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { confirmAuthCallback } from "@/lib/auth/confirm";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { readActiveWorkspace } from "@/lib/workspace/active-workspace.server";
 
 function formString(formData: FormData, key: string): string | null {
   const value = formData.get(key);
@@ -19,6 +20,7 @@ function formString(formData: FormData, key: string): string | null {
  */
 export async function confirmAction(formData: FormData): Promise<void> {
   const supabase = await createServerSupabaseClient();
+  const activeWorkspace = await readActiveWorkspace();
 
   const result = await confirmAuthCallback(supabase, {
     token_hash: formString(formData, "token_hash"),
@@ -26,6 +28,7 @@ export async function confirmAction(formData: FormData): Promise<void> {
     code: formString(formData, "code"),
     next: formString(formData, "next"),
     intent: formString(formData, "intent"),
+    activeWorkspace,
   });
 
   if (!result.ok) {

@@ -301,34 +301,6 @@
   font-size: var(--type-body-supporting-size);
 }
 
-.capabilityNav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-}
-
-.capabilityLink {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--touch-target-min);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
-  color: var(--color-text-link);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  text-decoration: none;
-}
-
-.capabilityLink[aria-current="page"] {
-  color: var(--color-text-primary);
-  background-color: var(--color-action-subtle);
-}
-
-.capabilityLink:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus-ring);
-  outline-offset: var(--focus-ring-offset);
-}
-
 .headerActions {
   display: flex;
   flex-wrap: wrap;

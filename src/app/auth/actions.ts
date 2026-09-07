@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { ensureCandidateProfile } from "@/lib/auth/ensure-candidate-profile";
 import { AUTH_CHECK_EMAIL, AUTH_GENERIC_FAILURE } from "@/lib/auth/messages";
+import { isEmployerIntentPath } from "@/lib/auth/paths";
 import {
   loginSchema,
   parseInternalNextPath,
@@ -17,6 +18,11 @@ import {
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { getPublicEnv } from "@/lib/env/public";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import type { ActiveWorkspace } from "@/lib/workspace/active-workspace";
+import {
+  readActiveWorkspace,
+  writeActiveWorkspace,
+} from "@/lib/workspace/active-workspace.server";
 
 export type AuthActionState = {
   error: string | null;
@@ -37,10 +43,12 @@ async function resolveAuthenticatedDestination(
     hasCandidateProfile: false,
     hasEmployerProfile: false,
   };
+  const activeWorkspace = await readActiveWorkspace();
 
   const destination = resolvePostAuthDestination({
     intentPath,
     capabilities,
+    activeWorkspace,
   });
 
   const href =
@@ -108,6 +116,12 @@ export async function registerAction(
     return { error: AUTH_GENERIC_FAILURE, message: null };
   }
 
+  const registrationWorkspace: ActiveWorkspace =
+    intentPath !== null && isEmployerIntentPath(intentPath)
+      ? "employer"
+      : "candidate";
+  await writeActiveWorkspace(registrationWorkspace);
+
   // Email confirmation enabled: typically no session until the user verifies.
   if (data.session === null || data.user === null) {
     return { error: null, message: AUTH_CHECK_EMAIL };
@@ -170,6 +184,12 @@ export async function loginAction(
 
 export async function logoutAction(): Promise<void> {
   const supabase = await createServerSupabaseClient();
-  await supabase.auth.signOut();
+  await supabase.auth.signOut({ scope: "local" });
+  redirect("/");
+}
+
+export async function logoutAllDevicesAction(): Promise<void> {
+  const supabase = await createServerSupabaseClient();
+  await supabase.auth.signOut({ scope: "global" });
   redirect("/");
 }

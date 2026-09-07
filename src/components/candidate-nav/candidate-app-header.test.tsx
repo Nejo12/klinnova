@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { CandidateAppHeader } from "@/components/candidate-nav/candidate-app-header";
@@ -21,8 +21,18 @@ describe("CandidateAppHeader (M5.1 Unit B)", () => {
   it("shows the capability switcher for a dual-capability account", () => {
     render(<CandidateAppHeader showEmployerNav />);
 
-    expect(screen.getByRole("link", { name: "Employer" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Candidate" })).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Workspace and account: Candidate",
+      }),
+    );
+    expect(
+      screen.getByRole("button", { name: "Employer" }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("Candidate")).toHaveLength(2);
+    expect(
+      screen.queryByRole("navigation", { name: "Account spaces" }),
+    ).toBeNull();
   });
 
   it("supports a custom brand href (matches page failure state)", () => {

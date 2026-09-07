@@ -146,7 +146,10 @@ test.describe("account export journeys", () => {
     expect(employerExport).toHaveProperty("employer");
     expect(employerExport).not.toHaveProperty("candidate");
 
-    await page.getByRole("link", { name: "Candidate" }).click();
+    await page
+      .getByRole("button", { name: "Workspace and account: Employer" })
+      .click();
+    await page.getByRole("button", { name: "Candidate" }).click();
     await expect(page).toHaveURL(/\/candidate/);
 
     // Export lives on the Account destination (M5.1 Unit B).

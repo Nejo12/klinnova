@@ -8,7 +8,14 @@ import { useLocale } from "@/components/i18n/locale-provider";
 
 import styles from "./shell-header.module.scss";
 
-export function ShellHeader() {
+type ShellHeaderProps = {
+  authenticated?: {
+    destination: string;
+    workspace: "candidate" | "employer" | null;
+  };
+};
+
+export function ShellHeader({ authenticated }: ShellHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const navId = useId();
   const { t } = useLocale();
@@ -78,20 +85,41 @@ export function ShellHeader() {
             </a>
           </div>
           <div className={styles.authActions}>
-            <Link
-              className={styles.signInLink}
-              href="/login"
-              onClick={() => setMenuOpen(false)}
-            >
-              {t("shell.signIn")}
-            </Link>
-            <Link
-              className={styles.createAccountLink}
-              href="/register"
-              onClick={() => setMenuOpen(false)}
-            >
-              {t("shell.createAccount")}
-            </Link>
+            {authenticated === undefined ? (
+              <>
+                <Link
+                  className={styles.signInLink}
+                  href="/login"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {t("shell.signIn")}
+                </Link>
+                <Link
+                  className={styles.createAccountLink}
+                  href="/register"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {t("shell.createAccount")}
+                </Link>
+              </>
+            ) : (
+              <>
+                <span className={styles.workspacePill}>
+                  {authenticated.workspace === "employer"
+                    ? t("workspace.employer")
+                    : authenticated.workspace === "candidate"
+                      ? t("workspace.candidate")
+                      : t("workspace.account")}
+                </span>
+                <Link
+                  className={styles.createAccountLink}
+                  href={authenticated.destination}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {t("shell.dashboard")}
+                </Link>
+              </>
+            )}
           </div>
         </nav>
       </div>

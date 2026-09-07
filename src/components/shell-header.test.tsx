@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { ShellHeader } from "@/components/shell-header";
+import { LocaleProvider } from "@/components/i18n/locale-provider";
 
 describe("ShellHeader", () => {
   it("exposes a banner with brand", () => {
@@ -40,6 +41,46 @@ describe("ShellHeader", () => {
     expect(
       within(nav).getByRole("link", { name: "Create account" }),
     ).toHaveAttribute("href", "/register");
+  });
+
+  it("shows the active workspace and dashboard without anonymous actions", () => {
+    render(
+      <ShellHeader
+        authenticated={{ destination: "/employer", workspace: "employer" }}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Menu" }));
+
+    expect(screen.getByText("Employer")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
+      "href",
+      "/employer",
+    );
+    expect(screen.queryByRole("link", { name: "Sign in" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Create account" })).toBeNull();
+  });
+
+  it("localizes the authenticated affordance in German", () => {
+    document.documentElement.dataset.locale = "de";
+    document.documentElement.lang = "de";
+
+    render(
+      <LocaleProvider>
+        <ShellHeader
+          authenticated={{
+            destination: "/candidate",
+            workspace: "candidate",
+          }}
+        />
+      </LocaleProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Menü" }));
+
+    expect(screen.getByText("Bewerbende")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Anmelden" })).toBeNull();
+
+    document.documentElement.dataset.locale = "en";
+    document.documentElement.lang = "en";
   });
 
   it("toggles the mobile menu button's expanded state", () => {

@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { EmployerDraftListItem } from "@/lib/employer/vacancies/load-employer-drafts";
@@ -537,9 +537,16 @@ describe("EmployerHomePage navigation and hero", () => {
     render(await EmployerHomePage());
 
     const nav = screen.getByRole("navigation", { name: "Employer" });
+    const workspaceTrigger = screen.getByRole("button", {
+      name: "Workspace and account: Employer",
+    });
+    fireEvent.click(workspaceTrigger);
     expect(
-      screen.getByRole("navigation", { name: "Account spaces" }),
+      screen.getByRole("button", { name: "Candidate" }),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("navigation", { name: "Account spaces" }),
+    ).toBeNull();
     expect(screen.getByRole("button", { name: "Log out" })).toBeInTheDocument();
     expect(
       within(nav).getByRole("link", { name: "Employer home" }),

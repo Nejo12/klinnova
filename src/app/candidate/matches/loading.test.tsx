@@ -68,7 +68,12 @@ describe("candidate matches Loading", () => {
   it("renders no destructive or data-dependent controls", () => {
     render(<Loading />);
 
-    expect(screen.queryAllByRole("button")).toHaveLength(0);
+    expect(screen.getAllByRole("button")).toHaveLength(1);
+    expect(
+      screen.getByRole("button", {
+        name: "Workspace and account: Candidate",
+      }),
+    ).toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: /apply|submit|save|view job/i }),
     ).toBeNull();

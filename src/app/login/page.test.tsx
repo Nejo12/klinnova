@@ -11,6 +11,9 @@ vi.mock("@/lib/supabase/server", () => ({
 vi.mock("@/lib/employer/load-capabilities", () => ({
   loadAccountCapabilities: vi.fn(),
 }));
+vi.mock("@/lib/workspace/active-workspace.server", () => ({
+  readActiveWorkspace: vi.fn().mockResolvedValue(null),
+}));
 
 import LoginPage from "@/app/login/page";
 

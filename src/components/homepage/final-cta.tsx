@@ -6,7 +6,11 @@ import { useLocale } from "@/components/i18n/locale-provider";
 
 import styles from "./final-cta.module.scss";
 
-export function FinalCta() {
+export function FinalCta({
+  authenticatedDestination,
+}: {
+  authenticatedDestination?: string;
+}) {
   const { t } = useLocale();
 
   return (
@@ -18,8 +22,15 @@ export function FinalCta() {
         <p className={styles.body}>{t("homepage.final.body")}</p>
       </div>
       <div className={styles.ctas}>
-        <Link className={styles.primaryCta} href="/register">
-          {t("homepage.final.createAccount")}
+        <Link
+          className={styles.primaryCta}
+          href={authenticatedDestination ?? "/register"}
+        >
+          {t(
+            authenticatedDestination === undefined
+              ? "homepage.final.createAccount"
+              : "shell.dashboard",
+          )}
         </Link>
         <Link className={styles.secondaryCta} href="/jobs">
           {t("homepage.final.browseJobs")}

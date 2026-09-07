@@ -152,10 +152,10 @@ test.describe("employer onboarding journeys", () => {
     await page.getByRole("button", { name: "Complete onboarding" }).click();
     await expect(page).toHaveURL(/\/employer$/, { timeout: 15_000 });
 
-    await expect(
-      page.getByRole("navigation", { name: /Account spaces/i }),
-    ).toBeVisible();
-    await page.getByRole("link", { name: "Candidate" }).click();
+    await page
+      .getByRole("button", { name: "Workspace and account: Employer" })
+      .click();
+    await page.getByRole("button", { name: "Candidate" }).click();
     await expect(page).toHaveURL(/\/candidate/);
   });
 });

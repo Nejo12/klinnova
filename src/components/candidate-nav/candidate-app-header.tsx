@@ -4,7 +4,7 @@ import {
   CandidateNav,
   type CandidateNavDestination,
 } from "@/components/candidate-nav/candidate-nav";
-import { CapabilityNav } from "@/components/employer-onboarding/capability-nav";
+import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
 
 import styles from "./candidate-nav.module.scss";
 
@@ -32,10 +32,10 @@ export function CandidateAppHeader({
       </Link>
       <div className={styles.headerActions}>
         <CandidateNav current={current} />
-        <CapabilityNav
-          showCandidate
-          showEmployer={showEmployerNav}
+        <WorkspaceSwitcher
           current="candidate"
+          hasCandidate
+          hasEmployer={showEmployerNav}
         />
       </div>
     </div>

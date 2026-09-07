@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { LogoutButton } from "@/components/auth/logout-button";
-import { CapabilityNav } from "@/components/employer-onboarding/capability-nav";
+import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
 import styles from "@/components/employer-onboarding/employer-onboarding.module.scss";
 import { OrganisationProfileForm } from "@/components/employer-onboarding/organisation-profile-form";
 import { PrivateProfileForm } from "@/components/employer-onboarding/private-profile-form";
@@ -57,10 +57,10 @@ export default async function EmployerOnboardingPage() {
           Klinnova
         </Link>
         <div className={styles.headerActions}>
-          <CapabilityNav
-            showCandidate={capabilities?.hasCandidateProfile === true}
-            showEmployer={profile !== null}
+          <WorkspaceSwitcher
             current="employer"
+            hasCandidate={capabilities?.hasCandidateProfile === true}
+            hasEmployer={profile !== null}
           />
           <LogoutButton />
         </div>

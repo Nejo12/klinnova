@@ -101,6 +101,6 @@ describe("continueToSignInAction (M5.1 Unit C)", () => {
 
   it("signs out the recovery session and redirects to /login", async () => {
     await expect(continueToSignInAction()).rejects.toThrow("REDIRECT:/login");
-    expect(signOut).toHaveBeenCalled();
+    expect(signOut).toHaveBeenCalledWith({ scope: "local" });
   });
 });

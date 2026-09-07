@@ -22,6 +22,7 @@ import {
 } from "@/lib/employer/schemas";
 import { updateOwnEmployerProfile } from "@/lib/employer/update-own-profile";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { writeActiveWorkspace } from "@/lib/workspace/active-workspace.server";
 
 export type EmployerOnboardingActionState = {
   error: string | null;
@@ -99,6 +100,7 @@ export async function selectEmployerTypeAction(
     return { error: ensured.error, message: null };
   }
 
+  await writeActiveWorkspace("employer");
   redirect("/employer/onboarding");
 }
 

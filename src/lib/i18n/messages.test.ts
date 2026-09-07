@@ -11,6 +11,10 @@ const REPRESENTATIVE_PUBLIC_MESSAGES: Array<[MessageKey, string]> = [
   ["homepage.final.heading", "Jetzt arbeiten — zuerst in Berlin"],
   ["publicJobs.heading", "Jobs in Berlin"],
   ["publicJobs.failureHeading", "Jobs sind nicht verfügbar"],
+  ["workspace.switch", "Arbeitsbereich wechseln"],
+  ["workspace.alsoEmployer", "Klinnova auch als Arbeitgeber nutzen"],
+  ["auth.logOut", "Abmelden"],
+  ["auth.logOutAll", "Von allen Geräten abmelden"],
 ];
 
 describe("public and shared locale messages", () => {
