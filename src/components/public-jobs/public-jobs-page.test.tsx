@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import { PublicJobsPage } from "@/components/public-jobs/public-jobs-page";
+import { LocaleProvider } from "@/components/i18n/locale-provider";
 import type { PublicVacancyListItem } from "@/lib/public-jobs/load-public-vacancies";
 
 function makeItem(id: string, title: string): PublicVacancyListItem {
@@ -27,6 +28,11 @@ function makeItem(id: string, title: string): PublicVacancyListItem {
 }
 
 describe("PublicJobsPage", () => {
+  beforeEach(() => {
+    document.documentElement.dataset.locale = "en";
+    document.documentElement.lang = "en";
+  });
+
   it("renders heading, count, and one card per item on success", () => {
     render(
       <PublicJobsPage
@@ -64,5 +70,35 @@ describe("PublicJobsPage", () => {
     ).toBeInTheDocument();
     expect(screen.queryByText(/^\d+ open jobs?$/)).not.toBeInTheDocument();
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
+  });
+
+  it("localizes public states while preserving employer-authored titles", () => {
+    document.documentElement.dataset.locale = "de";
+    document.documentElement.lang = "de";
+    render(
+      <LocaleProvider>
+        <PublicJobsPage
+          status="success"
+          items={[
+            makeItem(
+              "11111111-1111-4111-8111-111111111111",
+              "Employer-authored title",
+            ),
+          ]}
+        />
+      </LocaleProvider>,
+    );
+
+    expect(screen.getByText("1 offener Job")).toBeInTheDocument();
+    expect(screen.getByText("Reinigung")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Employer-authored title" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Ada Lovelace/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", {
+        name: "Job ansehen: Employer-authored title",
+      }),
+    ).toBeInTheDocument();
   });
 });

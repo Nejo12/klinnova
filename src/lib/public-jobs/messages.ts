@@ -23,6 +23,13 @@ export const PUBLIC_JOB_NOT_FOUND_HEADING = "Job not found";
 export const PUBLIC_JOB_NOT_FOUND_BODY =
   "This vacancy is not available. It may have closed, been filled, or been removed.";
 
-export function formatPublicVacancyCount(count: number): string {
+export function formatPublicVacancyCount(
+  count: number,
+  locale: Locale = "en",
+): string {
+  if (locale === "de") {
+    return count === 1 ? "1 offener Job" : `${count} offene Jobs`;
+  }
   return count === 1 ? "1 open job" : `${count} open jobs`;
 }
+import type { Locale } from "@/lib/i18n/locale";

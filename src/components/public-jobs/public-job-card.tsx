@@ -1,12 +1,14 @@
+"use client";
+
 import Link from "next/link";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import { VacancyFactChips } from "@/components/public-jobs/vacancy-fact-chips";
 import {
   languageLabel,
   languageProficiencyLabel,
 } from "@/lib/public-jobs/labels";
 import type { PublicVacancyListItem } from "@/lib/public-jobs/load-public-vacancies";
-import { DEMO_VACANCY_LABEL } from "@/lib/public-jobs/messages";
 
 import styles from "./public-jobs.module.scss";
 
@@ -26,6 +28,7 @@ export function PublicJobCard({
   item,
   headingLevel = "h2",
 }: PublicJobCardProps) {
+  const { locale, t } = useLocale();
   const { vacancy, languages } = item;
   const titleId = `public-job-title-${vacancy.vacancyId}`;
   const detailHref = `/jobs/${vacancy.vacancyId}`;
@@ -38,12 +41,12 @@ export function PublicJobCard({
           {vacancy.title}
         </TitleTag>
         {vacancy.source === "seed" ? (
-          <p className={styles.demoLabel}>{DEMO_VACANCY_LABEL}</p>
+          <p className={styles.demoLabel}>{t("publicJobs.demo")}</p>
         ) : null}
       </div>
 
       <p className={styles.company}>
-        {vacancy.employerDisplayName ?? "Berlin employer"}
+        {vacancy.employerDisplayName ?? t("publicJobs.defaultEmployer")}
         {vacancy.companyName !== null ? ` · ${vacancy.companyName}` : ""}
       </p>
 
@@ -53,8 +56,8 @@ export function PublicJobCard({
         <ul className={styles.languageList}>
           {languages.map((language) => (
             <li key={language.languageCode} className={styles.languageItem}>
-              {languageLabel(language.languageCode)} —{" "}
-              {languageProficiencyLabel(language.minProficiency)}
+              {languageLabel(language.languageCode, locale)} —{" "}
+              {languageProficiencyLabel(language.minProficiency, locale)}
             </li>
           ))}
         </ul>
@@ -63,9 +66,9 @@ export function PublicJobCard({
       <Link
         className={styles.detailLink}
         href={detailHref}
-        aria-label={`View job: ${vacancy.title}`}
+        aria-label={`${t("publicJobs.view")}: ${vacancy.title}`}
       >
-        View job
+        {t("publicJobs.view")}
       </Link>
     </article>
   );

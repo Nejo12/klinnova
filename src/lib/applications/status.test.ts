@@ -32,6 +32,20 @@ describe("application status contract (candidate + employer shared)", () => {
     ]);
   });
 
+  it("has an exhaustive German presentation label for every status", () => {
+    expect(
+      APPLICATION_STATUS_CODES.map((status) =>
+        applicationStatusLabel(status, "de"),
+      ),
+    ).toEqual([
+      "Eingereicht",
+      "In Prüfung",
+      "In engerer Auswahl",
+      "Angenommen",
+      "Abgelehnt",
+    ]);
+  });
+
   it("accepts every canonical status via the Zod schema", () => {
     for (const status of APPLICATION_STATUS_CODES) {
       expect(applicationStatusSchema.safeParse(status).success).toBe(true);
