@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { CandidateAppHeader } from "@/components/candidate-nav/candidate-app-header";
-import { LogoutButton } from "@/components/auth/logout-button";
+import { SessionSecurity } from "@/components/auth/session-security";
 import {
   CANDIDATE_EXPORT_BUTTON_LABEL,
   CANDIDATE_EXPORT_LEAD,
@@ -77,15 +77,7 @@ export default async function CandidateAccountPage() {
         </p>
       </section>
 
-      <section
-        className={styles.section}
-        aria-labelledby="account-signout-heading"
-      >
-        <h2 className={styles.heading} id="account-signout-heading">
-          Sign out
-        </h2>
-        <LogoutButton />
-      </section>
+      <SessionSecurity />
     </main>
   );
 }

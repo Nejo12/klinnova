@@ -8,6 +8,7 @@ import {
 } from "@/lib/employer/capability-routing";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import type { Database } from "@/types/database";
+import type { ActiveWorkspace } from "@/lib/workspace/active-workspace";
 
 /** OTP types accepted by the confirmation callback for Slice 1 registration. */
 const ALLOWED_OTP_TYPES = new Set<EmailOtpType>([
@@ -23,6 +24,7 @@ export type ConfirmSearchParams = {
   code?: string | null;
   next?: string | null;
   intent?: string | null;
+  activeWorkspace?: ActiveWorkspace | null;
 };
 
 export type ConfirmResult =
@@ -125,6 +127,7 @@ export async function confirmAuthCallback(
   const destination = resolvePostAuthDestination({
     intentPath,
     capabilities,
+    activeWorkspace: params.activeWorkspace,
   });
 
   const nextPath =

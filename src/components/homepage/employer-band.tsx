@@ -47,7 +47,11 @@ const SAMPLE_APPLICANTS: SampleApplicant[] = [
   },
 ];
 
-export function EmployerBand() {
+export function EmployerBand({
+  authenticatedDestination,
+}: {
+  authenticatedDestination?: string;
+}) {
   const { locale, t } = useLocale();
 
   return (
@@ -67,8 +71,15 @@ export function EmployerBand() {
             <li>{t("homepage.employer.benefitApplications")}</li>
             <li>{t("homepage.employer.benefitDecide")}</li>
           </ul>
-          <Link className={styles.cta} href="/employer/register">
-            {t("homepage.employer.cta")}
+          <Link
+            className={styles.cta}
+            href={authenticatedDestination ?? "/employer/register"}
+          >
+            {t(
+              authenticatedDestination === undefined
+                ? "homepage.employer.cta"
+                : "shell.dashboard",
+            )}
           </Link>
         </div>
 

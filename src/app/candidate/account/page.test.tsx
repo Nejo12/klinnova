@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const getUser = vi.hoisted(() => vi.fn());
@@ -84,6 +84,13 @@ describe("CandidateAccountPage (M5.1 Unit B)", () => {
 
     render(await CandidateAccountPage());
 
-    expect(screen.getByRole("link", { name: "Employer" })).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Workspace and account: Candidate",
+      }),
+    );
+    expect(
+      screen.getByRole("button", { name: "Employer" }),
+    ).toBeInTheDocument();
   });
 });

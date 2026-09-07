@@ -4,6 +4,7 @@ const getUser = vi.hoisted(() => vi.fn());
 const from = vi.hoisted(() => vi.fn());
 const rpc = vi.hoisted(() => vi.fn());
 const ensureEmployerProfile = vi.hoisted(() => vi.fn());
+const writeActiveWorkspace = vi.hoisted(() => vi.fn());
 const redirect = vi.hoisted(() =>
   vi.fn((path: string) => {
     throw new Error(`REDIRECT:${path}`);
@@ -22,6 +23,10 @@ vi.mock("@/lib/supabase/server", () => ({
 
 vi.mock("@/lib/employer/ensure-employer-profile", () => ({
   ensureEmployerProfile,
+}));
+
+vi.mock("@/lib/workspace/active-workspace.server", () => ({
+  writeActiveWorkspace,
 }));
 
 import {
@@ -68,6 +73,7 @@ describe("employer onboarding actions", () => {
     from.mockReset();
     rpc.mockReset();
     ensureEmployerProfile.mockReset();
+    writeActiveWorkspace.mockReset();
     redirect.mockClear();
     // is_current_employer_suspended() defaults to "not suspended" for
     // every test unless overridden — this is the pre-check every direct
@@ -107,6 +113,7 @@ describe("employer onboarding actions", () => {
       expect.anything(),
       "private",
     );
+    expect(writeActiveWorkspace).toHaveBeenCalledWith("employer");
   });
 
   it("maps type-lock conflicts from ensure", async () => {

@@ -1,0 +1,75 @@
+.trigger,
+.switchAction,
+.securityLink {
+  min-height: var(--touch-target-min);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-pill);
+  background: var(--color-action-subtle);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.options {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.current,
+.switchAction {
+  width: 100%;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+}
+
+.current {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  background: var(--color-action-subtle);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.currentStatus {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+
+.switchAction {
+  border: var(--border-width-default) solid var(--color-border-default);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.securityLink {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-text-link);
+  text-decoration: none;
+}
+
+.trigger:focus-visible,
+.switchAction:focus-visible,
+.securityLink:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.switchAction:hover {
+  background: var(--color-bg-subtle);
+}

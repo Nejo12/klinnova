@@ -10,6 +10,7 @@ import { parseInternalNextPath } from "@/lib/auth/schemas";
 import { resolvePostAuthDestination } from "@/lib/employer/capability-routing";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { readActiveWorkspace } from "@/lib/workspace/active-workspace.server";
 
 export const metadata = {
   title: "Sign in · Klinnova",
@@ -38,6 +39,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     const destination = resolvePostAuthDestination({
       intentPath,
       capabilities,
+      activeWorkspace: await readActiveWorkspace(),
     });
     redirect(
       destination.kind === "role_choice" ? "/account/choose" : destination.href,

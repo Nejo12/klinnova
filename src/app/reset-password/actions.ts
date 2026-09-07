@@ -74,6 +74,6 @@ export async function updatePasswordAction(
  */
 export async function continueToSignInAction(): Promise<void> {
   const supabase = await createServerSupabaseClient();
-  await supabase.auth.signOut();
+  await supabase.auth.signOut({ scope: "local" });
   redirect("/login");
 }

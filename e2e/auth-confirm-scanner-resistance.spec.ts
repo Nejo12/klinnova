@@ -103,7 +103,7 @@ test.describe("Auth confirmation/recovery scanner resistance (C4G-R1)", () => {
     await expect(page).toHaveURL(/\/candidate$/, { timeout: 15_000 });
 
     await page.goto("/candidate/account");
-    await page.getByRole("button", { name: "Log out" }).click();
+    await page.getByRole("button", { name: "Log out", exact: true }).click();
     await expect(page).toHaveURL(/\/$/);
 
     await page.goto("/forgot-password");

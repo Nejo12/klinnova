@@ -146,7 +146,9 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
       name: "Delete my Klinnova account",
     });
     await expect(deleteLink).toBeVisible();
-    await expect(page.getByRole("button", { name: "Log out" })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Log out", exact: true }),
+    ).toBeVisible();
 
     // Merely reaching the Account hub must not have deleted anything —
     // the profile must still exist and matches must still work.

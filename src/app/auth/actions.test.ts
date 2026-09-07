@@ -5,6 +5,8 @@ const signInWithPassword = vi.hoisted(() => vi.fn());
 const signOut = vi.hoisted(() => vi.fn());
 const ensureCandidateProfile = vi.hoisted(() => vi.fn());
 const loadAccountCapabilities = vi.hoisted(() => vi.fn());
+const readActiveWorkspace = vi.hoisted(() => vi.fn());
+const writeActiveWorkspace = vi.hoisted(() => vi.fn());
 const redirect = vi.hoisted(() =>
   vi.fn((path: string) => {
     throw new Error(`REDIRECT:${path}`);
@@ -29,6 +31,11 @@ vi.mock("@/lib/employer/load-capabilities", () => ({
   loadAccountCapabilities,
 }));
 
+vi.mock("@/lib/workspace/active-workspace.server", () => ({
+  readActiveWorkspace,
+  writeActiveWorkspace,
+}));
+
 vi.mock("@/lib/env/public", () => ({
   getPublicEnv: () => ({
     NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
@@ -37,7 +44,12 @@ vi.mock("@/lib/env/public", () => ({
   }),
 }));
 
-import { loginAction, logoutAction, registerAction } from "@/app/auth/actions";
+import {
+  loginAction,
+  logoutAction,
+  logoutAllDevicesAction,
+  registerAction,
+} from "@/app/auth/actions";
 import { AUTH_CHECK_EMAIL, AUTH_GENERIC_FAILURE } from "@/lib/auth/messages";
 
 function form(data: Record<string, string>): FormData {
@@ -52,6 +64,9 @@ describe("registerAction", () => {
     ensureCandidateProfile.mockReset();
     loadAccountCapabilities.mockReset();
     redirect.mockClear();
+    readActiveWorkspace.mockReset();
+    readActiveWorkspace.mockResolvedValue(null);
+    writeActiveWorkspace.mockReset();
     loadAccountCapabilities.mockResolvedValue({
       hasCandidateProfile: false,
       hasEmployerProfile: false,
@@ -96,6 +111,7 @@ describe("registerAction", () => {
     });
     expect(state).toEqual({ error: null, message: AUTH_CHECK_EMAIL });
     expect(ensureCandidateProfile).not.toHaveBeenCalled();
+    expect(writeActiveWorkspace).toHaveBeenCalledWith("candidate");
   });
 
   it("preserves employer next through confirmation email", async () => {
@@ -122,6 +138,7 @@ describe("registerAction", () => {
         }),
       }),
     );
+    expect(writeActiveWorkspace).toHaveBeenCalledWith("employer");
   });
 
   it("ensures profile and redirects when a session is returned", async () => {
@@ -193,6 +210,8 @@ describe("loginAction", () => {
     ensureCandidateProfile.mockReset();
     loadAccountCapabilities.mockReset();
     redirect.mockClear();
+    readActiveWorkspace.mockReset();
+    readActiveWorkspace.mockResolvedValue(null);
     loadAccountCapabilities.mockResolvedValue({
       hasCandidateProfile: true,
       hasEmployerProfile: false,
@@ -277,12 +296,44 @@ describe("loginAction", () => {
     ).rejects.toThrow("REDIRECT:/account/choose");
     expect(ensureCandidateProfile).not.toHaveBeenCalled();
   });
+
+  it("returns a dual-capability user to the known active workspace", async () => {
+    signInWithPassword.mockResolvedValue({
+      data: { user: { id: "u1" }, session: { access_token: "t" } },
+      error: null,
+    });
+    loadAccountCapabilities.mockResolvedValue({
+      hasCandidateProfile: true,
+      hasEmployerProfile: true,
+    });
+    readActiveWorkspace.mockResolvedValue("employer");
+
+    await expect(
+      loginAction(
+        { error: null, message: null },
+        form({
+          email: "ada@example.com",
+          password: "password123",
+          next: "",
+        }),
+      ),
+    ).rejects.toThrow("REDIRECT:/employer");
+  });
 });
 
 describe("logoutAction", () => {
-  it("signs out and redirects home", async () => {
+  beforeEach(() => signOut.mockReset());
+
+  it("signs out only the current browser session and redirects home", async () => {
     signOut.mockResolvedValue({ error: null });
     await expect(logoutAction()).rejects.toThrow("REDIRECT:/");
-    expect(signOut).toHaveBeenCalled();
+    expect(signOut).toHaveBeenCalledWith({ scope: "local" });
+    expect(signOut).not.toHaveBeenCalledWith({ scope: "global" });
+  });
+
+  it("uses global scope only for the separate all-devices action", async () => {
+    signOut.mockResolvedValue({ error: null });
+    await expect(logoutAllDevicesAction()).rejects.toThrow("REDIRECT:/");
+    expect(signOut).toHaveBeenCalledWith({ scope: "global" });
   });
 });

@@ -30,6 +30,19 @@ describe("resolvePostAuthDestination", () => {
     ).toEqual({ kind: "role_choice" });
   });
 
+  it("uses a valid active workspace for dual-capability accounts", () => {
+    expect(
+      resolvePostAuthDestination({
+        intentPath: null,
+        activeWorkspace: "employer",
+        capabilities: {
+          hasCandidateProfile: true,
+          hasEmployerProfile: true,
+        },
+      }),
+    ).toEqual({ kind: "redirect", href: "/employer" });
+  });
+
   it("sends employer-only users to employer home", () => {
     expect(
       resolvePostAuthDestination({

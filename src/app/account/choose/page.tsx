@@ -1,10 +1,17 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { activateWorkspaceAction } from "@/app/account/workspace-actions";
 import { LogoutButton } from "@/components/auth/logout-button";
+import { LocalizedText } from "@/components/i18n/localized-text";
 import styles from "@/components/employer-onboarding/employer-onboarding.module.scss";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import {
+  resolveActiveWorkspace,
+  workspaceHref,
+} from "@/lib/workspace/active-workspace";
+import { readActiveWorkspace } from "@/lib/workspace/active-workspace.server";
 
 export const dynamic = "force-dynamic";
 
@@ -13,8 +20,8 @@ export const metadata = {
 };
 
 /**
- * Explicit role-choice when a dual-capability user signs in without intent (D-047).
- * No hidden default-role preference is stored.
+ * Legacy fallback for a dual-capability account with no safe browser-local
+ * workspace preference. Ordinary sign-in bypasses this page once chosen.
  */
 export default async function AccountChoosePage() {
   const supabase = await createServerSupabaseClient();
@@ -38,6 +45,14 @@ export default async function AccountChoosePage() {
     redirect("/candidate");
   }
 
+  const resolvedWorkspace = resolveActiveWorkspace({
+    capabilities,
+    preference: await readActiveWorkspace(),
+  });
+  if (resolvedWorkspace !== null) {
+    redirect(workspaceHref(resolvedWorkspace));
+  }
+
   return (
     <main className={styles.page}>
       <div className={styles.header}>
@@ -47,22 +62,29 @@ export default async function AccountChoosePage() {
         <LogoutButton />
       </div>
 
-      <h1 className={styles.heading}>Choose where to continue</h1>
+      <h1 className={styles.heading}>
+        <LocalizedText message="workspace.chooseHeading" />
+      </h1>
       <p className={styles.lead}>
-        This account has both candidate and employer profiles. Pick the space
-        you want to open. Nothing is chosen for you automatically.
+        <LocalizedText message="workspace.chooseLead" />
       </p>
 
       <div className={styles.actions}>
-        <Link className={styles.button} href="/candidate">
-          Continue as candidate
-        </Link>
-        <Link
-          className={`${styles.button} ${styles.buttonSecondary}`}
-          href="/employer"
-        >
-          Continue as employer
-        </Link>
+        <form action={activateWorkspaceAction}>
+          <input type="hidden" name="workspace" value="candidate" />
+          <button className={styles.button} type="submit">
+            <LocalizedText message="workspace.continueCandidate" />
+          </button>
+        </form>
+        <form action={activateWorkspaceAction}>
+          <input type="hidden" name="workspace" value="employer" />
+          <button
+            className={`${styles.button} ${styles.buttonSecondary}`}
+            type="submit"
+          >
+            <LocalizedText message="workspace.continueEmployer" />
+          </button>
+        </form>
       </div>
     </main>
   );

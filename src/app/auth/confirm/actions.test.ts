@@ -28,6 +28,10 @@ vi.mock("@/lib/employer/load-capabilities", () => ({
   loadAccountCapabilities,
 }));
 
+vi.mock("@/lib/workspace/active-workspace.server", () => ({
+  readActiveWorkspace: vi.fn().mockResolvedValue(null),
+}));
+
 import { confirmAction } from "@/app/auth/confirm/actions";
 
 function form(data: Record<string, string>): FormData {

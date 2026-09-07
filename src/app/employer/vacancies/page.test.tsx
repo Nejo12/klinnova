@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const loadEmployerDrafts = vi.hoisted(() => vi.fn());
@@ -116,7 +116,14 @@ describe("EmployerVacanciesPage empty states", () => {
       "href",
       "/employer/vacancies/new",
     );
-    expect(screen.getByRole("link", { name: "Candidate" })).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Workspace and account: Employer",
+      }),
+    );
+    expect(
+      screen.getByRole("button", { name: "Candidate" }),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /Applications/ }),
     ).toHaveTextContent("2");

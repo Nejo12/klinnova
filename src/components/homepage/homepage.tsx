@@ -12,19 +12,23 @@ import styles from "./homepage.module.scss";
 
 type HomepageProps = {
   jobsResult: LoadPublicVacanciesResult;
+  viewer?: {
+    destination: string;
+    workspace: "candidate" | "employer" | null;
+  };
 };
 
-export function Homepage({ jobsResult }: HomepageProps) {
+export function Homepage({ jobsResult, viewer }: HomepageProps) {
   return (
     <>
-      <ShellHeader />
+      <ShellHeader authenticated={viewer} />
       <main className={styles.main}>
-        <PublicHero />
+        <PublicHero authenticatedDestination={viewer?.destination} />
         <ValuePillars />
         <CandidateJourney />
         <OpenJobsPreview result={jobsResult} />
-        <EmployerBand />
-        <FinalCta />
+        <EmployerBand authenticatedDestination={viewer?.destination} />
+        <FinalCta authenticatedDestination={viewer?.destination} />
       </main>
       <footer className={styles.footer}>
         <PublicFooter />
