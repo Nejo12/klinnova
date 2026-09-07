@@ -6,7 +6,6 @@ import {
   statusLabel,
 } from "@/components/employer-vacancies/vacancy-list";
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
-import { ThemePreferenceControl } from "@/components/theme/theme-preference-control";
 import styles from "@/app/employer/employer-home.module.scss";
 import {
   EMPLOYER_EXPORT_BUTTON_LABEL,
@@ -257,7 +256,6 @@ export default async function EmployerHomePage() {
           <p className={styles.note}>{EMPLOYER_EXPORT_LEAD}</p>
         </div>
         <div className={styles.accountControls}>
-          <ThemePreferenceControl />
           <div className={styles.accountActions}>
             {/* Plain anchor, not next/link: this is a real file download from a
                 Route Handler, not a client-side page transition. The server's

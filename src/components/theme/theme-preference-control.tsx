@@ -25,7 +25,7 @@ export function ThemePreferenceControl() {
     <fieldset className={styles.fieldset} aria-describedby={descriptionId}>
       <legend className={styles.legend}>{t("theme.legend")}</legend>
       <p className={styles.hint} id={descriptionId}>
-        {t("theme.hint")}
+        {t("theme.hint")}lllll------
       </p>
       <div className={styles.options}>
         {THEME_PREFERENCES.map((option) => (
