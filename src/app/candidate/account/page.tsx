@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { CandidateAppHeader } from "@/components/candidate-nav/candidate-app-header";
 import { LogoutButton } from "@/components/auth/logout-button";
+import { ThemePreferenceControl } from "@/components/theme/theme-preference-control";
 import {
   CANDIDATE_EXPORT_BUTTON_LABEL,
   CANDIDATE_EXPORT_LEAD,
@@ -40,6 +41,10 @@ export default async function CandidateAccountPage() {
       <p className={styles.lead}>
         Download your data, delete your account, or sign out.
       </p>
+
+      <section className={styles.section} aria-label="Appearance settings">
+        <ThemePreferenceControl />
+      </section>
 
       <section
         className={styles.section}

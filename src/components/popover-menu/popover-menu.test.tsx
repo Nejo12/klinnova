@@ -248,41 +248,6 @@ describe("Menu", () => {
     );
     expect(screen.getByText("⌫")).toHaveAttribute("aria-hidden", "true");
   });
-
-  it("exposes optional selected items with radio-menu semantics", async () => {
-    const user = userEvent.setup();
-    render(
-      <Menu
-        trigger={<button type="button">Appearance</button>}
-        items={[
-          {
-            id: "system",
-            label: "System",
-            onSelect: vi.fn(),
-            selected: false,
-          },
-          {
-            id: "dark",
-            label: "Dark",
-            onSelect: vi.fn(),
-            selected: true,
-            shortcut: "✓",
-          },
-        ]}
-      />,
-    );
-
-    await user.click(screen.getByRole("button", { name: "Appearance" }));
-
-    expect(screen.getByRole("menuitemradio", { name: "Dark" })).toHaveAttribute(
-      "aria-checked",
-      "true",
-    );
-    expect(
-      screen.getByRole("menuitemradio", { name: "System" }),
-    ).toHaveAttribute("aria-checked", "false");
-    expect(screen.getByRole("menuitemradio", { name: "Dark" })).toHaveFocus();
-  });
 });
 
 describe("Popover / Menu styles", () => {

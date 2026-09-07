@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import { LocaleBootstrapScript } from "@/components/i18n/locale-bootstrap-script";
 import { LocaleProvider } from "@/components/i18n/locale-provider";
-import { FloatingAppearanceControl } from "@/components/theme/floating-appearance-control";
+import { FloatingInterfacePreferences } from "@/components/theme/floating-appearance-control";
 import { ThemeBootstrapScript } from "@/components/theme/theme-bootstrap-script";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { assertServerEnv } from "@/lib/env/server";
@@ -33,7 +33,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <LocaleProvider>
           <ThemeProvider>
             {children}
-            <FloatingAppearanceControl />
+            <FloatingInterfacePreferences />
           </ThemeProvider>
         </LocaleProvider>
       </body>

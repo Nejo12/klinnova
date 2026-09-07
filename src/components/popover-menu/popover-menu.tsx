@@ -40,7 +40,6 @@ export type MenuItem = {
   label: ReactNode;
   onSelect: () => void;
   disabled?: boolean;
-  selected?: boolean;
   tone?: "default" | "danger";
   shortcut?: ReactNode;
 };
@@ -202,25 +201,17 @@ export function Menu({
         !rootRef.current?.contains(event.target)
       ) {
         setOpen(false);
-        focusTrigger(triggerId);
       }
     }
 
     document.addEventListener("pointerdown", handleOutsidePointer);
     return () =>
       document.removeEventListener("pointerdown", handleOutsidePointer);
-  }, [open, triggerId]);
+  }, [open]);
 
   function openMenu(target: "first" | "last" = "first") {
-    const selectedIndex = items.findIndex(
-      (item) => item.selected && !item.disabled,
-    );
     const index =
-      selectedIndex >= 0
-        ? selectedIndex
-        : target === "last"
-          ? enabledIndices.at(-1)
-          : enabledIndices.at(0);
+      target === "last" ? enabledIndices.at(-1) : enabledIndices.at(0);
     setActiveIndex(index ?? 0);
     setOpen(true);
   }
@@ -328,14 +319,10 @@ export function Menu({
               }}
               className={styles.menuItem}
               type="button"
-              role={item.selected === undefined ? "menuitem" : "menuitemradio"}
-              aria-checked={
-                item.selected === undefined ? undefined : item.selected
-              }
+              role="menuitem"
               tabIndex={index === activeIndex ? 0 : -1}
               disabled={item.disabled}
               data-tone={item.tone ?? "default"}
-              data-selected={item.selected ? "true" : undefined}
               onFocus={() => setActiveIndex(index)}
               onClick={() => {
                 item.onSelect();

@@ -1,18 +1,13 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LocaleProvider } from "@/components/i18n/locale-provider";
-import { FloatingAppearanceControl } from "@/components/theme/floating-appearance-control";
+import { FloatingInterfacePreferences } from "@/components/theme/floating-appearance-control";
 import { ThemeProvider } from "@/components/theme/theme-provider";
+import { LOCALE_STORAGE_KEY, type Locale } from "@/lib/i18n/locale";
 import { THEME_STORAGE_KEY, type ThemePreference } from "@/lib/theme/theme";
 
 const mockUsePathname = vi.fn(() => "/jobs");
@@ -48,166 +43,180 @@ function installMatchMedia(prefersDark = false) {
 
 function renderControl(
   preference: ThemePreference = "system",
-  locale: "en" | "de" = "en",
+  locale: Locale = "en",
 ) {
   document.documentElement.dataset.themePreference = preference;
   document.documentElement.dataset.theme =
     preference === "dark" ? "dark" : "light";
   document.documentElement.dataset.locale = locale;
+  document.documentElement.lang = locale;
 
   return render(
     <LocaleProvider>
       <ThemeProvider>
-        <FloatingAppearanceControl />
+        <FloatingInterfacePreferences />
       </ThemeProvider>
     </LocaleProvider>,
   );
 }
 
-describe("FloatingAppearanceControl", () => {
+async function openPanel(label = "Interface preferences") {
+  const user = userEvent.setup();
+  await user.click(screen.getByRole("button", { name: label }));
+  return user;
+}
+
+describe("FloatingInterfacePreferences", () => {
   beforeEach(() => {
     mockUsePathname.mockReturnValue("/jobs");
     window.localStorage.clear();
     document.documentElement.removeAttribute("data-theme");
     document.documentElement.removeAttribute("data-theme-preference");
     document.documentElement.removeAttribute("data-locale");
+    document.documentElement.removeAttribute("lang");
     document.documentElement.style.removeProperty("color-scheme");
     installMatchMedia();
   });
 
   it.each([
-    ["system", "Appearance: System"],
-    ["light", "Appearance: Light"],
-    ["dark", "Appearance: Dark"],
-  ] as const)("reflects the stored %s preference", (preference, label) => {
-    renderControl(preference);
+    ["en", "Interface preferences"],
+    ["de", "Oberflächeneinstellungen"],
+  ] as const)(
+    "uses the neutral localized trigger label for %s",
+    (locale, label) => {
+      renderControl("system", locale);
 
-    const trigger = screen.getByRole("button", { name: label });
-    expect(trigger.querySelector("svg")).toHaveAttribute(
-      "data-theme-icon",
-      preference,
-    );
-  });
+      const trigger = screen.getByRole("button", { name: label });
+      expect(trigger).toHaveAttribute("aria-haspopup", "dialog");
+      expect(
+        trigger.querySelector("[data-interface-preferences-icon]"),
+      ).toBeInTheDocument();
+      expect(
+        trigger.querySelector("[data-theme-icon]"),
+      ).not.toBeInTheDocument();
+    },
+  );
 
-  it("opens without mutating the preference and exposes three radio-menu options", async () => {
-    const user = userEvent.setup();
-    renderControl("dark");
+  it("opens one combined panel without mutating either preference", async () => {
+    renderControl("dark", "en");
+    await openPanel();
 
-    await user.click(screen.getByRole("button", { name: "Appearance: Dark" }));
-
-    expect(screen.getAllByRole("menuitemradio")).toHaveLength(3);
     expect(
-      screen.getByRole("menuitemradio", { name: "System" }),
-    ).toHaveAttribute("aria-checked", "false");
-    expect(
-      screen.getByRole("menuitemradio", { name: "Light" }),
-    ).toHaveAttribute("aria-checked", "false");
-    expect(screen.getByRole("menuitemradio", { name: "Dark" })).toHaveAttribute(
-      "aria-checked",
+      screen.getByRole("dialog", { name: "Interface preferences" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /English/ })).toHaveAttribute(
+      "aria-pressed",
       "true",
     );
-    expect(screen.getByRole("menuitemradio", { name: "Dark" })).toHaveFocus();
+    expect(screen.getByRole("button", { name: /Deutsch/ })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+    expect(screen.getByRole("button", { name: /System/ })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+    expect(screen.getByRole("button", { name: /Dark/ })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(document.documentElement.dataset.locale).toBe("en");
     expect(document.documentElement.dataset.themePreference).toBe("dark");
+    expect(window.localStorage.getItem(LOCALE_STORAGE_KEY)).toBeNull();
     expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBeNull();
   });
 
-  it("opens from the keyboard and selects the focused option with Space", async () => {
-    const user = userEvent.setup();
-    renderControl("system");
-    const trigger = screen.getByRole("button", { name: "Appearance: System" });
+  it("changes language only and preserves the appearance preference", async () => {
+    renderControl("dark", "en");
+    const user = await openPanel();
 
-    trigger.focus();
-    await user.keyboard(" ");
-    await user.keyboard("{ArrowDown} ");
+    await user.click(screen.getByRole("button", { name: /Deutsch/ }));
 
-    expect(document.documentElement.dataset.themePreference).toBe("light");
-    expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe("light");
-    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
-    expect(trigger).toHaveFocus();
+    expect(document.documentElement.dataset.locale).toBe("de");
+    expect(document.documentElement.lang).toBe("de");
+    expect(document.documentElement.dataset.themePreference).toBe("dark");
+    expect(window.localStorage.getItem(LOCALE_STORAGE_KEY)).toBe("de");
+    expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Oberflächeneinstellungen" }),
+    ).toBeInTheDocument();
   });
 
   it.each([
     ["system", "System"],
-    ["light", "Light"],
-    ["dark", "Dark"],
+    ["light", "Hell"],
+    ["dark", "Dunkel"],
   ] as const)(
-    "selects and persists %s explicitly",
+    "changes appearance to %s only and preserves locale",
     async (preference, label) => {
-      const user = userEvent.setup();
-      renderControl(preference === "dark" ? "light" : "dark");
-      const trigger = screen.getByRole("button", { name: /^Appearance:/ });
+      renderControl(preference === "dark" ? "light" : "dark", "de");
+      const user = await openPanel("Oberflächeneinstellungen");
 
-      await user.click(trigger);
-      await user.click(screen.getByRole("menuitemradio", { name: label }));
+      await user.click(screen.getByRole("button", { name: label }));
 
       expect(document.documentElement.dataset.themePreference).toBe(preference);
+      expect(document.documentElement.dataset.locale).toBe("de");
+      expect(document.documentElement.lang).toBe("de");
       expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe(preference);
-      expect(screen.queryByRole("menu")).not.toBeInTheDocument();
-      expect(trigger).toHaveFocus();
+      expect(window.localStorage.getItem(LOCALE_STORAGE_KEY)).toBeNull();
     },
   );
 
-  it("closes on Escape without mutation and returns focus", async () => {
-    const user = userEvent.setup();
-    renderControl("system");
-    const trigger = screen.getByRole("button", { name: "Appearance: System" });
+  it.each(["{Enter}", " "])(
+    "opens with %s and returns focus on Escape",
+    async (key) => {
+      const user = userEvent.setup();
+      renderControl();
+      const trigger = screen.getByRole("button", {
+        name: "Interface preferences",
+      });
 
-    await user.click(trigger);
-    await user.keyboard("{Escape}");
+      trigger.focus();
+      await user.keyboard(key);
+      expect(
+        screen.getByRole("dialog", { name: "Interface preferences" }),
+      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /English/ })).toHaveFocus();
 
-    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
-    expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBeNull();
-    expect(trigger).toHaveFocus();
-  });
+      await user.keyboard("{Escape}");
+      expect(trigger).toHaveFocus();
+      expect(trigger).toHaveAttribute("aria-expanded", "false");
+    },
+  );
 
   it("closes on outside dismissal and returns focus", async () => {
-    const user = userEvent.setup();
     renderControl();
-    const trigger = screen.getByRole("button", { name: "Appearance: System" });
+    const trigger = screen.getByRole("button", {
+      name: "Interface preferences",
+    });
+    await openPanel();
 
-    await user.click(trigger);
     act(() => fireEvent.pointerDown(document.body));
 
-    await waitFor(() =>
-      expect(screen.queryByRole("menu")).not.toBeInTheDocument(),
-    );
     expect(trigger).toHaveFocus();
-  });
-
-  it("uses the established German labels", async () => {
-    const user = userEvent.setup();
-    renderControl("dark", "de");
-
-    await user.click(
-      screen.getByRole("button", { name: "Darstellung: Dunkel" }),
-    );
-
-    expect(
-      screen.getByRole("menuitemradio", { name: "System" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("menuitemradio", { name: "Hell" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("menuitemradio", { name: "Dunkel" }),
-    ).toHaveAttribute("aria-checked", "true");
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
   });
 
   it("does not render on internal operator surfaces", () => {
     mockUsePathname.mockReturnValue("/internal/employers");
     renderControl();
 
-    expect(screen.queryByRole("button", { name: /^Appearance:/ })).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: "Interface preferences" }),
+    ).toBeNull();
   });
 });
 
-describe("FloatingAppearanceControl styles", () => {
-  it("keeps the approved fixed, safe-area-aware, collision-ready placement", () => {
+describe("FloatingInterfacePreferences styles", () => {
+  it("matches the approved placement, motion, and reduced-motion contracts", () => {
     expect(controlStyles).toContain("position: fixed");
     expect(controlStyles).toContain("width: 3rem");
     expect(controlStyles).toContain("height: 3rem");
     expect(controlStyles).toContain("env(safe-area-inset-bottom, 0px)");
-    expect(controlStyles).toContain("--appearance-control-bottom-clearance");
+    expect(controlStyles).toContain("--interface-preferences-bottom-clearance");
+    expect(controlStyles).toContain("var(--duration-fast)");
+    expect(controlStyles).toContain("translateY(0.375rem) scale(0.98)");
+    expect(controlStyles).toContain("interface-preferences-panel-fade-in");
     expect(controlStyles).toContain("@media (prefers-reduced-motion: reduce)");
     expect(controlStyles).not.toMatch(/#[0-9a-f]{3,8}\b/i);
     expect(controlStyles).not.toMatch(/\brgba?\(/i);
