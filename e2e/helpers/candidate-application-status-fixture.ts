@@ -90,9 +90,7 @@ export async function publishEligibleEmployerVacancy(
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByLabel("Display name").fill(employerDisplayName);
   await page.getByLabel("Berlin locality").fill("Mitte");
-  await page
-    .getByRole("checkbox", { name: /allowed to work in Germany/i })
-    .check();
+  await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Complete onboarding" }).click();
   await expect(page).toHaveURL(/\/employer$/, { timeout: 15_000 });
 
@@ -123,7 +121,7 @@ export async function publishEligibleEmployerVacancy(
   await saveVacancyDraftFormAndReload(page, "Save draft");
 
   await page.getByRole("button", { name: "Add language" }).click();
-  await page.getByLabel(/Language 1/i).selectOption("en");
+  await page.getByLabel(/^Language 1$/i).selectOption("en");
   await page.getByLabel(/Minimum proficiency 1/i).selectOption("basic");
   await saveVacancyDraftFormAndReload(page, "Save languages");
 
