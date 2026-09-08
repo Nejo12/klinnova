@@ -203,7 +203,7 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     );
 
     await page.getByRole("button", { name: "Add language" }).click();
-    await page.getByLabel(/Language 1/i).selectOption("en");
+    await page.getByLabel(/^Language 1$/i).selectOption("en");
     await page.getByLabel(/Minimum proficiency 1/i).selectOption("basic");
     await saveLanguagesAndReload(page);
     await expectBasicEnglishRequirementPersisted(page);
@@ -420,7 +420,7 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     await expectReadyDraftFieldsPersisted(page);
 
     await page.getByRole("button", { name: "Add language" }).click();
-    await page.getByLabel(/Language 1/i).selectOption("en");
+    await page.getByLabel(/^Language 1$/i).selectOption("en");
     await page.getByLabel(/Minimum proficiency 1/i).selectOption("basic");
     await saveLanguagesAndReload(page);
     await expectBasicEnglishRequirementPersisted(page);
