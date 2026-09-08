@@ -7,6 +7,8 @@ import {
   saveOrganisationEmployerAction,
   type EmployerOnboardingActionState,
 } from "@/app/employer/onboarding/actions";
+import { useLocale } from "@/components/i18n/locale-provider";
+import { localizeEmployerMessage } from "@/lib/employer/localize-message";
 import type { EmployerProfileData } from "@/lib/employer/load-employer";
 import { EMPLOYER_LAWFUL_HIRING_SUPPORT } from "@/lib/employer/messages";
 
@@ -24,6 +26,42 @@ type OrganisationProfileFormProps = {
 export function OrganisationProfileForm({
   profile,
 }: OrganisationProfileFormProps) {
+  const { locale, t } = useLocale();
+  const copy =
+    locale === "de"
+      ? {
+          heading: "Organisationsprofil",
+          lead: "Ergänzen Sie die Organisations- und Unternehmensangaben für die Einstellung. Registrierungsdokumente werden hier nicht erfasst.",
+          contact: "Anzeigename der Kontaktperson",
+          locality: "Berliner Ortsteil",
+          slug: "Unternehmens-Slug",
+          slugHelp:
+            "Nur Kleinbuchstaben, Zahlen und Bindestriche. Muss eindeutig sein.",
+          phone: "Telefon (optional)",
+          website: "Website (optional)",
+          lawful: "Rechtmäßige Einstellung",
+          lawfulHelp:
+            "Diese Selbsterklärung ist erforderlich, bevor die Einrichtung abgeschlossen werden kann.",
+          save: "Fortschritt speichern",
+          complete: "Einrichtung abschließen",
+          completing: "Wird abgeschlossen…",
+        }
+      : {
+          heading: "Organisation employer profile",
+          lead: "Add the organisation and company details used for hiring. Registration documents are not collected here.",
+          contact: "Contact display name",
+          locality: "Berlin locality",
+          slug: "Company slug",
+          slugHelp:
+            "Lowercase letters, numbers, and hyphens only. Must be unique.",
+          phone: "Phone (optional)",
+          website: "Website (optional)",
+          lawful: "Lawful hiring",
+          lawfulHelp: EMPLOYER_LAWFUL_HIRING_SUPPORT,
+          save: "Save progress",
+          complete: "Complete onboarding",
+          completing: "Completing…",
+        };
   const [saveState, saveAction, savePending] = useActionState(
     saveOrganisationEmployerAction,
     initialState,
@@ -41,15 +79,12 @@ export function OrganisationProfileForm({
 
   return (
     <form className={styles.form} action={saveAction} noValidate>
-      <h2 className={styles.heading}>Organisation employer profile</h2>
-      <p className={styles.lead}>
-        Add the organisation and company details used for hiring. Registration
-        documents are not collected here.
-      </p>
+      <h2 className={styles.heading}>{copy.heading}</h2>
+      <p className={styles.lead}>{copy.lead}</p>
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor="displayName">
-          Contact display name
+          {copy.contact}
         </label>
         <input
           className={styles.input}
@@ -67,14 +102,14 @@ export function OrganisationProfileForm({
         />
         {fieldErrors?.displayName ? (
           <p className={styles.fieldError} id="org-displayName-error">
-            {fieldErrors.displayName}
+            {localizeEmployerMessage(fieldErrors.displayName, locale)}
           </p>
         ) : null}
       </div>
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor="organisationLegalName">
-          Organisation legal name
+          {t("employer.onboarding.legalName")}
         </label>
         <input
           className={styles.input}
@@ -94,14 +129,14 @@ export function OrganisationProfileForm({
         />
         {fieldErrors?.organisationLegalName ? (
           <p className={styles.fieldError} id="organisationLegalName-error">
-            {fieldErrors.organisationLegalName}
+            {localizeEmployerMessage(fieldErrors.organisationLegalName, locale)}
           </p>
         ) : null}
       </div>
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor="berlinLocality">
-          Berlin locality
+          {copy.locality}
         </label>
         <input
           className={styles.input}
@@ -119,14 +154,14 @@ export function OrganisationProfileForm({
         />
         {fieldErrors?.berlinLocality ? (
           <p className={styles.fieldError} id="org-berlinLocality-error">
-            {fieldErrors.berlinLocality}
+            {localizeEmployerMessage(fieldErrors.berlinLocality, locale)}
           </p>
         ) : null}
       </div>
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor="companyName">
-          Company display name
+          {t("employer.onboarding.companyName")}
         </label>
         <input
           className={styles.input}
@@ -144,14 +179,14 @@ export function OrganisationProfileForm({
         />
         {fieldErrors?.companyName ? (
           <p className={styles.fieldError} id="companyName-error">
-            {fieldErrors.companyName}
+            {localizeEmployerMessage(fieldErrors.companyName, locale)}
           </p>
         ) : null}
       </div>
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor="companySlug">
-          Company slug
+          {copy.slug}
         </label>
         <input
           className={styles.input}
@@ -171,18 +206,18 @@ export function OrganisationProfileForm({
           aria-invalid={fieldErrors?.companySlug ? true : undefined}
         />
         <p className={styles.support} id="companySlug-help">
-          Lowercase letters, numbers, and hyphens only. Must be unique.
+          {copy.slugHelp}
         </p>
         {fieldErrors?.companySlug ? (
           <p className={styles.fieldError} id="companySlug-error">
-            {fieldErrors.companySlug}
+            {localizeEmployerMessage(fieldErrors.companySlug, locale)}
           </p>
         ) : null}
       </div>
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor="phone">
-          Phone (optional)
+          {copy.phone}
         </label>
         <input
           className={styles.input}
@@ -197,7 +232,7 @@ export function OrganisationProfileForm({
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor="website">
-          Website (optional)
+          {copy.website}
         </label>
         <input
           className={styles.input}
@@ -211,8 +246,8 @@ export function OrganisationProfileForm({
       </div>
 
       <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>Lawful hiring</legend>
-        <p className={styles.support}>{EMPLOYER_LAWFUL_HIRING_SUPPORT}</p>
+        <legend className={styles.legend}>{copy.lawful}</legend>
+        <p className={styles.support}>{copy.lawfulHelp}</p>
         <label className={styles.option}>
           <input
             type="checkbox"
@@ -228,24 +263,24 @@ export function OrganisationProfileForm({
             }
           />
           <span className={styles.optionLabel}>
-            I confirm I will only hire people who are allowed to work in Germany
+            {t("employer.onboarding.lawfulHiring")}
           </span>
         </label>
         {fieldErrors?.lawfulHiringDeclared ? (
           <p className={styles.fieldError} id="org-lawfulHiring-error">
-            {fieldErrors.lawfulHiringDeclared}
+            {localizeEmployerMessage(fieldErrors.lawfulHiringDeclared, locale)}
           </p>
         ) : null}
       </fieldset>
 
       {error !== null ? (
         <p className={styles.error} role="alert">
-          {error}
+          {localizeEmployerMessage(error, locale)}
         </p>
       ) : null}
       {message !== null ? (
         <p className={styles.note} role="status">
-          {message}
+          {localizeEmployerMessage(message, locale)}
         </p>
       ) : null}
 
@@ -255,7 +290,7 @@ export function OrganisationProfileForm({
           type="submit"
           disabled={pending}
         >
-          {savePending ? "Saving…" : "Save progress"}
+          {savePending ? t("employer.onboarding.saving") : copy.save}
         </button>
         <button
           className={styles.button}
@@ -263,7 +298,7 @@ export function OrganisationProfileForm({
           formAction={completeAction}
           disabled={pending}
         >
-          {completePending ? "Completing…" : "Complete onboarding"}
+          {completePending ? copy.completing : copy.complete}
         </button>
       </div>
     </form>

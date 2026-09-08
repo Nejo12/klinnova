@@ -1,8 +1,11 @@
+"use client";
+
 import {
   DelayedReveal,
   Skeleton,
   SkeletonRegion,
 } from "@/components/shared/skeleton";
+import { useLocale } from "@/components/i18n/locale-provider";
 import styles from "@/app/employer/employer-home.module.scss";
 
 // Representative home vacancy rows only. The real count, lifecycle labels,
@@ -21,10 +24,12 @@ export const EMPLOYER_HOME_VACANCY_SKELETON_COUNT = 2;
  * per-vacancy application counts.
  */
 export default function Loading() {
+  const { t } = useLocale();
+
   return (
     <main className={styles.page}>
       <DelayedReveal>
-        <SkeletonRegion label="Loading employer home">
+        <SkeletonRegion label={t("employer.loading.home")}>
           <header className={styles.hero}>
             <div className={styles.heroCopy}>
               <Skeleton height="2.25rem" width="min(100%, 18rem)" radius="sm" />
@@ -39,7 +44,7 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading employer attention">
+        <SkeletonRegion label={t("employer.loading.attention")}>
           <div className={styles.attentionCard}>
             <div className={styles.heroCopy}>
               <Skeleton height="1.25rem" width="min(100%, 12rem)" radius="sm" />
@@ -51,8 +56,11 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading vacancies">
-          <section className={styles.section} aria-label="Loading vacancies">
+        <SkeletonRegion label={t("employer.loading.vacancies")}>
+          <section
+            className={styles.section}
+            aria-label={t("employer.loading.vacancies")}
+          >
             <div className={styles.sectionHeader}>
               <Skeleton height="1.5rem" width="8rem" radius="sm" />
               <Skeleton height="2.75rem" width="9rem" radius="sm" />
@@ -96,10 +104,10 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading account data">
+        <SkeletonRegion label={t("employer.loading.accountData")}>
           <section
             className={styles.accountSection}
-            aria-label="Loading account data"
+            aria-label={t("employer.loading.accountData")}
           >
             <div className={styles.heroCopy}>
               <Skeleton height="1.5rem" width="8rem" radius="sm" />

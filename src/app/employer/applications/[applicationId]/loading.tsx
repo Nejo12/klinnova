@@ -1,8 +1,11 @@
+"use client";
+
 import {
   DelayedReveal,
   Skeleton,
   SkeletonRegion,
 } from "@/components/shared/skeleton";
+import { useLocale } from "@/components/i18n/locale-provider";
 import styles from "@/components/employer-applications/employer-applications.module.scss";
 
 // Mirrors the fixed, unconditional `<dl><div><dt/dd></div></dl>` rows
@@ -70,10 +73,12 @@ function DetailRowSkeleton({
  * `<button>`.
  */
 export default function Loading() {
+  const { t } = useLocale();
+
   return (
     <main className={styles.page}>
       <DelayedReveal>
-        <SkeletonRegion label="Loading application">
+        <SkeletonRegion label={t("employer.loading.application")}>
           <div className={styles.detailBackShell}>
             <Skeleton height="1rem" width="10rem" radius="sm" />
           </div>
@@ -88,7 +93,7 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading applicant review">
+        <SkeletonRegion label={t("employer.loading.applicantReview")}>
           <div className={styles.detailGrid}>
             <div className={styles.detailMain}>
               <section className={styles.section}>
@@ -135,7 +140,7 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading outcome form">
+        <SkeletonRegion label={t("employer.loading.outcomeForm")}>
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="10rem" radius="sm" />
             <div className={styles.field}>

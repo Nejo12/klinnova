@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef } from "react";
 
 import { voidApplicationOutcomeAction } from "@/app/employer/applications/[applicationId]/outcome-actions";
+import { useLocale } from "@/components/i18n/locale-provider";
 import styles from "@/components/employer-applications/employer-applications.module.scss";
 import {
   OUTCOME_ALREADY_VOIDED,
@@ -54,6 +55,7 @@ export function VoidOutcomeButton({
   applicationId,
   outcomeEventId,
 }: VoidOutcomeButtonProps) {
+  const { locale } = useLocale();
   const [state, formAction, pending] = useActionState(
     voidApplicationOutcomeAction,
     initialVoidOutcomeActionState,
@@ -78,7 +80,13 @@ export function VoidOutcomeButton({
         type="submit"
         disabled={pending}
       >
-        {pending ? "Voiding…" : "Void"}
+        {pending
+          ? locale === "de"
+            ? "Wird ungültig gemacht…"
+            : "Voiding…"
+          : locale === "de"
+            ? "Ungültig machen"
+            : "Void"}
       </button>
     </form>
   );

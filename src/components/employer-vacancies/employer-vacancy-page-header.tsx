@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 
 import { LogoutButton } from "@/components/auth/logout-button";
 import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
+import { useLocale } from "@/components/i18n/locale-provider";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 
 import responsiveStyles from "./employer-vacancy-page-header.module.scss";
@@ -21,6 +24,7 @@ export function EmployerVacancyPageHeader({
   currentPath,
   unseenApplicationsCount,
 }: EmployerVacancyPageHeaderProps) {
+  const { locale, t } = useLocale();
   return (
     <div className={`${styles.header} ${responsiveStyles.header}`}>
       <div className={responsiveStyles.topRow}>
@@ -36,19 +40,24 @@ export function EmployerVacancyPageHeader({
           <LogoutButton />
         </div>
       </div>
-      <nav className={responsiveStyles.primaryNav} aria-label="Employer">
+      <nav
+        className={responsiveStyles.primaryNav}
+        aria-label={t("employer.nav.label")}
+      >
         <ul className={`${styles.appNav} ${responsiveStyles.appNav}`}>
           <li>
             <Link
               className={styles.appNavLink}
               href="/employer"
-              aria-label="Employer home"
+              aria-label={t("employer.nav.home")}
               aria-current={currentPath === "home" ? "page" : undefined}
             >
               <span className={responsiveStyles.desktopHomeLabel}>
-                Employer home
+                {t("employer.nav.home")}
               </span>
-              <span className={responsiveStyles.mobileHomeLabel}>Home</span>
+              <span className={responsiveStyles.mobileHomeLabel}>
+                {locale === "de" ? "Start" : "Home"}
+              </span>
             </Link>
           </li>
           <li>
@@ -57,7 +66,7 @@ export function EmployerVacancyPageHeader({
               href="/employer/vacancies"
               aria-current={currentPath === "vacancies" ? "page" : undefined}
             >
-              Vacancies
+              {t("employer.nav.vacancies")}
             </Link>
           </li>
           <li>
@@ -66,14 +75,17 @@ export function EmployerVacancyPageHeader({
               href="/employer/applications"
               aria-current={currentPath === "applications" ? "page" : undefined}
             >
-              Applications
+              {t("employer.nav.applications")}
               {unseenApplicationsCount !== undefined &&
                 unseenApplicationsCount > 0 && (
                   <>
                     {" "}
                     <span className={styles.navBadge}>
                       {unseenApplicationsCount}
-                      <span className={styles.srOnly}> new</span>
+                      <span className={styles.srOnly}>
+                        {" "}
+                        {t("employer.nav.newApplications")}
+                      </span>
                     </span>
                   </>
                 )}
@@ -85,7 +97,7 @@ export function EmployerVacancyPageHeader({
               href="/employer/verification"
               aria-current={currentPath === "verification" ? "page" : undefined}
             >
-              Verification
+              {t("employer.nav.verification")}
             </Link>
           </li>
         </ul>

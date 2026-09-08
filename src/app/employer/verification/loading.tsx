@@ -1,11 +1,13 @@
+"use client";
+
 import {
   DelayedReveal,
   Skeleton,
   SkeletonRegion,
 } from "@/components/shared/skeleton";
+import { useLocale } from "@/components/i18n/locale-provider";
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
 import styles from "@/components/employer-verification/employer-verification.module.scss";
-import { VERIFICATION_PAGE_HEADING } from "@/lib/employer/verification/messages";
 
 /**
  * Route-loading state for /employer/verification. Renders static chrome
@@ -15,6 +17,8 @@ import { VERIFICATION_PAGE_HEADING } from "@/lib/employer/verification/messages"
  * unknown until loadEmployerProfile resolves — those remain omitted.
  */
 export default function Loading() {
+  const { t } = useLocale();
+
   return (
     <main className={styles.page}>
       <EmployerVacancyPageHeader
@@ -22,10 +26,10 @@ export default function Loading() {
         showEmployer={true}
         currentPath="verification"
       />
-      <h1 className={styles.heading}>{VERIFICATION_PAGE_HEADING}</h1>
+      <h1 className={styles.heading}>{t("employer.verification.heading")}</h1>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading verification status">
+        <SkeletonRegion label={t("employer.loading.verificationStatus")}>
           <div className={styles.panel}>
             <Skeleton height="1.75rem" width="7rem" radius="pill" />
             <Skeleton height="1.5rem" width="min(100%, 22rem)" radius="sm" />

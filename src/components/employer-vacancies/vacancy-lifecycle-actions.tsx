@@ -18,7 +18,9 @@ import {
   withdrawEmployerVacancyAction,
   type EmployerVacancyLifecycleActionState,
 } from "@/app/employer/vacancies/[vacancyId]/lifecycle-actions";
+import { useLocale } from "@/components/i18n/locale-provider";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import { localizeEmployerMessage } from "@/lib/employer/localize-message";
 import type { EmployerVacancyDetail } from "@/lib/employer/vacancies/load-employer-vacancy";
 import {
   VACANCY_FILL_CONFIRM,
@@ -30,6 +32,7 @@ import {
   VACANCY_WITHDRAW_CONFIRM,
 } from "@/lib/employer/vacancies/messages";
 import { mapReadinessChecklist } from "@/lib/employer/vacancies/readiness";
+import { readinessItemLabel } from "@/lib/employer/vacancies/readiness";
 
 const initialState: EmployerVacancyLifecycleActionState = {
   error: null,
@@ -66,6 +69,7 @@ function ConfirmedLifecycleForm({
   onPendingChange,
   note,
 }: ConfirmedFormProps) {
+  const { locale, t } = useLocale();
   const [state, formAction, pending] = useActionState(action, initialState);
   const errorRef = useRef<HTMLDivElement>(null);
 
@@ -109,7 +113,7 @@ function ConfirmedLifecycleForm({
       <div ref={errorRef} tabIndex={-1}>
         {state.error !== null ? (
           <p className={styles.error} role="alert">
-            {state.error}
+            {localizeEmployerMessage(state.error, locale)}
           </p>
         ) : null}
       </div>
@@ -123,9 +127,11 @@ function ConfirmedLifecycleForm({
               data-complete={item.complete ? "true" : "false"}
             >
               <span className={styles.checklistMarker}>
-                {item.complete ? "Complete" : "Missing"}
+                {item.complete
+                  ? t("employer.vacancies.complete")
+                  : t("employer.vacancies.missing")}
               </span>
-              <span>{item.label}</span>
+              <span>{readinessItemLabel(item, locale)}</span>
             </li>
           ))}
         </ul>
@@ -133,7 +139,7 @@ function ConfirmedLifecycleForm({
 
       {state.message !== null ? (
         <p className={styles.status} role="status">
-          {state.message}
+          {localizeEmployerMessage(state.message, locale)}
         </p>
       ) : null}
 
@@ -157,6 +163,8 @@ export function VacancyLifecycleActions({
   publicationState,
   isEffectivelyExpired,
 }: VacancyLifecycleActionsProps) {
+  const { locale, t } = useLocale();
+  const de = locale === "de";
   const [materializeState, materializeFormAction, materializePending] =
     useActionState(materializeEmployerVacancyExpiryAction, initialState);
 
@@ -219,7 +227,7 @@ export function VacancyLifecycleActions({
       aria-labelledby="lifecycle-actions-heading"
     >
       <h2 id="lifecycle-actions-heading" className={styles.sectionHeading}>
-        Lifecycle actions
+        {t("employer.vacancies.lifecycle")}
       </h2>
 
       {showPublish ? (
@@ -227,13 +235,21 @@ export function VacancyLifecycleActions({
           formKey="publish"
           action={publishEmployerVacancyAction}
           vacancyId={vacancyId}
-          confirmLabel={VACANCY_PUBLISH_CONFIRM}
-          submitLabel="Publish"
-          pendingLabel="Publishing…"
+          confirmLabel={
+            de
+              ? "Ich bestätige, dass dieser Entwurf veröffentlicht werden soll."
+              : VACANCY_PUBLISH_CONFIRM
+          }
+          submitLabel={de ? "Veröffentlichen" : "Publish"}
+          pendingLabel={de ? "Wird veröffentlicht…" : "Publishing…"}
           buttonClassName={styles.button}
           disabledByOther={anyPending && !pendingKeys.has("publish")}
           onPendingChange={handlePendingChange}
-          note={VACANCY_PUBLISH_EXPIRY_NOTE}
+          note={
+            de
+              ? "Veröffentlichte Stellen laufen nach dem festgelegten Zeitraum ab."
+              : VACANCY_PUBLISH_EXPIRY_NOTE
+          }
         />
       ) : null}
 
@@ -242,9 +258,13 @@ export function VacancyLifecycleActions({
           formKey="pause"
           action={pauseEmployerVacancyAction}
           vacancyId={vacancyId}
-          confirmLabel={VACANCY_PAUSE_CONFIRM}
-          submitLabel="Pause"
-          pendingLabel="Pausing…"
+          confirmLabel={
+            de
+              ? "Ich bestätige, dass diese Stelle pausiert werden soll."
+              : VACANCY_PAUSE_CONFIRM
+          }
+          submitLabel={de ? "Pausieren" : "Pause"}
+          pendingLabel={de ? "Wird pausiert…" : "Pausing…"}
           buttonClassName={styles.buttonSecondary}
           disabledByOther={anyPending && !pendingKeys.has("pause")}
           onPendingChange={handlePendingChange}
@@ -256,9 +276,13 @@ export function VacancyLifecycleActions({
           formKey="resume"
           action={resumeEmployerVacancyAction}
           vacancyId={vacancyId}
-          confirmLabel={VACANCY_RESUME_CONFIRM}
-          submitLabel="Resume"
-          pendingLabel="Resuming…"
+          confirmLabel={
+            de
+              ? "Ich bestätige, dass diese Stelle wieder sichtbar werden soll."
+              : VACANCY_RESUME_CONFIRM
+          }
+          submitLabel={de ? "Fortsetzen" : "Resume"}
+          pendingLabel={de ? "Wird fortgesetzt…" : "Resuming…"}
           buttonClassName={styles.button}
           disabledByOther={anyPending && !pendingKeys.has("resume")}
           onPendingChange={handlePendingChange}
@@ -270,9 +294,13 @@ export function VacancyLifecycleActions({
           formKey="fill"
           action={fillEmployerVacancyAction}
           vacancyId={vacancyId}
-          confirmLabel={VACANCY_FILL_CONFIRM}
-          submitLabel="Mark filled"
-          pendingLabel="Marking filled…"
+          confirmLabel={
+            de
+              ? "Ich bestätige, dass diese Stelle besetzt ist."
+              : VACANCY_FILL_CONFIRM
+          }
+          submitLabel={de ? "Als besetzt markieren" : "Mark filled"}
+          pendingLabel={de ? "Wird als besetzt markiert…" : "Marking filled…"}
           buttonClassName={styles.buttonSecondary}
           disabledByOther={anyPending && !pendingKeys.has("fill")}
           onPendingChange={handlePendingChange}
@@ -284,9 +312,13 @@ export function VacancyLifecycleActions({
           formKey="withdraw"
           action={withdrawEmployerVacancyAction}
           vacancyId={vacancyId}
-          confirmLabel={VACANCY_WITHDRAW_CONFIRM}
-          submitLabel="Withdraw"
-          pendingLabel="Withdrawing…"
+          confirmLabel={
+            de
+              ? "Ich bestätige, dass diese Stelle zurückgezogen werden soll."
+              : VACANCY_WITHDRAW_CONFIRM
+          }
+          submitLabel={de ? "Zurückziehen" : "Withdraw"}
+          pendingLabel={de ? "Wird zurückgezogen…" : "Withdrawing…"}
           buttonClassName={styles.buttonDanger}
           disabledByOther={anyPending && !pendingKeys.has("withdraw")}
           onPendingChange={handlePendingChange}
@@ -298,9 +330,13 @@ export function VacancyLifecycleActions({
           formKey="renew"
           action={renewEmployerVacancyAction}
           vacancyId={vacancyId}
-          confirmLabel={VACANCY_RENEW_CONFIRM}
-          submitLabel="Renew to draft"
-          pendingLabel="Renewing…"
+          confirmLabel={
+            de
+              ? "Ich bestätige, dass diese Stelle als Entwurf erneuert werden soll."
+              : VACANCY_RENEW_CONFIRM
+          }
+          submitLabel={de ? "Als Entwurf erneuern" : "Renew to draft"}
+          pendingLabel={de ? "Wird erneuert…" : "Renewing…"}
           buttonClassName={styles.button}
           disabledByOther={anyPending && !pendingKeys.has("renew")}
           onPendingChange={handlePendingChange}
@@ -311,18 +347,20 @@ export function VacancyLifecycleActions({
         <form
           className={styles.form}
           action={materializeFormAction}
-          aria-label="Refresh expired status"
+          aria-label={
+            de ? "Ablaufstatus aktualisieren" : "Refresh expired status"
+          }
           noValidate
         >
           <input type="hidden" name="vacancyId" value={vacancyId} />
           {materializeState.error !== null ? (
             <p className={styles.error} role="alert">
-              {materializeState.error}
+              {localizeEmployerMessage(materializeState.error, locale)}
             </p>
           ) : null}
           {materializeState.message !== null ? (
             <p className={styles.status} role="status">
-              {materializeState.message}
+              {localizeEmployerMessage(materializeState.message, locale)}
             </p>
           ) : null}
           <div className={styles.actions}>
@@ -331,7 +369,13 @@ export function VacancyLifecycleActions({
               type="submit"
               disabled={anyPending}
             >
-              {materializePending ? "Refreshing…" : "Refresh expired status"}
+              {materializePending
+                ? de
+                  ? "Wird aktualisiert…"
+                  : "Refreshing…"
+                : de
+                  ? "Ablaufstatus aktualisieren"
+                  : "Refresh expired status"}
             </button>
           </div>
         </form>

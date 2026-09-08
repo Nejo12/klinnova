@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import type { Locale } from "@/lib/i18n/locale";
+
 /**
  * Matches `applications_status_chk` in
  * supabase/migrations/20260806140000_application_status_and_review_contract.sql.
@@ -28,8 +30,21 @@ const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
   rejected: "Rejected",
 };
 
-export function applicationStatusLabel(status: ApplicationStatus): string {
-  return APPLICATION_STATUS_LABELS[status];
+const APPLICATION_STATUS_LABELS_DE: Record<ApplicationStatus, string> = {
+  submitted: "Eingegangen",
+  reviewing: "In Prüfung",
+  shortlisted: "Vorausgewählt",
+  accepted: "Angenommen",
+  rejected: "Abgelehnt",
+};
+
+export function applicationStatusLabel(
+  status: ApplicationStatus,
+  locale: Locale = "en",
+): string {
+  return locale === "de"
+    ? APPLICATION_STATUS_LABELS_DE[status]
+    : APPLICATION_STATUS_LABELS[status];
 }
 
 /**
@@ -48,10 +63,21 @@ const APPLICATION_ACTION_LABELS: Record<ApplicationStatus, string> = {
   rejected: "Reject application",
 };
 
+const APPLICATION_ACTION_LABELS_DE: Record<ApplicationStatus, string> = {
+  submitted: "Auf eingegangen zurücksetzen",
+  reviewing: "Prüfung beginnen",
+  shortlisted: "Vorauswählen",
+  accepted: "Annehmen",
+  rejected: "Bewerbung ablehnen",
+};
+
 export function employerApplicationActionLabel(
   status: ApplicationStatus,
+  locale: Locale = "en",
 ): string {
-  return APPLICATION_ACTION_LABELS[status];
+  return locale === "de"
+    ? APPLICATION_ACTION_LABELS_DE[status]
+    : APPLICATION_ACTION_LABELS[status];
 }
 
 /**
@@ -72,10 +98,22 @@ const APPLICATION_ACTION_PENDING_LABELS: Record<ApplicationStatus, string> = {
   rejected: "Recording…",
 };
 
+const APPLICATION_ACTION_PENDING_LABELS_DE: Record<ApplicationStatus, string> =
+  {
+    submitted: "Wird zurückgesetzt…",
+    reviewing: "Prüfung wird begonnen…",
+    shortlisted: "Wird vorausgewählt…",
+    accepted: "Wird gespeichert…",
+    rejected: "Wird gespeichert…",
+  };
+
 export function employerApplicationActionPendingLabel(
   status: ApplicationStatus,
+  locale: Locale = "en",
 ): string {
-  return APPLICATION_ACTION_PENDING_LABELS[status];
+  return locale === "de"
+    ? APPLICATION_ACTION_PENDING_LABELS_DE[status]
+    : APPLICATION_ACTION_PENDING_LABELS[status];
 }
 
 export function isApplicationStatus(value: string): value is ApplicationStatus {

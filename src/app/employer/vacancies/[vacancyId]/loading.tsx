@@ -1,8 +1,11 @@
+"use client";
+
 import {
   DelayedReveal,
   Skeleton,
   SkeletonRegion,
 } from "@/components/shared/skeleton";
+import { useLocale } from "@/components/i18n/locale-provider";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 
 // Mirrors the fixed, unconditional `<dl><div><dt/dd></div></dl>` rows
@@ -66,17 +69,19 @@ function DetailRowSkeleton({
 // them one child of `.page`, so that gap never applies between them. One
 // pair per genuinely distinct region restores it.
 export default function Loading() {
+  const { t } = useLocale();
+
   return (
     <main className={styles.page}>
       <DelayedReveal>
-        <SkeletonRegion label="Loading vacancy">
+        <SkeletonRegion label={t("employer.loading.vacancy")}>
           <Skeleton height="1rem" width="9rem" radius="sm" />
           <Skeleton height="2.25rem" width="60%" radius="sm" />
         </SkeletonRegion>
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading vacancy status">
+        <SkeletonRegion label={t("employer.loading.vacancyStatus")}>
           <div className={styles.section}>
             <Skeleton height="1.25rem" width="5rem" radius="sm" />
             <Skeleton height="1.5rem" width="8rem" radius="sm" />
@@ -85,7 +90,7 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading actions">
+        <SkeletonRegion label={t("employer.loading.actions")}>
           <div className={styles.actions}>
             <Skeleton height="2.75rem" width="8rem" radius="sm" />
           </div>
@@ -93,7 +98,7 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading vacancy details">
+        <SkeletonRegion label={t("employer.loading.vacancyDetails")}>
           <div className={styles.detailList}>
             {Array.from({ length: VACANCY_DETAIL_ROW_COUNT }, (_, index) => (
               <DetailRowSkeleton

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 import { DeleteDraftForm } from "@/components/employer-vacancies/delete-draft-form";
@@ -6,10 +8,11 @@ import { ReadinessChecklist } from "@/components/employer-vacancies/readiness-ch
 import { VacancyLifecycleActions } from "@/components/employer-vacancies/vacancy-lifecycle-actions";
 import { VacancyLifecycleStatus } from "@/components/employer-vacancies/vacancy-lifecycle-status";
 import { EmployerRestrictedNotice } from "@/components/employer-shared/employer-restricted-notice";
+import { useLocale } from "@/components/i18n/locale-provider";
 import {
   SALARY_PERIOD_OPTIONS,
-  WORK_FREQUENCY_OPTIONS,
-  WORKPLACE_TYPE_OPTIONS,
+  type WorkFrequencyCode,
+  type WorkplaceTypeCode,
 } from "@/lib/employer/vacancies/allow-lists";
 import type { EmployerVacancyDetail } from "@/lib/employer/vacancies/load-employer-vacancy";
 import { centsToEurString } from "@/lib/employer/vacancies/salary";
@@ -24,6 +27,10 @@ import type {
   LanguageCode,
   LanguageProficiencyCode,
 } from "@/lib/onboarding/allow-lists";
+import {
+  workplaceTypeLabel,
+  workFrequencyLabel,
+} from "@/lib/public-jobs/labels";
 
 type VacancyDetailProps = {
   vacancy: EmployerVacancyDetail;
@@ -44,10 +51,11 @@ export function VacancyDetail({
   vacancy,
   suspended = false,
 }: VacancyDetailProps) {
+  const { locale, t } = useLocale();
   const salarySummary =
     vacancy.salaryAmountCents !== null && vacancy.salaryPeriod !== null
-      ? `€${centsToEurString(vacancy.salaryAmountCents)} ${labelFromOptions(vacancy.salaryPeriod, SALARY_PERIOD_OPTIONS)}${vacancy.salaryIsGross === true ? " gross" : ""}`
-      : "Not set";
+      ? `€${centsToEurString(vacancy.salaryAmountCents)} ${locale === "de" ? ({ hourly: "pro Stunde", monthly: "pro Monat", fixed_job: "pauschal" } as const)[vacancy.salaryPeriod] : labelFromOptions(vacancy.salaryPeriod, SALARY_PERIOD_OPTIONS)}${vacancy.salaryIsGross === true ? (locale === "de" ? " brutto" : " gross") : ""}`
+      : t("employer.vacancies.notSet");
 
   const editable =
     !suspended &&
@@ -80,7 +88,7 @@ export function VacancyDetail({
             className={styles.button}
             href={`/employer/vacancies/${vacancy.id}/edit`}
           >
-            Edit vacancy
+            {t("employer.vacancies.edit")}
           </Link>
         </p>
       ) : null}
@@ -95,88 +103,100 @@ export function VacancyDetail({
 
       <dl className={styles.detailList}>
         <div>
-          <dt>Title</dt>
+          <dt>{t("employer.vacancies.title")}</dt>
           <dd>{vacancy.title}</dd>
         </div>
         <div>
-          <dt>Category</dt>
-          <dd>{jobCategoryLabel(vacancy.jobCategory as JobCategoryCode)}</dd>
+          <dt>{t("employer.vacancies.category")}</dt>
+          <dd>
+            {jobCategoryLabel(vacancy.jobCategory as JobCategoryCode, locale)}
+          </dd>
         </div>
         <div>
-          <dt>Berlin public locality</dt>
-          <dd>{vacancy.publicLocality ?? "Not set"}</dd>
+          <dt>{t("employer.vacancies.locality")}</dt>
+          <dd>{vacancy.publicLocality ?? t("employer.vacancies.notSet")}</dd>
         </div>
         <div>
-          <dt>Employer type</dt>
+          <dt>{locale === "de" ? "Arbeitgeberart" : "Employer type"}</dt>
           <dd>
             {vacancy.employerType === "organisation"
-              ? "Organisation"
-              : "Private person"}
+              ? t("employer.onboarding.organisation")
+              : t("employer.onboarding.private")}
           </dd>
         </div>
         {vacancy.companyName !== null ? (
           <div>
-            <dt>Company</dt>
+            <dt>{locale === "de" ? "Unternehmen" : "Company"}</dt>
             <dd>{vacancy.companyName}</dd>
           </div>
         ) : null}
         <div>
-          <dt>Description</dt>
-          <dd>{vacancy.description ?? "Not set"}</dd>
+          <dt>{t("employer.vacancies.description")}</dt>
+          <dd>{vacancy.description ?? t("employer.vacancies.notSet")}</dd>
         </div>
         <div>
-          <dt>Workplace type</dt>
+          <dt>{t("employer.vacancies.workplaceType")}</dt>
           <dd>
-            {labelFromOptions(vacancy.workplaceType, WORKPLACE_TYPE_OPTIONS)}
+            {vacancy.workplaceType === null
+              ? t("employer.vacancies.notSet")
+              : workplaceTypeLabel(
+                  vacancy.workplaceType as WorkplaceTypeCode,
+                  locale,
+                )}
           </dd>
         </div>
         <div>
-          <dt>Work frequency</dt>
+          <dt>{t("employer.vacancies.workFrequency")}</dt>
           <dd>
-            {labelFromOptions(vacancy.workFrequency, WORK_FREQUENCY_OPTIONS)}
+            {vacancy.workFrequency === null
+              ? t("employer.vacancies.notSet")
+              : workFrequencyLabel(
+                  vacancy.workFrequency as WorkFrequencyCode,
+                  locale,
+                )}
           </dd>
         </div>
         <div>
-          <dt>Available from</dt>
-          <dd>{vacancy.availableFrom ?? "Not set"}</dd>
+          <dt>{t("employer.vacancies.availableFrom")}</dt>
+          <dd>{vacancy.availableFrom ?? t("employer.vacancies.notSet")}</dd>
         </div>
         <div>
-          <dt>Salary</dt>
+          <dt>{t("employer.vacancies.salary")}</dt>
           <dd>{salarySummary}</dd>
         </div>
         <div>
-          <dt>CV required</dt>
+          <dt>{t("employer.vacancies.cvRequired")}</dt>
           <dd>
             {vacancy.cvRequired === null
-              ? "Not set"
+              ? t("employer.vacancies.notSet")
               : vacancy.cvRequired
-                ? "Yes"
-                : "No"}
+                ? t("employer.vacancies.yes")
+                : t("employer.vacancies.no")}
           </dd>
         </div>
         <div>
-          <dt>Interview in English</dt>
+          <dt>{t("employer.vacancies.interviewEnglish")}</dt>
           <dd>
             {vacancy.interviewEnglishOk === null
-              ? "Not set"
+              ? t("employer.vacancies.notSet")
               : vacancy.interviewEnglishOk
-                ? "Yes"
-                : "No"}
+                ? t("employer.vacancies.yes")
+                : t("employer.vacancies.no")}
           </dd>
         </div>
         <div>
-          <dt>Experience notes</dt>
-          <dd>{vacancy.experienceNotes ?? "Not set"}</dd>
+          <dt>{t("employer.vacancies.experienceNotes")}</dt>
+          <dd>{vacancy.experienceNotes ?? t("employer.vacancies.notSet")}</dd>
         </div>
         <div>
-          <dt>Language requirements</dt>
+          <dt>{t("employer.vacancies.languages")}</dt>
           <dd>
             {vacancy.languages.length === 0
-              ? "None yet"
+              ? t("employer.vacancies.noneYet")
               : vacancy.languages
                   .map(
                     (language) =>
-                      `${languageLabel(language.languageCode as LanguageCode)} (${languageProficiencyLabel(language.minProficiency as LanguageProficiencyCode)})`,
+                      `${languageLabel(language.languageCode as LanguageCode, locale)} (${languageProficiencyLabel(language.minProficiency as LanguageProficiencyCode, locale)})`,
                   )
                   .join(", ")}
           </dd>

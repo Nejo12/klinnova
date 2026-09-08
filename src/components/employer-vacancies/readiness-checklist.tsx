@@ -1,8 +1,14 @@
+"use client";
+
 import Link from "next/link";
 
 import { draftConsequence } from "@/components/employer-vacancies/vacancy-list";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
-import type { ReadinessChecklistItem } from "@/lib/employer/vacancies/readiness";
+import { useLocale } from "@/components/i18n/locale-provider";
+import {
+  readinessItemLabel,
+  type ReadinessChecklistItem,
+} from "@/lib/employer/vacancies/readiness";
 import {
   VACANCY_PRIVATE_NOTICE,
   VACANCY_VERIFICATION_INFO,
@@ -21,6 +27,7 @@ export function ReadinessChecklist({
   available = true,
   continueHref,
 }: ReadinessChecklistProps) {
+  const { locale, t } = useLocale();
   const orderedChecklist = [...checklist].sort((a, b) => {
     if (a.complete === b.complete) {
       return 0;
@@ -31,13 +38,23 @@ export function ReadinessChecklist({
   return (
     <section className={styles.section} aria-labelledby="readiness-heading">
       <h2 id="readiness-heading" className={styles.sectionHeading}>
-        Publication readiness
+        {t("employer.vacancies.readiness")}
       </h2>
-      <p className={styles.note}>{VACANCY_PRIVATE_NOTICE}</p>
-      <p className={styles.note}>{VACANCY_VERIFICATION_INFO}</p>
+      <p className={styles.note}>
+        {locale === "de"
+          ? "Entwürfe bleiben privat, bis Sie sie ausdrücklich veröffentlichen."
+          : VACANCY_PRIVATE_NOTICE}
+      </p>
+      <p className={styles.note}>
+        {locale === "de"
+          ? "Eine passende Verifizierung ist erforderlich, bevor eine Stelle veröffentlicht werden kann."
+          : VACANCY_VERIFICATION_INFO}
+      </p>
       {!available ? (
         <p className={styles.support} role="status">
-          Readiness could not be loaded for this draft.
+          {locale === "de"
+            ? "Die Veröffentlichungsbereitschaft dieses Entwurfs konnte nicht geladen werden."
+            : "Readiness could not be loaded for this draft."}
         </p>
       ) : (
         <>
@@ -46,7 +63,7 @@ export function ReadinessChecklist({
             data-ready={ready ? "true" : "false"}
             role="status"
           >
-            {draftConsequence({ checklist })}
+            {draftConsequence({ checklist }, locale)}
           </p>
           <ul className={styles.checklist}>
             {orderedChecklist.map((item) => (
@@ -56,16 +73,18 @@ export function ReadinessChecklist({
                 data-complete={item.complete ? "true" : "false"}
               >
                 <span className={styles.checklistMarker}>
-                  {item.complete ? "Complete" : "Missing"}
+                  {item.complete
+                    ? t("employer.vacancies.complete")
+                    : t("employer.vacancies.missing")}
                 </span>
-                <span>{item.label}</span>
+                <span>{readinessItemLabel(item, locale)}</span>
               </li>
             ))}
           </ul>
           {continueHref !== undefined ? (
             <p className={styles.actions}>
               <Link className={styles.button} href={continueHref}>
-                Edit vacancy
+                {t("employer.vacancies.edit")}
               </Link>
             </p>
           ) : null}

@@ -1,8 +1,11 @@
+"use client";
+
 import {
   DelayedReveal,
   Skeleton,
   SkeletonRegion,
 } from "@/components/shared/skeleton";
+import { useLocale } from "@/components/i18n/locale-provider";
 import styles from "@/components/employer-applications/employer-applications.module.scss";
 
 // Representative counts, not a claim about how many applications actually
@@ -46,10 +49,12 @@ function ApplicationRowSkeleton() {
  *   availability details
  */
 export default function Loading() {
+  const { t } = useLocale();
+
   return (
     <main className={styles.page}>
       <DelayedReveal>
-        <SkeletonRegion label="Loading applications">
+        <SkeletonRegion label={t("employer.loading.applications")}>
           <div className={styles.pageIntro}>
             <Skeleton height="2.25rem" width="45%" radius="sm" />
             <Skeleton height="1rem" width="70%" radius="sm" />
@@ -58,7 +63,7 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading application summary">
+        <SkeletonRegion label={t("employer.loading.applicationSummary")}>
           <ul className={styles.summaryList}>
             {Array.from({ length: 4 }, (_, index) => (
               <li key={index} className={styles.summaryChip}>
@@ -70,7 +75,7 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading application filters">
+        <SkeletonRegion label={t("employer.loading.applicationFilters")}>
           <div className={styles.filterPanel}>
             <div className={styles.filterForm}>
               <div className={styles.field}>
@@ -90,7 +95,7 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading applications needing review">
+        <SkeletonRegion label={t("employer.loading.applicationsNeedsReview")}>
           <div className={styles.section} data-priority="primary">
             <div className={styles.sectionHeader}>
               <Skeleton height="1.25rem" width="9rem" radius="sm" />
@@ -109,7 +114,7 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading open applications">
+        <SkeletonRegion label={t("employer.loading.applicationsOpen")}>
           <div className={styles.section} data-priority="quiet">
             <div className={styles.sectionHeader}>
               <Skeleton height="1.25rem" width="5rem" radius="sm" />
@@ -125,7 +130,7 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading decided applications">
+        <SkeletonRegion label={t("employer.loading.applicationsDecided")}>
           <div className={styles.section} data-priority="quiet">
             <div className={styles.sectionHeader}>
               <Skeleton height="1.25rem" width="6rem" radius="sm" />

@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef } from "react";
 
 import { recordApplicationOutcomeAction } from "@/app/employer/applications/[applicationId]/outcome-actions";
+import { useLocale } from "@/components/i18n/locale-provider";
 import styles from "@/components/employer-applications/employer-applications.module.scss";
 import {
   OUTCOME_TYPE_CODES,
@@ -28,14 +29,15 @@ type RecordOutcomeFormProps = {
   todayIso: string;
 };
 
-function renderFeedback(state: RecordOutcomeActionState) {
+function renderFeedback(state: RecordOutcomeActionState, locale: "en" | "de") {
   switch (state.kind) {
     case "idle":
       return null;
     case "recorded":
       return (
         <p className={styles.status} role="status">
-          {outcomeTypeLabel(state.outcomeType)} recorded.
+          {outcomeTypeLabel(state.outcomeType, locale)}{" "}
+          {locale === "de" ? "erfasst." : "recorded."}
         </p>
       );
     case "already_hired":
@@ -76,6 +78,7 @@ export function RecordOutcomeForm({
   applicationId,
   todayIso,
 }: RecordOutcomeFormProps) {
+  const { locale } = useLocale();
   const [state, formAction, pending] = useActionState(
     recordApplicationOutcomeAction,
     initialRecordOutcomeActionState,
@@ -99,7 +102,7 @@ export function RecordOutcomeForm({
       aria-labelledby="record-outcome-heading"
     >
       <h2 id="record-outcome-heading" className={styles.sectionHeading}>
-        Record an outcome
+        {locale === "de" ? "Ergebnis erfassen" : "Record an outcome"}
       </h2>
 
       <form
@@ -112,7 +115,7 @@ export function RecordOutcomeForm({
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="outcome-type">
-            Outcome
+            {locale === "de" ? "Ergebnis" : "Outcome"}
           </label>
           <select
             id="outcome-type"
@@ -123,7 +126,7 @@ export function RecordOutcomeForm({
           >
             {OUTCOME_TYPE_CODES.map((code) => (
               <option key={code} value={code}>
-                {outcomeTypeLabel(code)}
+                {outcomeTypeLabel(code, locale)}
               </option>
             ))}
           </select>
@@ -131,7 +134,7 @@ export function RecordOutcomeForm({
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="occurred-at-date">
-            Date
+            {locale === "de" ? "Datum" : "Date"}
           </label>
           <input
             id="occurred-at-date"
@@ -145,12 +148,18 @@ export function RecordOutcomeForm({
         </div>
 
         <div ref={feedbackRef} tabIndex={-1}>
-          {renderFeedback(state)}
+          {renderFeedback(state, locale)}
         </div>
 
         <div className={styles.actions}>
           <button className={styles.button} type="submit" disabled={pending}>
-            {pending ? "Recording…" : "Record outcome"}
+            {pending
+              ? locale === "de"
+                ? "Wird erfasst…"
+                : "Recording…"
+              : locale === "de"
+                ? "Ergebnis erfassen"
+                : "Record outcome"}
           </button>
         </div>
       </form>

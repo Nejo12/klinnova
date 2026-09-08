@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import styles from "@/components/employer-applications/employer-applications.module.scss";
 import type { ApplicationListFilter } from "@/lib/employer/applications/schemas";
 import {
@@ -22,6 +25,23 @@ export function ApplicationListFilters({
   filter,
   vacancyTitle,
 }: ApplicationListFiltersProps) {
+  const { locale } = useLocale();
+  const copy =
+    locale === "de"
+      ? {
+          label: "Nach Status filtern",
+          all: "Alle Status",
+          apply: "Filter anwenden",
+          filtered: "Gefiltert nach Stelle",
+          clear: "Stellenfilter löschen",
+        }
+      : {
+          label: "Filter by status",
+          all: "All statuses",
+          apply: "Apply filter",
+          filtered: "Filtered to vacancy",
+          clear: "Clear vacancy filter",
+        };
   return (
     <div className={styles.filterPanel}>
       <form className={styles.filterForm} method="get">
@@ -30,7 +50,7 @@ export function ApplicationListFilters({
         ) : null}
         <div className={styles.field}>
           <label className={styles.label} htmlFor="status-filter">
-            Filter by status
+            {copy.label}
           </label>
           <select
             id="status-filter"
@@ -38,25 +58,26 @@ export function ApplicationListFilters({
             className={styles.select}
             defaultValue={filter.status ?? ""}
           >
-            <option value="">All statuses</option>
+            <option value="">{copy.all}</option>
             {APPLICATION_STATUS_CODES.map((status) => (
               <option key={status} value={status}>
-                {applicationStatusLabel(status)}
+                {applicationStatusLabel(status, locale)}
               </option>
             ))}
           </select>
         </div>
         <div className={styles.filterActions}>
           <button className={styles.buttonSecondary} type="submit">
-            Apply filter
+            {copy.apply}
           </button>
         </div>
       </form>
       {filter.vacancyId !== null ? (
         <p className={styles.note}>
-          Filtered to vacancy{vacancyTitle !== null ? `: ${vacancyTitle}` : ""}.{" "}
+          {copy.filtered}
+          {vacancyTitle !== null ? `: ${vacancyTitle}` : ""}.{" "}
           <Link className={styles.linkButton} href="/employer/applications">
-            Clear vacancy filter
+            {copy.clear}
           </Link>
         </p>
       ) : null}

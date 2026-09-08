@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef } from "react";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import styles from "@/components/employer-applications/employer-applications.module.scss";
 import { APPLICATION_REASON_MAX_LENGTH } from "@/lib/employer/applications/messages";
 
@@ -48,11 +49,28 @@ export function StatusTransitionConfirmDialog({
   pending,
   onCancel,
 }: StatusTransitionConfirmDialogProps) {
+  const { locale } = useLocale();
   const headingId = useId();
   const reasonId = `${headingId}-reason`;
   const headingRef = useRef<HTMLHeadingElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const copy = COPY[targetStatus];
+  const copy =
+    locale === "de"
+      ? {
+          accepted: {
+            heading: "Diese Bewerbung annehmen?",
+            body: "Mit der Annahme halten Sie fest, dass Sie mit dieser Person fortfahren möchten. Dadurch werden weder eine Einstellung noch ein Arbeitsvertrag erfasst; die Einzelheiten vereinbaren Sie direkt.",
+            note: "Damit wird die Bewerbung beendet. Der Status kann anschließend nicht geändert werden.",
+            confirmLabel: "Bewerbung annehmen",
+          },
+          rejected: {
+            heading: "Diese Bewerbung ablehnen?",
+            body: "Die Bewerbung wird als abgelehnt erfasst. Damit wird sie beendet und kann anschließend nicht geändert werden.",
+            note: "Die Person sieht den Status „Nicht ausgewählt“. Ein Grund wird ihr nicht mitgeteilt.",
+            confirmLabel: "Bewerbung ablehnen",
+          },
+        }[targetStatus]
+      : COPY[targetStatus];
 
   useEffect(() => {
     headingRef.current?.focus();
@@ -125,7 +143,7 @@ export function StatusTransitionConfirmDialog({
         {targetStatus === "rejected" ? (
           <div className={styles.field}>
             <label className={styles.label} htmlFor={reasonId}>
-              Reason (optional)
+              {locale === "de" ? "Grund (optional)" : "Reason (optional)"}
             </label>
             <textarea
               id={reasonId}
@@ -144,7 +162,7 @@ export function StatusTransitionConfirmDialog({
             onClick={onCancel}
             disabled={pending}
           >
-            Cancel
+            {locale === "de" ? "Abbrechen" : "Cancel"}
           </button>
           <button
             type="submit"
@@ -156,7 +174,11 @@ export function StatusTransitionConfirmDialog({
             disabled={pending}
             aria-busy={pending ? true : undefined}
           >
-            {pending ? "Recording…" : copy.confirmLabel}
+            {pending
+              ? locale === "de"
+                ? "Wird erfasst…"
+                : "Recording…"
+              : copy.confirmLabel}
           </button>
         </div>
       </div>

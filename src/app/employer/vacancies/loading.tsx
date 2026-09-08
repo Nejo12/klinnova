@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 import {
@@ -6,12 +8,8 @@ import {
   SkeletonRegion,
 } from "@/components/shared/skeleton";
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
+import { useLocale } from "@/components/i18n/locale-provider";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
-import {
-  VACANCY_LIST_HEADING,
-  VACANCY_LIST_LEAD,
-  VACANCY_PRIVATE_NOTICE,
-} from "@/lib/employer/vacancies/messages";
 
 const LIVE_SKELETON_COUNT = 2;
 const NOT_LIVE_SKELETON_COUNT = 1;
@@ -43,6 +41,8 @@ function VacancyRowSkeleton() {
  * Publish/Edit control.
  */
 export default function Loading() {
+  const { t } = useLocale();
+
   return (
     <main className={styles.page}>
       <EmployerVacancyPageHeader
@@ -50,24 +50,28 @@ export default function Loading() {
         showEmployer={true}
         currentPath="vacancies"
       />
-      <h1 className={styles.heading}>{VACANCY_LIST_HEADING}</h1>
+      <h1 className={styles.heading}>{t("employer.vacancies.heading")}</h1>
       <div className={styles.pageIntro}>
         <div className={styles.pageIntroCopy}>
-          <p className={styles.lead}>{VACANCY_LIST_LEAD}</p>
-          <p className={styles.note}>{VACANCY_PRIVATE_NOTICE}</p>
+          <p className={styles.lead}>{t("employer.vacancies.listLead")}</p>
+          <p className={styles.note}>
+            {t("employer.vacancies.listPrivateNotice")}
+          </p>
         </div>
         <p className={styles.pageIntroActions}>
           <Link className={styles.button} href="/employer/vacancies/new">
-            Create draft
+            {t("employer.vacancies.createDraft")}
           </Link>
         </p>
       </div>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading live vacancies">
+        <SkeletonRegion label={t("employer.loading.liveVacancies")}>
           <div className={`${styles.section} ${styles.vacancyGroup}`}>
             <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionHeading}>Live</h2>
+              <h2 className={styles.sectionHeading}>
+                {t("employer.vacancies.live")}
+              </h2>
               <Skeleton height="1rem" width="1.5rem" radius="sm" />
             </div>
             <ul className={styles.list}>
@@ -80,10 +84,12 @@ export default function Loading() {
       </DelayedReveal>
 
       <DelayedReveal>
-        <SkeletonRegion label="Loading not-live vacancies">
+        <SkeletonRegion label={t("employer.loading.notLiveVacancies")}>
           <div className={`${styles.section} ${styles.vacancyGroup}`}>
             <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionHeading}>Not live</h2>
+              <h2 className={styles.sectionHeading}>
+                {t("employer.vacancies.notLive")}
+              </h2>
               <Skeleton height="1rem" width="1.5rem" radius="sm" />
             </div>
             <ul className={styles.list}>

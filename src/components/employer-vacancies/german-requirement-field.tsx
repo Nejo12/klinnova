@@ -1,6 +1,7 @@
 "use client";
 
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import { useLocale } from "@/components/i18n/locale-provider";
 import { germanRequirementLabel } from "@/lib/matching/labels";
 import {
   GERMAN_COMFORT_CODES,
@@ -26,9 +27,12 @@ export function GermanRequirementField({
   onChange,
   name,
 }: GermanRequirementFieldProps) {
+  const { locale } = useLocale();
   return (
     <fieldset className={styles.field}>
-      <legend className={styles.label}>German requirement</legend>
+      <legend className={styles.label}>
+        {locale === "de" ? "Deutschanforderung" : "German requirement"}
+      </legend>
       {GERMAN_COMFORT_CODES.map((code) => (
         <label key={code} className={styles.checkboxRow}>
           <input
@@ -38,7 +42,7 @@ export function GermanRequirementField({
             checked={value === code}
             onChange={() => onChange(code)}
           />
-          <span>{germanRequirementLabel(code)}</span>
+          <span>{germanRequirementLabel(code, locale)}</span>
         </label>
       ))}
     </fieldset>

@@ -29,6 +29,35 @@ export type ReadinessChecklistItem = {
   complete: boolean;
 };
 
+const READINESS_ITEM_LABELS_DE: Record<string, string> = {
+  title: "Titel",
+  job_category: "Stellenkategorie",
+  public_locality: "Öffentlich angezeigter Berliner Ortsteil",
+  description: "Beschreibung",
+  salary: "Vergütung (EUR brutto)",
+  languages: "Sprachanforderungen",
+  company: "Verknüpfung mit dem Unternehmen",
+  employer_completion: "Abgeschlossenes Arbeitgeberprofil",
+  publication_state: "Entwurfsstatus",
+  verification: "Arbeitgeberverifizierung",
+  workplace_type: "Arbeitsorttyp",
+  work_frequency: "Arbeitshäufigkeit",
+  cv_required: "Angabe zur Lebenslaufpflicht",
+  interview_english_ok: "Angabe zum Gespräch auf Englisch",
+  employment_types: "Beschäftigungsarten",
+  shift_requirements: "Schichtanforderungen",
+  expiry: "Gültiges Veröffentlichungsende (bis zu 90 Tage)",
+};
+
+export function readinessItemLabel(
+  item: ReadinessChecklistItem,
+  locale: "en" | "de" = "en",
+): string {
+  return locale === "de"
+    ? (READINESS_ITEM_LABELS_DE[item.id] ?? `Weitere Anforderung (${item.id})`)
+    : item.label;
+}
+
 // D-M5-19: matches employer_vacancy_draft_readiness's own field set exactly
 // — every field publish_employer_vacancy requires, so this checklist and
 // the publish gate can never disagree again. Deliberately excludes

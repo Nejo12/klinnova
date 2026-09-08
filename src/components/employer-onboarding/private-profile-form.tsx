@@ -7,6 +7,8 @@ import {
   savePrivateEmployerAction,
   type EmployerOnboardingActionState,
 } from "@/app/employer/onboarding/actions";
+import { useLocale } from "@/components/i18n/locale-provider";
+import { localizeEmployerMessage } from "@/lib/employer/localize-message";
 import { EMPLOYER_LAWFUL_HIRING_SUPPORT } from "@/lib/employer/messages";
 import type { EmployerProfileData } from "@/lib/employer/load-employer";
 
@@ -22,6 +24,32 @@ type PrivateProfileFormProps = {
 };
 
 export function PrivateProfileForm({ profile }: PrivateProfileFormProps) {
+  const { locale, t } = useLocale();
+  const copy =
+    locale === "de"
+      ? {
+          lead: "Teilen Sie Bewerbenden mit, wer Sie sind und in welchem Berliner Ortsteil Sie einstellen. Genaue Adressen werden nicht erfasst.",
+          locality: "Berliner Ortsteil",
+          phone: "Telefon (optional)",
+          website: "Website (optional)",
+          lawful: "Rechtmäßige Einstellung",
+          lawfulHelp:
+            "Diese Selbsterklärung ist erforderlich, bevor die Einrichtung abgeschlossen werden kann.",
+          save: "Fortschritt speichern",
+          complete: "Einrichtung abschließen",
+          completing: "Wird abgeschlossen…",
+        }
+      : {
+          lead: "Tell candidates who you are and where in Berlin you hire. Exact addresses are not collected.",
+          locality: "Berlin locality",
+          phone: "Phone (optional)",
+          website: "Website (optional)",
+          lawful: "Lawful hiring",
+          lawfulHelp: EMPLOYER_LAWFUL_HIRING_SUPPORT,
+          save: "Save progress",
+          complete: "Complete onboarding",
+          completing: "Completing…",
+        };
   const [saveState, saveAction, savePending] = useActionState(
     savePrivateEmployerAction,
     initialState,
@@ -40,15 +68,14 @@ export function PrivateProfileForm({ profile }: PrivateProfileFormProps) {
   return (
     <div className={styles.formStack}>
       <form className={styles.form} action={saveAction} noValidate>
-        <h2 className={styles.heading}>Private employer profile</h2>
-        <p className={styles.lead}>
-          Tell candidates who you are and where in Berlin you hire. Exact
-          addresses are not collected.
-        </p>
+        <h2 className={styles.heading}>
+          {t("employer.onboarding.privateHeading")}
+        </h2>
+        <p className={styles.lead}>{copy.lead}</p>
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="displayName">
-            Display name
+            {t("employer.onboarding.displayName")}
           </label>
           <input
             className={styles.input}
@@ -66,14 +93,14 @@ export function PrivateProfileForm({ profile }: PrivateProfileFormProps) {
           />
           {fieldErrors?.displayName ? (
             <p className={styles.fieldError} id="displayName-error">
-              {fieldErrors.displayName}
+              {localizeEmployerMessage(fieldErrors.displayName, locale)}
             </p>
           ) : null}
         </div>
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="berlinLocality">
-            Berlin locality
+            {copy.locality}
           </label>
           <input
             className={styles.input}
@@ -91,14 +118,14 @@ export function PrivateProfileForm({ profile }: PrivateProfileFormProps) {
           />
           {fieldErrors?.berlinLocality ? (
             <p className={styles.fieldError} id="berlinLocality-error">
-              {fieldErrors.berlinLocality}
+              {localizeEmployerMessage(fieldErrors.berlinLocality, locale)}
             </p>
           ) : null}
         </div>
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="phone">
-            Phone (optional)
+            {copy.phone}
           </label>
           <input
             className={styles.input}
@@ -113,7 +140,7 @@ export function PrivateProfileForm({ profile }: PrivateProfileFormProps) {
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="website">
-            Website (optional)
+            {copy.website}
           </label>
           <input
             className={styles.input}
@@ -127,8 +154,8 @@ export function PrivateProfileForm({ profile }: PrivateProfileFormProps) {
         </div>
 
         <fieldset className={styles.fieldset}>
-          <legend className={styles.legend}>Lawful hiring</legend>
-          <p className={styles.support}>{EMPLOYER_LAWFUL_HIRING_SUPPORT}</p>
+          <legend className={styles.legend}>{copy.lawful}</legend>
+          <p className={styles.support}>{copy.lawfulHelp}</p>
           <label className={styles.option}>
             <input
               type="checkbox"
@@ -146,25 +173,27 @@ export function PrivateProfileForm({ profile }: PrivateProfileFormProps) {
               }
             />
             <span className={styles.optionLabel}>
-              I confirm I will only hire people who are allowed to work in
-              Germany
+              {t("employer.onboarding.lawfulHiring")}
             </span>
           </label>
           {fieldErrors?.lawfulHiringDeclared ? (
             <p className={styles.fieldError} id="lawfulHiring-error">
-              {fieldErrors.lawfulHiringDeclared}
+              {localizeEmployerMessage(
+                fieldErrors.lawfulHiringDeclared,
+                locale,
+              )}
             </p>
           ) : null}
         </fieldset>
 
         {error !== null ? (
           <p className={styles.error} role="alert">
-            {error}
+            {localizeEmployerMessage(error, locale)}
           </p>
         ) : null}
         {message !== null ? (
           <p className={styles.note} role="status">
-            {message}
+            {localizeEmployerMessage(message, locale)}
           </p>
         ) : null}
 
@@ -174,7 +203,7 @@ export function PrivateProfileForm({ profile }: PrivateProfileFormProps) {
             type="submit"
             disabled={pending}
           >
-            {savePending ? "Saving…" : "Save progress"}
+            {savePending ? t("employer.onboarding.saving") : copy.save}
           </button>
           <button
             className={styles.button}
@@ -182,7 +211,7 @@ export function PrivateProfileForm({ profile }: PrivateProfileFormProps) {
             formAction={completeAction}
             disabled={pending}
           >
-            {completePending ? "Completing…" : "Complete onboarding"}
+            {completePending ? copy.completing : copy.complete}
           </button>
         </div>
       </form>

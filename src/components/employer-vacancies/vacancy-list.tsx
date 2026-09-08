@@ -1,12 +1,19 @@
+"use client";
+
 import Link from "next/link";
 
 import { EmployerEmptyState } from "@/components/employer-shared/employer-empty-state";
+import { useLocale } from "@/components/i18n/locale-provider";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import type {
   EmployerDraftListItem,
   VacancyLifecycleState,
 } from "@/lib/employer/vacancies/load-employer-drafts";
-import type { ReadinessChecklistItem } from "@/lib/employer/vacancies/readiness";
+import {
+  readinessItemLabel,
+  type ReadinessChecklistItem,
+} from "@/lib/employer/vacancies/readiness";
+import type { Locale } from "@/lib/i18n/locale";
 import {
   VACANCY_EMPTY_LIST,
   VACANCY_LIST_LEAD,
@@ -42,6 +49,14 @@ export const STATE_LABELS: Record<
   expired: "Expired",
   withdrawn: "Withdrawn",
 };
+const STATE_LABELS_DE: typeof STATE_LABELS = {
+  draft: "Privater Entwurf",
+  published: "Veröffentlicht",
+  paused: "Pausiert",
+  filled: "Besetzt",
+  expired: "Abgelaufen",
+  withdrawn: "Zurückgezogen",
+};
 
 // "Live" = publicly visible or resumable-to-visible without a full
 // republish (published, paused). Everything else — draft (never
@@ -66,7 +81,10 @@ export function groupVacancies(
 }
 
 /** Berlin-facing calendar dates for vacancy list/manage consequence copy. */
-export function formatVacancyDate(value: string | null): string | null {
+export function formatVacancyDate(
+  value: string | null,
+  locale: Locale = "en",
+): string | null {
   if (value === null) {
     return null;
   }
@@ -74,21 +92,43 @@ export function formatVacancyDate(value: string | null): string | null {
   if (Number.isNaN(date.getTime())) {
     return null;
   }
-  return new Intl.DateTimeFormat("en-GB", {
+  return new Intl.DateTimeFormat(locale === "de" ? "de-DE" : "en-GB", {
     dateStyle: "medium",
     timeZone: "Europe/Berlin",
   }).format(date);
 }
 
-export function statusLabel(draft: EmployerDraftListItem): string {
-  const base = STATE_LABELS[draft.publicationState];
+export function statusLabel(
+  draft: EmployerDraftListItem,
+  locale: Locale = "en",
+): string {
+  const base = (locale === "de" ? STATE_LABELS_DE : STATE_LABELS)[
+    draft.publicationState
+  ];
   if (draft.publicationState === "published" && draft.isEffectivelyExpired) {
-    return `${base} — effectively expired`;
+    return `${base} — ${locale === "de" ? "faktisch abgelaufen" : "effectively expired"}`;
   }
   return base;
 }
 
-function nextActionHint(draft: EmployerDraftListItem): string {
+function nextActionHint(draft: EmployerDraftListItem, locale: Locale): string {
+  if (locale === "de") {
+    switch (draft.publicationState) {
+      case "draft":
+        return "Bereitschaft prüfen und dann veröffentlichen";
+      case "published":
+        return draft.isEffectivelyExpired
+          ? "Ablaufstatus aktualisieren oder erneuern"
+          : "Pausieren, als besetzt markieren oder zurückziehen";
+      case "paused":
+        return "Fortsetzen, als besetzt markieren oder zurückziehen";
+      case "expired":
+        return "Als Entwurf erneuern";
+      case "filled":
+      case "withdrawn":
+        return "Keine Aktion verfügbar";
+    }
+  }
   switch (draft.publicationState) {
     case "draft":
       return "Review readiness, then publish";
@@ -106,14 +146,14 @@ function nextActionHint(draft: EmployerDraftListItem): string {
   }
 }
 
-function formatMissingList(labels: string[]): string {
+function formatMissingList(labels: string[], locale: Locale): string {
   if (labels.length === 1) {
     return labels[0]!;
   }
   if (labels.length === 2) {
-    return `${labels[0]} and ${labels[1]}`;
+    return `${labels[0]} ${locale === "de" ? "und" : "and"} ${labels[1]}`;
   }
-  return `${labels.slice(0, -1).join(", ")}, and ${labels[labels.length - 1]}`;
+  return `${labels.slice(0, -1).join(", ")}, ${locale === "de" ? "und" : "and"} ${labels[labels.length - 1]}`;
 }
 
 /**
@@ -125,11 +165,16 @@ function formatMissingList(labels: string[]): string {
  * reason (`draftIncompleteReason` in `src/app/employer/page.tsx`), so the
  * two surfaces don't re-solve the same problem differently.
  */
-export function summarizeMissingLabels(labels: string[]): string {
+export function summarizeMissingLabels(
+  labels: string[],
+  locale: Locale = "en",
+): string {
   if (labels.length > 3) {
-    return `${labels.length} required details`;
+    return locale === "de"
+      ? `${labels.length} erforderliche Angaben`
+      : `${labels.length} required details`;
   }
-  return formatMissingList(labels);
+  return formatMissingList(labels, locale);
 }
 
 const DRAFT_FALLBACK_CONSEQUENCE =
@@ -145,20 +190,32 @@ const DRAFT_FALLBACK_CONSEQUENCE =
  * single-vacancy readiness lookup that isn't a full list row — see
  * `application-list.tsx`'s "This vacancy is a draft" empty state.
  */
-export function draftConsequence(draft: {
-  checklist: ReadinessChecklistItem[];
-}): string {
+export function draftConsequence(
+  draft: { checklist: ReadinessChecklistItem[] },
+  locale: Locale = "en",
+): string {
   if (draft.checklist.length === 0) {
-    return DRAFT_FALLBACK_CONSEQUENCE;
+    return locale === "de"
+      ? "Vor der Veröffentlichung fehlen erforderliche Angaben."
+      : DRAFT_FALLBACK_CONSEQUENCE;
   }
   const missing = draft.checklist.filter((item) => !item.complete);
   if (missing.length === 0) {
-    return "Ready to publish.";
+    return locale === "de"
+      ? "Bereit zur Veröffentlichung."
+      : "Ready to publish.";
   }
-  const summary = summarizeMissingLabels(missing.map((item) => item.label));
+  const summary = summarizeMissingLabels(
+    missing.map((item) => readinessItemLabel(item, locale)),
+    locale,
+  );
   return missing.length > 3
-    ? `${summary} missing before publishing.`
-    : `${summary} still needed before publishing.`;
+    ? locale === "de"
+      ? `${summary} fehlen vor der Veröffentlichung.`
+      : `${summary} missing before publishing.`
+    : locale === "de"
+      ? `${summary} werden vor der Veröffentlichung noch benötigt.`
+      : `${summary} still needed before publishing.`;
 }
 
 /**
@@ -174,7 +231,37 @@ export function draftConsequence(draft: {
  * `applications` — so "existing applications" claims below are real, not
  * assumed.
  */
-function consequenceSentence(draft: EmployerDraftListItem): string | null {
+function consequenceSentence(
+  draft: EmployerDraftListItem,
+  locale: Locale,
+): string | null {
+  if (locale === "de") {
+    switch (draft.publicationState) {
+      case "draft":
+        return draftConsequence(draft, locale);
+      case "paused":
+        return "Für Bewerbende nicht sichtbar. Bestehende Bewerbungen bleiben offen.";
+      case "filled": {
+        const date = formatVacancyDate(draft.filledAt, locale);
+        return date === null
+          ? "Als besetzt markiert. Keine weitere Aktion verfügbar."
+          : `Am ${date} als besetzt markiert.`;
+      }
+      case "expired": {
+        const date = formatVacancyDate(
+          draft.expiredAt ?? draft.expiresAt,
+          locale,
+        );
+        return date === null
+          ? "Abgelaufen, ohne besetzt zu werden."
+          : `Am ${date} abgelaufen, ohne besetzt zu werden.`;
+      }
+      case "withdrawn":
+        return "Für Bewerbende nicht sichtbar. Bestehende Bewerbungen bleiben erhalten. Keine weitere Aktion verfügbar.";
+      case "published":
+        return null;
+    }
+  }
   switch (draft.publicationState) {
     case "draft":
       return draftConsequence(draft);
@@ -203,6 +290,34 @@ export function VacancyList({
   drafts,
   verificationState = null,
 }: VacancyListProps) {
+  const { locale } = useLocale();
+  const copy =
+    locale === "de"
+      ? {
+          lead: "Erstellen und verwalten Sie Ihre Stellen.",
+          private:
+            "Entwürfe bleiben privat, bis Sie sie ausdrücklich veröffentlichen.",
+          create: "Entwurf erstellen",
+          verifyHeading:
+            "Verifizierung vor der ersten Veröffentlichung abschließen",
+          verifySupport:
+            "Sie können bereits Entwürfe erstellen. Für die Veröffentlichung ist jedoch eine passende Verifizierung erforderlich.",
+          verifyAction: "Verifizierungsstatus prüfen",
+          empty: "Noch keine Stellen",
+          live: "Aktiv",
+          notLive: "Nicht aktiv",
+        }
+      : {
+          lead: VACANCY_LIST_LEAD,
+          private: VACANCY_PRIVATE_NOTICE,
+          create: "Create draft",
+          verifyHeading: VACANCY_VERIFICATION_EMPTY_HEADING,
+          verifySupport: VACANCY_VERIFICATION_EMPTY_SUPPORT,
+          verifyAction: VACANCY_VERIFICATION_EMPTY_ACTION,
+          empty: VACANCY_EMPTY_LIST,
+          live: "Live",
+          notLive: "Not live",
+        };
   const { live, notLive } = groupVacancies(drafts);
 
   // A zero-draft employer who isn't verified yet isn't blocked by "forgot
@@ -217,12 +332,12 @@ export function VacancyList({
     <>
       <div className={styles.pageIntro}>
         <div className={styles.pageIntroCopy}>
-          <p className={styles.lead}>{VACANCY_LIST_LEAD}</p>
-          <p className={styles.note}>{VACANCY_PRIVATE_NOTICE}</p>
+          <p className={styles.lead}>{copy.lead}</p>
+          <p className={styles.note}>{copy.private}</p>
         </div>
         <p className={styles.pageIntroActions}>
           <Link className={styles.button} href="/employer/vacancies/new">
-            Create draft
+            {copy.create}
           </Link>
         </p>
       </div>
@@ -231,10 +346,10 @@ export function VacancyList({
         showVerificationEmptyState ? (
           <EmployerEmptyState
             headingId="vacancies-verification-empty-heading"
-            heading={VACANCY_VERIFICATION_EMPTY_HEADING}
-            support={VACANCY_VERIFICATION_EMPTY_SUPPORT}
+            heading={copy.verifyHeading}
+            support={copy.verifySupport}
             actionHref="/employer/verification"
-            actionLabel={VACANCY_VERIFICATION_EMPTY_ACTION}
+            actionLabel={copy.verifyAction}
           />
         ) : (
           // No action link here: the "Create draft" button immediately
@@ -242,19 +357,19 @@ export function VacancyList({
           // repeat with identical text/href.
           <EmployerEmptyState
             headingId="vacancies-empty-heading"
-            heading={VACANCY_EMPTY_LIST}
+            heading={copy.empty}
           />
         )
       ) : (
         <>
           <VacancyListGroup
             headingId="live-vacancies-heading"
-            heading="Live"
+            heading={copy.live}
             drafts={live}
           />
           <VacancyListGroup
             headingId="not-live-vacancies-heading"
-            heading="Not live"
+            heading={copy.notLive}
             drafts={notLive}
           />
         </>
@@ -296,24 +411,34 @@ function VacancyListGroup({
   );
 }
 
-function primaryFactLine(draft: EmployerDraftListItem): string {
-  const category = jobCategoryLabel(draft.jobCategory as JobCategoryCode);
-  const locality = draft.publicLocality ?? "Locality not set";
+function primaryFactLine(draft: EmployerDraftListItem, locale: Locale): string {
+  const category = jobCategoryLabel(
+    draft.jobCategory as JobCategoryCode,
+    locale,
+  );
+  const locality =
+    draft.publicLocality ??
+    (locale === "de" ? "Ortsteil nicht angegeben" : "Locality not set");
   const employerContext =
     draft.employerType === "organisation"
       ? draft.companyName !== null
         ? `Organisation · ${draft.companyName}`
         : "Organisation"
-      : "Private";
+      : locale === "de"
+        ? "Privat"
+        : "Private";
   return `${category} · ${locality} · ${employerContext}`;
 }
 
 function VacancyListRow({ draft }: { draft: EmployerDraftListItem }) {
+  const { locale } = useLocale();
   const showExpiry =
     draft.publicationState === "published" &&
     draft.isEffectivelyExpired === false;
-  const expiresAt = showExpiry ? formatVacancyDate(draft.expiresAt) : null;
-  const consequence = consequenceSentence(draft);
+  const expiresAt = showExpiry
+    ? formatVacancyDate(draft.expiresAt, locale)
+    : null;
+  const consequence = consequenceSentence(draft, locale);
   const canEdit =
     draft.publicationState === "draft" || draft.publicationState === "paused";
   const canDelete = draft.publicationState === "draft";
@@ -322,45 +447,50 @@ function VacancyListRow({ draft }: { draft: EmployerDraftListItem }) {
     <li className={`${styles.listItem} ${styles.vacancyRow}`}>
       <div className={styles.rowMain}>
         <h3 className={styles.listTitle}>{draft.title}</h3>
-        <p className={styles.factLine}>{primaryFactLine(draft)}</p>
+        <p className={styles.factLine}>{primaryFactLine(draft, locale)}</p>
         <p
           className={styles.lifecycleBadge}
           data-state={draft.publicationState}
         >
-          {statusLabel(draft)}
+          {statusLabel(draft, locale)}
         </p>
         {expiresAt !== null ? (
-          <p className={styles.expiry}>Expires {expiresAt}</p>
+          <p className={styles.expiry}>
+            {locale === "de" ? "Läuft ab" : "Expires"} {expiresAt}
+          </p>
         ) : null}
         {consequence !== null ? (
           <p className={styles.support}>{consequence}</p>
         ) : null}
-        <p className={styles.nextHint}>Next: {nextActionHint(draft)}</p>
+        <p className={styles.nextHint}>
+          {locale === "de" ? "Nächster Schritt" : "Next"}:{" "}
+          {nextActionHint(draft, locale)}
+        </p>
       </div>
       <div className={styles.rowActions}>
         <Link
           className={styles.linkButton}
           href={`/employer/vacancies/${draft.id}`}
-          aria-label={`Manage ${draft.title}`}
+          aria-label={`${locale === "de" ? "Verwalten" : "Manage"} ${draft.title}`}
         >
-          Manage
+          {locale === "de" ? "Verwalten" : "Manage"}
         </Link>
         {canEdit ? (
           <Link
             className={styles.quietLink}
             href={`/employer/vacancies/${draft.id}/edit`}
-            aria-label={`Edit ${draft.title}`}
+            aria-label={`${locale === "de" ? "Bearbeiten" : "Edit"} ${draft.title}`}
           >
-            Edit
+            {locale === "de" ? "Bearbeiten" : "Edit"}
           </Link>
         ) : null}
         {canDelete ? (
           <Link
             className={styles.quietLink}
             href={`/employer/vacancies/${draft.id}#delete-draft`}
-            aria-label={`Delete ${draft.title}`}
+            aria-label={`${locale === "de" ? "Löschen" : "Delete"} ${draft.title}`}
           >
-            Delete
+            {locale === "de" ? "Löschen" : "Delete"}
           </Link>
         ) : null}
       </div>

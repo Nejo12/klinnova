@@ -6,9 +6,9 @@ import {
 } from "@/components/employer-applications/application-list";
 import { ApplicationListFilters } from "@/components/employer-applications/application-list-filters";
 import { EmployerRestrictedNotice } from "@/components/employer-shared/employer-restricted-notice";
+import { LocalizedText } from "@/components/i18n/localized-text";
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
 import styles from "@/components/employer-applications/employer-applications.module.scss";
-import { APPLICATION_LIST_LEAD } from "@/lib/employer/applications/messages";
 import { loadEmployerApplications } from "@/lib/employer/applications/load-employer-applications";
 import { loadUnseenApplicationsCount } from "@/lib/employer/applications/load-unseen-applications-count";
 import { parseApplicationListFilters } from "@/lib/employer/applications/parse-list-filters";
@@ -55,7 +55,9 @@ export default async function EmployerApplicationsPage({
           unseenApplicationsCount={0}
         />
         <div className={styles.pageIntro}>
-          <h1 className={styles.heading}>Applications</h1>
+          <h1 className={styles.heading}>
+            <LocalizedText message="employer.applications.heading" />
+          </h1>
         </div>
         <EmployerRestrictedNotice message={EMPLOYER_RESTRICTED_APPLICATIONS} />
       </main>
@@ -118,8 +120,12 @@ export default async function EmployerApplicationsPage({
         unseenApplicationsCount={unseenApplicationsCount}
       />
       <div className={styles.pageIntro}>
-        <h1 className={styles.heading}>Applications</h1>
-        <p className={styles.lead}>{APPLICATION_LIST_LEAD}</p>
+        <h1 className={styles.heading}>
+          <LocalizedText message="employer.applications.heading" />
+        </h1>
+        <p className={styles.lead}>
+          <LocalizedText message="employer.applications.lead" />
+        </p>
       </div>
       <ApplicationListFilters filter={filter} vacancyTitle={vacancyTitle} />
       <ApplicationList

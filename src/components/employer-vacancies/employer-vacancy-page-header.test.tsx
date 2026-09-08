@@ -2,8 +2,36 @@ import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
+import { LocaleProvider } from "@/components/i18n/locale-provider";
 
 describe("EmployerVacancyPageHeader", () => {
+  it("renders Employer navigation and accessibility labels in German", () => {
+    document.documentElement.dataset.locale = "de";
+    document.documentElement.lang = "de";
+
+    render(
+      <LocaleProvider>
+        <EmployerVacancyPageHeader
+          showCandidate={false}
+          showEmployer
+          currentPath="vacancies"
+          unseenApplicationsCount={2}
+        />
+      </LocaleProvider>,
+    );
+
+    const nav = screen.getByRole("navigation", { name: "Arbeitgeber" });
+    expect(within(nav).getByRole("link", { name: "Stellen" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(
+      within(nav).getByRole("link", { name: /^Bewerbungen\s*2\s*neu$/ }),
+    ).toBeInTheDocument();
+
+    document.documentElement.dataset.locale = "en";
+    document.documentElement.lang = "en";
+  });
   it("renders an Applications nav link to /employer/applications", () => {
     render(
       <EmployerVacancyPageHeader

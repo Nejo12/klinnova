@@ -1,14 +1,11 @@
 import { redirect } from "next/navigation";
 
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
+import { LocalizedText } from "@/components/i18n/localized-text";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import { VacancyDraftForm } from "@/components/employer-vacancies/vacancy-draft-form";
 import { loadUnseenApplicationsCount } from "@/lib/employer/applications/load-unseen-applications-count";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
-import {
-  VACANCY_PRIVATE_NOTICE,
-  VACANCY_VERIFICATION_INFO,
-} from "@/lib/employer/vacancies/messages";
 import { requireCompletedEmployer } from "@/lib/employer/vacancies/require-completed-employer";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -43,18 +40,23 @@ export default async function NewEmployerVacancyPage() {
         currentPath="vacancies"
         unseenApplicationsCount={unseenApplicationsCount}
       />
-      <h1 className={styles.heading}>Create vacancy draft</h1>
+      <h1 className={styles.heading}>
+        <LocalizedText message="employer.vacancies.create" />
+      </h1>
       <p className={styles.lead}>
-        Save a private draft with the minimum fields. You can add more detail
-        later.
+        <LocalizedText message="employer.vacancies.createLead" />
       </p>
-      <p className={styles.note}>{VACANCY_PRIVATE_NOTICE}</p>
-      <p className={styles.note}>{VACANCY_VERIFICATION_INFO}</p>
+      <p className={styles.note}>
+        <LocalizedText message="employer.vacancies.privateNotice" />
+      </p>
+      <p className={styles.note}>
+        <LocalizedText message="employer.vacancies.verificationInfo" />
+      </p>
       {gate.profile.employerType === "organisation" &&
       gate.profile.company !== null ? (
         <p className={styles.support}>
-          Organisation company: {gate.profile.company.name} (derived
-          automatically — no company selector)
+          <LocalizedText message="employer.vacancies.organisationCompany" />:{" "}
+          {gate.profile.company.name}
         </p>
       ) : null}
       <VacancyDraftForm mode="create" />

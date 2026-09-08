@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
+import { LocalizedText } from "@/components/i18n/localized-text";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import { VacancyDetail } from "@/components/employer-vacancies/vacancy-detail";
 import { VacancyUnavailable } from "@/components/employer-vacancies/vacancy-unavailable";
@@ -62,7 +63,7 @@ export default async function EmployerVacancyDetailPage({
       />
       <p className={styles.detailBack}>
         <Link className={styles.backLink} href="/employer/vacancies">
-          Back to vacancies
+          <LocalizedText message="employer.vacancies.backVacancies" />
         </Link>
       </p>
       <h1 className={styles.heading}>{loaded.vacancy.title}</h1>
