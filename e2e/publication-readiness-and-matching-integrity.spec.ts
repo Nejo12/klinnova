@@ -36,9 +36,7 @@ async function registerAndOnboardPrivateEmployer(
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByLabel("Display name").fill(displayName);
   await page.getByLabel("Berlin locality").fill("Mitte");
-  await page
-    .getByRole("checkbox", { name: /allowed to work in Germany/i })
-    .check();
+  await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Complete onboarding" }).click();
   await expect(page).toHaveURL(/\/employer$/, { timeout: 15_000 });
 
@@ -132,7 +130,7 @@ async function expectReadyDraftFieldsPersisted(page: Page): Promise<void> {
 async function expectBasicEnglishRequirementPersisted(
   page: Page,
 ): Promise<void> {
-  await expect(page.getByLabel(/Language 1/i)).toHaveValue("en");
+  await expect(page.getByLabel(/^Language 1$/i)).toHaveValue("en");
   await expect(page.getByLabel(/Minimum proficiency 1/i)).toHaveValue("basic");
 }
 
@@ -205,7 +203,7 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     );
 
     await page.getByRole("button", { name: "Add language" }).click();
-    await page.getByLabel(/Language 1/i).selectOption("en");
+    await page.getByLabel(/^Language 1$/i).selectOption("en");
     await page.getByLabel(/Minimum proficiency 1/i).selectOption("basic");
     await saveLanguagesAndReload(page);
     await expectBasicEnglishRequirementPersisted(page);
@@ -422,7 +420,7 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     await expectReadyDraftFieldsPersisted(page);
 
     await page.getByRole("button", { name: "Add language" }).click();
-    await page.getByLabel(/Language 1/i).selectOption("en");
+    await page.getByLabel(/^Language 1$/i).selectOption("en");
     await page.getByLabel(/Minimum proficiency 1/i).selectOption("basic");
     await saveLanguagesAndReload(page);
     await expectBasicEnglishRequirementPersisted(page);

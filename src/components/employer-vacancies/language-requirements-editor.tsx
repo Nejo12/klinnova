@@ -7,11 +7,14 @@ import {
   type EmployerVacancyActionState,
 } from "@/app/employer/vacancies/actions";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
+import { useLocale } from "@/components/i18n/locale-provider";
+import { localizeEmployerMessage } from "@/lib/employer/localize-message";
 import type { LanguageRequirementRow } from "@/lib/employer/vacancies/schemas";
 import {
   LANGUAGE_OPTIONS,
   LANGUAGE_PROFICIENCY_OPTIONS,
 } from "@/lib/onboarding/allow-lists";
+import { languageLabel, languageProficiencyLabel } from "@/lib/matching/labels";
 
 type LanguageDraft = {
   key: string;
@@ -33,6 +36,29 @@ export function LanguageRequirementsEditor({
   vacancyId,
   languages,
 }: LanguageRequirementsEditorProps) {
+  const { locale, t } = useLocale();
+  const copy =
+    locale === "de"
+      ? {
+          help: "Während der Entwurfsphase optional. Zur Veröffentlichung ist mindestens eine Sprache erforderlich. Keine Freitexteingabe.",
+          empty: "Noch keine Sprachanforderungen.",
+          language: "Sprache",
+          proficiency: "Mindestkenntnisse",
+          select: "Sprache auswählen",
+          remove: "Entfernen",
+          add: "Sprache hinzufügen",
+          save: "Sprachen speichern",
+        }
+      : {
+          help: "Optional while drafting. At least one language is required for publication readiness. No free-text languages.",
+          empty: "No language requirements yet.",
+          language: "Language",
+          proficiency: "Minimum proficiency",
+          select: "Select language",
+          remove: "Remove",
+          add: "Add language",
+          save: "Save languages",
+        };
   const [state, formAction, pending] = useActionState(
     replaceEmployerVacancyLanguagesAction,
     initialState,
@@ -64,25 +90,24 @@ export function LanguageRequirementsEditor({
     <form className={styles.form} action={formAction} noValidate>
       <input type="hidden" name="vacancyId" value={vacancyId} />
       <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>Language requirements</legend>
-        <p className={styles.support}>
-          Optional while drafting. At least one language is required for
-          publication readiness. No free-text languages.
-        </p>
+        <legend className={styles.legend}>
+          {t("employer.vacancies.languages")}
+        </legend>
+        <p className={styles.support}>{copy.help}</p>
 
         {state.error !== null ? (
           <p className={styles.error} role="alert">
-            {state.error}
+            {localizeEmployerMessage(state.error, locale)}
           </p>
         ) : null}
         {state.message !== null ? (
           <p className={styles.status} role="status">
-            {state.message}
+            {localizeEmployerMessage(state.message, locale)}
           </p>
         ) : null}
 
         {rows.length === 0 ? (
-          <p className={styles.support}>No language requirements yet.</p>
+          <p className={styles.support}>{copy.empty}</p>
         ) : (
           rows.map((row, index) => (
             <div key={row.key} className={styles.languageRow}>
@@ -91,7 +116,7 @@ export function LanguageRequirementsEditor({
                   className={styles.label}
                   htmlFor={`languageCode-${row.key}`}
                 >
-                  Language {index + 1}
+                  {copy.language} {index + 1}
                 </label>
                 <select
                   id={`languageCode-${row.key}`}
@@ -110,10 +135,10 @@ export function LanguageRequirementsEditor({
                   }}
                   required
                 >
-                  <option value="">Select language</option>
+                  <option value="">{copy.select}</option>
                   {LANGUAGE_OPTIONS.map((option) => (
                     <option key={option.code} value={option.code}>
-                      {option.label}
+                      {languageLabel(option.code, locale)}
                     </option>
                   ))}
                 </select>
@@ -123,7 +148,7 @@ export function LanguageRequirementsEditor({
                   className={styles.label}
                   htmlFor={`minProficiency-${row.key}`}
                 >
-                  Minimum proficiency {index + 1}
+                  {copy.proficiency} {index + 1}
                 </label>
                 <select
                   id={`minProficiency-${row.key}`}
@@ -144,7 +169,7 @@ export function LanguageRequirementsEditor({
                 >
                   {LANGUAGE_PROFICIENCY_OPTIONS.map((option) => (
                     <option key={option.code} value={option.code}>
-                      {option.label}
+                      {languageProficiencyLabel(option.code, locale)}
                     </option>
                   ))}
                 </select>
@@ -153,9 +178,9 @@ export function LanguageRequirementsEditor({
                 className={`${styles.button} ${styles.buttonSecondary}`}
                 type="button"
                 onClick={() => removeRow(row.key)}
-                aria-label={`Remove language requirement ${index + 1}`}
+                aria-label={`${copy.remove} ${copy.language.toLocaleLowerCase(locale === "de" ? "de-DE" : "en-GB")} ${index + 1}`}
               >
-                Remove
+                {copy.remove}
               </button>
             </div>
           ))
@@ -167,10 +192,10 @@ export function LanguageRequirementsEditor({
             type="button"
             onClick={addRow}
           >
-            Add language
+            {copy.add}
           </button>
           <button className={styles.button} type="submit" disabled={pending}>
-            {pending ? "Saving…" : "Save languages"}
+            {pending ? t("employer.vacancies.saving") : copy.save}
           </button>
         </div>
       </fieldset>

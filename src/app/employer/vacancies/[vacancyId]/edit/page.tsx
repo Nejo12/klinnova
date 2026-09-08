@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
+import { LocalizedText } from "@/components/i18n/localized-text";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import { LanguageRequirementsEditor } from "@/components/employer-vacancies/language-requirements-editor";
 import { ReadinessChecklist } from "@/components/employer-vacancies/readiness-checklist";
@@ -10,10 +11,6 @@ import { VacancyUnavailable } from "@/components/employer-vacancies/vacancy-unav
 import { loadUnseenApplicationsCount } from "@/lib/employer/applications/load-unseen-applications-count";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadEmployerDraft } from "@/lib/employer/vacancies/load-employer-draft";
-import {
-  VACANCY_PRIVATE_NOTICE,
-  VACANCY_VERIFICATION_INFO,
-} from "@/lib/employer/vacancies/messages";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -57,21 +54,27 @@ export default async function EditEmployerVacancyPage({
         currentPath="vacancies"
         unseenApplicationsCount={unseenApplicationsCount}
       />
-      <h1 className={styles.heading}>Edit vacancy</h1>
+      <h1 className={styles.heading}>
+        <LocalizedText message="employer.vacancies.edit" />
+      </h1>
       {loaded.draft.publicationState === "paused" ? (
         <p className={styles.note}>
-          This vacancy is currently paused. Changes are saved immediately, but
-          it stays paused until you resume it from the manage page.
+          <LocalizedText message="employer.vacancies.pausedEdit" />
         </p>
       ) : (
         <>
-          <p className={styles.note}>{VACANCY_PRIVATE_NOTICE}</p>
-          <p className={styles.note}>{VACANCY_VERIFICATION_INFO}</p>
+          <p className={styles.note}>
+            <LocalizedText message="employer.vacancies.privateNotice" />
+          </p>
+          <p className={styles.note}>
+            <LocalizedText message="employer.vacancies.verificationInfo" />
+          </p>
         </>
       )}
       {loaded.draft.companyName !== null ? (
         <p className={styles.support}>
-          Organisation company: {loaded.draft.companyName}
+          <LocalizedText message="employer.vacancies.organisationCompany" />:{" "}
+          {loaded.draft.companyName}
         </p>
       ) : null}
       <p className={styles.actions}>
@@ -79,10 +82,10 @@ export default async function EditEmployerVacancyPage({
           className={styles.linkButton}
           href={`/employer/vacancies/${loaded.draft.id}`}
         >
-          View summary
+          <LocalizedText message="employer.vacancies.viewSummary" />
         </Link>
         <Link className={styles.linkButton} href="/employer/vacancies">
-          Back to list
+          <LocalizedText message="employer.vacancies.backList" />
         </Link>
       </p>
 

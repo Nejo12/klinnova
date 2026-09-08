@@ -1,4 +1,7 @@
+"use client";
+
 import { VoidOutcomeButton } from "@/components/employer-applications/void-outcome-button";
+import { useLocale } from "@/components/i18n/locale-provider";
 import styles from "@/components/employer-applications/employer-applications.module.scss";
 import { outcomeTypeLabel } from "@/lib/applications/outcome-type";
 import { formatApplicationTimestamp } from "@/lib/employer/applications/format-timestamp";
@@ -24,38 +27,56 @@ export function ApplicationOutcomeHistory({
   applicationId,
   outcomes,
 }: ApplicationOutcomeHistoryProps) {
+  const { locale } = useLocale();
   return (
     <section
       className={styles.section}
       aria-labelledby="outcome-history-heading"
     >
       <h2 id="outcome-history-heading" className={styles.sectionHeading}>
-        Interview and hire history
+        {locale === "de"
+          ? "Verlauf von Gesprächen und Einstellungen"
+          : "Interview and hire history"}
       </h2>
 
       {outcomes === null ? (
         <p className={styles.support} role="status">
-          Could not load outcome history.
+          {locale === "de"
+            ? "Der Ergebnisverlauf konnte nicht geladen werden."
+            : "Could not load outcome history."}
         </p>
       ) : outcomes.length === 0 ? (
-        <p className={styles.support}>{OUTCOME_EMPTY_HISTORY}</p>
+        <p className={styles.support}>
+          {locale === "de"
+            ? "Noch keine Gespräche oder Einstellungen erfasst."
+            : OUTCOME_EMPTY_HISTORY}
+        </p>
       ) : (
         <ul className={styles.list}>
           {outcomes.map((entry) => (
             <li key={entry.outcome_event_id} className={styles.listItem}>
               <p className={styles.listTitle}>
-                {outcomeTypeLabel(entry.outcome_type)}
-                {entry.voided_at !== null ? " — Voided" : ""}
+                {outcomeTypeLabel(entry.outcome_type, locale)}
+                {entry.voided_at !== null
+                  ? locale === "de"
+                    ? " — Ungültig gemacht"
+                    : " — Voided"
+                  : ""}
               </p>
               <ul className={styles.meta}>
                 <li>
-                  Occurred {formatApplicationTimestamp(entry.occurred_at)}
+                  {locale === "de" ? "Ereignis" : "Occurred"}{" "}
+                  {formatApplicationTimestamp(entry.occurred_at, locale)}
                 </li>
                 <li>
-                  Recorded {formatApplicationTimestamp(entry.recorded_at)}
+                  {locale === "de" ? "Erfasst" : "Recorded"}{" "}
+                  {formatApplicationTimestamp(entry.recorded_at, locale)}
                 </li>
                 {entry.voided_at !== null ? (
-                  <li>Voided {formatApplicationTimestamp(entry.voided_at)}</li>
+                  <li>
+                    {locale === "de" ? "Ungültig gemacht" : "Voided"}{" "}
+                    {formatApplicationTimestamp(entry.voided_at, locale)}
+                  </li>
                 ) : null}
               </ul>
               {entry.voided_at === null ? (

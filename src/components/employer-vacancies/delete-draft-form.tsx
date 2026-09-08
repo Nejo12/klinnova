@@ -6,6 +6,8 @@ import {
   deleteEmployerVacancyDraftAction,
   type EmployerVacancyActionState,
 } from "@/app/employer/vacancies/actions";
+import { useLocale } from "@/components/i18n/locale-provider";
+import { localizeEmployerMessage } from "@/lib/employer/localize-message";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 
 type DeleteDraftFormProps = {
@@ -19,6 +21,7 @@ const initialState: EmployerVacancyActionState = {
 };
 
 export function DeleteDraftForm({ vacancyId, title }: DeleteDraftFormProps) {
+  const { locale, t } = useLocale();
   const [state, formAction, pending] = useActionState(
     deleteEmployerVacancyDraftAction,
     initialState,
@@ -31,22 +34,23 @@ export function DeleteDraftForm({ vacancyId, title }: DeleteDraftFormProps) {
       aria-labelledby="delete-draft-heading"
     >
       <h2 id="delete-draft-heading" className={styles.sectionHeading}>
-        Delete draft
+        {t("employer.vacancies.deleteDraft")}
       </h2>
       <p className={styles.support}>
-        Delete “{title}” only if it has never been published and has no
-        applications. This cannot be undone.
+        {locale === "de"
+          ? `Löschen Sie „${title}“ nur, wenn der Entwurf nie veröffentlicht wurde und keine Bewerbungen vorliegen. Dies kann nicht rückgängig gemacht werden.`
+          : `Delete “${title}” only if it has never been published and has no applications. This cannot be undone.`}
       </p>
       <form className={styles.form} action={formAction} noValidate>
         <input type="hidden" name="vacancyId" value={vacancyId} />
         {state.error !== null ? (
           <p className={styles.error} role="alert">
-            {state.error}
+            {localizeEmployerMessage(state.error, locale)}
           </p>
         ) : null}
         <div className={styles.field}>
           <label className={styles.label} htmlFor="confirmTitle">
-            Type the draft title to confirm
+            {t("employer.vacancies.deleteConfirm")}
           </label>
           <input
             id="confirmTitle"
@@ -66,7 +70,7 @@ export function DeleteDraftForm({ vacancyId, title }: DeleteDraftFormProps) {
           />
           {state.fieldErrors?.confirmTitle !== undefined ? (
             <p id="confirmTitle-error" className={styles.fieldError}>
-              {state.fieldErrors.confirmTitle}
+              {localizeEmployerMessage(state.fieldErrors.confirmTitle, locale)}
             </p>
           ) : null}
         </div>
@@ -76,7 +80,9 @@ export function DeleteDraftForm({ vacancyId, title }: DeleteDraftFormProps) {
             type="submit"
             disabled={pending}
           >
-            {pending ? "Deleting…" : "Delete draft permanently"}
+            {pending
+              ? t("employer.vacancies.deleting")
+              : t("employer.vacancies.deletePermanently")}
           </button>
         </div>
       </form>

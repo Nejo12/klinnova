@@ -4,6 +4,7 @@ import { ApplicationDetail } from "@/components/employer-applications/applicatio
 import styles from "@/components/employer-applications/employer-applications.module.scss";
 import { ApplicationUnavailable } from "@/components/employer-applications/application-unavailable";
 import { EmployerRestrictedNotice } from "@/components/employer-shared/employer-restricted-notice";
+import { LocalizedText } from "@/components/i18n/localized-text";
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
 import { berlinTodayIso } from "@/lib/applications/outcome-type";
 import { loadEmployerApplication } from "@/lib/employer/applications/load-employer-application";
@@ -55,7 +56,9 @@ export default async function EmployerApplicationDetailPage({
           // restricted-notice branch rather than calling it just to get 0.
           unseenApplicationsCount={0}
         />
-        <h1 className={styles.heading}>Application</h1>
+        <h1 className={styles.heading}>
+          <LocalizedText message="employer.applications.application" />
+        </h1>
         <EmployerRestrictedNotice message={EMPLOYER_RESTRICTED_APPLICATIONS} />
       </main>
     );

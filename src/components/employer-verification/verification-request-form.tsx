@@ -4,6 +4,8 @@ import { useActionState } from "react";
 
 import { requestEmployerVerificationAction } from "@/app/employer/verification/actions";
 import type { EmployerVerificationActionState } from "@/app/employer/verification/actions";
+import { useLocale } from "@/components/i18n/locale-provider";
+import { localizeEmployerMessage } from "@/lib/employer/localize-message";
 import { VERIFICATION_ATTESTATION_LABEL } from "@/lib/employer/verification/messages";
 
 import styles from "./employer-verification.module.scss";
@@ -22,6 +24,7 @@ export function VerificationRequestForm({
   submitLabel,
   pendingLabel,
 }: VerificationRequestFormProps) {
+  const { locale, t } = useLocale();
   const [state, formAction, pending] = useActionState(
     requestEmployerVerificationAction,
     initialState,
@@ -35,7 +38,9 @@ export function VerificationRequestForm({
       aria-busy={pending || undefined}
     >
       <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>Attestation</legend>
+        <legend className={styles.legend}>
+          {t("employer.verification.attestation")}
+        </legend>
         <label className={styles.option}>
           <input
             type="checkbox"
@@ -52,24 +57,29 @@ export function VerificationRequestForm({
             }
           />
           <span className={styles.optionLabel}>
-            {VERIFICATION_ATTESTATION_LABEL}
+            {locale === "de"
+              ? "Ich bestätige, dass die Angaben in meinem Arbeitgeberprofil richtig sind und ich berechtigt bin, für die von mir erstellten Stellen zu rekrutieren."
+              : VERIFICATION_ATTESTATION_LABEL}
           </span>
         </label>
         {state.fieldErrors?.attestationConfirmed ? (
           <p className={styles.fieldError} id="attestation-error">
-            {state.fieldErrors.attestationConfirmed}
+            {localizeEmployerMessage(
+              state.fieldErrors.attestationConfirmed,
+              locale,
+            )}
           </p>
         ) : null}
       </fieldset>
 
       {state.error !== null ? (
         <p className={styles.error} role="alert">
-          {state.error}
+          {localizeEmployerMessage(state.error, locale)}
         </p>
       ) : null}
       {state.message !== null ? (
         <p className={styles.status} role="status">
-          {state.message}
+          {localizeEmployerMessage(state.message, locale)}
         </p>
       ) : null}
 

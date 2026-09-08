@@ -8,6 +8,7 @@ import {
   summarizeMissingLabels,
   VacancyList,
 } from "@/components/employer-vacancies/vacancy-list";
+import { LocaleProvider } from "@/components/i18n/locale-provider";
 import type { EmployerDraftListItem } from "@/lib/employer/vacancies/load-employer-drafts";
 import { VACANCY_EMPTY_LIST } from "@/lib/employer/vacancies/messages";
 
@@ -75,6 +76,35 @@ describe("groupVacancies", () => {
 });
 
 describe("VacancyList", () => {
+  it("localizes Employer chrome and structured values without translating authored content", () => {
+    document.documentElement.dataset.locale = "de";
+    document.documentElement.lang = "de";
+    const authoredTitle = "Morning kitchen support";
+
+    render(
+      <LocaleProvider>
+        <VacancyList
+          drafts={[
+            buildDraft({
+              title: authoredTitle,
+              jobCategory: "hospitality",
+              publicLocality: "Neukölln",
+            }),
+          ]}
+        />
+      </LocaleProvider>,
+    );
+
+    expect(screen.getByText(authoredTitle)).toBeInTheDocument();
+    expect(screen.getByText(/Gastronomie.*Neukölln/)).toBeInTheDocument();
+    expect(screen.getByText("Privater Entwurf")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: `Verwalten ${authoredTitle}` }),
+    ).toBeInTheDocument();
+
+    document.documentElement.dataset.locale = "en";
+    document.documentElement.lang = "en";
+  });
   it("shows an empty-state message when there are no vacancies", () => {
     render(<VacancyList drafts={[]} />);
     expect(screen.getByText(VACANCY_EMPTY_LIST)).toBeInTheDocument();

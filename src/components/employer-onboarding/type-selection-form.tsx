@@ -6,6 +6,8 @@ import {
   selectEmployerTypeAction,
   type EmployerOnboardingActionState,
 } from "@/app/employer/onboarding/actions";
+import { useLocale } from "@/components/i18n/locale-provider";
+import { localizeEmployerMessage } from "@/lib/employer/localize-message";
 
 import styles from "./employer-onboarding.module.scss";
 
@@ -23,6 +25,7 @@ export function TypeSelectionForm({
   currentType,
   typeLocked,
 }: TypeSelectionFormProps) {
+  const { locale, t } = useLocale();
   const [state, formAction, pending] = useActionState(
     selectEmployerTypeAction,
     initialState,
@@ -32,12 +35,16 @@ export function TypeSelectionForm({
     return (
       <section className={styles.form} aria-labelledby="employer-type-heading">
         <h2 className={styles.heading} id="employer-type-heading">
-          Employer type
+          {t("employer.onboarding.type")}
         </h2>
         <p className={styles.lead}>
           {currentType === "organisation"
-            ? "You hire as an organisation. This type is locked for your account."
-            : "You hire as a private person. This type is locked for your account."}
+            ? locale === "de"
+              ? "Sie stellen als Organisation ein. Diese Auswahl ist für Ihr Konto festgelegt."
+              : "You hire as an organisation. This type is locked for your account."
+            : locale === "de"
+              ? "Sie stellen als Privatperson ein. Diese Auswahl ist für Ihr Konto festgelegt."
+              : "You hire as a private person. This type is locked for your account."}
         </p>
       </section>
     );
@@ -46,11 +53,13 @@ export function TypeSelectionForm({
   return (
     <form className={styles.form} action={formAction} noValidate>
       <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>How do you hire?</legend>
+        <legend className={styles.legend}>
+          {t("employer.onboarding.howHire")}
+        </legend>
         <p className={styles.support}>
-          Choose private if you hire as an individual. Choose organisation if
-          you hire for a company. You can correct this while onboarding is
-          incomplete and no organisation company exists yet.
+          {locale === "de"
+            ? "Wählen Sie Privatperson, wenn Sie als Einzelperson einstellen, oder Organisation, wenn Sie für ein Unternehmen einstellen. Während der Einrichtung kann diese Auswahl korrigiert werden, solange noch kein Unternehmen angelegt wurde."
+            : "Choose private if you hire as an individual. Choose organisation if you hire for a company. You can correct this while onboarding is incomplete and no organisation company exists yet."}
         </p>
         <div className={styles.optionList}>
           <label className={styles.option}>
@@ -62,7 +71,9 @@ export function TypeSelectionForm({
               required
               disabled={pending}
             />
-            <span className={styles.optionLabel}>Private person</span>
+            <span className={styles.optionLabel}>
+              {t("employer.onboarding.private")}
+            </span>
           </label>
           <label className={styles.option}>
             <input
@@ -73,20 +84,24 @@ export function TypeSelectionForm({
               required
               disabled={pending}
             />
-            <span className={styles.optionLabel}>Organisation</span>
+            <span className={styles.optionLabel}>
+              {t("employer.onboarding.organisation")}
+            </span>
           </label>
         </div>
       </fieldset>
 
       {state.error !== null ? (
         <p className={styles.error} role="alert">
-          {state.error}
+          {localizeEmployerMessage(state.error, locale)}
         </p>
       ) : null}
 
       <div className={styles.actions}>
         <button className={styles.button} type="submit" disabled={pending}>
-          {pending ? "Saving…" : "Continue"}
+          {pending
+            ? t("employer.onboarding.saving")
+            : t("employer.onboarding.continue")}
         </button>
       </div>
     </form>

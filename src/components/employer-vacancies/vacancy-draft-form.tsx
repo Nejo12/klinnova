@@ -9,6 +9,8 @@ import {
 } from "@/app/employer/vacancies/actions";
 import styles from "@/components/employer-vacancies/employer-vacancies.module.scss";
 import { GermanRequirementField } from "@/components/employer-vacancies/german-requirement-field";
+import { useLocale } from "@/components/i18n/locale-provider";
+import { localizeEmployerMessage } from "@/lib/employer/localize-message";
 import {
   SALARY_PERIOD_OPTIONS,
   SHIFT_REQUIREMENT_OPTIONS,
@@ -27,6 +29,15 @@ import {
   JOB_CATEGORY_OPTIONS,
   type GermanComfortCode,
 } from "@/lib/onboarding/allow-lists";
+import {
+  employmentTypeLabel,
+  jobCategoryLabel,
+  shiftLabel,
+} from "@/lib/matching/labels";
+import {
+  workplaceTypeLabel,
+  workFrequencyLabel,
+} from "@/lib/public-jobs/labels";
 
 /**
  * A draft's persisted `germanRequirement` always satisfies the DB CHECK
@@ -58,6 +69,50 @@ function fieldError(
 }
 
 export function VacancyDraftForm(props: VacancyDraftFormProps) {
+  const { locale, t } = useLocale();
+  const copy =
+    locale === "de"
+      ? {
+          sections: "Abschnitte des Stellenformulars",
+          basics: "Grundlagen",
+          role: "Stellendetails",
+          salary: "Vergütung",
+          jobCategory: "Stellenkategorie",
+          selectCategory: "Kategorie auswählen",
+          notSet: "Noch nicht angegeben",
+          employment: "Beschäftigungsarten",
+          shifts: "Schichtanforderungen",
+          clearDate: "Verfügbarkeitsdatum löschen",
+          englishInterview:
+            "Vorstellungsgespräch kann auf Englisch stattfinden",
+          gross: "Vergütung (EUR brutto)",
+          salaryHelp:
+            "Für einen Entwurf optional, zur Veröffentlichung erforderlich. Beträge werden in ganzen Cent gespeichert.",
+          amount: "Betrag in EUR",
+          period: "Zeitraum",
+          clearSalary: "Vergütung löschen",
+          create: "Entwurf erstellen",
+        }
+      : {
+          sections: "Vacancy form sections",
+          basics: "Basics",
+          role: "Role details",
+          salary: "Salary",
+          jobCategory: "Job category",
+          selectCategory: "Select a category",
+          notSet: "Not set yet",
+          employment: "Employment types",
+          shifts: "Shift requirements",
+          clearDate: "Clear available-from date",
+          englishInterview: "Interview can be in English",
+          gross: "Salary (EUR gross)",
+          salaryHelp:
+            "Optional for saving a draft. Required later for publication readiness. Amounts are stored as integer cents.",
+          amount: "Amount in EUR",
+          period: "Period",
+          clearSalary: "Clear salary",
+          create: "Create draft",
+        };
   const action =
     props.mode === "create"
       ? createEmployerVacancyDraftAction
@@ -74,21 +129,21 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
 
   return (
     <>
-      <nav className={styles.sectionNav} aria-label="Vacancy form sections">
+      <nav className={styles.sectionNav} aria-label={copy.sections}>
         <ul className={styles.sectionNavList}>
           <li>
             <a className={styles.sectionNavLink} href="#section-basics">
-              Basics
+              {copy.basics}
             </a>
           </li>
           <li>
             <a className={styles.sectionNavLink} href="#section-role-details">
-              Role details
+              {copy.role}
             </a>
           </li>
           <li>
             <a className={styles.sectionNavLink} href="#section-salary">
-              Salary
+              {copy.salary}
             </a>
           </li>
         </ul>
@@ -100,20 +155,20 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
 
         {state.error !== null ? (
           <p className={styles.error} role="alert">
-            {state.error}
+            {localizeEmployerMessage(state.error, locale)}
           </p>
         ) : null}
         {state.message !== null ? (
           <p className={styles.status} role="status">
-            {state.message}
+            {localizeEmployerMessage(state.message, locale)}
           </p>
         ) : null}
 
         <fieldset id="section-basics" className={styles.fieldset}>
-          <legend className={styles.legend}>Basics</legend>
+          <legend className={styles.legend}>{copy.basics}</legend>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="title">
-              Title
+              {t("employer.vacancies.title")}
             </label>
             <input
               id="title"
@@ -130,14 +185,14 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
             />
             {fieldError(state, "title") ? (
               <p id="title-error" className={styles.fieldError}>
-                {fieldError(state, "title")}
+                {localizeEmployerMessage(fieldError(state, "title")!, locale)}
               </p>
             ) : null}
           </div>
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="jobCategory">
-              Job category
+              {copy.jobCategory}
             </label>
             <select
               id="jobCategory"
@@ -152,26 +207,31 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
                   : undefined
               }
             >
-              <option value="">Select a category</option>
+              <option value="">{copy.selectCategory}</option>
               {JOB_CATEGORY_OPTIONS.map((option) => (
                 <option key={option.code} value={option.code}>
-                  {option.label}
+                  {jobCategoryLabel(option.code, locale)}
                 </option>
               ))}
             </select>
             {fieldError(state, "jobCategory") ? (
               <p id="jobCategory-error" className={styles.fieldError}>
-                {fieldError(state, "jobCategory")}
+                {localizeEmployerMessage(
+                  fieldError(state, "jobCategory")!,
+                  locale,
+                )}
               </p>
             ) : null}
           </div>
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="publicLocality">
-              Berlin public locality
+              {t("employer.vacancies.locality")}
             </label>
             <p id="publicLocality-support" className={styles.support}>
-              {VACANCY_LOCALITY_SUPPORT}
+              {locale === "de"
+                ? "Zeigen Sie nur einen Bezirk oder Ortsteil an — niemals eine genaue Wohnadresse."
+                : VACANCY_LOCALITY_SUPPORT}
             </p>
             <input
               id="publicLocality"
@@ -192,17 +252,20 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
             />
             {fieldError(state, "publicLocality") ? (
               <p id="publicLocality-error" className={styles.fieldError}>
-                {fieldError(state, "publicLocality")}
+                {localizeEmployerMessage(
+                  fieldError(state, "publicLocality")!,
+                  locale,
+                )}
               </p>
             ) : null}
           </div>
         </fieldset>
 
         <fieldset id="section-role-details" className={styles.fieldset}>
-          <legend className={styles.legend}>Role details</legend>
+          <legend className={styles.legend}>{copy.role}</legend>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="description">
-              Description
+              {t("employer.vacancies.description")}
             </label>
             <textarea
               id="description"
@@ -215,7 +278,7 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="workplaceType">
-              Workplace type
+              {t("employer.vacancies.workplaceType")}
             </label>
             <select
               id="workplaceType"
@@ -223,19 +286,23 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               name="workplaceType"
               defaultValue={draft?.workplaceType ?? ""}
             >
-              <option value="">Not set yet</option>
+              <option value="">{copy.notSet}</option>
               {WORKPLACE_TYPE_OPTIONS.map((option) => (
                 <option key={option.code} value={option.code}>
-                  {option.label}
+                  {workplaceTypeLabel(option.code, locale)}
                 </option>
               ))}
             </select>
-            <p className={styles.warning}>{VACANCY_PRIVATE_HOME_WARNING}</p>
+            <p className={styles.warning}>
+              {locale === "de"
+                ? "Geben Sie bei Privathaushalten keine genaue Adresse in öffentlich sichtbaren Feldern an."
+                : VACANCY_PRIVATE_HOME_WARNING}
+            </p>
           </div>
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="workFrequency">
-              Work frequency
+              {t("employer.vacancies.workFrequency")}
             </label>
             <select
               id="workFrequency"
@@ -243,17 +310,17 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               name="workFrequency"
               defaultValue={draft?.workFrequency ?? ""}
             >
-              <option value="">Not set yet</option>
+              <option value="">{copy.notSet}</option>
               {WORK_FREQUENCY_OPTIONS.map((option) => (
                 <option key={option.code} value={option.code}>
-                  {option.label}
+                  {workFrequencyLabel(option.code, locale)}
                 </option>
               ))}
             </select>
           </div>
 
           <fieldset className={styles.field}>
-            <legend className={styles.label}>Employment types</legend>
+            <legend className={styles.label}>{copy.employment}</legend>
             {EMPLOYMENT_TYPE_OPTIONS.map((option) => (
               <label key={option.code} className={styles.checkboxRow}>
                 <input
@@ -262,13 +329,13 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
                   value={option.code}
                   defaultChecked={draft?.employmentTypes.includes(option.code)}
                 />
-                <span>{option.label}</span>
+                <span>{employmentTypeLabel(option.code, locale)}</span>
               </label>
             ))}
           </fieldset>
 
           <fieldset className={styles.field}>
-            <legend className={styles.label}>Shift requirements</legend>
+            <legend className={styles.label}>{copy.shifts}</legend>
             {SHIFT_REQUIREMENT_OPTIONS.map((option) => (
               <label key={option.code} className={styles.checkboxRow}>
                 <input
@@ -279,14 +346,14 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
                     option.code,
                   )}
                 />
-                <span>{option.label}</span>
+                <span>{shiftLabel(option.code, locale)}</span>
               </label>
             ))}
           </fieldset>
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="availableFrom">
-              Available from
+              {t("employer.vacancies.availableFrom")}
             </label>
             <input
               id="availableFrom"
@@ -298,14 +365,14 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
             {props.mode === "edit" ? (
               <label className={styles.checkboxRow}>
                 <input type="checkbox" name="clearAvailableFrom" value="true" />
-                <span>Clear available-from date</span>
+                <span>{copy.clearDate}</span>
               </label>
             ) : null}
           </div>
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="experienceNotes">
-              Experience notes
+              {t("employer.vacancies.experienceNotes")}
             </label>
             <textarea
               id="experienceNotes"
@@ -323,7 +390,7 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               value="true"
               defaultChecked={draft?.cvRequired === true}
             />
-            <span>CV required</span>
+            <span>{t("employer.vacancies.cvRequired")}</span>
           </label>
 
           <label className={styles.checkboxRow}>
@@ -333,7 +400,7 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               value="true"
               defaultChecked={draft?.interviewEnglishOk === true}
             />
-            <span>Interview can be in English</span>
+            <span>{copy.englishInterview}</span>
           </label>
 
           <GermanRequirementField
@@ -344,14 +411,11 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
         </fieldset>
 
         <fieldset id="section-salary" className={styles.fieldset}>
-          <legend className={styles.legend}>Salary (EUR gross)</legend>
-          <p className={styles.support}>
-            Optional for saving a draft. Required later for publication
-            readiness. Amounts are stored as integer cents.
-          </p>
+          <legend className={styles.legend}>{copy.gross}</legend>
+          <p className={styles.support}>{copy.salaryHelp}</p>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="salaryAmountEur">
-              Amount in EUR
+              {copy.amount}
             </label>
             <input
               id="salaryAmountEur"
@@ -372,13 +436,16 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
             />
             {fieldError(state, "salaryAmountEur") ? (
               <p id="salaryAmountEur-error" className={styles.fieldError}>
-                {fieldError(state, "salaryAmountEur")}
+                {localizeEmployerMessage(
+                  fieldError(state, "salaryAmountEur")!,
+                  locale,
+                )}
               </p>
             ) : null}
           </div>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="salaryPeriod">
-              Period
+              {copy.period}
             </label>
             <select
               id="salaryPeriod"
@@ -389,32 +456,43 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
                 fieldError(state, "salaryPeriod") ? true : undefined
               }
             >
-              <option value="">Not set yet</option>
+              <option value="">{copy.notSet}</option>
               {SALARY_PERIOD_OPTIONS.map((option) => (
                 <option key={option.code} value={option.code}>
-                  {option.label}
+                  {locale === "de"
+                    ? (
+                        {
+                          hourly: "Pro Stunde",
+                          monthly: "Pro Monat",
+                          fixed_job: "Pauschal für den Auftrag",
+                        } as const
+                      )[option.code]
+                    : option.label}
                 </option>
               ))}
             </select>
             {fieldError(state, "salaryPeriod") ? (
               <p className={styles.fieldError}>
-                {fieldError(state, "salaryPeriod")}
+                {localizeEmployerMessage(
+                  fieldError(state, "salaryPeriod")!,
+                  locale,
+                )}
               </p>
             ) : null}
           </div>
           <label className={styles.checkboxRow}>
             <input type="checkbox" name="clearSalary" value="true" />
-            <span>Clear salary</span>
+            <span>{copy.clearSalary}</span>
           </label>
         </fieldset>
 
         <div className={styles.actions}>
           <button className={styles.button} type="submit" disabled={pending}>
             {pending
-              ? "Saving…"
+              ? t("employer.vacancies.saving")
               : props.mode === "create"
-                ? "Create draft"
-                : "Save draft"}
+                ? copy.create
+                : t("employer.vacancies.save")}
           </button>
         </div>
       </form>

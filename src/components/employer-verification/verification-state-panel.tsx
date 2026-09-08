@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
+import { useLocale } from "@/components/i18n/locale-provider";
 import { VerificationRequestForm } from "@/components/employer-verification/verification-request-form";
 import styles from "@/components/employer-verification/employer-verification.module.scss";
 import {
@@ -71,7 +74,45 @@ export function VerificationStatePanel({
   canRequest,
   onboardingIncomplete,
 }: VerificationStatePanelProps) {
-  const copy = STATUS_COPY[view.status];
+  const { locale, t } = useLocale();
+  const formatTimestamp = (value: string | null) => {
+    if (value === null || !/^\d{4}-\d{2}-\d{2}T/.test(value)) return value;
+    return new Intl.DateTimeFormat(locale === "de" ? "de-DE" : "en-GB", {
+      dateStyle: "medium",
+      timeStyle: "short",
+      timeZone: "Europe/Berlin",
+    }).format(new Date(value));
+  };
+  const requestedLabel = formatTimestamp(requestedAt);
+  const reviewedLabel = formatTimestamp(reviewedAt);
+  const germanCopy: typeof STATUS_COPY = {
+    unverified: {
+      badge: "Nicht beantragt",
+      heading: "Verifizierung wurde noch nicht beantragt",
+      lead: "Die Verifizierung ist vor der Veröffentlichung von Stellen erforderlich. Es werden keine Dokumente verlangt; der Antrag verwendet Ihre aktuellen Arbeitgeberangaben und Ihre Bestätigung.",
+    },
+    pending: {
+      badge: "In Prüfung",
+      heading: "Ihr Verifizierungsantrag wird geprüft",
+      lead: "Ihr Antrag ist eingegangen und wartet auf Prüfung. Die Veröffentlichung bleibt bis zur Entscheidung nicht verfügbar. Es gibt keine feste Bearbeitungszeit.",
+    },
+    verified: {
+      badge: "Verifiziert",
+      heading: "Ihr Arbeitgeberkonto ist verifiziert",
+      lead: "Ihr Arbeitgeberkonto ist für die entsprechende Verifizierungsdimension bestätigt. Veröffentlichungsfähige Stellen können nun veröffentlicht werden.",
+    },
+    rejected: {
+      badge: "Nicht genehmigt",
+      heading: "Verifizierung wurde nicht genehmigt",
+      lead: "Prüfen Sie den unten genannten Grund, aktualisieren Sie bei Bedarf Ihr Arbeitgeberprofil und stellen Sie den Antrag erneut.",
+    },
+    revoked: {
+      badge: "Widerrufen",
+      heading: "Verifizierung widerrufen",
+      lead: "Die Verifizierung wurde widerrufen. Veröffentlichungen sind nicht verfügbar; zuvor veröffentlichte Stellen wurden automatisch pausiert. Prüfen Sie Ihre Profilangaben.",
+    },
+  };
+  const copy = (locale === "de" ? germanCopy : STATUS_COPY)[view.status];
   const showReason = view.reviewReason !== null;
   const showRequested =
     requestedAt !== null &&
@@ -84,8 +125,8 @@ export function VerificationStatePanel({
   const showDetails = showReason || showRequested || showReviewed;
   const profileActionLabel =
     view.status === "rejected"
-      ? "Edit employer profile"
-      : "Review employer profile";
+      ? t("employer.verification.profileEdit")
+      : t("employer.verification.profileReview");
   const showProfileAction = view.status !== "verified";
 
   return (
@@ -105,34 +146,42 @@ export function VerificationStatePanel({
       <p className={styles.lead}>{copy.lead}</p>
 
       {onboardingIncomplete && view.status === "unverified" ? (
-        <p className={styles.warning}>{VERIFICATION_INCOMPLETE_EMPLOYER}</p>
+        <p className={styles.warning}>
+          {locale === "de"
+            ? "Schließen Sie die Arbeitgeber-Einrichtung ab, bevor Sie die Verifizierung beantragen."
+            : VERIFICATION_INCOMPLETE_EMPLOYER}
+        </p>
       ) : null}
 
       {showDetails ? (
         <dl className={styles.detailList}>
           {showReason ? (
             <div>
-              <dt>Reason</dt>
+              <dt>{t("employer.verification.reason")}</dt>
               <dd>{view.reviewReason}</dd>
             </div>
           ) : null}
           {showRequested ? (
             <div>
-              <dt>Requested</dt>
-              <dd>{requestedAt}</dd>
+              <dt>{t("employer.verification.requested")}</dt>
+              <dd>{requestedLabel}</dd>
             </div>
           ) : null}
           {showReviewed ? (
             <div>
-              <dt>Reviewed</dt>
-              <dd>{reviewedAt}</dd>
+              <dt>{t("employer.verification.reviewed")}</dt>
+              <dd>{reviewedLabel}</dd>
             </div>
           ) : null}
         </dl>
       ) : null}
 
       {view.status === "revoked" ? (
-        <p className={styles.warning}>{VERIFICATION_REVOKED_NO_RESUBMIT}</p>
+        <p className={styles.warning}>
+          {locale === "de"
+            ? "Nach einem Widerruf ist kein direkter Neuantrag möglich. Kontaktieren Sie den Support, wenn Sie dies für einen Fehler halten."
+            : VERIFICATION_REVOKED_NO_RESUBMIT}
+        </p>
       ) : null}
 
       {showProfileAction ? (
@@ -145,15 +194,15 @@ export function VerificationStatePanel({
 
       {canRequest && view.status === "unverified" ? (
         <VerificationRequestForm
-          submitLabel="Request verification"
-          pendingLabel="Requesting…"
+          submitLabel={t("employer.verification.request")}
+          pendingLabel={t("employer.verification.requesting")}
         />
       ) : null}
 
       {canRequest && view.status === "rejected" ? (
         <VerificationRequestForm
-          submitLabel="Resubmit verification"
-          pendingLabel="Resubmitting…"
+          submitLabel={t("employer.verification.resubmit")}
+          pendingLabel={t("employer.verification.resubmitting")}
         />
       ) : null}
     </section>

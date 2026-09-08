@@ -55,9 +55,7 @@ async function registerAndCompleteEmployerOnboarding(
 
   await page.getByLabel("Display name").fill(displayName);
   await page.getByLabel("Berlin locality").fill("Mitte");
-  await page
-    .getByRole("checkbox", { name: /allowed to work in Germany/i })
-    .check();
+  await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Complete onboarding" }).click();
   await expect(page).toHaveURL(/\/employer$/, { timeout: 15_000 });
 

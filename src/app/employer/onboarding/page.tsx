@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { LogoutButton } from "@/components/auth/logout-button";
 import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
+import { LocalizedText } from "@/components/i18n/localized-text";
 import styles from "@/components/employer-onboarding/employer-onboarding.module.scss";
 import { OrganisationProfileForm } from "@/components/employer-onboarding/organisation-profile-form";
 import { PrivateProfileForm } from "@/components/employer-onboarding/private-profile-form";
@@ -66,15 +67,16 @@ export default async function EmployerOnboardingPage() {
         </div>
       </div>
 
-      <h1 className={styles.heading}>Employer onboarding</h1>
+      <h1 className={styles.heading}>
+        <LocalizedText message="employer.onboarding.heading" />
+      </h1>
 
       {suspended ? (
         <EmployerRestrictedNotice />
       ) : (
         <>
           <p className={styles.lead}>
-            Set up your employer profile. Progress is saved on the server —
-            refresh anytime to resume.
+            <LocalizedText message="employer.onboarding.lead" />
           </p>
 
           <TypeSelectionForm

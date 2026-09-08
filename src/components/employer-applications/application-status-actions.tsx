@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 
 import { transitionEmployerApplicationAction } from "@/app/employer/applications/[applicationId]/transition-actions";
+import { useLocale } from "@/components/i18n/locale-provider";
 import styles from "@/components/employer-applications/employer-applications.module.scss";
 import { StatusTransitionConfirmDialog } from "@/components/employer-applications/status-transition-confirm-dialog";
 import {
@@ -43,21 +44,27 @@ function isTerminalTransition(
   return TERMINAL_TRANSITIONS.has(status);
 }
 
-function renderFeedback(state: TransitionApplicationActionState) {
+function renderFeedback(
+  state: TransitionApplicationActionState,
+  locale: "en" | "de",
+) {
   switch (state.kind) {
     case "idle":
       return null;
     case "updated":
       return (
         <p className={styles.status} role="status">
-          Status updated to {applicationStatusLabel(state.currentStatus)}.
+          {locale === "de" ? "Status aktualisiert auf" : "Status updated to"}{" "}
+          {applicationStatusLabel(state.currentStatus, locale)}.
         </p>
       );
     case "already_in_state":
       return (
         <p className={styles.status} role="status">
-          {APPLICATION_ALREADY_IN_STATE} Current status:{" "}
-          {applicationStatusLabel(state.currentStatus)}.
+          {locale === "de"
+            ? "Die Bewerbung hat bereits diesen Status. Aktueller Status:"
+            : `${APPLICATION_ALREADY_IN_STATE} Current status:`}{" "}
+          {applicationStatusLabel(state.currentStatus, locale)}.
         </p>
       );
     case "invalid_transition":
@@ -101,6 +108,7 @@ export function ApplicationStatusActions({
   currentStatus,
   allowedTransitions,
 }: ApplicationStatusActionsProps) {
+  const { locale, t } = useLocale();
   const [state, formAction, pending] = useActionState(
     transitionEmployerApplicationAction,
     initialTransitionActionState,
@@ -148,15 +156,21 @@ export function ApplicationStatusActions({
     return (
       <section className={styles.reviewPanel} aria-labelledby="review-heading">
         <h2 id="review-heading" className={styles.sectionHeading}>
-          Review
+          {t("employer.applications.review")}
         </h2>
         <div className={styles.reviewCurrent}>
-          <p className={styles.kicker}>Current status</p>
+          <p className={styles.kicker}>
+            {t("employer.applications.currentStatus")}
+          </p>
           <p className={styles.reviewStatus}>
-            {applicationStatusLabel(currentStatus)}
+            {applicationStatusLabel(currentStatus, locale)}
           </p>
         </div>
-        <p className={styles.note}>{APPLICATION_TERMINAL_STATE}</p>
+        <p className={styles.note}>
+          {locale === "de"
+            ? "Diese Bewerbung hat einen endgültigen Status und kann nicht mehr geändert werden."
+            : APPLICATION_TERMINAL_STATE}
+        </p>
       </section>
     );
   }
@@ -170,12 +184,14 @@ export function ApplicationStatusActions({
   return (
     <section className={styles.reviewPanel} aria-labelledby="review-heading">
       <h2 id="review-heading" className={styles.sectionHeading}>
-        Review
+        {t("employer.applications.review")}
       </h2>
       <div className={styles.reviewCurrent}>
-        <p className={styles.kicker}>Current status</p>
+        <p className={styles.kicker}>
+          {t("employer.applications.currentStatus")}
+        </p>
         <p className={styles.reviewStatus}>
-          {applicationStatusLabel(currentStatus)}
+          {applicationStatusLabel(currentStatus, locale)}
         </p>
       </div>
 
@@ -183,10 +199,10 @@ export function ApplicationStatusActions({
         <input type="hidden" name="applicationId" value={applicationId} />
 
         <div ref={feedbackRef} tabIndex={-1}>
-          {renderFeedback(state)}
+          {renderFeedback(state, locale)}
         </div>
 
-        <p className={styles.kicker}>Next status</p>
+        <p className={styles.kicker}>{t("employer.applications.nextStatus")}</p>
         <div className={`${styles.actions} ${styles.statusActionsGroup}`}>
           {ordinaryTransitions.map((status) => {
             const isPressed = pending && pressedStatus === status;
@@ -202,8 +218,8 @@ export function ApplicationStatusActions({
                 onClick={() => setPressedStatus(status)}
               >
                 {isPressed
-                  ? employerApplicationActionPendingLabel(status)
-                  : employerApplicationActionLabel(status)}
+                  ? employerApplicationActionPendingLabel(status, locale)
+                  : employerApplicationActionLabel(status, locale)}
               </button>
             );
           })}
@@ -226,7 +242,7 @@ export function ApplicationStatusActions({
                     setPendingTerminal(status);
                   }}
                 >
-                  {employerApplicationActionLabel(status)}
+                  {employerApplicationActionLabel(status, locale)}
                 </button>
               ))}
             </div>
@@ -234,8 +250,9 @@ export function ApplicationStatusActions({
         ) : null}
 
         <p className={styles.note}>
-          Accepted and rejected are terminal application states. Hired remains a
-          separate outcome event.
+          {locale === "de"
+            ? "Angenommen und Abgelehnt sind endgültige Bewerbungsstatus. Eine Einstellung wird weiterhin als separates Ergebnis erfasst."
+            : "Accepted and rejected are terminal application states. Hired remains a separate outcome event."}
         </p>
 
         {pendingTerminal !== null ? (
