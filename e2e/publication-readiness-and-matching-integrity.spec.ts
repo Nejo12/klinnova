@@ -130,7 +130,7 @@ async function expectReadyDraftFieldsPersisted(page: Page): Promise<void> {
 async function expectBasicEnglishRequirementPersisted(
   page: Page,
 ): Promise<void> {
-  await expect(page.getByLabel(/Language 1/i)).toHaveValue("en");
+  await expect(page.getByLabel(/^Language 1$/i)).toHaveValue("en");
   await expect(page.getByLabel(/Minimum proficiency 1/i)).toHaveValue("basic");
 }
 
