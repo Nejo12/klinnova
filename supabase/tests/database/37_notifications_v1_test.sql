@@ -130,7 +130,7 @@ update public.notifications set read_at=null;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','a2310000-0000-4000-8000-000000000001',true);
 select is((public.mark_current_employer_notification_read((select notification_id from public.list_current_employer_notifications() where vacancy_title='N231 Vacancy A1'))->>'result'),'ok','individual read succeeds');
-select is((public.mark_current_employer_notification_read((select notification_id from public.list_current_employer_notifications() where vacancy_title='N231 Vacancy A1'))->>'application_id'),(select id::text from public.applications where vacancy_id='a2310000-0000-4000-8000-000000000011'),'individual read returns authorized application destination');
+select is((public.mark_current_employer_notification_read((select notification_id from public.list_current_employer_notifications() where vacancy_title='N231 Vacancy A1'))->>'application_id'),(select application_id::text from public.list_current_employer_notifications() where vacancy_title='N231 Vacancy A1'),'individual read returns authorized application destination');
 select is((public.mark_all_current_employer_notifications_read()->>'updated_count')::int,1,'mark all reads only the remaining unread row');
 reset role;
 select is((select count(*)::int from public.notifications where read_at is null),0,'all recipient notifications are now read');
