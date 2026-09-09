@@ -46,6 +46,25 @@ describe("EmployerVacancyPageHeader", () => {
     );
   });
 
+  it("adds one lightweight Employer Notification Centre entry point", () => {
+    render(
+      <EmployerVacancyPageHeader
+        showCandidate={false}
+        showEmployer={true}
+        currentPath="notifications"
+      />,
+    );
+
+    expect(screen.getByRole("link", { name: "Notifications" })).toHaveAttribute(
+      "href",
+      "/employer/notifications",
+    );
+    expect(screen.getByRole("link", { name: "Notifications" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+  });
+
   it("marks the Applications link as the current page only when currentPath is applications", () => {
     render(
       <EmployerVacancyPageHeader
@@ -170,6 +189,7 @@ describe("EmployerVacancyPageHeader", () => {
 
     const nav = screen.getByRole("navigation", { name: "Employer" });
     expect(within(nav).getAllByRole("link")).toHaveLength(4);
+    expect(screen.getByRole("link", { name: "Notifications" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Log out" })).toBeInTheDocument();
   });
 });

@@ -42,6 +42,8 @@ const REPRESENTATIVE_EMPLOYER_MESSAGES: Array<[MessageKey, string]> = [
   ["employer.applications.needsReview", "Zu prüfen"],
   ["employer.verification.request", "Verifizierung beantragen"],
   ["employer.account.export", "Kontodaten exportieren"],
+  ["employer.notifications.heading", "Benachrichtigungen"],
+  ["employer.notifications.markAllRead", "Alle als gelesen markieren"],
 ];
 
 describe("public and shared locale messages", () => {
