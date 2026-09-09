@@ -1141,17 +1141,6 @@ export type Database = {
           vacancy_title: string
         }[]
       }
-      list_current_employer_notifications: {
-        Args: never
-        Returns: {
-          application_id: string
-          created_at: string
-          kind: string
-          notification_id: string
-          read_at: string | null
-          vacancy_title: string
-        }[]
-      }
       list_current_employer_export_applications: {
         Args: never
         Returns: {
@@ -1159,6 +1148,17 @@ export type Database = {
           status: string
           submitted_at: string
           vacancy_id: string
+        }[]
+      }
+      list_current_employer_notifications: {
+        Args: never
+        Returns: {
+          application_id: string
+          created_at: string
+          kind: string
+          notification_id: string
+          read_at: string
+          vacancy_title: string
         }[]
       }
       list_effective_public_vacancies: {
