@@ -454,6 +454,41 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          application_id: string
+          created_at: string
+          id: string
+          kind: string
+          read_at: string | null
+          recipient_user_id: string
+        }
+        Insert: {
+          application_id: string
+          created_at?: string
+          id?: string
+          kind: string
+          read_at?: string | null
+          recipient_user_id: string
+        }
+        Update: {
+          application_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          read_at?: string | null
+          recipient_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vacancies: {
         Row: {
           available_from: string | null
@@ -1115,6 +1150,17 @@ export type Database = {
           vacancy_id: string
         }[]
       }
+      list_current_employer_notifications: {
+        Args: never
+        Returns: {
+          application_id: string
+          created_at: string
+          kind: string
+          notification_id: string
+          read_at: string
+          vacancy_title: string
+        }[]
+      }
       list_effective_public_vacancies: {
         Args: never
         Returns: {
@@ -1179,6 +1225,14 @@ export type Database = {
           verification_state: string
           website: string
         }[]
+      }
+      mark_all_current_employer_notifications_read: {
+        Args: never
+        Returns: Json
+      }
+      mark_current_employer_notification_read: {
+        Args: { p_notification_id: string }
+        Returns: Json
       }
       mark_employer_application_seen: {
         Args: { p_application_id: string }

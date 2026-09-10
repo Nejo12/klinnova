@@ -13,7 +13,12 @@ type EmployerVacancyPageHeaderProps = {
   showCandidate: boolean;
   showEmployer: boolean;
   currentPath:
-    "home" | "vacancies" | "applications" | "verification" | "account";
+    | "home"
+    | "vacancies"
+    | "applications"
+    | "verification"
+    | "notifications"
+    | "account";
   /** N4: unseen-application count for the Applications nav indicator. No badge when 0/omitted. */
   unseenApplicationsCount?: number;
 };
@@ -32,6 +37,13 @@ export function EmployerVacancyPageHeader({
           Klinnova
         </Link>
         <div className={responsiveStyles.utilities}>
+          <Link
+            className={responsiveStyles.notificationLink}
+            href="/employer/notifications"
+            aria-current={currentPath === "notifications" ? "page" : undefined}
+          >
+            {t("employer.nav.notifications")}
+          </Link>
           <WorkspaceSwitcher
             current="employer"
             hasCandidate={showCandidate}
