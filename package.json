@@ -49,6 +49,7 @@
     "db:types:check": "supabase gen types --local --lang typescript --schema public | diff -u src/types/database.ts -"
   },
   "dependencies": {
+    "@nova-component/ui": "0.1.1",
     "@sentry/nextjs": "^10.70.0",
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.111.0",

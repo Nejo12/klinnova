@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
+import { Button } from "@nova-component/ui";
 
 import {
   ERROR_BOUNDARY_BODY,
@@ -31,9 +32,9 @@ export default function ErrorBoundary({ error, reset }: ErrorBoundaryProps) {
     <main className={styles.page}>
       <h1 className={styles.heading}>{ERROR_BOUNDARY_HEADING}</h1>
       <p className={styles.body}>{ERROR_BOUNDARY_BODY}</p>
-      <button type="button" className={styles.action} onClick={reset}>
+      <Button type="button" className={styles.action} onClick={reset}>
         {ERROR_BOUNDARY_RETRY_LABEL}
-      </button>
+      </Button>
     </main>
   );
 }
