@@ -7,6 +7,7 @@ import { FloatingInterfacePreferences } from "@/components/theme/floating-appear
 import { ThemeBootstrapScript } from "@/components/theme/theme-bootstrap-script";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { assertServerEnv } from "@/lib/env/server";
+import "@nova-component/ui/styles.css";
 import "@/styles/tokens.css";
 import "@/styles/pulse.css";
 import "@/styles/globals.scss";
