@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Progress } from "@nova-component/ui";
 
 import { useLocale } from "@/components/i18n/locale-provider";
 
@@ -36,23 +37,12 @@ export function CandidateHomeProgress({
             {completeCount} {locale === "de" ? "von" : "of"} {totalGroups}{" "}
             {t("candidate.home.sectionsSaved")}.
           </p>
-          <div
-            className={styles.progressBar}
-            role="progressbar"
-            aria-valuenow={completeCount}
-            aria-valuemin={0}
-            aria-valuemax={totalGroups}
+          <Progress
+            value={completeCount}
+            min={0}
+            max={totalGroups}
             aria-label={t("candidate.home.progressLabel")}
-          >
-            {Array.from({ length: totalGroups }, (_, index) => (
-              <span
-                key={index}
-                className={styles.progressSegment}
-                data-state={index < completeCount ? "complete" : "upcoming"}
-                aria-hidden="true"
-              />
-            ))}
-          </div>
+          />
         </div>
         <Link className={styles.cta} href={continueHref}>
           {t(
