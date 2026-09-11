@@ -46,7 +46,8 @@
     "supabase:test:db": "supabase test db",
     "test:db:lock": "STINT_DB_INTEGRATION=1 vitest run src/lib/onboarding/completion-lock.integration.test.ts",
     "db:types": "supabase gen types --local --lang typescript --schema public > src/types/database.ts",
-    "db:types:check": "supabase gen types --local --lang typescript --schema public | diff -u src/types/database.ts -"
+    "db:types:check": "supabase gen types --local --lang typescript --schema public | diff -u src/types/database.ts -",
+    "test:e2e:metrics": "E2E_AUTH_JOURNEY=1 playwright test --workers=1 e2e/internal-metrics-journey.spec.ts"
   },
   "dependencies": {
     "@nova-component/ui": "0.3.0",

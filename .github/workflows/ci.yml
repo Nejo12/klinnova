@@ -216,6 +216,9 @@ jobs:
       - name: Employer application outcome UI journeys (local Supabase + Mailpit)
         run: pnpm test:e2e:outcome-ui
 
+      - name: M5 Founder metrics authorization journey (local Supabase + Mailpit)
+        run: pnpm test:e2e:metrics
+
       - name: Stop local Supabase
         if: always()
         run: pnpm supabase:stop

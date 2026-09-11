@@ -454,6 +454,71 @@ export type Database = {
           },
         ]
       }
+      m5_candidate_cohort_enrollments: {
+        Row: {
+          candidate_user_id: string
+          cohort: string
+          created_at: string
+          enrolled_at: string
+        }
+        Insert: {
+          candidate_user_id: string
+          cohort: string
+          created_at?: string
+          enrolled_at?: string
+        }
+        Update: {
+          candidate_user_id?: string
+          cohort?: string
+          created_at?: string
+          enrolled_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "m5_candidate_cohort_enrollments_candidate_user_id_fkey"
+            columns: ["candidate_user_id"]
+            isOneToOne: true
+            referencedRelation: "candidate_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      m5_vacancy_qualifications: {
+        Row: {
+          created_at: string
+          employer_profile_id: string
+          qualified_at: string
+          vacancy_id: string
+        }
+        Insert: {
+          created_at?: string
+          employer_profile_id: string
+          qualified_at: string
+          vacancy_id: string
+        }
+        Update: {
+          created_at?: string
+          employer_profile_id?: string
+          qualified_at?: string
+          vacancy_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "m5_vacancy_qualifications_employer_profile_id_fkey"
+            columns: ["employer_profile_id"]
+            isOneToOne: false
+            referencedRelation: "employer_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "m5_vacancy_qualifications_vacancy_id_fkey"
+            columns: ["vacancy_id"]
+            isOneToOne: true
+            referencedRelation: "vacancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           application_id: string
@@ -936,6 +1001,10 @@ export type Database = {
         Args: { p_failure_code: string; p_request_id: string }
         Returns: Json
       }
+      _record_m5_vacancy_qualification: {
+        Args: { p_qualified_at: string; p_vacancy_id: string }
+        Returns: boolean
+      }
       _slugify_vacancy_title: { Args: { p_title: string }; Returns: string }
       _transition_employer_vacancy: {
         Args: { p_action: string; p_expires_at?: string; p_vacancy_id: string }
@@ -1032,6 +1101,7 @@ export type Database = {
         Args: { p_application_id: string }
         Returns: Json
       }
+      get_m5_founder_metrics: { Args: never; Returns: Json }
       get_effective_public_vacancy: {
         Args: { p_vacancy_id: string }
         Returns: {
