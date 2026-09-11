@@ -59,29 +59,6 @@
   color: var(--color-text-muted);
 }
 
-.progressBar {
-  display: flex;
-  align-items: center;
-  gap: var(--step-gap);
-  width: 100%;
-}
-
-.progressSegment {
-  flex: 1 1 0;
-  height: var(--space-2);
-  border-radius: var(--radius-pill);
-  border: var(--step-line-width) solid var(--step-color-upcoming);
-  background-color: transparent;
-  transition:
-    background-color var(--duration-fast) var(--ease-standard),
-    border-color var(--duration-fast) var(--ease-standard);
-}
-
-.progressSegment[data-state="complete"] {
-  border-color: var(--step-color-complete);
-  background-color: var(--step-color-complete);
-}
-
 .cta {
   display: inline-flex;
   align-items: center;

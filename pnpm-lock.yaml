@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@nova-component/ui':
-    specifier: 0.1.1
-    version: 0.1.1(react-dom@19.2.4)(react@19.2.4)
+    specifier: 0.3.0
+    version: 0.3.0(react-dom@19.2.4)(react@19.2.4)
   '@sentry/nextjs':
     specifier: ^10.70.0
     version: 10.70.0(@opentelemetry/core@2.10.0)(@opentelemetry/sdk-trace-base@2.10.0)(next@16.2.12)(react@19.2.4)(webpack@5.109.2)
@@ -975,8 +975,8 @@ packages:
     resolution: {integrity: sha512-ZCD/8F2L9qBy8St/PYuzfPcAzkFm99wG6DTABN4VnMMHCVYoliKpVDAUW+CvR9Klk56S7T/uANXhhjhDFpgBIQ==}
     dev: false
 
-  /@nova-component/ui@0.1.1(react-dom@19.2.4)(react@19.2.4):
-    resolution: {integrity: sha512-8d0uMq4RrZS9C+fmIl4I8jLIfKFEioWCCx3zVNHHUqGxJ1aRa8atAAE40uDSAVP/5cMKXWIwfHahJpNd/BJyBw==}
+  /@nova-component/ui@0.3.0(react-dom@19.2.4)(react@19.2.4):
+    resolution: {integrity: sha512-a7aOvn2C38UEMdQdl+Ha6ju6+xkD29dfkGtdpjobxX4yRw9MWqNwxhIATGeIX5xu9JkPwfr3hT30+uLoreFWhg==}
     peerDependencies:
       react: '>=18.3.0 <20'
       react-dom: '>=18.3.0 <20'
