@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { Fieldset } from "@nova-component/ui";
 
 import {
   selectEmployerTypeAction,
@@ -52,15 +53,15 @@ export function TypeSelectionForm({
 
   return (
     <form className={styles.form} action={formAction} noValidate>
-      <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>
-          {t("employer.onboarding.howHire")}
-        </legend>
-        <p className={styles.support}>
-          {locale === "de"
+      <Fieldset
+        className={styles.fieldset}
+        legend={t("employer.onboarding.howHire")}
+        description={
+          locale === "de"
             ? "Wählen Sie Privatperson, wenn Sie als Einzelperson einstellen, oder Organisation, wenn Sie für ein Unternehmen einstellen. Während der Einrichtung kann diese Auswahl korrigiert werden, solange noch kein Unternehmen angelegt wurde."
-            : "Choose private if you hire as an individual. Choose organisation if you hire for a company. You can correct this while onboarding is incomplete and no organisation company exists yet."}
-        </p>
+            : "Choose private if you hire as an individual. Choose organisation if you hire for a company. You can correct this while onboarding is incomplete and no organisation company exists yet."
+        }
+      >
         <div className={styles.optionList}>
           <label className={styles.option}>
             <input
@@ -89,7 +90,7 @@ export function TypeSelectionForm({
             </span>
           </label>
         </div>
-      </fieldset>
+      </Fieldset>
 
       {state.error !== null ? (
         <p className={styles.error} role="alert">
