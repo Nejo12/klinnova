@@ -29,6 +29,8 @@ Default workflow for substantial changes:
 
 Never merge automatically. Never infer Founder approval from a prior task, a plan, a branch name, or a nearby conversation.
 
+For coding-agent execution, follow `docs/agent/workflow.md`. Codex/Work should normally receive implementation-ready tasks only; discovery, unresolved product/schema/architecture decisions, and CI diagnosis stay in Chat unless the task explicitly requires agent investigation.
+
 ## Scope Discipline
 
 - Do not implement deferred work from `NOT_NOW.md` or superseded/historical plans.
