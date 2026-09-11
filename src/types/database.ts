@@ -1101,7 +1101,6 @@ export type Database = {
         Args: { p_application_id: string }
         Returns: Json
       }
-      get_m5_founder_metrics: { Args: never; Returns: Json }
       get_effective_public_vacancy: {
         Args: { p_vacancy_id: string }
         Returns: {
@@ -1152,6 +1151,7 @@ export type Database = {
           website: string
         }[]
       }
+      get_m5_founder_metrics: { Args: never; Returns: Json }
       get_vacancy_moderation_status: {
         Args: { p_vacancy_id: string }
         Returns: Json
