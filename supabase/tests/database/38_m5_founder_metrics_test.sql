@@ -408,14 +408,12 @@ select is(
   '100.0',
   'interview-to-hire conversion uses active outcome facts'
 );
-select unlike(
-  public.get_m5_founder_metrics()::text,
-  '%email%',
+select ok(
+  position('email' in public.get_m5_founder_metrics()::text) = 0,
   'aggregate output contains no email field'
 );
-select unlike(
-  public.get_m5_founder_metrics()::text,
-  '%candidate_snapshot%',
+select ok(
+  position('candidate_snapshot' in public.get_m5_founder_metrics()::text) = 0,
   'aggregate output contains no user-authored snapshot field'
 );
 reset role;
