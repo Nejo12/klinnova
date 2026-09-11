@@ -160,21 +160,29 @@ select is(
   'ok',
   'publish succeeds when canonical conditions are met'
 );
+reset role;
 select is(
   (select count(*)::integer from public.m5_vacancy_qualifications where vacancy_id = 'a3800000-0000-4000-8000-000000000041'),
   1,
   'publish records one qualification'
 );
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub','a3800000-0000-4000-8000-000000000011',true);
 select is(
   public.publish_employer_vacancy('a3800000-0000-4000-8000-000000000041')->>'status',
   'ok',
   'idempotent publish remains successful'
 );
+reset role;
 select is(
   (select count(*)::integer from public.m5_vacancy_qualifications where vacancy_id = 'a3800000-0000-4000-8000-000000000041'),
   1,
   'idempotent publish cannot duplicate qualification'
 );
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub','a3800000-0000-4000-8000-000000000011',true);
 select is(
   public.pause_employer_vacancy('a3800000-0000-4000-8000-000000000041')->>'status',
   'ok',
@@ -185,12 +193,12 @@ select is(
   'ok',
   'qualified vacancy resumes'
 );
+reset role;
 select is(
   (select count(*)::integer from public.m5_vacancy_qualifications where vacancy_id = 'a3800000-0000-4000-8000-000000000041'),
   1,
   'resume preserves exactly one first qualification'
 );
-reset role;
 
 set local role authenticated;
 select set_config('request.jwt.claim.sub','a3800000-0000-4000-8000-000000000012',true);
