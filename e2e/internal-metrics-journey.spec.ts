@@ -68,7 +68,9 @@ test.describe("M5 Founder metrics authorization", () => {
     await expect(
       page.getByRole("heading", { name: "M5 — Berlin private beta" }),
     ).toBeVisible();
-    await expect(page.getByText("Participating employers")).toBeVisible();
+    await expect(
+      page.getByText("Participating employers", { exact: true }),
+    ).toBeVisible();
     await expect(page.getByText("Verified vacancies")).toBeVisible();
     await expect(page.getByText("Confirmed hires")).toBeVisible();
     await expect(page.locator("form")).toHaveCount(0);
