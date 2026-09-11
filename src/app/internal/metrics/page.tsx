@@ -36,11 +36,27 @@ export default async function InternalMetricsPage() {
 
   const { metrics } = loaded;
   const coreMetrics = [
-    ["Participating employers", metrics.core.participating_employers, TARGETS.participating_employers],
-    ["Verified vacancies", metrics.core.verified_vacancies, TARGETS.verified_vacancies],
-    ["Candidates", metrics.core.completed_candidates, TARGETS.completed_candidates],
+    [
+      "Participating employers",
+      metrics.core.participating_employers,
+      TARGETS.participating_employers,
+    ],
+    [
+      "Verified vacancies",
+      metrics.core.verified_vacancies,
+      TARGETS.verified_vacancies,
+    ],
+    [
+      "Candidates",
+      metrics.core.completed_candidates,
+      TARGETS.completed_candidates,
+    ],
     ["Submitted applications", metrics.core.submitted_applications, null],
-    ["Completed interviews", metrics.core.completed_interview_conversions, TARGETS.completed_interview_conversions],
+    [
+      "Completed interviews",
+      metrics.core.completed_interview_conversions,
+      TARGETS.completed_interview_conversions,
+    ],
     ["Confirmed hires", metrics.core.confirmed_hires, TARGETS.confirmed_hires],
   ] as const;
 
@@ -77,7 +93,9 @@ export default async function InternalMetricsPage() {
         <dl className={styles.metricList}>
           <div>
             <dt>Active/safe participating employers</dt>
-            <dd>{metrics.current_supply.active_safe_participating_employers}</dd>
+            <dd>
+              {metrics.current_supply.active_safe_participating_employers}
+            </dd>
           </div>
           <div>
             <dt>Effective-public vacancies</dt>
@@ -117,22 +135,39 @@ export default async function InternalMetricsPage() {
         <dl className={styles.metricList}>
           <div>
             <dt>Completed Candidates → application</dt>
-            <dd>{formatPercent(metrics.conversions.candidate_to_application_percent)}</dd>
+            <dd>
+              {formatPercent(
+                metrics.conversions.candidate_to_application_percent,
+              )}
+            </dd>
           </div>
           <div>
             <dt>Applications → completed interview</dt>
-            <dd>{formatPercent(metrics.conversions.application_to_interview_percent)}</dd>
+            <dd>
+              {formatPercent(
+                metrics.conversions.application_to_interview_percent,
+              )}
+            </dd>
           </div>
           <div>
             <dt>Completed interviews → hire</dt>
-            <dd>{formatPercent(metrics.conversions.interview_to_hire_percent)}</dd>
+            <dd>
+              {formatPercent(metrics.conversions.interview_to_hire_percent)}
+            </dd>
           </div>
         </dl>
       </section>
 
       <p className={styles.metricsTimestamp}>
-        M5 began <time dateTime={metrics.m5_started_at}>8 August 2026, 23:35 UTC</time>.
-        Measured <time dateTime={metrics.measured_at}>{new Date(metrics.measured_at).toISOString()}</time>.
+        M5 began{" "}
+        <time dateTime={metrics.m5_started_at}>
+          8 August 2026, 23:35 UTC
+        </time>
+        . Measured{" "}
+        <time dateTime={metrics.measured_at}>
+          {new Date(metrics.measured_at).toISOString()}
+        </time>
+        .
       </p>
     </main>
   );

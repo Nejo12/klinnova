@@ -47,7 +47,10 @@ function makeClient(options?: {
   return {
     auth: {
       getUser: vi.fn().mockResolvedValue({
-        data: { user: options?.user === undefined ? { id: "operator-1" } : options.user },
+        data: {
+          user:
+            options?.user === undefined ? { id: "operator-1" } : options.user,
+        },
         error: null,
       }),
     },
