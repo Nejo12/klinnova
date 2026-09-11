@@ -280,7 +280,8 @@ insert into public.companies (id, name, slug, source)
 values ('a3800000-0000-4000-8000-000000000031','M5 Seed','m5-seed','seed');
 insert into public.vacancies (
   id, company_id, title, slug, summary, city, job_category, employment_types,
-  shift_requirements, german_requirement, publication_state, source
+  shift_requirements, german_requirement, publication_state, source,
+  published_at, expires_at
 ) values (
   'a3800000-0000-4000-8000-000000000047',
   'a3800000-0000-4000-8000-000000000031',
@@ -292,14 +293,11 @@ insert into public.vacancies (
   array['part_time'],
   array['daytime'],
   'none',
-  'draft',
-  'seed'
+  'published',
+  'seed',
+  now(),
+  now() + interval '30 days'
 );
-update public.vacancies
-set publication_state = 'published',
-    published_at = now(),
-    expires_at = now() + interval '30 days'
-where id = 'a3800000-0000-4000-8000-000000000047';
 select is(
   (select count(*)::integer from public.m5_vacancy_qualifications where vacancy_id = 'a3800000-0000-4000-8000-000000000047'),
   0,

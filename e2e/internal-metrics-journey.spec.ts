@@ -48,32 +48,33 @@ test.describe("M5 Founder metrics authorization", () => {
     },
   );
 
-  test("an active operator sees aggregate-only, read-only metrics", async ({
-    page,
-  }) => {
-    expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
-    const stamp = Date.now();
-    const email = `metrics.operator.${stamp}@example.test`;
+  test(
+    "an active operator sees aggregate-only, read-only metrics",
+    async ({ page }) => {
+      expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
+      const stamp = Date.now();
+      const email = `metrics.operator.${stamp}@example.test`;
 
-    await registerAndConfirm(page, {
-      email,
-      password: `TestPass-${stamp}!`,
-      displayName: `Metrics Operator ${stamp}`,
-    });
+      await registerAndConfirm(page, {
+        email,
+        password: `TestPass-${stamp}!`,
+        displayName: `Metrics Operator ${stamp}`,
+      });
 
-    const operatorId = await getLocalUserIdByEmail(email);
-    await provisionLocalVerificationOperator(operatorId);
+      const operatorId = await getLocalUserIdByEmail(email);
+      await provisionLocalVerificationOperator(operatorId);
 
-    await page.goto("/internal/metrics");
+      await page.goto("/internal/metrics");
 
-    await expect(
-      page.getByRole("heading", { name: "M5 — Berlin private beta" }),
-    ).toBeVisible();
-    await expect(page.getByText("Participating employers")).toBeVisible();
-    await expect(page.getByText("Verified vacancies")).toBeVisible();
-    await expect(page.getByText("Confirmed hires")).toBeVisible();
-    await expect(page.locator("form")).toHaveCount(0);
-    await expect(page.getByRole("button")).toHaveCount(0);
-    await expect(page.locator("input, textarea, select")).toHaveCount(0);
-  });
+      await expect(
+        page.getByRole("heading", { name: "M5 — Berlin private beta" }),
+      ).toBeVisible();
+      await expect(page.getByText("Participating employers")).toBeVisible();
+      await expect(page.getByText("Verified vacancies")).toBeVisible();
+      await expect(page.getByText("Confirmed hires")).toBeVisible();
+      await expect(page.locator("form")).toHaveCount(0);
+      await expect(page.getByRole("button")).toHaveCount(0);
+      await expect(page.locator("input, textarea, select")).toHaveCount(0);
+    },
+  );
 });
