@@ -51,21 +51,13 @@ export default async function InternalMetricsPage() {
       metrics.core.completed_candidates,
       TARGETS.completed_candidates,
     ],
-    [
-      "Submitted applications",
-      metrics.core.submitted_applications,
-      null,
-    ],
+    ["Submitted applications", metrics.core.submitted_applications, null],
     [
       "Completed interviews",
       metrics.core.completed_interview_conversions,
       TARGETS.completed_interview_conversions,
     ],
-    [
-      "Confirmed hires",
-      metrics.core.confirmed_hires,
-      TARGETS.confirmed_hires,
-    ],
+    ["Confirmed hires", metrics.core.confirmed_hires, TARGETS.confirmed_hires],
   ] as const;
 
   return (
@@ -168,10 +160,8 @@ export default async function InternalMetricsPage() {
 
       <p className={styles.metricsTimestamp}>
         M5 began{" "}
-        <time dateTime={metrics.m5_started_at}>
-          8 August 2026, 23:35 UTC
-        </time>
-        . Measured{" "}
+        <time dateTime={metrics.m5_started_at}>8 August 2026, 23:35 UTC</time>.
+        Measured{" "}
         <time dateTime={metrics.measured_at}>
           {new Date(metrics.measured_at).toISOString()}
         </time>

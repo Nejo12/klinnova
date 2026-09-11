@@ -95,11 +95,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Check formatting
-        shell: bash
-        run: |
-          pnpm exec prettier --write e2e/internal-metrics-journey.spec.ts src/app/internal/metrics/page.tsx
-          git diff -- e2e/internal-metrics-journey.spec.ts src/app/internal/metrics/page.tsx
-          git diff --quiet -- e2e/internal-metrics-journey.spec.ts src/app/internal/metrics/page.tsx
+        run: pnpm format:check
 
       - name: Lint
         run: pnpm lint
