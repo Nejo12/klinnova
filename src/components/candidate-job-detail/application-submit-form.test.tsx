@@ -45,6 +45,29 @@ describe("ApplicationSubmitForm", () => {
     expect(introduction).toHaveValue("My own words.");
   });
 
+  it("keeps the introduction wired to its hint and live character count", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    const introduction = screen.getByRole("textbox", {
+      name: "Introduction to the employer",
+    });
+    expect(introduction).toHaveAttribute(
+      "aria-describedby",
+      "application-introduction-hint application-introduction-count",
+    );
+
+    const hint = document.getElementById("application-introduction-hint");
+    const count = document.getElementById("application-introduction-count");
+    expect(hint).not.toBeNull();
+    expect(count).not.toBeNull();
+    expect(count).toHaveAttribute("aria-live", "polite");
+
+    await user.clear(introduction);
+    await user.type(introduction, "Short note.");
+    expect(count).toHaveTextContent("989 characters remaining");
+  });
+
   it("previews exact normalized text and context without submitting", async () => {
     const user = userEvent.setup();
     renderForm();
