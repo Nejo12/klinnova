@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { Fieldset } from "@nova-component/ui";
+import { Fieldset, Radio } from "@nova-component/ui";
 
 import {
   selectEmployerTypeAction,
@@ -63,32 +63,26 @@ export function TypeSelectionForm({
         }
       >
         <div className={styles.optionList}>
-          <label className={styles.option}>
-            <input
-              type="radio"
+          <div className={styles.option}>
+            <Radio
               name="employerType"
               value="private"
               defaultChecked={currentType === "private"}
               required
               disabled={pending}
+              label={t("employer.onboarding.private")}
             />
-            <span className={styles.optionLabel}>
-              {t("employer.onboarding.private")}
-            </span>
-          </label>
-          <label className={styles.option}>
-            <input
-              type="radio"
+          </div>
+          <div className={styles.option}>
+            <Radio
               name="employerType"
               value="organisation"
               defaultChecked={currentType === "organisation"}
               required
               disabled={pending}
+              label={t("employer.onboarding.organisation")}
             />
-            <span className={styles.optionLabel}>
-              {t("employer.onboarding.organisation")}
-            </span>
-          </label>
+          </div>
         </div>
       </Fieldset>
 
