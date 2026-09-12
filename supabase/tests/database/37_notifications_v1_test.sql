@@ -27,7 +27,7 @@ insert into public.candidate_profiles (
   job_categories, employment_types, shift_preferences, onboarding_completed_at
 ) values (
   'a2310000-0000-4000-8000-000000000003','N231 Candidate','basic',true,
-  now(),'Berlin',30,current_date,array['cleaning'],array['part_time'],array['daytime'],now()
+  now(),'Berlin',30,(timezone('Europe/Berlin', now()))::date,array['cleaning'],array['part_time'],array['daytime'],now()
 );
 
 insert into public.candidate_languages (candidate_id, language_code, proficiency)
