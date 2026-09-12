@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { Textarea } from "@nova-component/ui";
 
 import { submitCandidateApplicationAction } from "@/app/candidate/jobs/[vacancyId]/actions";
 import { useLocale } from "@/components/i18n/locale-provider";
@@ -204,7 +205,7 @@ export function ApplicationSubmitForm({
           >
             {t("application.introduction.label")}
           </label>
-          <textarea
+          <Textarea
             className={styles.introductionTextarea}
             id="application-introduction"
             maxLength={APPLICATION_INTRODUCTION_MAX_LENGTH}
