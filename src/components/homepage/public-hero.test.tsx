@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { PublicHero } from "@/components/homepage/public-hero";
@@ -38,23 +38,16 @@ describe("PublicHero", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("renders the illustrative match card using real match-reason copy", () => {
+  it("renders the Berlin work illustration with localized accessible text", () => {
     render(<PublicHero />);
 
     expect(
-      screen.getByText(
-        "Illustrative example — sample data, not real Klinnova activity.",
-      ),
+      screen.getByRole("img", {
+        name: "A Berlin café worker beside a neighbourhood market, with the TV Tower and a city bus in the background.",
+      }),
     ).toBeInTheDocument();
-    const card = screen.getByRole("group", { name: /Reinigungskraft/ });
-    expect(
-      within(card).getByText("Your German level meets the requirement"),
-    ).toBeInTheDocument();
-    expect(
-      within(card).getByText("Start date fits your availability"),
-    ).toBeInTheDocument();
-    expect(within(card).getByText("Based in Berlin")).toBeInTheDocument();
-    expect(within(card).getByText("Cleaning")).toBeInTheDocument();
-    expect(within(card).getByText(/Mitte/)).toBeInTheDocument();
+    expect(screen.getAllByText("Verified employers only")).toHaveLength(2);
+    expect(screen.getAllByText("Built for Berlin")).toHaveLength(2);
+    expect(screen.queryByText(/Hauswerk Berlin/)).not.toBeInTheDocument();
   });
 });
