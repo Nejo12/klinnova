@@ -94,6 +94,7 @@ describe("FloatingInterfacePreferences", () => {
       expect(
         trigger.querySelector("[data-theme-icon]"),
       ).not.toBeInTheDocument();
+      expect(trigger).toHaveTextContent(label);
     },
   );
 
@@ -210,8 +211,8 @@ describe("FloatingInterfacePreferences", () => {
 describe("FloatingInterfacePreferences styles", () => {
   it("matches the approved placement, motion, and reduced-motion contracts", () => {
     expect(controlStyles).toContain("position: fixed");
-    expect(controlStyles).toContain("width: 3rem");
-    expect(controlStyles).toContain("height: 3rem");
+    expect(controlStyles).toContain("min-height: 3rem");
+    expect(controlStyles).toContain("font-weight: var(--font-weight-semibold)");
     expect(controlStyles).toContain("env(safe-area-inset-bottom, 0px)");
     expect(controlStyles).toContain("--interface-preferences-bottom-clearance");
     expect(controlStyles).toContain("var(--duration-fast)");

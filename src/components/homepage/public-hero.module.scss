@@ -29,7 +29,7 @@
   max-width: 13ch;
   font-size: var(--font-size-4xl);
   line-height: var(--line-height-4xl);
-  font-weight: var(--type-display-weight);
+  font-weight: var(--font-weight-bold);
   letter-spacing: var(--type-display-tracking);
   color: var(--color-text-primary);
 }
@@ -43,6 +43,7 @@
   max-width: 40ch;
   font-size: var(--font-size-lg);
   line-height: var(--line-height-lg);
+  font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
 }
 
