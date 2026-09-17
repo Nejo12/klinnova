@@ -1,5 +1,10 @@
 import { defineConfig, devices } from "@playwright/test";
 
+import { loadEnvFileIfPresent } from "./src/lib/proof/load-env-file";
+
+loadEnvFileIfPresent(".env.local");
+loadEnvFileIfPresent(".env");
+
 const scaffoldUrl = "https://placeholder.supabase.co";
 const scaffoldKey = "stint-ci-scaffold-not-connected";
 

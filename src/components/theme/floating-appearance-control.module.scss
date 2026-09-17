@@ -248,6 +248,26 @@
     );
   }
 
+  /* Keep a 48px icon control so the labelled chip cannot cover primary CTAs. */
+  .trigger {
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    gap: 0;
+  }
+
+  .triggerLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   .panel {
     padding: var(--space-5);
   }

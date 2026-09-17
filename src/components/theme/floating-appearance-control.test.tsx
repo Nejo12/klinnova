@@ -213,6 +213,7 @@ describe("FloatingInterfacePreferences styles", () => {
     expect(controlStyles).toContain("position: fixed");
     expect(controlStyles).toContain("min-height: 3rem");
     expect(controlStyles).toContain("font-weight: var(--font-weight-semibold)");
+    expect(controlStyles).toContain("clip: rect(0 0 0 0)");
     expect(controlStyles).toContain("env(safe-area-inset-bottom, 0px)");
     expect(controlStyles).toContain("--interface-preferences-bottom-clearance");
     expect(controlStyles).toContain("var(--duration-fast)");

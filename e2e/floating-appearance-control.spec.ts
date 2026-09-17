@@ -75,7 +75,7 @@ test("floating interface preferences preserve motion, clearance, and mobile safe
   expect(initialBox).not.toBeNull();
   expect(initialBox?.width ?? 0).toBeGreaterThanOrEqual(48);
   expect(initialBox?.height ?? 0).toBeGreaterThanOrEqual(48);
-  expect(initialBox?.width ?? 0).toBeLessThanOrEqual(390 - 32);
+  expect(initialBox?.width ?? 0).toBeLessThanOrEqual(56);
   expect(390 - (initialBox?.x ?? 0) - (initialBox?.width ?? 0)).toBeCloseTo(
     16,
     0,
