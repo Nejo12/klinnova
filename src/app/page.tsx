@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import { Homepage } from "@/components/homepage/homepage";
 import { resolvePostAuthDestination } from "@/lib/employer/capability-routing";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
@@ -5,6 +7,12 @@ import { loadPublicVacancies } from "@/lib/public-jobs/load-public-vacancies";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { resolveActiveWorkspace } from "@/lib/workspace/active-workspace";
 import { readActiveWorkspace } from "@/lib/workspace/active-workspace.server";
+
+export const metadata: Metadata = {
+  title: "Klinnova – Berlin Jobs Without Fluent German",
+  description:
+    "Find English-friendly jobs, minijobs, and entry-level roles in Berlin where fluent German is not required.",
+};
 
 export const dynamic = "force-dynamic";
 
