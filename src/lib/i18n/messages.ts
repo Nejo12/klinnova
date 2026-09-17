@@ -355,6 +355,8 @@ const englishMessages = {
   "homepage.hero.accent": "In Berlin.",
   "homepage.hero.lead":
     "Language level, availability and location — checked against what each vacancy needs.",
+  "homepage.hero.imageAlt":
+    "A Berlin café worker beside a neighbourhood market, with the TV Tower and a city bus in the background.",
   "homepage.hero.candidateCta": "I'm a candidate",
   "homepage.hero.employerCta": "I'm an employer",
   "homepage.hero.verifiedOnly": "Verified employers only",
@@ -1043,6 +1045,8 @@ const germanMessages: Partial<Record<MessageKey, string>> = {
   "homepage.hero.accent": "In Berlin.",
   "homepage.hero.lead":
     "Sprachniveau, Verfügbarkeit und Standort — geprüft anhand der Anforderungen jeder Stelle.",
+  "homepage.hero.imageAlt":
+    "Eine Berliner Café-Mitarbeiterin neben einem Kiezmarkt, mit Fernsehturm und Stadtbus im Hintergrund.",
   "homepage.hero.candidateCta": "Ich suche einen Job",
   "homepage.hero.employerCta": "Ich bin Arbeitgeber",
   "homepage.hero.verifiedOnly": "Nur geprüfte Arbeitgeber",

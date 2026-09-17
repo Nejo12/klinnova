@@ -212,6 +212,7 @@ export function FloatingInterfacePreferences() {
         }}
       >
         <InterfacePreferencesIcon />
+        <span className={styles.triggerLabel}>{t("preferences.label")}</span>
       </button>
     </div>
   );

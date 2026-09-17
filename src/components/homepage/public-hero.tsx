@@ -1,38 +1,18 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 
 import { useLocale } from "@/components/i18n/locale-provider";
-import { presentMatchReasons } from "@/lib/matching/present-reasons";
-import type { MatchReason } from "@/lib/matching/types";
-import {
-  jobCategoryLabel,
-  languageLabel,
-  languageProficiencyLabel,
-  workFrequencyLabel,
-  workplaceTypeLabel,
-} from "@/lib/public-jobs/labels";
 
 import styles from "./public-hero.module.scss";
-
-/**
- * Synthetic but real MatchReason values, run through the production
- * presentMatchReason function so the illustrative copy can never drift
- * from what the authenticated matches UI actually says.
- */
-const HERO_MATCH_REASONS: MatchReason[] = [
-  { code: "german_requirement_met", germanRequirement: "basic" },
-  { code: "availability_match", kind: "flexible_start" },
-  { code: "berlin_job", city: "Berlin" },
-];
 
 export function PublicHero({
   authenticatedDestination,
 }: {
   authenticatedDestination?: string;
 }) {
-  const { locale, t } = useLocale();
-  const reasons = presentMatchReasons(HERO_MATCH_REASONS, locale);
+  const { t } = useLocale();
 
   return (
     <section className={styles.hero} aria-labelledby="hero-heading">
@@ -69,63 +49,26 @@ export function PublicHero({
         </ul>
       </div>
 
-      <div
-        className={styles.previewCard}
-        role="group"
-        aria-labelledby="hero-preview-title"
-      >
-        <div className={styles.previewHeader}>
-          <div>
-            <p className={styles.previewTitle} id="hero-preview-title">
-              Reinigungskraft
-            </p>
-            <p className={styles.previewCompany}>Hauswerk Berlin · Mitte</p>
-          </div>
-          <span className={styles.verifiedBadge}>
-            {t("homepage.hero.verifiedEmployer")}
+      <figure className={styles.visual}>
+        <Image
+          className={styles.illustration}
+          src="/images/klinnova-berlin-work.webp"
+          alt={t("homepage.hero.imageAlt")}
+          width={1024}
+          height={1024}
+          priority
+          sizes="(min-width: 1024px) 46vw, (min-width: 768px) 70vw, 100vw"
+        />
+        <figcaption className={styles.frostedPanel}>
+          <span className={styles.frostedMark} aria-hidden="true">
+            ✓
           </span>
-        </div>
-
-        <ul className={styles.previewChips}>
-          <li className={styles.previewChip}>
-            {jobCategoryLabel("cleaning", locale)}
-          </li>
-          <li className={styles.previewChip}>
-            {workplaceTypeLabel("private_home", locale)}
-          </li>
-          <li className={styles.previewChip}>
-            {workFrequencyLabel("recurring", locale)}
-          </li>
-          <li className={styles.previewChip}>
-            {languageLabel("de", locale)} —{" "}
-            {languageProficiencyLabel("basic", locale)}
-          </li>
-        </ul>
-
-        <div className={styles.previewReasons}>
-          <p className={styles.previewReasonsHeading}>
-            {t("homepage.hero.reasonsHeading")}
-          </p>
-          <ul className={styles.reasonsList}>
-            {reasons.map((reason) => (
-              <li key={reason.key} className={styles.reasonItem}>
-                {reason.text}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <p className={styles.previewNote}>
-          {t(
-            authenticatedDestination === undefined
-              ? "homepage.hero.signInNote"
-              : "homepage.hero.dashboardNote",
-          )}
-        </p>
-        <p className={styles.illustrativeCaption}>
-          {t("homepage.illustrative")}
-        </p>
-      </div>
+          <span>
+            <strong>{t("homepage.hero.verifiedOnly")}</strong>
+            <small>{t("homepage.hero.builtForBerlin")}</small>
+          </span>
+        </figcaption>
+      </figure>
     </section>
   );
 }
