@@ -154,10 +154,10 @@ describe("Homepage", () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(
+      screen.getAllByText(
         "Sprachniveau, Verfügbarkeit und Standort — geprüft anhand der Anforderungen jeder Stelle.",
       ),
-    ).toBeInTheDocument();
+    ).toHaveLength(2);
     expect(
       screen.getByRole("heading", {
         level: 2,

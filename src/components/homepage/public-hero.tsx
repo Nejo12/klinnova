@@ -53,7 +53,10 @@ export function PublicHero({
               <Link className={styles.primaryCta} href="/jobs">
                 {t("homepage.final.browseJobs")}
               </Link>
-              <Link className={styles.secondaryCta} href={authenticatedDestination}>
+              <Link
+                className={styles.secondaryCta}
+                href={authenticatedDestination}
+              >
                 {t("shell.dashboard")}
               </Link>
             </>
