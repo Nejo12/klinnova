@@ -29,7 +29,7 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 | Production | **Canonical Production is `https://klinnova.com`.** `www.klinnova.com` permanently redirects to apex. `stint.company` permanently redirects to Klinnova and no longer serves the application directly. Production baseline after K6-4 merge: `0564a5e749b65f5589d1bd2dc32f926b848a5493`. |
 | Cohort A readiness | **ON HOLD / NOT STARTED** — employer acquisition, candidate recruitment, founder-assisted onboarding, support/moderation preparation, and other operational work are preserved for later resumption. Funding submission does not start Cohort A. |
 | Hosted destructive proof | Not authorized / not run |
-| Demo fixture deadline | Remove or explicitly re-authorize retained Production Demo fixtures by **2026-09-02** |
+| Production Demo fixtures | **Closed — cleanup complete before 2026-09-02**; founder-provided cleanup evidence is recorded in `docs/53-m5.1-beta-readiness-closure.md` |
 | Legal readiness | Unit H is **CLOSED for current launch sequencing by Founder decision**. Current merged legal surfaces are accepted provisionally for this launch path; Founder will review/correct legal wording in the nearest future. No qualified legal-review, full legal-compliance, or GDPR-compliance claim is made. |
 
 ## GründungsBONUS Plus post-submission gate
