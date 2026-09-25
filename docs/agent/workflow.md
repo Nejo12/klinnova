@@ -32,6 +32,12 @@ Keep command output concise where tooling allows it. On successful checks, retai
 
 Do not reinstall dependencies on every continuation. Run a frozen install when the environment is fresh, dependencies are missing, or the lockfile/package manifest changed.
 
+## Quality Skills
+
+During discovery and design, use `klinnova-ui-quality` for relevant UI work. During copy or prose work, use `klinnova-writing-quality` where relevant. During implementation, apply either skill only inside the approved scope.
+
+If a quality recommendation requires redesign, a new dependency, a product-copy semantic change, a legal/privacy change, or scope expansion, stop and return to Founder/Chat instead of silently applying it.
+
 ## Implementation
 
 Before editing, verify branch/base/status and reread the approved plan. Implement only the bounded tasks. Preserve product truth, auth/RLS boundaries, privacy constraints, and existing design-system conventions.
