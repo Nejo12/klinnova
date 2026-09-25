@@ -78,4 +78,4 @@ Required scrutiny: authorization, onboarding persistence, matching rules, applic
 
 ## Agent Support
 
-Repository-specific Codex setup lives in `docs/agent/`. Use project-local Klinnova skills from `.agents/skills` when their trigger matches the task. Keep this file compact; put repeatable workflow detail in skills or `docs/agent/`.
+Repository-specific Codex setup lives in `docs/agent/`. Use project-local Klinnova skills from `.agents/skills` when their trigger matches the task. Use `klinnova-ui-quality` for UI design/review/refinement and `klinnova-writing-quality` for applicable user-facing, public, or internal prose editing. Authoritative product, design, and legal sources override quality heuristics; these skills do not authorize scope expansion. Keep this file compact; put repeatable workflow detail in skills or `docs/agent/`.
