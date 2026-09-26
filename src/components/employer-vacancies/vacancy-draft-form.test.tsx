@@ -55,6 +55,39 @@ const baseDraft: EmployerDraftDetail = {
 };
 
 describe("VacancyDraftForm — D-M5-19 employment types / shift requirements", () => {
+  it.each([
+    ["hourly", "Hourly"],
+    ["monthly", "Monthly"],
+    ["fixed_job", "Fixed for the job"],
+  ])(
+    "submits salary amount and %s period without changing the form contract",
+    async (code, label) => {
+      createEmployerVacancyDraftAction.mockClear();
+      render(<VacancyDraftForm mode="create" />);
+      fireEvent.change(screen.getByRole("textbox", { name: "Amount in EUR" }), {
+        target: { value: "21.50" },
+      });
+      fireEvent.change(screen.getByRole("combobox", { name: "Period" }), {
+        target: { value: code },
+      });
+      expect(screen.getByRole("option", { name: label })).toBeInTheDocument();
+      fireEvent.submit(
+        screen.getByRole("button", { name: "Create draft" }).closest("form")!,
+      );
+      await waitFor(() =>
+        expect(createEmployerVacancyDraftAction).toHaveBeenCalled(),
+      );
+      const calls = createEmployerVacancyDraftAction.mock.calls as unknown as [
+        unknown,
+        FormData,
+      ][];
+      const formData = calls.at(-1)?.[1];
+      expect(formData).toBeInstanceOf(FormData);
+      expect(formData?.get("salaryAmountEur")).toBe("21.50");
+      expect(formData?.get("salaryPeriod")).toBe(code);
+    },
+  );
+
   it("renders every allow-listed checkbox, unchecked, for a new draft", () => {
     render(<VacancyDraftForm mode="create" />);
 

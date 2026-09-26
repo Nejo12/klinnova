@@ -60,8 +60,8 @@ describe("VacancyDetail", () => {
     render(<VacancyDetail vacancy={buildVacancy()} />);
 
     expect(screen.getByText("Private draft")).toBeInTheDocument();
-    expect(screen.getByText("Ready to publish.")).toBeInTheDocument();
-    expect(screen.getByText("Complete")).toBeInTheDocument();
+    expect(screen.getByText("Ready to publish")).toBeInTheDocument();
+    expect(screen.getByText("1 / 1 complete")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Edit vacancy" })).toHaveAttribute(
       "href",
       "/employer/vacancies/22222222-2222-4222-8222-222222222222/edit",
@@ -83,7 +83,7 @@ describe("VacancyDetail", () => {
     ).toBeTruthy();
   });
 
-  it("shows missing readiness items with Complete/Missing text, not color alone", () => {
+  it("shows missing readiness items and a compact completed count, not color alone", () => {
     render(
       <VacancyDetail
         vacancy={buildVacancy({
@@ -96,11 +96,11 @@ describe("VacancyDetail", () => {
       />,
     );
 
-    expect(
-      screen.getByText("Salary (EUR gross) still needed before publishing."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("1 detail missing")).toBeInTheDocument();
+    expect(screen.getByText("Salary (EUR gross)")).toBeInTheDocument();
     expect(screen.getByText("Missing")).toBeInTheDocument();
-    expect(screen.getByText("Complete")).toBeInTheDocument();
+    expect(screen.getByText("1 / 2 complete")).toBeInTheDocument();
+    expect(screen.queryByText("Complete")).not.toBeInTheDocument();
   });
 
   it("does not offer Edit vacancy when the employer is suspended", () => {
@@ -110,5 +110,31 @@ describe("VacancyDetail", () => {
     expect(
       screen.queryByRole("region", { name: "Lifecycle actions" }),
     ).toBeNull();
+  });
+
+  it("prioritizes verification without offering Publish for a blocked draft", () => {
+    render(
+      <VacancyDetail
+        vacancy={buildVacancy({
+          ready: false,
+          verificationState: "unverified",
+          checklist: [
+            { id: "title", label: "Title", complete: true },
+            {
+              id: "verification",
+              label: "Employer verification",
+              complete: false,
+            },
+          ],
+        })}
+      />,
+    );
+    expect(screen.getByText("Vacancy details complete")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Go to verification" }),
+    ).toHaveAttribute("href", "/employer/verification");
+    expect(
+      screen.queryByRole("region", { name: "Lifecycle actions" }),
+    ).not.toBeInTheDocument();
   });
 });

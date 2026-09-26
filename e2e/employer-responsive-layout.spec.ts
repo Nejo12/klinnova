@@ -346,6 +346,32 @@ test.describe("employer responsive layout (Task I)", () => {
       // --- Vacancies list: no horizontal scroll, long title wraps ---
       await page.goto("/employer/vacancies");
       await assertNoHorizontalScroll(page, `vacancies@${width}`);
+      const createDraft = page.getByRole("link", { name: "Create draft" });
+      const createBox = await createDraft.boundingBox();
+      expect(createBox).not.toBeNull();
+      expect(createBox!.x + createBox!.width).toBeLessThanOrEqual(width + 1);
+      expect(createBox!.height).toBeGreaterThanOrEqual(44);
+      if (width < 768) {
+        const intro = createDraft.locator("xpath=../..");
+        const introCopy = intro.locator("div").first();
+        const copyBox = await introCopy.boundingBox();
+        expect(createBox!.y).toBeGreaterThanOrEqual(
+          copyBox!.y + copyBox!.height,
+        );
+        expect(createBox!.width).toBeGreaterThanOrEqual(copyBox!.width - 1);
+      }
+      await page.evaluate(() => localStorage.setItem("klinnova-locale", "de"));
+      await page.reload();
+      await assertNoHorizontalScroll(page, `vacancies-de@${width}`);
+      const germanCreate = page.getByRole("link", {
+        name: "Entwurf erstellen",
+      });
+      const germanBox = await germanCreate.boundingBox();
+      expect(germanBox).not.toBeNull();
+      expect(germanBox!.x + germanBox!.width).toBeLessThanOrEqual(width + 1);
+      expect(germanBox!.height).toBeGreaterThanOrEqual(44);
+      await page.evaluate(() => localStorage.setItem("klinnova-locale", "en"));
+      await page.reload();
       const titleHeading = page.getByRole("heading", {
         name: LONG_GERMAN_TITLE,
         level: 3,

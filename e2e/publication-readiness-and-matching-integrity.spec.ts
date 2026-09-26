@@ -143,11 +143,42 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
   test("employer completes readiness through the real form, publishes, and a compatible candidate matches and applies — with the required negative proofs along the way", async ({
     page,
   }) => {
-    test.setTimeout(90_000);
+    test.setTimeout(120_000);
     expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
     const stamp = Date.now();
     const { email: employerEmail, displayName: employerDisplayName } =
       await registerAndOnboardPrivateEmployer(page, stamp);
+
+    // The page-level action must remain visible before and after DE reflow.
+    await page.goto("/employer/vacancies");
+    for (const width of [360, 390, 430, 768, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      const action = page.getByRole("link", { name: "Create draft" });
+      await expect(action).toBeVisible({ timeout: 15_000 });
+      const box = await action.boundingBox();
+      expect(box).not.toBeNull();
+      expect(box!.x + box!.width).toBeLessThanOrEqual(width + 1);
+      expect(box!.height).toBeGreaterThanOrEqual(44);
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth),
+      ).toBeLessThanOrEqual(width);
+    }
+    await page.evaluate(() => localStorage.setItem("klinnova-locale", "de"));
+    await page.reload();
+    for (const width of [360, 390, 430]) {
+      await page.setViewportSize({ width, height: 900 });
+      const action = page.getByRole("link", { name: "Entwurf erstellen" });
+      await expect(action).toBeVisible({ timeout: 15_000 });
+      const box = await action.boundingBox();
+      expect(box).not.toBeNull();
+      expect(box!.x + box!.width).toBeLessThanOrEqual(width + 1);
+      expect(box!.height).toBeGreaterThanOrEqual(44);
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth),
+      ).toBeLessThanOrEqual(width);
+    }
+    await page.evaluate(() => localStorage.setItem("klinnova-locale", "en"));
+    await page.setViewportSize({ width: 1280, height: 900 });
 
     await page.goto("/employer/vacancies/new");
     await page.getByLabel("Title").fill(`A1 Cleaning Role ${stamp}`);
@@ -167,17 +198,12 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     // --- Negative proof: readiness truthfully reports what publish will
     // actually require, before anything beyond the minimum is filled.
     await expect(
-      page.getByText(
-        /still needed before publishing\.|missing before publishing\./,
-      ),
+      page.getByLabel("Publication readiness").getByText(/details missing/),
     ).toBeVisible({
       timeout: 15_000,
     });
-    const workplaceTypeRow = page
-      .getByLabel("Publication readiness")
-      .getByText("Workplace type", { exact: true })
-      .locator("..");
-    await expect(workplaceTypeRow).toHaveAttribute("data-complete", "false");
+    const workplaceTypeRow = await readinessRow(page, "Workplace type");
+    await expect(workplaceTypeRow).toContainText("Missing");
 
     // Complete every remaining vacancy-level field, including the two new
     // checkbox groups this unit adds — through the real form, not a fixture.
@@ -195,12 +221,12 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     await saveDraftAndReload(page);
     await expectReadyDraftFieldsPersisted(page);
 
-    // --- Negative proof, inverted: readiness reflects the durably saved
-    // draft fields. workplace_type is now correctly "Complete".
-    await expect(await readinessRow(page, "Workplace type")).toHaveAttribute(
-      "data-complete",
-      "true",
-    );
+    // Completed fields no longer repeat as checklist rows after persistence.
+    await expect(
+      page.getByLabel("Publication readiness").getByText("Workplace type", {
+        exact: true,
+      }),
+    ).toHaveCount(0);
 
     await page.getByRole("button", { name: "Add language" }).click();
     await page.getByLabel(/^Language 1$/i).selectOption("en");
@@ -211,14 +237,20 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     // Still not ready: employer is not yet verified. Readiness must not
     // claim otherwise merely because every vacancy field is complete.
     await expect(
-      page.getByText("Employer verification still needed before publishing."),
+      page
+        .getByLabel("Publication readiness")
+        .getByText("Vacancy details complete"),
     ).toBeVisible({
       timeout: 15_000,
     });
-    const verificationRow = page
-      .getByText("Employer verification", { exact: true })
-      .locator("..");
-    await expect(verificationRow).toHaveAttribute("data-complete", "false");
+    await expect(
+      page
+        .getByLabel("Publication readiness")
+        .getByText(/Verification required before publishing/),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Go to verification" }),
+    ).toHaveAttribute("href", "/employer/verification");
 
     await page.goto("/employer/verification");
     await page
@@ -269,7 +301,7 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
 
     await page.goto(`/employer/vacancies/${vacancyId}`);
     await expect(
-      page.getByText("Ready to publish.", { exact: true }),
+      page.getByText("Ready to publish", { exact: true }),
     ).toBeVisible({ timeout: 15_000 });
     await publishVacancyAndReload(page);
 

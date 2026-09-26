@@ -156,6 +156,9 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
           sections: "Abschnitte des Stellenformulars",
           basics: "Grundlagen",
           role: "Stellendetails",
+          requirements: "Anforderungen",
+          availability: "Verfügbarkeit",
+          languages: "Sprachen",
           salary: "Vergütung",
           jobCategory: "Stellenkategorie",
           selectCategory: "Kategorie auswählen",
@@ -177,6 +180,9 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
           sections: "Vacancy form sections",
           basics: "Basics",
           role: "Role details",
+          requirements: "Requirements",
+          availability: "Availability",
+          languages: "Languages",
           salary: "Salary",
           jobCategory: "Job category",
           selectCategory: "Select a category",
@@ -263,8 +269,23 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
             </a>
           </li>
           <li>
+            <a className={styles.sectionNavLink} href="#section-requirements">
+              {copy.requirements}
+            </a>
+          </li>
+          <li>
+            <a className={styles.sectionNavLink} href="#section-availability">
+              {copy.availability}
+            </a>
+          </li>
+          <li>
             <a className={styles.sectionNavLink} href="#section-salary">
               {copy.salary}
+            </a>
+          </li>
+          <li>
+            <a className={styles.sectionNavLink} href="#section-languages">
+              {copy.languages}
             </a>
           </li>
         </ul>
@@ -583,53 +604,10 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               </p>
             ) : null}
           </fieldset>
+        </fieldset>
 
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="availableFrom">
-              {t("employer.vacancies.availableFrom")}
-            </label>
-            <input
-              id="availableFrom"
-              className={styles.input}
-              name="availableFrom"
-              type="date"
-              value={values.availableFrom}
-              aria-invalid={
-                fieldError(state, "availableFrom") ? true : undefined
-              }
-              aria-describedby={
-                fieldError(state, "availableFrom")
-                  ? "availableFrom-error"
-                  : undefined
-              }
-              onChange={(event) =>
-                updateValues(valuesFromForm(event.currentTarget.form!))
-              }
-            />
-            {fieldError(state, "availableFrom") ? (
-              <p id="availableFrom-error" className={styles.fieldError}>
-                {localizeEmployerMessage(
-                  fieldError(state, "availableFrom")!,
-                  locale,
-                )}
-              </p>
-            ) : null}
-            {props.mode === "edit" ? (
-              <label className={styles.checkboxRow}>
-                <input
-                  type="checkbox"
-                  name="clearAvailableFrom"
-                  value="true"
-                  checked={values.clearAvailableFrom}
-                  onChange={(event) =>
-                    updateValues(valuesFromForm(event.currentTarget.form!))
-                  }
-                />
-                <span>{copy.clearDate}</span>
-              </label>
-            ) : null}
-          </div>
-
+        <fieldset id="section-requirements" className={styles.fieldset}>
+          <legend className={styles.legend}>{copy.requirements}</legend>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="experienceNotes">
               {t("employer.vacancies.experienceNotes")}
@@ -687,96 +665,144 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
             />
             <span>{copy.englishInterview}</span>
           </label>
-
-          <GermanRequirementField
-            name="germanRequirement"
-            value={values.germanRequirement}
-            onChange={(germanRequirement) =>
-              updateValues({ ...values, germanRequirement })
-            }
-          />
         </fieldset>
 
-        <fieldset id="section-salary" className={styles.fieldset}>
-          <legend className={styles.legend}>{copy.gross}</legend>
-          <p className={styles.support}>{copy.salaryHelp}</p>
+        <fieldset id="section-availability" className={styles.fieldset}>
+          <legend className={styles.legend}>{copy.availability}</legend>
           <div className={styles.field}>
-            <label className={styles.label} htmlFor="salaryAmountEur">
-              {copy.amount}
+            <label className={styles.label} htmlFor="availableFrom">
+              {t("employer.vacancies.availableFrom")}
             </label>
             <input
-              id="salaryAmountEur"
+              id="availableFrom"
               className={styles.input}
-              name="salaryAmountEur"
-              type="text"
-              inputMode="decimal"
-              placeholder="15.00"
-              value={values.salaryAmountEur}
+              name="availableFrom"
+              type="date"
+              value={values.availableFrom}
               aria-invalid={
-                fieldError(state, "salaryAmountEur") ? true : undefined
+                fieldError(state, "availableFrom") ? true : undefined
               }
               aria-describedby={
-                fieldError(state, "salaryAmountEur")
-                  ? "salaryAmountEur-error"
+                fieldError(state, "availableFrom")
+                  ? "availableFrom-error"
                   : undefined
               }
               onChange={(event) =>
                 updateValues(valuesFromForm(event.currentTarget.form!))
               }
             />
-            {fieldError(state, "salaryAmountEur") ? (
-              <p id="salaryAmountEur-error" className={styles.fieldError}>
+            {fieldError(state, "availableFrom") ? (
+              <p id="availableFrom-error" className={styles.fieldError}>
                 {localizeEmployerMessage(
-                  fieldError(state, "salaryAmountEur")!,
+                  fieldError(state, "availableFrom")!,
                   locale,
                 )}
               </p>
+            ) : null}
+            {props.mode === "edit" ? (
+              <label className={styles.checkboxRow}>
+                <input
+                  type="checkbox"
+                  name="clearAvailableFrom"
+                  value="true"
+                  checked={values.clearAvailableFrom}
+                  onChange={(event) =>
+                    updateValues(valuesFromForm(event.currentTarget.form!))
+                  }
+                />
+                <span>{copy.clearDate}</span>
+              </label>
             ) : null}
           </div>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="salaryPeriod">
-              {copy.period}
-            </label>
-            <select
-              id="salaryPeriod"
-              className={styles.select}
-              name="salaryPeriod"
-              value={values.salaryPeriod}
-              aria-invalid={
-                fieldError(state, "salaryPeriod") ? true : undefined
-              }
-              aria-describedby={
-                fieldError(state, "salaryPeriod")
-                  ? "salaryPeriod-error"
-                  : undefined
-              }
-              onChange={(event) =>
-                updateValues(valuesFromForm(event.currentTarget.form!))
-              }
-            >
-              <option value="">{copy.notSet}</option>
-              {SALARY_PERIOD_OPTIONS.map((option) => (
-                <option key={option.code} value={option.code}>
-                  {locale === "de"
-                    ? (
-                        {
-                          hourly: "Pro Stunde",
-                          monthly: "Pro Monat",
-                          fixed_job: "Pauschal für den Auftrag",
-                        } as const
-                      )[option.code]
-                    : option.label}
-                </option>
-              ))}
-            </select>
-            {fieldError(state, "salaryPeriod") ? (
-              <p id="salaryPeriod-error" className={styles.fieldError}>
-                {localizeEmployerMessage(
-                  fieldError(state, "salaryPeriod")!,
-                  locale,
-                )}
-              </p>
-            ) : null}
+        </fieldset>
+
+        <fieldset id="section-salary" className={styles.fieldset}>
+          <legend className={styles.legend}>{copy.gross}</legend>
+          <p className={styles.support}>{copy.salaryHelp}</p>
+          <div className={styles.salaryFields}>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="salaryAmountEur">
+                {copy.amount}
+              </label>
+              <div className={styles.salaryAmount}>
+                <span aria-hidden="true">EUR</span>
+                <input
+                  id="salaryAmountEur"
+                  className={styles.input}
+                  name="salaryAmountEur"
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="15.00"
+                  value={values.salaryAmountEur}
+                  aria-invalid={
+                    fieldError(state, "salaryAmountEur") ? true : undefined
+                  }
+                  aria-describedby={
+                    fieldError(state, "salaryAmountEur")
+                      ? "salaryAmountEur-error"
+                      : undefined
+                  }
+                  onChange={(event) =>
+                    updateValues(valuesFromForm(event.currentTarget.form!))
+                  }
+                />
+              </div>
+              {fieldError(state, "salaryAmountEur") ? (
+                <p id="salaryAmountEur-error" className={styles.fieldError}>
+                  {localizeEmployerMessage(
+                    fieldError(state, "salaryAmountEur")!,
+                    locale,
+                  )}
+                </p>
+              ) : null}
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="salaryPeriod">
+                {copy.period}
+              </label>
+              <select
+                id="salaryPeriod"
+                className={styles.select}
+                name="salaryPeriod"
+                value={values.salaryPeriod}
+                aria-invalid={
+                  fieldError(state, "salaryPeriod") ? true : undefined
+                }
+                aria-describedby={
+                  fieldError(state, "salaryPeriod")
+                    ? "salaryPeriod-error"
+                    : undefined
+                }
+                onChange={(event) =>
+                  updateValues(valuesFromForm(event.currentTarget.form!))
+                }
+              >
+                <option value="">{copy.notSet}</option>
+                {SALARY_PERIOD_OPTIONS.map((option) => (
+                  <option key={option.code} value={option.code}>
+                    {locale === "de"
+                      ? (
+                          {
+                            hourly: "Pro Stunde",
+                            monthly: "Pro Monat",
+                            fixed_job: "Pauschal für den Auftrag",
+                          } as const
+                        )[option.code]
+                      : option.code === "fixed_job"
+                        ? "Fixed for the job"
+                        : option.label}
+                  </option>
+                ))}
+              </select>
+              {fieldError(state, "salaryPeriod") ? (
+                <p id="salaryPeriod-error" className={styles.fieldError}>
+                  {localizeEmployerMessage(
+                    fieldError(state, "salaryPeriod")!,
+                    locale,
+                  )}
+                </p>
+              ) : null}
+            </div>
           </div>
           <label className={styles.checkboxRow}>
             <input
@@ -790,6 +816,17 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
             />
             <span>{copy.clearSalary}</span>
           </label>
+        </fieldset>
+
+        <fieldset id="section-languages" className={styles.fieldset}>
+          <legend className={styles.legend}>{copy.languages}</legend>
+          <GermanRequirementField
+            name="germanRequirement"
+            value={values.germanRequirement}
+            onChange={(germanRequirement) =>
+              updateValues({ ...values, germanRequirement })
+            }
+          />
         </fieldset>
 
         <div className={styles.actions}>
