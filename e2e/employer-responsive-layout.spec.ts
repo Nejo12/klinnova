@@ -134,26 +134,36 @@ async function publishEligibleEmployerVacancy(
 
   await seedVacancyMatchingArrays(vacancyId, ["part_time"], ["morning"]);
 
-  // Readiness checklist only renders while `publicationState === "draft"`
-  // (vacancy-detail.tsx) — check it here, at the one point in this flow
-  // the vacancy is a fully-readied draft, across all 6 widths. This is
-  // Task I's explicit desktop (1280/1440) regression check: the ~15-item
-  // checklist must stay scannable without horizontal scroll.
+  // Readiness only renders while `publicationState === "draft"`.
+  // At this point every vacancy detail is complete but Employer verification
+  // is still the sole blocker. Across all required widths, assert the compact
+  // #258 state instead of the retired wall of Complete/Missing rows.
   for (const width of REQUIRED_WIDTHS) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto(`/employer/vacancies/${vacancyId}`);
     await assertNoHorizontalScroll(page, `vacancy-detail-readiness@${width}`);
+    const readiness = page.getByLabel("Publication readiness");
     await expect(
-      page.getByRole("heading", { name: "Publication readiness" }),
+      readiness.getByRole("heading", { name: "Publication readiness" }),
     ).toBeVisible();
-    const checklistItemCount = await page
-      .locator("li")
-      .filter({ hasText: /Complete|Missing/ })
-      .count();
-    expect(
-      checklistItemCount,
-      `vacancy-detail-readiness@${width}: expected multiple checklist items`,
-    ).toBeGreaterThan(5);
+    await expect(
+      readiness.getByText("Vacancy details complete", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      readiness.getByText(/\d+ \/ \d+ complete/, { exact: true }),
+    ).toBeVisible();
+    await expect(
+      readiness.getByText(
+        "Verification required before publishing. Your draft stays saved.",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await expect(
+      readiness.getByRole("link", { name: "Go to verification" }),
+    ).toHaveAttribute("href", "/employer/verification");
+    await expect(
+      readiness.getByText("Ready to publish", { exact: true }),
+    ).toHaveCount(0);
     await page.screenshot({
       path: screenshotPath(`vacancy-detail-readiness-${width}`),
       fullPage: true,
