@@ -89,9 +89,7 @@ async function publishEligibleEmployerVacancy(
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByLabel("Display name").fill(employerDisplayName);
   await page.getByLabel("Berlin locality").fill("Mitte");
-  await page
-    .getByRole("checkbox", { name: /allowed to work in Germany/i })
-    .check();
+  await page.locator('input[name="lawfulHiringDeclared"]').check();
   await page.getByRole("button", { name: "Complete onboarding" }).click();
   await expect(page).toHaveURL(/\/employer$/, { timeout: 15_000 });
 
