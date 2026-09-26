@@ -154,6 +154,7 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     for (const width of [360, 390, 430, 768, 1280]) {
       await page.setViewportSize({ width, height: 900 });
       const action = page.getByRole("link", { name: "Create draft" });
+      await expect(action).toBeVisible({ timeout: 15_000 });
       const box = await action.boundingBox();
       expect(box).not.toBeNull();
       expect(box!.x + box!.width).toBeLessThanOrEqual(width + 1);
@@ -167,6 +168,7 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     for (const width of [360, 390, 430]) {
       await page.setViewportSize({ width, height: 900 });
       const action = page.getByRole("link", { name: "Entwurf erstellen" });
+      await expect(action).toBeVisible({ timeout: 15_000 });
       const box = await action.boundingBox();
       expect(box).not.toBeNull();
       expect(box!.x + box!.width).toBeLessThanOrEqual(width + 1);

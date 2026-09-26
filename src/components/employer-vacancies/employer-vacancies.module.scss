@@ -35,6 +35,17 @@
   min-width: 0;
 }
 
+.pageIntroActions .button {
+  display: inline-flex;
+  min-height: 2.75rem;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 .sectionHeader {
   display: flex;
   align-items: baseline;
