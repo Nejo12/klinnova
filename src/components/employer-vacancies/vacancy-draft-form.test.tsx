@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import type { EmployerVacancyActionState } from "@/app/employer/vacancies/actions";
@@ -113,5 +113,159 @@ describe("VacancyDraftForm — D-M5-19 employment types / shift requirements", (
       "night",
       "weekend",
     ]);
+  });
+});
+
+describe("VacancyDraftForm — unsaved state", () => {
+  it("initializes persisted edit values across control types", () => {
+    render(
+      <VacancyDraftForm
+        mode="edit"
+        draft={{
+          ...baseDraft,
+          id: "22222222-2222-4222-8222-222222222266",
+          description: "Persisted description",
+          availableFrom: "2026-12-01",
+          salaryAmountCents: 2150,
+          salaryPeriod: "hourly",
+          germanRequirement: "comfortable",
+        }}
+      />,
+    );
+    expect(screen.getByRole("textbox", { name: "Description" })).toHaveValue(
+      "Persisted description",
+    );
+    expect(screen.getByLabelText("Available from")).toHaveValue("2026-12-01");
+    expect(screen.getByRole("textbox", { name: "Amount in EUR" })).toHaveValue(
+      "21.50",
+    );
+    expect(screen.getByRole("combobox", { name: "Period" })).toHaveValue(
+      "hourly",
+    );
+    expect(
+      screen.getByRole("radio", { name: "Comfortable German" }),
+    ).toBeChecked();
+  });
+
+  it("retains every kind of dirty field after validation and focuses the first invalid field", async () => {
+    updateEmployerVacancyDraftAction.mockResolvedValueOnce({
+      error: "Title is required.",
+      message: null,
+      fieldErrors: { title: "Title is required." },
+    });
+    const draft = { ...baseDraft, id: "22222222-2222-4222-8222-222222222288" };
+    render(<VacancyDraftForm mode="edit" draft={draft} />);
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), {
+      target: { value: "" },
+    });
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Berlin public locality" }),
+      {
+        target: { value: "Kreuzberg" },
+      },
+    );
+    fireEvent.change(screen.getByRole("textbox", { name: "Description" }), {
+      target: { value: "A careful description" },
+    });
+    fireEvent.change(screen.getByLabelText("Available from"), {
+      target: { value: "2026-11-01" },
+    });
+    fireEvent.change(screen.getByRole("textbox", { name: "Amount in EUR" }), {
+      target: { value: "20.50" },
+    });
+    fireEvent.change(screen.getByRole("combobox", { name: "Period" }), {
+      target: { value: "hourly" },
+    });
+    expect(screen.getByRole("combobox", { name: "Period" })).toHaveValue(
+      "hourly",
+    );
+    fireEvent.change(screen.getByRole("combobox", { name: "Job category" }), {
+      target: { value: "cleaning" },
+    });
+    fireEvent.click(screen.getByRole("checkbox", { name: "Part time" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Weekend" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Comfortable German" }));
+
+    fireEvent.submit(
+      screen.getByRole("button", { name: "Save draft" }).closest("form")!,
+    );
+    await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
+
+    expect(screen.getByRole("textbox", { name: "Title" })).toHaveFocus();
+    expect(screen.getByRole("textbox", { name: "Title" })).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+    expect(screen.getByRole("textbox", { name: "Title" })).toHaveAttribute(
+      "aria-describedby",
+      "title-error",
+    );
+    expect(
+      screen.getByRole("textbox", { name: "Berlin public locality" }),
+    ).toHaveValue("Kreuzberg");
+    expect(screen.getByRole("textbox", { name: "Description" })).toHaveValue(
+      "A careful description",
+    );
+    expect(screen.getByLabelText("Available from")).toHaveValue("2026-11-01");
+    expect(screen.getByRole("textbox", { name: "Amount in EUR" })).toHaveValue(
+      "20.50",
+    );
+    expect(screen.getByRole("combobox", { name: "Period" })).toHaveValue(
+      "hourly",
+    );
+    expect(screen.getByRole("combobox", { name: "Job category" })).toHaveValue(
+      "cleaning",
+    );
+    expect(screen.getByRole("checkbox", { name: "Part time" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "Weekend" })).toBeChecked();
+    expect(
+      screen.getByRole("radio", { name: "Comfortable German" }),
+    ).toBeChecked();
+  });
+
+  it("retains dirty edit fields through a readiness remount", () => {
+    const draft = { ...baseDraft, id: "22222222-2222-4222-8222-222222222277" };
+    const view = render(<VacancyDraftForm mode="edit" draft={draft} />);
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), {
+      target: { value: "Unsaved job" },
+    });
+    fireEvent.click(screen.getByRole("checkbox", { name: "Part time" }));
+    view.unmount();
+    render(<VacancyDraftForm mode="edit" draft={{ ...draft, ready: true }} />);
+    expect(screen.getByRole("textbox", { name: "Title" })).toHaveValue(
+      "Unsaved job",
+    );
+    expect(screen.getByRole("checkbox", { name: "Part time" })).toBeChecked();
+  });
+
+  it("uses the newly persisted draft after a successful save and remount", async () => {
+    updateEmployerVacancyDraftAction.mockResolvedValueOnce({
+      error: null,
+      message: "Draft changes saved.",
+    });
+    const draft = { ...baseDraft, id: "22222222-2222-4222-8222-222222222255" };
+    const view = render(<VacancyDraftForm mode="edit" draft={draft} />);
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), {
+      target: { value: "Saved title" },
+    });
+    fireEvent.submit(
+      screen.getByRole("button", { name: "Save draft" }).closest("form")!,
+    );
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Draft changes saved.",
+      ),
+    );
+    view.unmount();
+    render(
+      <VacancyDraftForm
+        mode="edit"
+        draft={{ ...draft, title: "Server title" }}
+      />,
+    );
+    expect(screen.getByRole("textbox", { name: "Title" })).toHaveValue(
+      "Server title",
+    );
   });
 });

@@ -1,6 +1,12 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import {
+  startTransition,
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import {
   createEmployerVacancyDraftAction,
@@ -61,6 +67,79 @@ const initialState: EmployerVacancyActionState = {
   message: null,
 };
 
+type FormValues = {
+  title: string;
+  jobCategory: string;
+  publicLocality: string;
+  description: string;
+  workplaceType: string;
+  workFrequency: string;
+  employmentTypes: string[];
+  shiftRequirements: string[];
+  availableFrom: string;
+  clearAvailableFrom: boolean;
+  experienceNotes: string;
+  cvRequired: boolean;
+  interviewEnglishOk: boolean;
+  germanRequirement: GermanComfortCode;
+  salaryAmountEur: string;
+  salaryPeriod: string;
+  clearSalary: boolean;
+};
+
+// Survives a Server Component refresh that remounts the edit form. This is
+// tab-local memory, never a persisted draft or an autosave.
+const unsavedForms = new Map<string, FormValues>();
+
+function valuesFromDraft(draft: EmployerDraftDetail | null): FormValues {
+  return {
+    title: draft?.title ?? "",
+    jobCategory: draft?.jobCategory ?? "",
+    publicLocality: draft?.publicLocality ?? "",
+    description: draft?.description ?? "",
+    workplaceType: draft?.workplaceType ?? "",
+    workFrequency: draft?.workFrequency ?? "",
+    employmentTypes: draft?.employmentTypes ?? [],
+    shiftRequirements: draft?.shiftRequirements ?? [],
+    availableFrom: draft?.availableFrom ?? "",
+    clearAvailableFrom: false,
+    experienceNotes: draft?.experienceNotes ?? "",
+    cvRequired: draft?.cvRequired === true,
+    interviewEnglishOk: draft?.interviewEnglishOk === true,
+    germanRequirement: toGermanComfortCode(draft?.germanRequirement),
+    salaryAmountEur:
+      draft?.salaryAmountCents != null
+        ? centsToEurString(draft.salaryAmountCents)
+        : "",
+    salaryPeriod: draft?.salaryPeriod ?? "",
+    clearSalary: false,
+  };
+}
+
+function valuesFromForm(form: HTMLFormElement): FormValues {
+  const data = new FormData(form);
+  const value = (key: string) => String(data.get(key) ?? "");
+  return {
+    title: value("title"),
+    jobCategory: value("jobCategory"),
+    publicLocality: value("publicLocality"),
+    description: value("description"),
+    workplaceType: value("workplaceType"),
+    workFrequency: value("workFrequency"),
+    employmentTypes: data.getAll("employmentTypes").map(String),
+    shiftRequirements: data.getAll("shiftRequirements").map(String),
+    availableFrom: value("availableFrom"),
+    clearAvailableFrom: data.has("clearAvailableFrom"),
+    experienceNotes: value("experienceNotes"),
+    cvRequired: data.has("cvRequired"),
+    interviewEnglishOk: data.has("interviewEnglishOk"),
+    germanRequirement: toGermanComfortCode(value("germanRequirement")),
+    salaryAmountEur: value("salaryAmountEur"),
+    salaryPeriod: value("salaryPeriod"),
+    clearSalary: data.has("clearSalary"),
+  };
+}
+
 function fieldError(
   state: EmployerVacancyActionState,
   key: string,
@@ -119,13 +198,42 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
       : updateEmployerVacancyDraftAction;
   const [state, formAction, pending] = useActionState(action, initialState);
   const draft = props.mode === "edit" ? props.draft : null;
-  const [germanRequirement, setGermanRequirement] = useState<GermanComfortCode>(
-    toGermanComfortCode(draft?.germanRequirement),
+  const formKey = draft?.id ?? "create";
+  const [values, setValues] = useState<FormValues>(
+    () => unsavedForms.get(formKey) ?? valuesFromDraft(draft),
   );
-  const salaryDefault =
-    draft?.salaryAmountCents !== null && draft?.salaryAmountCents !== undefined
-      ? centsToEurString(draft.salaryAmountCents)
-      : "";
+  const formRef = useRef<HTMLFormElement>(null);
+  const submittedValues = useRef<FormValues | null>(null);
+
+  function updateValues(next: FormValues) {
+    unsavedForms.set(formKey, next);
+    setValues(next);
+  }
+
+  useEffect(() => {
+    if (
+      state.error === null &&
+      state.message !== null &&
+      submittedValues.current
+    ) {
+      if (JSON.stringify(values) === JSON.stringify(submittedValues.current)) {
+        unsavedForms.delete(formKey);
+      }
+      submittedValues.current = null;
+    }
+  }, [state, values, formKey]);
+
+  useEffect(() => {
+    if (!state.fieldErrors || !formRef.current) return;
+    const invalid = Array.from(formRef.current.elements).find(
+      (element) =>
+        element instanceof HTMLElement &&
+        "name" in element &&
+        typeof element.name === "string" &&
+        state.fieldErrors?.[element.name],
+    );
+    if (invalid instanceof HTMLElement) invalid.focus();
+  }, [state]);
 
   return (
     <>
@@ -148,7 +256,18 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
           </li>
         </ul>
       </nav>
-      <form className={styles.form} action={formAction} noValidate>
+      <form
+        ref={formRef}
+        className={styles.form}
+        noValidate
+        onSubmit={(event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          submittedValues.current = valuesFromForm(form);
+          const data = new FormData(form);
+          startTransition(() => formAction(data));
+        }}
+      >
         {props.mode === "edit" ? (
           <input type="hidden" name="vacancyId" value={props.draft.id} />
         ) : null}
@@ -177,10 +296,13 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               type="text"
               required
               maxLength={120}
-              defaultValue={draft?.title ?? ""}
+              value={values.title}
               aria-invalid={fieldError(state, "title") ? true : undefined}
               aria-describedby={
                 fieldError(state, "title") ? "title-error" : undefined
+              }
+              onChange={(event) =>
+                updateValues(valuesFromForm(event.currentTarget.form!))
               }
             />
             {fieldError(state, "title") ? (
@@ -199,12 +321,15 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               className={styles.select}
               name="jobCategory"
               required
-              defaultValue={draft?.jobCategory ?? ""}
+              value={values.jobCategory}
               aria-invalid={fieldError(state, "jobCategory") ? true : undefined}
               aria-describedby={
                 fieldError(state, "jobCategory")
                   ? "jobCategory-error"
                   : undefined
+              }
+              onChange={(event) =>
+                updateValues(valuesFromForm(event.currentTarget.form!))
               }
             >
               <option value="">{copy.selectCategory}</option>
@@ -240,7 +365,7 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               type="text"
               required
               maxLength={120}
-              defaultValue={draft?.publicLocality ?? ""}
+              value={values.publicLocality}
               aria-describedby={
                 fieldError(state, "publicLocality")
                   ? "publicLocality-support publicLocality-error"
@@ -248,6 +373,9 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               }
               aria-invalid={
                 fieldError(state, "publicLocality") ? true : undefined
+              }
+              onChange={(event) =>
+                updateValues(valuesFromForm(event.currentTarget.form!))
               }
             />
             {fieldError(state, "publicLocality") ? (
@@ -272,8 +400,25 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               className={styles.textarea}
               name="description"
               maxLength={5000}
-              defaultValue={draft?.description ?? ""}
+              value={values.description}
+              aria-invalid={fieldError(state, "description") ? true : undefined}
+              aria-describedby={
+                fieldError(state, "description")
+                  ? "description-error"
+                  : undefined
+              }
+              onChange={(event) =>
+                updateValues(valuesFromForm(event.currentTarget.form!))
+              }
             />
+            {fieldError(state, "description") ? (
+              <p id="description-error" className={styles.fieldError}>
+                {localizeEmployerMessage(
+                  fieldError(state, "description")!,
+                  locale,
+                )}
+              </p>
+            ) : null}
           </div>
 
           <div className={styles.field}>
@@ -284,7 +429,18 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               id="workplaceType"
               className={styles.select}
               name="workplaceType"
-              defaultValue={draft?.workplaceType ?? ""}
+              value={values.workplaceType}
+              aria-invalid={
+                fieldError(state, "workplaceType") ? true : undefined
+              }
+              aria-describedby={
+                fieldError(state, "workplaceType")
+                  ? "workplaceType-error"
+                  : undefined
+              }
+              onChange={(event) =>
+                updateValues(valuesFromForm(event.currentTarget.form!))
+              }
             >
               <option value="">{copy.notSet}</option>
               {WORKPLACE_TYPE_OPTIONS.map((option) => (
@@ -293,6 +449,14 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
                 </option>
               ))}
             </select>
+            {fieldError(state, "workplaceType") ? (
+              <p id="workplaceType-error" className={styles.fieldError}>
+                {localizeEmployerMessage(
+                  fieldError(state, "workplaceType")!,
+                  locale,
+                )}
+              </p>
+            ) : null}
             <p className={styles.warning}>
               {locale === "de"
                 ? "Geben Sie bei Privathaushalten keine genaue Adresse in öffentlich sichtbaren Feldern an."
@@ -308,7 +472,18 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               id="workFrequency"
               className={styles.select}
               name="workFrequency"
-              defaultValue={draft?.workFrequency ?? ""}
+              value={values.workFrequency}
+              aria-invalid={
+                fieldError(state, "workFrequency") ? true : undefined
+              }
+              aria-describedby={
+                fieldError(state, "workFrequency")
+                  ? "workFrequency-error"
+                  : undefined
+              }
+              onChange={(event) =>
+                updateValues(valuesFromForm(event.currentTarget.form!))
+              }
             >
               <option value="">{copy.notSet}</option>
               {WORK_FREQUENCY_OPTIONS.map((option) => (
@@ -317,6 +492,14 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
                 </option>
               ))}
             </select>
+            {fieldError(state, "workFrequency") ? (
+              <p id="workFrequency-error" className={styles.fieldError}>
+                {localizeEmployerMessage(
+                  fieldError(state, "workFrequency")!,
+                  locale,
+                )}
+              </p>
+            ) : null}
           </div>
 
           <fieldset className={styles.field}>
@@ -327,11 +510,30 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
                   type="checkbox"
                   name="employmentTypes"
                   value={option.code}
-                  defaultChecked={draft?.employmentTypes.includes(option.code)}
+                  checked={values.employmentTypes.includes(option.code)}
+                  aria-invalid={
+                    fieldError(state, "employmentTypes") ? true : undefined
+                  }
+                  aria-describedby={
+                    fieldError(state, "employmentTypes")
+                      ? "employmentTypes-error"
+                      : undefined
+                  }
+                  onChange={(event) =>
+                    updateValues(valuesFromForm(event.currentTarget.form!))
+                  }
                 />
                 <span>{employmentTypeLabel(option.code, locale)}</span>
               </label>
             ))}
+            {fieldError(state, "employmentTypes") ? (
+              <p id="employmentTypes-error" className={styles.fieldError}>
+                {localizeEmployerMessage(
+                  fieldError(state, "employmentTypes")!,
+                  locale,
+                )}
+              </p>
+            ) : null}
           </fieldset>
 
           <fieldset className={styles.field}>
@@ -342,13 +544,30 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
                   type="checkbox"
                   name="shiftRequirements"
                   value={option.code}
-                  defaultChecked={draft?.shiftRequirements.includes(
-                    option.code,
-                  )}
+                  checked={values.shiftRequirements.includes(option.code)}
+                  aria-invalid={
+                    fieldError(state, "shiftRequirements") ? true : undefined
+                  }
+                  aria-describedby={
+                    fieldError(state, "shiftRequirements")
+                      ? "shiftRequirements-error"
+                      : undefined
+                  }
+                  onChange={(event) =>
+                    updateValues(valuesFromForm(event.currentTarget.form!))
+                  }
                 />
                 <span>{shiftLabel(option.code, locale)}</span>
               </label>
             ))}
+            {fieldError(state, "shiftRequirements") ? (
+              <p id="shiftRequirements-error" className={styles.fieldError}>
+                {localizeEmployerMessage(
+                  fieldError(state, "shiftRequirements")!,
+                  locale,
+                )}
+              </p>
+            ) : null}
           </fieldset>
 
           <div className={styles.field}>
@@ -360,11 +579,38 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               className={styles.input}
               name="availableFrom"
               type="date"
-              defaultValue={draft?.availableFrom ?? ""}
+              value={values.availableFrom}
+              aria-invalid={
+                fieldError(state, "availableFrom") ? true : undefined
+              }
+              aria-describedby={
+                fieldError(state, "availableFrom")
+                  ? "availableFrom-error"
+                  : undefined
+              }
+              onChange={(event) =>
+                updateValues(valuesFromForm(event.currentTarget.form!))
+              }
             />
+            {fieldError(state, "availableFrom") ? (
+              <p id="availableFrom-error" className={styles.fieldError}>
+                {localizeEmployerMessage(
+                  fieldError(state, "availableFrom")!,
+                  locale,
+                )}
+              </p>
+            ) : null}
             {props.mode === "edit" ? (
               <label className={styles.checkboxRow}>
-                <input type="checkbox" name="clearAvailableFrom" value="true" />
+                <input
+                  type="checkbox"
+                  name="clearAvailableFrom"
+                  value="true"
+                  checked={values.clearAvailableFrom}
+                  onChange={(event) =>
+                    updateValues(valuesFromForm(event.currentTarget.form!))
+                  }
+                />
                 <span>{copy.clearDate}</span>
               </label>
             ) : null}
@@ -379,8 +625,27 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               className={styles.textarea}
               name="experienceNotes"
               maxLength={2000}
-              defaultValue={draft?.experienceNotes ?? ""}
+              value={values.experienceNotes}
+              aria-invalid={
+                fieldError(state, "experienceNotes") ? true : undefined
+              }
+              aria-describedby={
+                fieldError(state, "experienceNotes")
+                  ? "experienceNotes-error"
+                  : undefined
+              }
+              onChange={(event) =>
+                updateValues(valuesFromForm(event.currentTarget.form!))
+              }
             />
+            {fieldError(state, "experienceNotes") ? (
+              <p id="experienceNotes-error" className={styles.fieldError}>
+                {localizeEmployerMessage(
+                  fieldError(state, "experienceNotes")!,
+                  locale,
+                )}
+              </p>
+            ) : null}
           </div>
 
           <label className={styles.checkboxRow}>
@@ -388,7 +653,10 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               type="checkbox"
               name="cvRequired"
               value="true"
-              defaultChecked={draft?.cvRequired === true}
+              checked={values.cvRequired}
+              onChange={(event) =>
+                updateValues(valuesFromForm(event.currentTarget.form!))
+              }
             />
             <span>{t("employer.vacancies.cvRequired")}</span>
           </label>
@@ -398,15 +666,20 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               type="checkbox"
               name="interviewEnglishOk"
               value="true"
-              defaultChecked={draft?.interviewEnglishOk === true}
+              checked={values.interviewEnglishOk}
+              onChange={(event) =>
+                updateValues(valuesFromForm(event.currentTarget.form!))
+              }
             />
             <span>{copy.englishInterview}</span>
           </label>
 
           <GermanRequirementField
             name="germanRequirement"
-            value={germanRequirement}
-            onChange={setGermanRequirement}
+            value={values.germanRequirement}
+            onChange={(germanRequirement) =>
+              updateValues({ ...values, germanRequirement })
+            }
           />
         </fieldset>
 
@@ -424,7 +697,7 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               type="text"
               inputMode="decimal"
               placeholder="15.00"
-              defaultValue={salaryDefault}
+              value={values.salaryAmountEur}
               aria-invalid={
                 fieldError(state, "salaryAmountEur") ? true : undefined
               }
@@ -432,6 +705,9 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
                 fieldError(state, "salaryAmountEur")
                   ? "salaryAmountEur-error"
                   : undefined
+              }
+              onChange={(event) =>
+                updateValues(valuesFromForm(event.currentTarget.form!))
               }
             />
             {fieldError(state, "salaryAmountEur") ? (
@@ -451,9 +727,17 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               id="salaryPeriod"
               className={styles.select}
               name="salaryPeriod"
-              defaultValue={draft?.salaryPeriod ?? ""}
+              value={values.salaryPeriod}
               aria-invalid={
                 fieldError(state, "salaryPeriod") ? true : undefined
+              }
+              aria-describedby={
+                fieldError(state, "salaryPeriod")
+                  ? "salaryPeriod-error"
+                  : undefined
+              }
+              onChange={(event) =>
+                updateValues(valuesFromForm(event.currentTarget.form!))
               }
             >
               <option value="">{copy.notSet}</option>
@@ -472,7 +756,7 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
               ))}
             </select>
             {fieldError(state, "salaryPeriod") ? (
-              <p className={styles.fieldError}>
+              <p id="salaryPeriod-error" className={styles.fieldError}>
                 {localizeEmployerMessage(
                   fieldError(state, "salaryPeriod")!,
                   locale,
@@ -481,7 +765,15 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
             ) : null}
           </div>
           <label className={styles.checkboxRow}>
-            <input type="checkbox" name="clearSalary" value="true" />
+            <input
+              type="checkbox"
+              name="clearSalary"
+              value="true"
+              checked={values.clearSalary}
+              onChange={(event) =>
+                updateValues(valuesFromForm(event.currentTarget.form!))
+              }
+            />
             <span>{copy.clearSalary}</span>
           </label>
         </fieldset>
