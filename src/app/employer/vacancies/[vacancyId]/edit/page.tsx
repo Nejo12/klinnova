@@ -93,6 +93,13 @@ export default async function EditEmployerVacancyPage({
         ready={loaded.draft.ready}
         checklist={loaded.draft.checklist}
         available={loaded.draft.readinessAvailable}
+        continueHref={
+          loaded.draft.checklist.some(
+            (item) => !item.complete && item.id !== "verification",
+          )
+            ? "#section-basics"
+            : undefined
+        }
       />
 
       <VacancyDraftForm mode="edit" draft={loaded.draft} />

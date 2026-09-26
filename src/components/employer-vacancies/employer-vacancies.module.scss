@@ -30,6 +30,11 @@
   min-width: 0;
 }
 
+.pageIntroActions {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
 .sectionHeader {
   display: flex;
   align-items: baseline;
@@ -288,8 +293,11 @@
 
 .fieldset {
   margin: 0;
-  padding: 0;
-  border: none;
+  min-width: 0;
+  padding: var(--space-5);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-surface);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -297,9 +305,7 @@
 }
 
 .fieldset + .fieldset {
-  margin-top: var(--space-3);
-  padding-top: var(--space-6);
-  border-top: var(--border-width-default) solid var(--color-border-default);
+  margin-top: var(--space-2);
 }
 
 .legend {
@@ -356,6 +362,43 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  min-width: 0;
+}
+
+.salaryFields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.salaryAmount {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
+}
+
+.salaryAmount > span {
+  padding-left: var(--space-4);
+  color: var(--color-text-secondary);
+}
+
+.salaryAmount .input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  border: none;
+}
+
+.salaryAmount:focus-within {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.salaryAmount .input:focus-visible {
+  outline: none;
 }
 
 .label {
@@ -637,6 +680,11 @@
   color: var(--color-status-warning);
 }
 
+.readinessStatusBadge[data-verification-only="true"] {
+  background-color: var(--color-action-subtle);
+  color: var(--color-text-primary);
+}
+
 .input:focus-visible,
 .select:focus-visible,
 .textarea:focus-visible,
@@ -751,6 +799,29 @@
   .page {
     padding-right: var(--layout-gutter-desktop);
     padding-left: var(--layout-gutter-desktop);
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .pageIntro {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pageIntroActions,
+  .pageIntroActions .button {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .salaryFields {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
