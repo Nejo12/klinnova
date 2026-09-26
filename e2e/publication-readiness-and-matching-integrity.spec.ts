@@ -143,11 +143,40 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
   test("employer completes readiness through the real form, publishes, and a compatible candidate matches and applies — with the required negative proofs along the way", async ({
     page,
   }) => {
-    test.setTimeout(90_000);
+    test.setTimeout(120_000);
     expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
     const stamp = Date.now();
     const { email: employerEmail, displayName: employerDisplayName } =
       await registerAndOnboardPrivateEmployer(page, stamp);
+
+    // The page-level action must remain visible before and after DE reflow.
+    await page.goto("/employer/vacancies");
+    for (const width of [360, 390, 430, 768, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      const action = page.getByRole("link", { name: "Create draft" });
+      const box = await action.boundingBox();
+      expect(box).not.toBeNull();
+      expect(box!.x + box!.width).toBeLessThanOrEqual(width + 1);
+      expect(box!.height).toBeGreaterThanOrEqual(44);
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth),
+      ).toBeLessThanOrEqual(width);
+    }
+    await page.evaluate(() => localStorage.setItem("klinnova-locale", "de"));
+    await page.reload();
+    for (const width of [360, 390, 430]) {
+      await page.setViewportSize({ width, height: 900 });
+      const action = page.getByRole("link", { name: "Entwurf erstellen" });
+      const box = await action.boundingBox();
+      expect(box).not.toBeNull();
+      expect(box!.x + box!.width).toBeLessThanOrEqual(width + 1);
+      expect(box!.height).toBeGreaterThanOrEqual(44);
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth),
+      ).toBeLessThanOrEqual(width);
+    }
+    await page.evaluate(() => localStorage.setItem("klinnova-locale", "en"));
+    await page.setViewportSize({ width: 1280, height: 900 });
 
     await page.goto("/employer/vacancies/new");
     await page.getByLabel("Title").fill(`A1 Cleaning Role ${stamp}`);
