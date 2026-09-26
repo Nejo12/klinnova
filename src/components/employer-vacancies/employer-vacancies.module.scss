@@ -802,7 +802,7 @@
   }
 }
 
-@media (max-width: $breakpoint-md) {
+@media (max-width: ($breakpoint-md - 0.001rem)) {
   .pageIntro {
     flex-direction: column;
     align-items: stretch;
