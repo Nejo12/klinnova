@@ -117,6 +117,52 @@ describe("VacancyDraftForm — D-M5-19 employment types / shift requirements", (
 });
 
 describe("VacancyDraftForm — unsaved state", () => {
+  it("does not reuse a successfully created draft as the next new vacancy", async () => {
+    const creation = render(<VacancyDraftForm mode="create" />);
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), {
+      target: { value: "Created vacancy" },
+    });
+    fireEvent.click(screen.getByRole("checkbox", { name: "Part time" }));
+    fireEvent.submit(
+      screen.getByRole("button", { name: "Create draft" }).closest("form")!,
+    );
+    await waitFor(() =>
+      expect(createEmployerVacancyDraftAction).toHaveBeenCalled(),
+    );
+    creation.unmount(); // The create action redirects to the new draft's edit page.
+
+    const edit = render(<VacancyDraftForm mode="edit" draft={baseDraft} />);
+    edit.unmount();
+    render(<VacancyDraftForm mode="create" />);
+    expect(screen.getByRole("textbox", { name: "Title" })).toHaveValue("");
+    expect(
+      screen.getByRole("checkbox", { name: "Part time" }),
+    ).not.toBeChecked();
+  });
+
+  it("keeps a failed create submission available through a remount", async () => {
+    createEmployerVacancyDraftAction.mockResolvedValueOnce({
+      error: "Title is required.",
+      message: null,
+      fieldErrors: { title: "Title is required." },
+    });
+    const creation = render(<VacancyDraftForm mode="create" />);
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), {
+      target: { value: "Still unsaved" },
+    });
+    fireEvent.submit(
+      screen.getByRole("button", { name: "Create draft" }).closest("form")!,
+    );
+    await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
+    creation.unmount();
+    const edit = render(<VacancyDraftForm mode="edit" draft={baseDraft} />);
+    edit.unmount();
+    render(<VacancyDraftForm mode="create" />);
+    expect(screen.getByRole("textbox", { name: "Title" })).toHaveValue(
+      "Still unsaved",
+    );
+  });
+
   it("initializes persisted edit values across control types", () => {
     render(
       <VacancyDraftForm

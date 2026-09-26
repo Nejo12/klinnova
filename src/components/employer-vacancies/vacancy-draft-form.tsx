@@ -90,6 +90,7 @@ type FormValues = {
 // Survives a Server Component refresh that remounts the edit form. This is
 // tab-local memory, never a persisted draft or an autosave.
 const unsavedForms = new Map<string, FormValues>();
+let createRedirectPending = false;
 
 function valuesFromDraft(draft: EmployerDraftDetail | null): FormValues {
   return {
@@ -211,6 +212,18 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
   }
 
   useEffect(() => {
+    // A successful create redirects straight to edit without returning a
+    // success state. Clear its submitted snapshot at the destination.
+    if (draft && createRedirectPending) {
+      unsavedForms.delete("create");
+      createRedirectPending = false;
+    }
+  }, [draft]);
+
+  useEffect(() => {
+    if (props.mode === "create" && state.error !== null) {
+      createRedirectPending = false;
+    }
     if (
       state.error === null &&
       state.message !== null &&
@@ -221,7 +234,7 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
       }
       submittedValues.current = null;
     }
-  }, [state, values, formKey]);
+  }, [state, values, formKey, props.mode]);
 
   useEffect(() => {
     if (!state.fieldErrors || !formRef.current) return;
@@ -265,6 +278,7 @@ export function VacancyDraftForm(props: VacancyDraftFormProps) {
           const form = event.currentTarget;
           submittedValues.current = valuesFromForm(form);
           const data = new FormData(form);
+          if (props.mode === "create") createRedirectPending = true;
           startTransition(() => formAction(data));
         }}
       >
