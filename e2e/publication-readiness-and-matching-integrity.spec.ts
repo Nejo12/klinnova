@@ -1,4 +1,4 @@
-import { expect, test, type Page, type Response } from "@playwright/test";
+import { expect, test, type Locator, type Page, type Response } from "@playwright/test";
 
 import { registerAndConfirm } from "./helpers/auth";
 import {
@@ -56,6 +56,29 @@ async function readinessRow(page: Page, label: string) {
     .getByLabel("Publication readiness")
     .getByText(label, { exact: true })
     .locator("..");
+}
+
+async function expectResponsiveActionFitsViewport(
+  page: Page,
+  action: Locator,
+  width: number,
+): Promise<void> {
+  await expect(action).toBeVisible({ timeout: 15_000 });
+
+  // Measure the currently-resolved DOM node in one locator operation.
+  // A standalone boundingBox() can return null if React/Next replaces the
+  // link between the visibility assertion and the measurement during a
+  // viewport-triggered reflow/hydration boundary.
+  const rect = await action.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    return { right: box.right, height: box.height };
+  });
+
+  expect(rect.right).toBeLessThanOrEqual(width + 1);
+  expect(rect.height).toBeGreaterThanOrEqual(44);
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth),
+  ).toBeLessThanOrEqual(width);
 }
 
 async function saveDraftAndReload(page: Page): Promise<void> {
@@ -154,28 +177,14 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     for (const width of [360, 390, 430, 768, 1280]) {
       await page.setViewportSize({ width, height: 900 });
       const action = page.getByRole("link", { name: "Create draft" });
-      await expect(action).toBeVisible({ timeout: 15_000 });
-      const box = await action.boundingBox();
-      expect(box).not.toBeNull();
-      expect(box!.x + box!.width).toBeLessThanOrEqual(width + 1);
-      expect(box!.height).toBeGreaterThanOrEqual(44);
-      expect(
-        await page.evaluate(() => document.documentElement.scrollWidth),
-      ).toBeLessThanOrEqual(width);
+      await expectResponsiveActionFitsViewport(page, action, width);
     }
     await page.evaluate(() => localStorage.setItem("klinnova-locale", "de"));
     await page.reload();
     for (const width of [360, 390, 430]) {
       await page.setViewportSize({ width, height: 900 });
       const action = page.getByRole("link", { name: "Entwurf erstellen" });
-      await expect(action).toBeVisible({ timeout: 15_000 });
-      const box = await action.boundingBox();
-      expect(box).not.toBeNull();
-      expect(box!.x + box!.width).toBeLessThanOrEqual(width + 1);
-      expect(box!.height).toBeGreaterThanOrEqual(44);
-      expect(
-        await page.evaluate(() => document.documentElement.scrollWidth),
-      ).toBeLessThanOrEqual(width);
+      await expectResponsiveActionFitsViewport(page, action, width);
     }
     await page.evaluate(() => localStorage.setItem("klinnova-locale", "en"));
     await page.setViewportSize({ width: 1280, height: 900 });
