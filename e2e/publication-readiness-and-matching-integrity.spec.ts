@@ -167,17 +167,12 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     // --- Negative proof: readiness truthfully reports what publish will
     // actually require, before anything beyond the minimum is filled.
     await expect(
-      page.getByText(
-        /still needed before publishing\.|missing before publishing\./,
-      ),
+      page.getByLabel("Publication readiness").getByText(/details missing/),
     ).toBeVisible({
       timeout: 15_000,
     });
-    const workplaceTypeRow = page
-      .getByLabel("Publication readiness")
-      .getByText("Workplace type", { exact: true })
-      .locator("..");
-    await expect(workplaceTypeRow).toHaveAttribute("data-complete", "false");
+    const workplaceTypeRow = await readinessRow(page, "Workplace type");
+    await expect(workplaceTypeRow).toContainText("Missing");
 
     // Complete every remaining vacancy-level field, including the two new
     // checkbox groups this unit adds — through the real form, not a fixture.
@@ -195,12 +190,12 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     await saveDraftAndReload(page);
     await expectReadyDraftFieldsPersisted(page);
 
-    // --- Negative proof, inverted: readiness reflects the durably saved
-    // draft fields. workplace_type is now correctly "Complete".
-    await expect(await readinessRow(page, "Workplace type")).toHaveAttribute(
-      "data-complete",
-      "true",
-    );
+    // Completed fields no longer repeat as checklist rows after persistence.
+    await expect(
+      page.getByLabel("Publication readiness").getByText("Workplace type", {
+        exact: true,
+      }),
+    ).toHaveCount(0);
 
     await page.getByRole("button", { name: "Add language" }).click();
     await page.getByLabel(/^Language 1$/i).selectOption("en");
@@ -211,14 +206,20 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
     // Still not ready: employer is not yet verified. Readiness must not
     // claim otherwise merely because every vacancy field is complete.
     await expect(
-      page.getByText("Employer verification still needed before publishing."),
+      page
+        .getByLabel("Publication readiness")
+        .getByText("Vacancy details complete"),
     ).toBeVisible({
       timeout: 15_000,
     });
-    const verificationRow = page
-      .getByText("Employer verification", { exact: true })
-      .locator("..");
-    await expect(verificationRow).toHaveAttribute("data-complete", "false");
+    await expect(
+      page
+        .getByLabel("Publication readiness")
+        .getByText(/Verification required before publishing/),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Go to verification" }),
+    ).toHaveAttribute("href", "/employer/verification");
 
     await page.goto("/employer/verification");
     await page
@@ -269,7 +270,7 @@ test.describe("publication readiness and matching integrity (D-M5-19)", () => {
 
     await page.goto(`/employer/vacancies/${vacancyId}`);
     await expect(
-      page.getByText("Ready to publish.", { exact: true }),
+      page.getByText("Ready to publish", { exact: true }),
     ).toBeVisible({ timeout: 15_000 });
     await publishVacancyAndReload(page);
 
