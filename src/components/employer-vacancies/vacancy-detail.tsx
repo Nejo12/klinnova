@@ -93,7 +93,9 @@ export function VacancyDetail({
         </p>
       ) : null}
 
-      {suspended ? null : (
+      {suspended ||
+      (showDraftReadiness &&
+        (!vacancy.ready || !vacancy.readinessAvailable)) ? null : (
         <VacancyLifecycleActions
           vacancyId={vacancy.id}
           publicationState={vacancy.publicationState}

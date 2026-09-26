@@ -111,4 +111,30 @@ describe("VacancyDetail", () => {
       screen.queryByRole("region", { name: "Lifecycle actions" }),
     ).toBeNull();
   });
+
+  it("prioritizes verification without offering Publish for a blocked draft", () => {
+    render(
+      <VacancyDetail
+        vacancy={buildVacancy({
+          ready: false,
+          verificationState: "unverified",
+          checklist: [
+            { id: "title", label: "Title", complete: true },
+            {
+              id: "verification",
+              label: "Employer verification",
+              complete: false,
+            },
+          ],
+        })}
+      />,
+    );
+    expect(screen.getByText("Vacancy details complete")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Go to verification" }),
+    ).toHaveAttribute("href", "/employer/verification");
+    expect(
+      screen.queryByRole("region", { name: "Lifecycle actions" }),
+    ).not.toBeInTheDocument();
+  });
 });
