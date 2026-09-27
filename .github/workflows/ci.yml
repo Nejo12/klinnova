@@ -204,6 +204,9 @@ jobs:
       - name: Employer navigation IA journeys (local Supabase + Mailpit)
         run: pnpm test:e2e:employer-navigation-ia
 
+      - name: Employer responsive layout regression (local Supabase + Mailpit)
+        run: pnpm exec playwright test --workers=1 e2e/employer-responsive-layout.spec.ts
+
       - name: WebKit/mobile navigation IA smoke — Unit I / I-05 (local Supabase + Mailpit)
         run: pnpm test:e2e:webkit-smoke
 
