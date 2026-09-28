@@ -44,102 +44,98 @@
 }
 
 .progressLabel {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-regular);
-  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.progressBar {
+  width: 100%;
 }
 
 .progressList {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-2) 0;
-  margin: 0;
-  padding: var(--space-1) 0;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 0;
+  padding: 0;
   list-style: none;
 }
 
 .progressList li {
   display: flex;
-  align-items: center;
-  flex: 0 0 auto;
   max-width: 100%;
 }
 
-.progressList li:not(:last-child)::after {
-  content: "";
-  flex: 0 0 auto;
-  width: var(--space-6);
-  height: var(--step-line-width);
-  background-color: var(--color-border-default);
-  margin: 0 var(--space-1);
-}
-
 .progressItem {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  width: 100%;
   min-height: var(--touch-target-min);
   padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-pill);
-  color: var(--color-text-secondary);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
   font-size: var(--font-size-sm);
   text-decoration: none;
 }
 
+.progressIndex {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--step-size);
+  height: var(--step-size);
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+  border-radius: 50%;
+  border: var(--step-line-width) solid var(--color-border-default);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
 .progressItemLabel {
-  max-width: 10rem;
+  flex: 1 1 auto;
+  min-width: 0;
   white-space: normal;
   line-height: var(--line-height-sm);
   overflow-wrap: break-word;
 }
 
-.progressItem::before {
-  content: "";
+.progressEdit {
   flex: 0 0 auto;
-  width: var(--step-size);
-  height: var(--step-size);
-  border-radius: 50%;
-  border: var(--step-line-width) solid var(--step-color-upcoming);
-  background-color: transparent;
-  transition:
-    width var(--duration-fast) var(--ease-standard),
-    height var(--duration-fast) var(--ease-standard),
-    background-color var(--duration-fast) var(--ease-standard),
-    border-color var(--duration-fast) var(--ease-standard);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-link);
 }
 
 .progressItem[data-state="complete"] {
-  color: var(--color-support-strong);
+  color: var(--color-text-secondary);
 }
 
-.progressItem[data-state="complete"]::before {
+.progressItem[data-state="complete"] .progressIndex {
   border-color: var(--step-color-complete);
   background-color: var(--step-color-complete);
+  color: var(--color-action-primary-text);
 }
 
 .progressItem[data-state="current"] {
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
+  background-color: var(--color-action-subtle);
+  border-inline-start: var(--border-width-strong) solid
+    var(--color-action-primary);
 }
 
-.progressItem[data-state="current"]::before {
-  width: calc(var(--step-size) * 1.6);
-  height: calc(var(--step-size) * 1.6);
+.progressItem[data-state="current"] .progressIndex {
   border-color: var(--step-color-current);
-  background-color: var(--step-color-current);
+  color: var(--color-text-primary);
 }
 
-.progressMarker {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+.progressItem[data-state="upcoming"] {
   color: var(--color-text-muted);
-}
-
-.progressItem[data-state="current"] .progressMarker {
-  color: inherit;
 }
 
 .form {
@@ -463,43 +459,6 @@
 
   .progress {
     gap: var(--space-1);
-  }
-
-  .progressList {
-    flex-wrap: nowrap;
-    gap: var(--space-1);
-    overflow-x: auto;
-    padding-bottom: var(--space-2);
-    scroll-snap-type: x proximity;
-    scrollbar-width: thin;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .progressList li {
-    scroll-snap-align: start;
-  }
-
-  .progressList li:not(:last-child)::after {
-    display: none;
-  }
-
-  .progressItem {
-    min-height: var(--touch-target-min);
-    padding: var(--space-2);
-    border: var(--border-width-default) solid var(--color-border-default);
-    border-radius: var(--radius-md);
-    background-color: var(--color-bg-surface);
-    white-space: nowrap;
-  }
-
-  .progressItemLabel {
-    max-width: none;
-    white-space: nowrap;
-  }
-
-  .progressItem[data-state="current"] {
-    border-color: var(--color-action-primary);
-    background-color: var(--color-action-subtle);
   }
 
   .actions {

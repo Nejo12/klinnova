@@ -30,22 +30,43 @@ describe("OnboardingProgressNav", () => {
       <OnboardingProgressNav progress={baseProgress} current="location" />,
     );
 
-    const nav = screen.getByRole("navigation", { name: "Onboarding progress" });
+    const nav = screen.getByRole("navigation", {
+      name: "Onboarding progress",
+    });
     const items = within(nav).getAllByRole("listitem");
     expect(items).toHaveLength(6);
 
     for (const label of Object.values(ONBOARDING_GROUP_LABELS)) {
-      expect(within(nav).getByText(new RegExp(label))).toBeInTheDocument();
+      expect(within(nav).getByText(label)).toBeInTheDocument();
     }
   });
 
-  it("marks the current group with aria-current=step and Current state/marker", () => {
+  it("shows a localized Step N of 6 primary progress label", () => {
+    render(
+      <OnboardingProgressNav progress={baseProgress} current="location" />,
+    );
+
+    // location is the third onboarding group.
+    expect(screen.getByText("Step 3 of 6")).toBeInTheDocument();
+  });
+
+  it("renders the Nova Progress primitive with the completed-group value", () => {
+    render(
+      <OnboardingProgressNav progress={baseProgress} current="location" />,
+    );
+
+    const progressBar = screen.getByRole("progressbar");
+    expect(progressBar).toHaveAttribute("aria-valuenow", "2");
+    expect(progressBar).toHaveAttribute("aria-valuemax", "6");
+  });
+
+  it("marks the current group with aria-current=step", () => {
     render(
       <OnboardingProgressNav progress={baseProgress} current="location" />,
     );
 
     const currentLink = screen.getByRole("link", {
-      name: /Current.*Berlin and travel time/,
+      name: "Berlin and travel time",
     });
     expect(currentLink).toHaveAttribute("aria-current", "step");
     expect(currentLink).toHaveAttribute("data-state", "current");
@@ -57,35 +78,70 @@ describe("OnboardingProgressNav", () => {
     );
 
     const completeLink = screen.getByRole("link", {
-      name: /Saved.*Languages and German comfort/,
+      name: "Languages and German comfort: Edit",
     });
     expect(completeLink).not.toHaveAttribute("aria-current");
     expect(completeLink).toHaveAttribute("data-state", "complete");
 
     const upcomingLink = screen.getByRole("link", {
-      name: /Next.*Job categories/,
+      name: "Job categories",
     });
     expect(upcomingLink).not.toHaveAttribute("aria-current");
     expect(upcomingLink).toHaveAttribute("data-state", "upcoming");
   });
 
-  it("shows the X of Y sections saved caption", () => {
+  it("removes the old SAVED/CURRENT/NEXT marker text", () => {
     render(
       <OnboardingProgressNav progress={baseProgress} current="location" />,
     );
 
-    expect(screen.getByText("2 of 6 sections saved")).toBeInTheDocument();
+    const nav = screen.getByRole("navigation", {
+      name: "Onboarding progress",
+    });
+    expect(within(nav).queryByText("Saved")).not.toBeInTheDocument();
+    expect(within(nav).queryByText("Current")).not.toBeInTheDocument();
+    expect(within(nav).queryByText("Next")).not.toBeInTheDocument();
   });
 
-  it("gives complete, current, and upcoming steps distinct marker text (never color alone)", () => {
+  it("gives completed groups a non-color cue (checkmark) and an Edit affordance", () => {
     render(
       <OnboardingProgressNav progress={baseProgress} current="location" />,
     );
 
-    const nav = screen.getByRole("navigation", { name: "Onboarding progress" });
-    expect(within(nav).getAllByText("Saved")).toHaveLength(2);
-    expect(within(nav).getAllByText("Current")).toHaveLength(1);
-    expect(within(nav).getAllByText("Next")).toHaveLength(3);
+    const completeLink = screen.getByRole("link", {
+      name: "Languages and German comfort: Edit",
+    });
+    expect(within(completeLink).getByText("✓")).toBeInTheDocument();
+    expect(within(completeLink).getByText("Edit")).toBeInTheDocument();
+    expect(within(completeLink).getByText("Completed")).toBeInTheDocument();
+  });
+
+  it("shows a plain step number (not a checkmark) for current and upcoming groups", () => {
+    render(
+      <OnboardingProgressNav progress={baseProgress} current="location" />,
+    );
+
+    const currentLink = screen.getByRole("link", {
+      name: "Berlin and travel time",
+    });
+    expect(within(currentLink).getByText("3")).toBeInTheDocument();
+
+    const upcomingLink = screen.getByRole("link", {
+      name: "Job categories",
+    });
+    expect(within(upcomingLink).getByText("4")).toBeInTheDocument();
+  });
+
+  it("keeps every group directly navigable, including future groups", () => {
+    render(
+      <OnboardingProgressNav progress={baseProgress} current="location" />,
+    );
+
+    const upcomingLink = screen.getByRole("link", { name: "Job categories" });
+    expect(upcomingLink).toHaveAttribute(
+      "href",
+      "/candidate/onboarding?group=categories",
+    );
   });
 
   it("links each item to the correct onboarding group href", () => {
@@ -93,9 +149,7 @@ describe("OnboardingProgressNav", () => {
       <OnboardingProgressNav progress={baseProgress} current="location" />,
     );
 
-    const link = screen.getByRole("link", {
-      name: /Current.*Berlin and travel time/,
-    });
+    const link = screen.getByRole("link", { name: "Berlin and travel time" });
     expect(link).toHaveAttribute(
       "href",
       "/candidate/onboarding?group=location",
@@ -105,10 +159,12 @@ describe("OnboardingProgressNav", () => {
   it("marks no group as current when current is 'review'", () => {
     render(<OnboardingProgressNav progress={baseProgress} current="review" />);
 
-    const nav = screen.getByRole("navigation", { name: "Onboarding progress" });
-    expect(within(nav).queryByText("Current")).not.toBeInTheDocument();
+    const nav = screen.getByRole("navigation", {
+      name: "Onboarding progress",
+    });
     expect(
       within(nav).queryByRole("link", { current: "step" }),
     ).not.toBeInTheDocument();
+    expect(screen.getByText("Step 6 of 6")).toBeInTheDocument();
   });
 });
