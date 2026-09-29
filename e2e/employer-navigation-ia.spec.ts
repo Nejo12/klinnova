@@ -236,12 +236,20 @@ test.describe("employer navigation IA (Unit I / I2)", () => {
       ).toBe(false);
     }
 
-    await page.getByRole("radio", { name: "Dark" }).check();
+    await page
+      .getByRole("group", { name: "Appearance" })
+      .getByText("Dark", { exact: true })
+      .click();
+    await expect(page.getByRole("radio", { name: "Dark" })).toBeChecked();
     await expect(page.locator("html")).toHaveAttribute(
       "data-theme-preference",
       "dark",
     );
-    await page.getByRole("radio", { name: "Deutsch" }).check();
+    await page
+      .getByRole("group", { name: "Interface language" })
+      .getByText("Deutsch", { exact: true })
+      .click();
+    await expect(page.getByRole("radio", { name: "Deutsch" })).toBeChecked();
     await expect(
       page.getByRole("heading", { level: 1, name: "Konto und Einstellungen" }),
     ).toBeVisible();
