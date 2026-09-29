@@ -86,6 +86,7 @@ export async function notifyCandidateOfStatusChange(
     to: recipient.candidateEmail,
     subject: content.subject,
     text: content.text,
+    html: content.html,
     eventId: `application-status:${input.applicationId}:${input.toStatus}`,
   });
 

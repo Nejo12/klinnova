@@ -78,6 +78,10 @@ describe("notifyEmployerOfNewApplication", () => {
     expect(sentMessage.text).toContain(
       `https://klinnova.com/employer/applications/${applicationIdA}`,
     );
+    expect(sentMessage.html).toContain("Review application</a>");
+    expect(sentMessage.html).toContain(
+      `https://klinnova.com/employer/applications/${applicationIdA}`,
+    );
   });
 
   it("derives eventId deterministically from the application id: application-submitted:<id>", async () => {

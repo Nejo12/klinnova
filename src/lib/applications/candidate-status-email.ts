@@ -4,6 +4,8 @@
  * forward-only/terminal matrix: `submitted`/`reviewing` are never terminal
  * and never notified — see `notify-candidate-status-change.ts`).
  */
+import { renderBusinessEmailHtml } from "@/lib/mail/presentation";
+
 export const NOTIFIABLE_APPLICATION_STATUSES = [
   "shortlisted",
   "accepted",
@@ -36,6 +38,7 @@ export type CandidateStatusEmailInput = {
 export type CandidateStatusEmailContent = {
   subject: string;
   text: string;
+  html: string;
 };
 
 function signInLines(applicationUrl: string): string[] {
@@ -44,7 +47,22 @@ function signInLines(applicationUrl: string): string[] {
     "Sign in to Klinnova to view your application status.",
     "",
     applicationUrl,
+    "",
+    "Need help? support@klinnova.com",
   ];
+}
+
+function statusHtml(
+  heading: string,
+  paragraphs: string[],
+  applicationUrl: string,
+): string {
+  return renderBusinessEmailHtml({
+    heading,
+    paragraphs,
+    actionLabel: "View application",
+    actionUrl: applicationUrl,
+  });
 }
 
 function buildShortlisted(
@@ -56,6 +74,14 @@ function buildShortlisted(
       `Your application for ${input.vacancyTitle} has been shortlisted.`,
       ...signInLines(input.applicationUrl),
     ].join("\n"),
+    html: statusHtml(
+      `Your application for ${input.vacancyTitle} was shortlisted`,
+      [
+        `Your application for ${input.vacancyTitle} has been shortlisted.`,
+        "Sign in to Klinnova to view your application status.",
+      ],
+      input.applicationUrl,
+    ),
   };
 }
 
@@ -70,6 +96,15 @@ function buildAccepted(
       "Acceptance in Klinnova does not by itself confirm that you have been hired or that a work agreement has been completed.",
       ...signInLines(input.applicationUrl),
     ].join("\n"),
+    html: statusHtml(
+      `Your application for ${input.vacancyTitle} was accepted`,
+      [
+        `Your application for ${input.vacancyTitle} has been accepted.`,
+        "Acceptance in Klinnova does not by itself confirm that you have been hired or that a work agreement has been completed.",
+        "Sign in to Klinnova to view your application status.",
+      ],
+      input.applicationUrl,
+    ),
   };
 }
 
@@ -82,6 +117,14 @@ function buildRejected(
       `Your application for ${input.vacancyTitle} was not selected.`,
       ...signInLines(input.applicationUrl),
     ].join("\n"),
+    html: statusHtml(
+      `Update on your application for ${input.vacancyTitle}`,
+      [
+        `Your application for ${input.vacancyTitle} was not selected.`,
+        "Sign in to Klinnova to view your application status.",
+      ],
+      input.applicationUrl,
+    ),
   };
 }
 

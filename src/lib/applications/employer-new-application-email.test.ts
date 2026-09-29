@@ -22,6 +22,8 @@ describe("buildEmployerNewApplicationEmail", () => {
         "Sign in to Klinnova to review the application.",
         "",
         "https://klinnova.com/employer/applications/abc-123",
+        "",
+        "Need help? support@klinnova.com",
       ].join("\n"),
     );
   });
@@ -34,7 +36,8 @@ describe("buildEmployerNewApplicationEmail", () => {
 
   it("never includes marketing language, urgency, or unsubscribe text", () => {
     const content = buildEmployerNewApplicationEmail(input);
-    const combined = `${content.subject}\n${content.text}`.toLowerCase();
+    const combined =
+      `${content.subject}\n${content.text}\n${content.html}`.toLowerCase();
     expect(combined).not.toMatch(/great news|act now|unsubscribe|limited time/);
   });
 
@@ -43,9 +46,28 @@ describe("buildEmployerNewApplicationEmail", () => {
       vacancyTitle: "Evening cleaning",
       reviewUrl: "https://klinnova.com/employer/applications/xyz-789",
     });
-    const combined = `${content.subject}\n${content.text}`;
-    expect(combined).not.toMatch(/candidate/i);
-    expect(combined).not.toMatch(/@/);
+    const combined = `${content.subject}\n${content.text}\n${content.html}`;
+    expect(combined).not.toMatch(
+      /candidate|phone|photo|profile|application answers/i,
+    );
     expect(combined).not.toMatch(/\+?\d{5,}/);
+  });
+
+  it("renders one action and a visible fallback URL while escaping dynamic content", () => {
+    const content = buildEmployerNewApplicationEmail({
+      vacancyTitle: 'Kitchen <script>"',
+      reviewUrl: "https://klinnova.com/employer/applications/id?one=1&two=2",
+    });
+    expect(content.html).toContain("Review application</a>");
+    expect(content.html.match(/Review application<\/a>/g)).toHaveLength(1);
+    expect(content.html).toContain("Kitchen &lt;script&gt;&quot;");
+    expect(content.html).not.toContain("<script>");
+    expect(content.html).toContain(
+      "https://klinnova.com/employer/applications/id?one=1&amp;two=2",
+    );
+    expect(content.html).toContain("support@klinnova.com");
+    expect(content.text).toContain(
+      "https://klinnova.com/employer/applications/id?one=1&two=2",
+    );
   });
 });
