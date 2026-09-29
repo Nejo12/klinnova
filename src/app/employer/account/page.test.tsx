@@ -42,7 +42,9 @@ describe("EmployerAccountPage", () => {
         }),
       ).toBeVisible();
       expect(screen.getByRole("group", { name: "Appearance" })).toBeVisible();
-      expect(screen.getByRole("group", { name: "Language" })).toBeVisible();
+      expect(
+        screen.getByRole("group", { name: "Interface language" }),
+      ).toBeVisible();
       expect(screen.getByRole("radio", { name: "System" })).toBeChecked();
       expect(
         screen.getByRole("link", { name: "Download employer data" }),

@@ -194,7 +194,9 @@ test.describe("employer navigation IA (Unit I / I2)", () => {
       await expect(
         page.getByRole("link", { name: "Download employer data" }),
       ).toHaveCount(0);
-      await expect(page.locator("[data-overlay-trigger]")).toHaveCount(0);
+      await expect(
+        page.getByRole("button", { name: "Interface preferences" }),
+      ).toHaveCount(0);
       expect(
         await page.evaluate(
           () => document.documentElement.scrollWidth > innerWidth,
@@ -202,7 +204,7 @@ test.describe("employer navigation IA (Unit I / I2)", () => {
       ).toBe(false);
 
       await page
-        .getByRole("button", { name: /Workspace menu: Employer/ })
+        .getByRole("button", { name: /Workspace and account: Employer/ })
         .click();
       await page.getByRole("link", { name: "Account and security" }).click();
       await expect(page).toHaveURL(/\/employer\/account$/);
@@ -224,7 +226,9 @@ test.describe("employer navigation IA (Unit I / I2)", () => {
       await expect(
         page.getByRole("heading", { name: "Session security" }),
       ).toBeVisible();
-      await expect(page.locator("[data-overlay-trigger]")).toHaveCount(0);
+      await expect(
+        page.getByRole("button", { name: "Interface preferences" }),
+      ).toHaveCount(0);
       expect(
         await page.evaluate(
           () => document.documentElement.scrollWidth > innerWidth,
