@@ -78,6 +78,10 @@ describe("notifyCandidateOfStatusChange", () => {
     expect(sentMessage.text).toContain(
       `https://klinnova.com/candidate/applications/${applicationIdA}`,
     );
+    expect(sentMessage.html).toContain("View application</a>");
+    expect(sentMessage.html).toContain(
+      `https://klinnova.com/candidate/applications/${applicationIdA}`,
+    );
   });
 
   it.each(["shortlisted", "accepted", "rejected"] as const)(

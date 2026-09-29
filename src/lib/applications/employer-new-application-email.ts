@@ -4,10 +4,10 @@
  * belongs, not this email. Contains only the vacancy title, Klinnova
  * identity, and a safe authenticated destination — never candidate name,
  * email, phone, address, application answers, or any internal identifier
- * beyond what the URL itself requires. Plain text only; no HTML — this is a
- * one-line attention nudge, not a document. Structure kept easy to revise
- * once Unit H legal review lands; no legal footer content is invented here.
+ * beyond what the URL itself requires. No legal footer content is invented.
  */
+import { renderBusinessEmailHtml } from "@/lib/mail/presentation";
+
 export type EmployerNewApplicationEmailInput = {
   vacancyTitle: string;
   reviewUrl: string;
@@ -16,6 +16,7 @@ export type EmployerNewApplicationEmailInput = {
 export type EmployerNewApplicationEmailContent = {
   subject: string;
   text: string;
+  html: string;
 };
 
 export function buildEmployerNewApplicationEmail(
@@ -29,6 +30,16 @@ export function buildEmployerNewApplicationEmail(
       "Sign in to Klinnova to review the application.",
       "",
       input.reviewUrl,
+      "",
+      "Need help? support@klinnova.com",
     ].join("\n"),
+    html: renderBusinessEmailHtml({
+      heading: `New application for ${input.vacancyTitle}`,
+      paragraphs: [
+        `You received a new application for ${input.vacancyTitle}. Sign in to Klinnova to review it.`,
+      ],
+      actionLabel: "Review application",
+      actionUrl: input.reviewUrl,
+    }),
   };
 }

@@ -71,6 +71,7 @@ export async function notifyEmployerOfNewApplication(
     to: recipient.employerEmail,
     subject: content.subject,
     text: content.text,
+    html: content.html,
     eventId: `application-submitted:${input.applicationId}`,
   });
 

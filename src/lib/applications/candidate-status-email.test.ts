@@ -52,6 +52,8 @@ describe("buildCandidateStatusEmail — shortlisted", () => {
         "Sign in to Klinnova to view your application status.",
         "",
         applicationUrl,
+        "",
+        "Need help? support@klinnova.com",
       ].join("\n"),
     );
   });
@@ -88,6 +90,8 @@ describe("buildCandidateStatusEmail — accepted (high scrutiny: accepted != hir
         "Sign in to Klinnova to view your application status.",
         "",
         applicationUrl,
+        "",
+        "Need help? support@klinnova.com",
       ].join("\n"),
     );
   });
@@ -160,6 +164,8 @@ describe("buildCandidateStatusEmail — rejected (privacy-critical)", () => {
         "Sign in to Klinnova to view your application status.",
         "",
         applicationUrl,
+        "",
+        "Need help? support@klinnova.com",
       ].join("\n"),
     );
   });
@@ -219,6 +225,41 @@ describe("buildCandidateStatusEmail — general", () => {
       seen.add(`${content.subject}|${content.text}`);
     }
     expect(seen.size).toBe(NOTIFIABLE_APPLICATION_STATUSES.length);
+  });
+
+  it.each(NOTIFIABLE_APPLICATION_STATUSES)(
+    "renders safe HTML, a single View application CTA, and a raw fallback for %s",
+    (toStatus) => {
+      const content = buildCandidateStatusEmail({
+        toStatus,
+        vacancyTitle: "Kitchen <script>",
+        applicationUrl,
+      });
+      expect(content.html).toContain("Kitchen &lt;script&gt;");
+      expect(content.html).not.toContain("<script>");
+      expect(content.html.match(/View application<\/a>/g)).toHaveLength(1);
+      expect(content.html).toContain(applicationUrl);
+      expect(content.html).toContain("support@klinnova.com");
+      expect(content.text).toContain(applicationUrl);
+    },
+  );
+
+  it("preserves the accepted clarification in HTML and keeps rejected HTML private", () => {
+    const accepted = buildCandidateStatusEmail({
+      toStatus: "accepted",
+      vacancyTitle,
+      applicationUrl,
+    });
+    expect(accepted.html).toContain(
+      "does not by itself confirm that you have been hired or that a work agreement has been completed",
+    );
+    const rejected = buildCandidateStatusEmail({
+      toStatus: "rejected",
+      vacancyTitle,
+      applicationUrl,
+    });
+    expect(rejected.html).toContain("was not selected");
+    expect(rejected.html).not.toMatch(/rejection reason|actor|internal note/i);
   });
 
   it("exhausts every NotifiableApplicationStatus without a default case masking a missing status", () => {
