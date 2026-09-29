@@ -19,7 +19,7 @@ export const EMPLOYER_HOME_VACANCY_SKELETON_COUNT = 2;
  * capabilities, unseen applications, and employer vacancies before
  * rendering; the skeleton therefore keeps only stable structure:
  * welcome/lead geometry, one possible attention slot, the vacancies
- * section, and account data. It does not render fake display names,
+ * section. It does not render fake display names,
  * verification claims, unseen counts, vacancy lifecycle values, or
  * per-vacancy application counts.
  */
@@ -98,24 +98,6 @@ export default function Loading() {
             </ul>
             <div className={styles.inlineActions}>
               <Skeleton height="2.75rem" width="7rem" radius="sm" />
-            </div>
-          </section>
-        </SkeletonRegion>
-      </DelayedReveal>
-
-      <DelayedReveal>
-        <SkeletonRegion label={t("employer.loading.accountData")}>
-          <section
-            className={styles.accountSection}
-            aria-label={t("employer.loading.accountData")}
-          >
-            <div className={styles.heroCopy}>
-              <Skeleton height="1.5rem" width="8rem" radius="sm" />
-              <Skeleton height="1rem" width="min(100%, 28rem)" radius="sm" />
-            </div>
-            <div className={styles.accountActions}>
-              <Skeleton height="2.75rem" width="10rem" radius="sm" />
-              <Skeleton height="2.75rem" width="8rem" radius="sm" />
             </div>
           </section>
         </SkeletonRegion>

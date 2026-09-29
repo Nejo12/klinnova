@@ -73,7 +73,7 @@ function draft(
   };
 }
 
-describe("EmployerHomePage account-data export link", () => {
+describe("EmployerHomePage hiring focus", () => {
   beforeEach(() => {
     loadEmployerProfile.mockReset();
     loadAccountCapabilities.mockReset();
@@ -87,7 +87,7 @@ describe("EmployerHomePage account-data export link", () => {
     loadEmployerDrafts.mockResolvedValue({ ok: true, drafts: [] });
   });
 
-  it("shows a fixed employer data-download link for a completed employer", async () => {
+  it("leaves appearance and account administration on Account", async () => {
     loadEmployerProfile.mockResolvedValue({
       ok: true,
       data: completedProfile,
@@ -96,25 +96,17 @@ describe("EmployerHomePage account-data export link", () => {
 
     render(await EmployerHomePage());
 
-    const downloadLink = screen.getByRole("link", {
-      name: "Download employer data",
-    });
-    expect(downloadLink).toHaveAttribute("href", "/employer/account/export");
-    expect(downloadLink.getAttribute("href")).not.toMatch(/\?/);
-  });
-
-  it("keeps employer account deletion explicit", async () => {
-    loadEmployerProfile.mockResolvedValue({
-      ok: true,
-      data: completedProfile,
-      userId: "emp-1",
-    });
-
-    render(await EmployerHomePage());
-
+    expect(screen.queryByRole("group", { name: "Appearance" })).toBeNull();
     expect(
-      screen.getByRole("link", { name: "Delete my Klinnova account" }),
-    ).toHaveAttribute("href", "/employer/account/delete");
+      screen.queryByRole("link", { name: "Download employer data" }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole("link", { name: "Delete my Klinnova account" }),
+    ).toBeNull();
+    expect(screen.getByRole("link", { name: "Create draft" })).toHaveAttribute(
+      "href",
+      "/employer/vacancies/new",
+    );
   });
 
   it("never claims GDPR compliance or legal completeness", async () => {

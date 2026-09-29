@@ -560,9 +560,9 @@ const englishMessages = {
   "employer.loading.applicantReview": "Loading applicant review",
   "employer.loading.outcomeForm": "Loading outcome form",
   "employer.loading.verificationStatus": "Loading verification status",
-  "employer.account.heading": "Account",
+  "employer.account.heading": "Account and preferences",
   "employer.account.lead":
-    "Download your data, delete your account, or log out.",
+    "Manage your appearance, data, and account security in one place.",
   "employer.account.data": "Account data",
   "employer.account.export": "Download employer data",
   "employer.account.exportLead":
@@ -1260,9 +1260,9 @@ const germanMessages: Partial<Record<MessageKey, string>> = {
   "employer.loading.applicantReview": "Bewerbungsprüfung wird geladen",
   "employer.loading.outcomeForm": "Ergebnisformular wird geladen",
   "employer.loading.verificationStatus": "Verifizierungsstatus wird geladen",
-  "employer.account.heading": "Konto",
+  "employer.account.heading": "Konto und Einstellungen",
   "employer.account.lead":
-    "Laden Sie Ihre Daten herunter, löschen Sie Ihr Konto oder melden Sie sich ab.",
+    "Verwalten Sie Darstellung, Daten und Kontosicherheit an einem Ort.",
   "employer.account.data": "Ihre Daten",
   "employer.account.export": "Kontodaten exportieren",
   "employer.account.exportLead":
