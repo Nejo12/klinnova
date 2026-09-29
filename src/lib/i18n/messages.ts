@@ -50,9 +50,8 @@ const englishMessages = {
   "candidate.onboarding.savedLead":
     "Progress is saved when you continue. You can go back or reload without losing what you already saved.",
   "candidate.onboarding.progress": "Onboarding progress",
-  "candidate.onboarding.saved": "Saved",
-  "candidate.onboarding.current": "Current",
-  "candidate.onboarding.next": "Next",
+  "candidate.onboarding.step": "Step",
+  "candidate.onboarding.completed": "Completed",
   "candidate.onboarding.backPrevious": "Back to previous section",
   "candidate.onboarding.backHome": "Back to candidate home",
   "candidate.onboarding.saveContinue": "Save and continue",
@@ -735,9 +734,8 @@ const germanMessages: Partial<Record<MessageKey, string>> = {
   "candidate.onboarding.savedLead":
     "Deine Angaben werden beim Fortfahren gespeichert. Du kannst zurückgehen oder die Seite neu laden, ohne bereits Gespeichertes zu verlieren.",
   "candidate.onboarding.progress": "Onboarding-Fortschritt",
-  "candidate.onboarding.saved": "Gespeichert",
-  "candidate.onboarding.current": "Aktuell",
-  "candidate.onboarding.next": "Als Nächstes",
+  "candidate.onboarding.step": "Schritt",
+  "candidate.onboarding.completed": "Abgeschlossen",
   "candidate.onboarding.backPrevious": "Zurück zum vorherigen Abschnitt",
   "candidate.onboarding.backHome": "Zurück zum Bewerbendenbereich",
   "candidate.onboarding.saveContinue": "Speichern und fortfahren",

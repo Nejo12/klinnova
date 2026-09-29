@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Progress, VisuallyHidden } from "@nova-component/ui";
 
 import { useLocale } from "@/components/i18n/locale-provider";
 import {
@@ -31,15 +32,28 @@ export function OnboardingProgressNav({
     employment: t("candidate.onboarding.group.employment"),
   };
 
+  const currentIndex = ONBOARDING_GROUPS.findIndex(
+    (group) => group === current,
+  );
+  const stepPosition =
+    currentIndex === -1 ? progress.totalGroups : currentIndex + 1;
+
   return (
     <nav
       className={styles.progress}
       aria-label={t("candidate.onboarding.progress")}
     >
       <p className={styles.progressLabel}>
-        {progress.completeCount} {locale === "de" ? "von" : "of"}{" "}
-        {progress.totalGroups} {t("candidate.home.sectionsSaved")}
+        {t("candidate.onboarding.step")} {stepPosition}{" "}
+        {locale === "de" ? "von" : "of"} {progress.totalGroups}
       </p>
+      <Progress
+        value={progress.completeCount}
+        min={0}
+        max={progress.totalGroups}
+        aria-label={t("candidate.home.progressLabel")}
+        className={styles.progressBar}
+      />
       <ol className={styles.progressList}>
         {ONBOARDING_GROUPS.map((group, index) => {
           const complete = progress.completeGroups.includes(group);
@@ -49,11 +63,8 @@ export function OnboardingProgressNav({
             : complete
               ? "complete"
               : "upcoming";
-          const marker = complete
-            ? t("candidate.onboarding.saved")
-            : isCurrent
-              ? t("candidate.onboarding.current")
-              : t("candidate.onboarding.next");
+
+          const label = groupLabels[group];
 
           return (
             <li key={group}>
@@ -62,11 +73,31 @@ export function OnboardingProgressNav({
                 href={onboardingGroupHref(group)}
                 data-state={state}
                 aria-current={isCurrent ? "step" : undefined}
+                aria-label={
+                  complete
+                    ? `${label}: ${t("candidateReview.edit")}`
+                    : undefined
+                }
               >
-                <span className={styles.progressMarker}>{marker}</span>
-                <span className={styles.progressItemLabel}>
-                  {index + 1}. {groupLabels[group]}
+                <span className={styles.progressIndex} aria-hidden="true">
+                  {complete ? "✓" : index + 1}
                 </span>
+                <span
+                  className={styles.progressItemLabel}
+                  aria-hidden={complete || undefined}
+                >
+                  {label}
+                </span>
+                {complete ? (
+                  <>
+                    <VisuallyHidden>
+                      {t("candidate.onboarding.completed")}
+                    </VisuallyHidden>
+                    <span className={styles.progressEdit} aria-hidden="true">
+                      {t("candidateReview.edit")}
+                    </span>
+                  </>
+                ) : null}
               </Link>
             </li>
           );
