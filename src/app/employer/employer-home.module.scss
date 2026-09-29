@@ -234,11 +234,16 @@
   padding-top: var(--space-4);
 }
 
-.accountControls {
+.preferencesSection {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: var(--space-3);
+  align-items: flex-start;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: var(--space-5);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
 }
 
 @media (min-width: $breakpoint-sm) {
@@ -274,9 +279,5 @@
   .vacancyState {
     align-items: stretch;
     min-width: 0;
-  }
-
-  .accountControls {
-    align-items: stretch;
   }
 }

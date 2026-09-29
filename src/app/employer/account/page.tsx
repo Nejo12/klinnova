@@ -4,7 +4,9 @@ import { redirect } from "next/navigation";
 import styles from "@/app/employer/employer-home.module.scss";
 import { SessionSecurity } from "@/components/auth/session-security";
 import { LocalizedText } from "@/components/i18n/localized-text";
+import { LanguagePreferenceControl } from "@/components/i18n/language-preference-control";
 import { EmployerVacancyPageHeader } from "@/components/employer-vacancies/employer-vacancy-page-header";
+import { ThemePreferenceControl } from "@/components/theme/theme-preference-control";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -49,6 +51,17 @@ export default async function EmployerAccountPage() {
       </header>
 
       <section
+        className={styles.preferencesSection}
+        aria-labelledby="appearance-heading"
+      >
+        <h2 id="appearance-heading" className={styles.sectionHeading}>
+          <LocalizedText message="theme.legend" />
+        </h2>
+        <ThemePreferenceControl />
+        <LanguagePreferenceControl />
+      </section>
+
+      <section
         className={styles.accountSection}
         aria-labelledby="account-data-heading"
       >
@@ -64,10 +77,19 @@ export default async function EmployerAccountPage() {
           <a className={styles.textLink} href="/employer/account/export">
             <LocalizedText message="employer.account.export" />
           </a>
-          <Link className={styles.textLink} href="/employer/account/delete">
-            <LocalizedText message="employer.account.delete" />
-          </Link>
         </div>
+      </section>
+
+      <section
+        className={styles.accountSection}
+        aria-labelledby="account-delete-heading"
+      >
+        <h2 id="account-delete-heading" className={styles.sectionHeading}>
+          <LocalizedText message="employer.account.delete" />
+        </h2>
+        <Link className={styles.textLink} href="/employer/account/delete">
+          <LocalizedText message="employer.account.delete" />
+        </Link>
       </section>
 
       <SessionSecurity />

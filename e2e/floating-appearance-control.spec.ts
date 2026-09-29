@@ -1,5 +1,17 @@
 import { expect, test } from "@playwright/test";
 
+test("interface preferences remain available on Employer registration", async ({
+  page,
+}) => {
+  await page.goto("/employer/register");
+  const trigger = page.getByRole("button", { name: "Interface preferences" });
+  await expect(trigger).toBeVisible();
+  await trigger.click();
+  await expect(
+    page.getByRole("dialog", { name: "Interface preferences" }),
+  ).toBeVisible();
+});
+
 test("floating interface preferences keep language and appearance independent", async ({
   page,
 }) => {

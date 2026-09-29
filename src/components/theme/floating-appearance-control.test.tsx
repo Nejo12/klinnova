@@ -198,6 +198,32 @@ describe("FloatingInterfacePreferences", () => {
     expect(trigger).toHaveAttribute("aria-expanded", "false");
   });
 
+  it.each([
+    "/employer",
+    "/employer/account",
+    "/employer/vacancies/new",
+    "/employer/applications",
+    "/employer/verification",
+    "/employer/onboarding",
+  ])("does not render on employer product route %s", (route) => {
+    mockUsePathname.mockReturnValue(route);
+    renderControl();
+    expect(
+      screen.queryByRole("button", { name: "Interface preferences" }),
+    ).toBeNull();
+  });
+
+  it.each(["/", "/jobs", "/login", "/employer/register", "/candidate"])(
+    "remains available on %s",
+    (route) => {
+      mockUsePathname.mockReturnValue(route);
+      renderControl();
+      expect(
+        screen.getByRole("button", { name: "Interface preferences" }),
+      ).toBeVisible();
+    },
+  );
+
   it("does not render on internal operator surfaces", () => {
     mockUsePathname.mockReturnValue("/internal/employers");
     renderControl();

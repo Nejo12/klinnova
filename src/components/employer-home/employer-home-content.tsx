@@ -3,7 +3,6 @@
 import Link from "next/link";
 
 import { useLocale } from "@/components/i18n/locale-provider";
-import { ThemePreferenceControl } from "@/components/theme/theme-preference-control";
 import styles from "@/app/employer/employer-home.module.scss";
 import {
   draftConsequence,
@@ -226,33 +225,6 @@ export function EmployerHomeContent({
             {t("employer.home.viewVacancies")}
           </Link>
         </p>
-      </section>
-
-      <section
-        className={styles.accountSection}
-        aria-labelledby="account-data-heading"
-      >
-        <div>
-          <h2 id="account-data-heading" className={styles.sectionHeading}>
-            {t("employer.account.data")}
-          </h2>
-          <p className={styles.note}>
-            {locale === "de"
-              ? "Laden Sie eine Kopie Ihrer Klinnova-Arbeitgeberdaten als JSON herunter."
-              : "Download a copy of your Klinnova employer data as JSON."}
-          </p>
-        </div>
-        <div className={styles.accountControls}>
-          <ThemePreferenceControl />
-          <div className={styles.accountActions}>
-            <a className={styles.textLink} href="/employer/account/export">
-              {t("employer.account.export")}
-            </a>
-            <Link className={styles.textLink} href="/employer/account/delete">
-              {t("employer.account.delete")}
-            </Link>
-          </div>
-        </div>
       </section>
     </>
   );

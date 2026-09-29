@@ -110,7 +110,11 @@ export function FloatingInterfacePreferences() {
     };
   }, [closePanel, isOpen]);
 
-  if (pathname.startsWith("/internal")) {
+  if (
+    pathname.startsWith("/internal") ||
+    pathname === "/employer" ||
+    (pathname.startsWith("/employer/") && pathname !== "/employer/register")
+  ) {
     return null;
   }
 

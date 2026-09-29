@@ -177,4 +177,98 @@ test.describe("employer navigation IA (Unit I / I2)", () => {
       page.getByRole("link", { name: "View vacancies" }),
     ).toHaveCount(0);
   });
+
+  test("Employer Home and Account separate hiring from preferences at all required widths in EN and DE", async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
+    await registerAndCompleteEmployerOnboarding(page, Date.now() + 264);
+
+    for (const width of [360, 390, 430, 768, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/employer");
+      await expect(
+        page.getByRole("heading", { name: "Vacancies" }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("link", { name: "Download employer data" }),
+      ).toHaveCount(0);
+      await expect(
+        page.getByRole("button", { name: "Interface preferences" }),
+      ).toHaveCount(0);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth > innerWidth,
+        ),
+      ).toBe(false);
+
+      await page
+        .getByRole("button", { name: /Workspace and account: Employer/ })
+        .click();
+      await page.getByRole("link", { name: "Account and security" }).click();
+      await expect(page).toHaveURL(/\/employer\/account$/);
+      await expect(
+        page.getByRole("heading", {
+          level: 1,
+          name: "Account and preferences",
+        }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("group", { name: "Appearance" }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("link", { name: "Download employer data" }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("link", { name: "Delete my Klinnova account" }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "Session security" }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("button", { name: "Interface preferences" }),
+      ).toHaveCount(0);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth > innerWidth,
+        ),
+      ).toBe(false);
+    }
+
+    await page
+      .getByRole("group", { name: "Appearance" })
+      .getByText("Dark", { exact: true })
+      .click();
+    await expect(page.getByRole("radio", { name: "Dark" })).toBeChecked();
+    await expect(page.locator("html")).toHaveAttribute(
+      "data-theme-preference",
+      "dark",
+    );
+    await page
+      .getByRole("group", { name: "Interface language" })
+      .getByText("Deutsch", { exact: true })
+      .click();
+    await expect(page.getByRole("radio", { name: "Deutsch" })).toBeChecked();
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Konto und Einstellungen" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("group", { name: "Darstellung" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Kontodaten exportieren" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Sitzungssicherheit" }),
+    ).toBeVisible();
+    for (const width of [360, 390, 430, 768, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth > innerWidth,
+        ),
+      ).toBe(false);
+    }
+  });
 });
