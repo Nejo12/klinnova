@@ -68,6 +68,7 @@ export default async function CandidateJobDetailRoutePage({
     <CandidateJobDetailPage
       status="failure"
       showEmployerNav={showEmployerNav}
+      displayName={displayName}
     />
   );
 }
