@@ -13,12 +13,14 @@ type WorkspaceSwitcherProps = {
   current: ActiveWorkspace;
   hasCandidate: boolean;
   hasEmployer: boolean;
+  displayName?: string | null;
 };
 
 export function WorkspaceSwitcher({
   current,
   hasCandidate,
   hasEmployer,
+  displayName = null,
 }: WorkspaceSwitcherProps) {
   const { t } = useLocale();
   const currentLabel =
@@ -37,6 +39,16 @@ export function WorkspaceSwitcher({
     otherWorkspace === "candidate"
       ? t("workspace.alsoCandidate")
       : t("workspace.alsoEmployer");
+  const initials =
+    current === "candidate" && displayName !== null
+      ? displayName
+          .trim()
+          .split(/\s+/)
+          .filter((part) => part.length > 0)
+          .slice(0, 2)
+          .map((part) => part[0]?.toUpperCase() ?? "")
+          .join("")
+      : null;
 
   return (
     <Popover
@@ -48,7 +60,16 @@ export function WorkspaceSwitcher({
           type="button"
           aria-label={`${t("workspace.menu")}: ${currentLabel}`}
         >
-          <span>{currentLabel}</span>
+          {initials !== null && displayName !== null ? (
+            <>
+              <span className={styles.avatar} aria-hidden="true">
+                {initials || "?"}
+              </span>
+              <span className={styles.identityName}>{displayName}</span>
+            </>
+          ) : (
+            <span>{currentLabel}</span>
+          )}
           <span aria-hidden="true">⌄</span>
         </button>
       }
@@ -64,6 +85,17 @@ export function WorkspaceSwitcher({
       }
     >
       <div className={styles.options}>
+        {current === "candidate" && displayName !== null ? (
+          <div className={styles.identitySummary}>
+            <span className={styles.avatar} aria-hidden="true">
+              {initials || "?"}
+            </span>
+            <span>
+              <strong>{displayName}</strong>
+              <small>{currentLabel}</small>
+            </span>
+          </div>
+        ) : null}
         <div className={styles.current} aria-current="true">
           <span>{currentLabel}</span>
           <span className={styles.currentStatus}>
