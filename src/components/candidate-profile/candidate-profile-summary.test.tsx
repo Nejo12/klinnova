@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { CandidateProfileSummary } from "@/components/candidate-profile/candidate-profile-summary";
+import type { OnboardingProgress } from "@/lib/onboarding/progress";
 
 const profile = {
   germanComfort: "basic",
@@ -21,7 +22,7 @@ const languages = [
   },
 ];
 
-const progress = {
+const progress: OnboardingProgress = {
   completeGroups: [
     "languages",
     "work_authorisation",
@@ -29,7 +30,7 @@ const progress = {
     "categories",
     "availability",
     "employment",
-  ] as const,
+  ],
   incompleteGroups: [],
   firstIncompleteGroup: null,
   completeCount: 6,
