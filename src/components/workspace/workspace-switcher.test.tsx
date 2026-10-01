@@ -26,6 +26,28 @@ describe("WorkspaceSwitcher", () => {
     ).toBeNull();
   });
 
+  it("shows Candidate initials and display name when identity is available", () => {
+    render(
+      <WorkspaceSwitcher
+        current="candidate"
+        hasCandidate
+        hasEmployer={false}
+        displayName="Ada Candidate"
+      />,
+    );
+
+    const trigger = screen.getByRole("button", {
+      name: "Workspace and account: Candidate",
+    });
+    expect(trigger).toHaveTextContent("AC");
+    expect(trigger).toHaveTextContent("Ada Candidate");
+
+    fireEvent.click(trigger);
+    const dialog = screen.getByRole("dialog", { name: "Switch workspace" });
+    expect(within(dialog).getByText("Ada Candidate")).toBeInTheDocument();
+    expect(within(dialog).getAllByText("Candidate").length).toBeGreaterThan(0);
+  });
+
   it("offers explicit second-capability creation instead of silently adding it", () => {
     render(
       <WorkspaceSwitcher current="employer" hasCandidate={false} hasEmployer />,
