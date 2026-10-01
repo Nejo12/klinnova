@@ -43,7 +43,7 @@ describe("CandidateNav (M5.1 Unit B)", () => {
     );
     expect(screen.getByRole("link", { name: "Profile" })).toHaveAttribute(
       "href",
-      "/candidate/onboarding?group=review",
+      "/candidate/profile",
     );
     expect(screen.getByRole("link", { name: "Account" })).toHaveAttribute(
       "href",

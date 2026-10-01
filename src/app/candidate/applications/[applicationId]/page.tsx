@@ -5,6 +5,7 @@ import { ApplicationConfirmationPage } from "@/components/candidate-application-
 import { loadCandidateApplicationConfirmation } from "@/lib/applications/load-candidate-application-confirmation";
 import { loadCandidateApplicationHistory } from "@/lib/applications/load-candidate-application-history";
 import { loadCandidateApplicationOutcomes } from "@/lib/applications/load-candidate-application-outcomes";
+import { loadCandidateDisplayName } from "@/lib/auth/load-candidate-display-name";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -34,7 +35,10 @@ export default async function CandidateApplicationConfirmationRoutePage({
   }
 
   const supabase = await createServerSupabaseClient();
-  const capabilities = await loadAccountCapabilities(supabase);
+  const [capabilities, displayName] = await Promise.all([
+    loadAccountCapabilities(supabase),
+    loadCandidateDisplayName(supabase),
+  ]);
   const showEmployerNav = capabilities?.hasEmployerProfile === true;
 
   if (view.kind === "ready") {
@@ -44,6 +48,7 @@ export default async function CandidateApplicationConfirmationRoutePage({
         <ApplicationConfirmationPage
           status="failure"
           showEmployerNav={showEmployerNav}
+          displayName={displayName}
         />
       );
     }
@@ -59,6 +64,7 @@ export default async function CandidateApplicationConfirmationRoutePage({
         history={historyResult.history}
         outcomes={outcomesResult.ok ? outcomesResult.outcomes : []}
         showEmployerNav={showEmployerNav}
+        displayName={displayName}
       />
     );
   }
@@ -68,6 +74,7 @@ export default async function CandidateApplicationConfirmationRoutePage({
       <ApplicationConfirmationPage
         status="unavailable"
         showEmployerNav={showEmployerNav}
+        displayName={displayName}
       />
     );
   }
@@ -76,6 +83,7 @@ export default async function CandidateApplicationConfirmationRoutePage({
     <ApplicationConfirmationPage
       status="failure"
       showEmployerNav={showEmployerNav}
+      displayName={displayName}
     />
   );
 }

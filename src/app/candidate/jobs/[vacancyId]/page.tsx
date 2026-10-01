@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { resolveJobDetailPageView } from "@/app/candidate/jobs/[vacancyId]/resolve-job-detail-view";
 import { CandidateJobDetailPage } from "@/components/candidate-job-detail/candidate-job-detail-page";
+import { loadCandidateDisplayName } from "@/lib/auth/load-candidate-display-name";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadCurrentCandidateVacancyDetail } from "@/lib/matching/resolve-current-candidate-vacancy-detail";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -32,7 +33,10 @@ export default async function CandidateJobDetailRoutePage({
     redirect(view.href);
   }
 
-  const capabilities = await loadAccountCapabilities(supabase);
+  const [capabilities, displayName] = await Promise.all([
+    loadAccountCapabilities(supabase),
+    loadCandidateDisplayName(supabase),
+  ]);
   const showEmployerNav = capabilities?.hasEmployerProfile === true;
 
   if (view.kind === "ready") {
@@ -45,6 +49,7 @@ export default async function CandidateJobDetailRoutePage({
         languages={view.languages}
         application={view.application}
         showEmployerNav={showEmployerNav}
+        displayName={displayName}
       />
     );
   }
@@ -54,6 +59,7 @@ export default async function CandidateJobDetailRoutePage({
       <CandidateJobDetailPage
         status="unavailable"
         showEmployerNav={showEmployerNav}
+        displayName={displayName}
       />
     );
   }
@@ -62,6 +68,7 @@ export default async function CandidateJobDetailRoutePage({
     <CandidateJobDetailPage
       status="failure"
       showEmployerNav={showEmployerNav}
+      displayName={displayName}
     />
   );
 }

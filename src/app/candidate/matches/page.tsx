@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { resolveMatchesPageView } from "@/app/candidate/matches/resolve-matches-view";
 import { CandidateMatchesPage } from "@/components/candidate-matches/candidate-matches-page";
+import { loadCandidateDisplayName } from "@/lib/auth/load-candidate-display-name";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { loadCurrentCandidateMatchesPage } from "@/lib/matching/load-current-candidate-matches-page";
 import { loadCandidateOnboarding } from "@/lib/onboarding/load-candidate";
@@ -32,7 +33,10 @@ export default async function CandidateMatchesRoutePage({
     redirect(view.href);
   }
 
-  const capabilities = await loadAccountCapabilities(supabase);
+  const [capabilities, displayName] = await Promise.all([
+    loadAccountCapabilities(supabase),
+    loadCandidateDisplayName(supabase),
+  ]);
   const showEmployerNav = capabilities?.hasEmployerProfile === true;
 
   if (view.kind === "failure") {
@@ -40,6 +44,7 @@ export default async function CandidateMatchesRoutePage({
       <CandidateMatchesPage
         status="failure"
         showEmployerNav={showEmployerNav}
+        displayName={displayName}
       />
     );
   }
@@ -61,6 +66,7 @@ export default async function CandidateMatchesRoutePage({
       vacancies={view.vacancies}
       applicationsByVacancyId={view.applicationsByVacancyId}
       showEmployerNav={showEmployerNav}
+      displayName={displayName}
       pulseProfileItems={pulseProfileItems}
     />
   );

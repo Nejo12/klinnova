@@ -21,9 +21,14 @@ type CandidateMatchesPageProps =
       vacancies: readonly PublicVacancy[];
       applicationsByVacancyId: ReadonlyMap<string, OwnedApplicationSummary>;
       showEmployerNav?: boolean;
+      displayName?: string | null;
       pulseProfileItems?: readonly CandidatePulseProfileItem[] | null;
     }
-  | { status: "failure"; showEmployerNav?: boolean };
+  | {
+      status: "failure";
+      showEmployerNav?: boolean;
+      displayName?: string | null;
+    };
 
 export function CandidateMatchesPage(props: CandidateMatchesPageProps) {
   const { t } = useLocale();
@@ -36,6 +41,7 @@ export function CandidateMatchesPage(props: CandidateMatchesPageProps) {
         current="matches"
         showEmployerNav={showEmployerNav}
         brandHref={brandHref}
+        displayName={props.displayName}
       />
 
       {props.status === "failure" ? (

@@ -38,9 +38,18 @@ type CandidateJobDetailPageProps =
       languages: PublicVacancyLanguage[];
       application: OwnedApplicationSummary | null;
       showEmployerNav?: boolean;
+      displayName?: string | null;
     }
-  | { status: "unavailable"; showEmployerNav?: boolean }
-  | { status: "failure"; showEmployerNav?: boolean };
+  | {
+      status: "unavailable";
+      showEmployerNav?: boolean;
+      displayName?: string | null;
+    }
+  | {
+      status: "failure";
+      showEmployerNav?: boolean;
+      displayName?: string | null;
+    };
 
 function employerLine(vacancy: PublicVacancy, defaultEmployer: string): string {
   const employerName = vacancy.employerDisplayName ?? defaultEmployer;
@@ -60,7 +69,10 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
   if (props.status !== "ready") {
     return (
       <main className={styles.page}>
-        <CandidateAppHeader showEmployerNav={showEmployerNav} />
+        <CandidateAppHeader
+          showEmployerNav={showEmployerNav}
+          displayName={props.displayName}
+        />
         <JobDetailUnavailable />
       </main>
     );
@@ -83,7 +95,10 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
 
   return (
     <main className={styles.page}>
-      <CandidateAppHeader showEmployerNav={showEmployerNav} />
+      <CandidateAppHeader
+        showEmployerNav={showEmployerNav}
+        displayName={props.displayName}
+      />
 
       <Link className={styles.backLink} href="/candidate/matches">
         {t("candidate.jobs.back")}

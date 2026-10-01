@@ -5,6 +5,10 @@ vi.mock("@/app/account/workspace-actions", () => ({
   activateWorkspaceAction: vi.fn(),
 }));
 
+vi.mock("@/app/auth/actions", () => ({
+  logoutAction: vi.fn(),
+}));
+
 import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
 
 describe("WorkspaceSwitcher", () => {
@@ -24,6 +28,34 @@ describe("WorkspaceSwitcher", () => {
     expect(
       within(dialog).queryByRole("link", { name: "Candidate" }),
     ).toBeNull();
+  });
+
+  it("shows Candidate initials and display name when identity is available", () => {
+    render(
+      <WorkspaceSwitcher
+        current="candidate"
+        hasCandidate
+        hasEmployer={false}
+        displayName="Ada Candidate"
+      />,
+    );
+
+    const trigger = screen.getByRole("button", {
+      name: "Workspace and account: Candidate",
+    });
+    expect(trigger).toHaveTextContent("AC");
+    expect(trigger).toHaveTextContent("Ada Candidate");
+
+    fireEvent.click(trigger);
+    const dialog = screen.getByRole("dialog", { name: "Switch workspace" });
+    expect(within(dialog).getByText("Ada Candidate")).toBeInTheDocument();
+    expect(within(dialog).getAllByText("Candidate").length).toBeGreaterThan(0);
+    expect(
+      within(dialog).getByRole("link", { name: "Profile" }),
+    ).toHaveAttribute("href", "/candidate/profile");
+    expect(
+      within(dialog).getByRole("button", { name: "Log out" }),
+    ).toBeInTheDocument();
   });
 
   it("offers explicit second-capability creation instead of silently adding it", () => {

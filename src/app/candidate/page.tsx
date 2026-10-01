@@ -47,7 +47,10 @@ export default async function CandidatePage() {
 
   return (
     <main className={styles.page}>
-      <CandidateAppHeader showEmployerNav={showEmployerNav} />
+      <CandidateAppHeader
+        showEmployerNav={showEmployerNav}
+        displayName={displayName}
+      />
       <CandidateWelcome displayName={displayName} />
       <CandidateHomeProgress
         completeCount={progress.completeCount}

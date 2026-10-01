@@ -1,6 +1,8 @@
 .trigger,
 .switchAction,
-.securityLink {
+.securityLink,
+.menuLink,
+.signOutAction {
   min-height: var(--touch-target-min);
   font: inherit;
   font-size: var(--font-size-sm);
@@ -26,7 +28,9 @@
 }
 
 .current,
-.switchAction {
+.switchAction,
+.menuLink,
+.signOutAction {
   width: 100%;
   padding: var(--space-3);
   border-radius: var(--radius-md);
@@ -48,12 +52,28 @@
   white-space: nowrap;
 }
 
-.switchAction {
+.switchAction,
+.menuLink,
+.signOutAction {
   border: var(--border-width-default) solid var(--color-border-default);
   background: var(--color-bg-surface);
   color: var(--color-text-primary);
   text-align: left;
+}
+
+.switchAction,
+.signOutAction {
   cursor: pointer;
+}
+
+.menuLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.signOutAction {
+  font: inherit;
 }
 
 .securityLink {
@@ -65,11 +85,59 @@
 
 .trigger:focus-visible,
 .switchAction:focus-visible,
-.securityLink:focus-visible {
+.securityLink:focus-visible,
+.menuLink:focus-visible,
+.signOutAction:focus-visible {
   outline: var(--focus-ring-width) solid var(--color-focus-ring);
   outline-offset: var(--focus-ring-offset);
 }
 
-.switchAction:hover {
+.switchAction:hover,
+.menuLink:hover,
+.signOutAction:hover {
   background: var(--color-bg-subtle);
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-action-primary);
+  color: var(--color-action-primary-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.identityName {
+  max-width: 10rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identitySummary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+}
+
+.identitySummary > span:last-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.identitySummary strong {
+  overflow-wrap: anywhere;
+}
+
+.identitySummary small {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
 }
