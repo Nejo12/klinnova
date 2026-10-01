@@ -38,6 +38,28 @@ const englishMessages = {
   "candidate.nav.applications": "Applications",
   "candidate.nav.profile": "Profile",
   "candidate.nav.account": "Account",
+  "candidate.profile.eyebrow": "Candidate profile",
+  "candidate.profile.ready": "Profile ready",
+  "candidate.profile.inProgress": "Profile in progress",
+  "candidate.profile.readyBody":
+    "Your essentials are complete and used for matching.",
+  "candidate.profile.inProgressBody":
+    "Finish your essentials so Klinnova can use them for matching.",
+  "candidate.profile.edit": "Edit profile",
+  "candidate.profile.workPreferences": "Work preferences",
+  "candidate.profile.roles": "Roles",
+  "candidate.profile.employment": "Employment and shifts",
+  "candidate.profile.languages": "Languages and German",
+  "candidate.profile.languageNotice":
+    "Self-reported language comfort — not a certificate.",
+  "candidate.profile.availabilityLocation": "Availability and location",
+  "candidate.profile.available": "Available from",
+  "candidate.profile.location": "Berlin and travel time",
+  "candidate.profile.workAuthorisation": "Work authorisation",
+  "candidate.profile.accountHeading": "Looking for account settings?",
+  "candidate.profile.accountBody":
+    "Export, delete and session security stay in Account and security.",
+  "candidate.profile.accountAction": "Account and security",
   "candidate.home.welcome": "Welcome",
   "candidate.home.readyLead":
     "Your essential answers are saved. Confirm completion from review when you are ready.",
@@ -740,6 +762,28 @@ const germanMessages: Partial<Record<MessageKey, string>> = {
   "candidate.nav.applications": "Bewerbungen",
   "candidate.nav.profile": "Profil",
   "candidate.nav.account": "Konto",
+  "candidate.profile.eyebrow": "Bewerbendenprofil",
+  "candidate.profile.ready": "Profil bereit",
+  "candidate.profile.inProgress": "Profil in Bearbeitung",
+  "candidate.profile.readyBody":
+    "Deine wesentlichen Angaben sind vollständig und werden für passende Jobs verwendet.",
+  "candidate.profile.inProgressBody":
+    "Vervollständige deine wesentlichen Angaben, damit Klinnova sie für passende Jobs verwenden kann.",
+  "candidate.profile.edit": "Profil bearbeiten",
+  "candidate.profile.workPreferences": "Arbeitswünsche",
+  "candidate.profile.roles": "Tätigkeiten",
+  "candidate.profile.employment": "Beschäftigung und Schichten",
+  "candidate.profile.languages": "Sprachen und Deutsch",
+  "candidate.profile.languageNotice":
+    "Selbsteinschätzung der Sprachkenntnisse — kein Zertifikat.",
+  "candidate.profile.availabilityLocation": "Verfügbarkeit und Ort",
+  "candidate.profile.available": "Verfügbar ab",
+  "candidate.profile.location": "Berlin und Fahrtzeit",
+  "candidate.profile.workAuthorisation": "Arbeitserlaubnis",
+  "candidate.profile.accountHeading": "Suchst du Kontoeinstellungen?",
+  "candidate.profile.accountBody":
+    "Export, Löschung und Sitzungssicherheit bleiben unter Konto und Sicherheit.",
+  "candidate.profile.accountAction": "Konto und Sicherheit",
   "candidate.home.welcome": "Willkommen",
   "candidate.home.readyLead":
     "Deine wesentlichen Angaben sind gespeichert. Wenn du bereit bist, bestätige den Abschluss in der Profilübersicht.",
