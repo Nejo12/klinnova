@@ -13,6 +13,7 @@ type CandidateAppHeaderProps = {
   showEmployerNav: boolean;
   /** The candidate matches page uses a plain "/" brand link in its failure state, before a session is confirmed. */
   brandHref?: string;
+  displayName?: string | null;
 };
 
 /**
@@ -24,6 +25,7 @@ export function CandidateAppHeader({
   current,
   showEmployerNav,
   brandHref = "/candidate",
+  displayName = null,
 }: CandidateAppHeaderProps) {
   return (
     <div className={styles.header}>
@@ -36,6 +38,7 @@ export function CandidateAppHeader({
           current="candidate"
           hasCandidate
           hasEmployer={showEmployerNav}
+          displayName={displayName}
         />
       </div>
     </div>
