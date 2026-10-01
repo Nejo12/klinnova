@@ -117,7 +117,9 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
       page.getByRole("heading", { level: 1, name: displayName }),
     ).toBeVisible();
     await expect(page.getByText("Profile ready")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Edit profile" })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Edit profile" }),
+    ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Account and security" }),
     ).toHaveAttribute("href", "/candidate/account");

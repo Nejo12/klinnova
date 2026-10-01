@@ -43,6 +43,7 @@ describe("CandidateProfileSummary", () => {
     render(
       <CandidateProfileSummary
         displayName="Ada Candidate"
+        onboardingCompleted
         profile={profile}
         languages={languages}
         progress={progress}
@@ -68,6 +69,7 @@ describe("CandidateProfileSummary", () => {
     render(
       <CandidateProfileSummary
         displayName="Ada Candidate"
+        onboardingCompleted
         profile={profile}
         languages={languages}
         progress={progress}

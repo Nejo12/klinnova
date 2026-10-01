@@ -96,9 +96,9 @@ export function CandidateJobDetailPage(props: CandidateJobDetailPageProps) {
   return (
     <main className={styles.page}>
       <CandidateAppHeader
-          showEmployerNav={showEmployerNav}
-          displayName={props.displayName}
-        />
+        showEmployerNav={showEmployerNav}
+        displayName={props.displayName}
+      />
 
       <Link className={styles.backLink} href="/candidate/matches">
         {t("candidate.jobs.back")}

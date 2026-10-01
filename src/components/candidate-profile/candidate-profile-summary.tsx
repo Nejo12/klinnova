@@ -33,8 +33,7 @@ function initials(displayName: string): string {
   }
 
   const first = parts[0]?.[0] ?? "";
-  const second =
-    parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? "") : "";
+  const second = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? "") : "";
 
   return `${first}${second}`.toUpperCase();
 }
@@ -48,12 +47,7 @@ export function CandidateProfileSummary({
 }: CandidateProfileSummaryProps) {
   const { locale, t } = useLocale();
 
-  const languageRow = formatReviewRow(
-    "languages",
-    profile,
-    languages,
-    locale,
-  );
+  const languageRow = formatReviewRow("languages", profile, languages, locale);
   const workAuthorisationRow = formatReviewRow(
     "work_authorisation",
     profile,
@@ -177,10 +171,7 @@ export function CandidateProfileSummary({
           className={styles.card}
           aria-labelledby="profile-authorisation-heading"
         >
-          <h2
-            className={styles.cardHeading}
-            id="profile-authorisation-heading"
-          >
+          <h2 className={styles.cardHeading} id="profile-authorisation-heading">
             {t("candidate.profile.workAuthorisation")}
           </h2>
           <p className={styles.cardValue}>{workAuthorisationRow.value}</p>
