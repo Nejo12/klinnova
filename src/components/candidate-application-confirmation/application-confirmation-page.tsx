@@ -142,6 +142,60 @@ export function ApplicationConfirmationPage(
   const vacancyLanguagesHeadingId = "confirmation-vacancy-languages";
   const candidateLanguagesHeadingId = "confirmation-candidate-languages";
 
+  let receiptMarker: string;
+  let receiptHeading: string;
+  let receiptBody: string;
+  let receiptLead: string;
+
+  switch (confirmation.status) {
+    case "reviewing":
+      receiptMarker = t("candidate.applications.reviewingMarker");
+      receiptHeading = t("candidate.applications.reviewingHeading");
+      receiptBody = t("candidate.applications.reviewingBody");
+      receiptLead =
+        locale === "de"
+          ? `Deine Bewerbung für ${confirmation.vacancyTitle} bei ${confirmation.employerDisplayName} wird geprüft.`
+          : `Your application for ${confirmation.vacancyTitle} at ${confirmation.employerDisplayName} is in review.`;
+      break;
+    case "shortlisted":
+      receiptMarker = t("candidate.applications.shortlistedMarker");
+      receiptHeading = t("candidate.applications.shortlistedHeading");
+      receiptBody = t("candidate.applications.shortlistedBody");
+      receiptLead =
+        locale === "de"
+          ? `Deine Bewerbung für ${confirmation.vacancyTitle} bei ${confirmation.employerDisplayName} ist in der engeren Auswahl.`
+          : `Your application for ${confirmation.vacancyTitle} at ${confirmation.employerDisplayName} is shortlisted.`;
+      break;
+    case "accepted":
+      receiptMarker = t("candidate.applications.acceptedMarker");
+      receiptHeading = t("candidate.applications.acceptedReceiptHeading");
+      receiptBody = t("candidate.applications.acceptedReceiptBody");
+      receiptLead =
+        locale === "de"
+          ? `Deine Bewerbung für ${confirmation.vacancyTitle} bei ${confirmation.employerDisplayName} wurde angenommen.`
+          : `Your application for ${confirmation.vacancyTitle} at ${confirmation.employerDisplayName} was accepted.`;
+      break;
+    case "rejected":
+      receiptMarker = t("candidate.applications.rejectedMarker");
+      receiptHeading = t("candidate.applications.rejectedHeading");
+      receiptBody = t("candidate.applications.rejectedBody");
+      receiptLead =
+        locale === "de"
+          ? `Du wurdest für ${confirmation.vacancyTitle} bei ${confirmation.employerDisplayName} nicht ausgewählt.`
+          : `You were not selected for ${confirmation.vacancyTitle} at ${confirmation.employerDisplayName}.`;
+      break;
+    case "submitted":
+    default:
+      receiptMarker = t("candidate.applications.receiptMarker");
+      receiptHeading = t("candidate.applications.receiptHeading");
+      receiptBody = t("candidate.applications.receiptBody");
+      receiptLead =
+        locale === "de"
+          ? `Deine Bewerbung für ${confirmation.vacancyTitle} ist jetzt bei ${confirmation.employerDisplayName}.`
+          : `Your application for ${confirmation.vacancyTitle} is now with ${confirmation.employerDisplayName}.`;
+      break;
+  }
+
   return (
     <main className={styles.page}>
       <CandidateApplicationsPageHeader
@@ -149,23 +203,16 @@ export function ApplicationConfirmationPage(
       />
 
       <section className={styles.hero} aria-labelledby="confirmation-heading">
-        <p className={styles.eyebrow}>
-          {t("candidate.applications.receiptMarker")}
-        </p>
+        <p className={styles.eyebrow}>{receiptMarker}</p>
         <div className={styles.titleRow}>
           <h1 className={styles.heading} id="confirmation-heading">
-            {t("candidate.applications.receiptHeading")}
+            {receiptHeading}
           </h1>
           {confirmation.demoLabel !== null ? (
             <p className={styles.demoLabel}>{t("publicJobs.demo")}</p>
           ) : null}
         </div>
-        <p className={styles.lead}>
-          {locale === "de" ? "Deine Bewerbung für " : "Your application for "}
-          {confirmation.vacancyTitle}
-          {locale === "de" ? " ist jetzt bei " : " is now with "}
-          {confirmation.employerDisplayName}.
-        </p>
+        <p className={styles.lead}>{receiptLead}</p>
       </section>
 
       <section className={styles.statusPanel} aria-labelledby="status-heading">
@@ -173,9 +220,7 @@ export function ApplicationConfirmationPage(
           {t("candidate.applications.currentStatus")}
         </h2>
         <p className={styles.statusValue}>{statusLabel}</p>
-        <p className={styles.support}>
-          {t("candidate.applications.receiptBody")}
-        </p>
+        <p className={styles.support}>{receiptBody}</p>
         <dl className={styles.meta}>
           <div className={styles.metaRow}>
             <dt className={styles.metaLabel}>
