@@ -16,6 +16,7 @@ import styles from "./candidate-profile-summary.module.scss";
 
 type CandidateProfileSummaryProps = {
   displayName: string;
+  onboardingCompleted: boolean;
   profile: ProgressProfile;
   languages: readonly ProgressLanguage[];
   progress: OnboardingProgress;
@@ -40,6 +41,7 @@ function initials(displayName: string): string {
 
 export function CandidateProfileSummary({
   displayName,
+  onboardingCompleted,
   profile,
   languages,
   progress,
@@ -78,7 +80,7 @@ export function CandidateProfileSummary({
     locale,
   );
 
-  const profileReady = progress.essentialsValid;
+  const profileReady = onboardingCompleted && progress.essentialsValid;
 
   return (
     <section
