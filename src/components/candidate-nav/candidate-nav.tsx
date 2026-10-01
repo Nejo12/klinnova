@@ -3,8 +3,6 @@
 import Link from "next/link";
 
 import { useLocale } from "@/components/i18n/locale-provider";
-import { onboardingGroupHref } from "@/lib/onboarding/navigation";
-
 import styles from "./candidate-nav.module.scss";
 
 export type CandidateNavDestination =
@@ -42,7 +40,7 @@ export function CandidateNav({ current }: CandidateNavProps) {
       </Link>
       <Link
         className={styles.navLink}
-        href={onboardingGroupHref("review")}
+        href="/candidate/profile"
         aria-current={current === "profile" ? "page" : undefined}
       >
         {t("candidate.nav.profile")}
