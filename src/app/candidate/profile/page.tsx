@@ -38,6 +38,7 @@ export default async function CandidateProfilePage() {
       />
       <CandidateProfileSummary
         displayName={displayName}
+        onboardingCompleted={profile.onboardingCompletedAt !== null}
         profile={profile}
         languages={languages}
         progress={progress}
