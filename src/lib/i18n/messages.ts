@@ -237,8 +237,7 @@ const englishMessages = {
   "candidate.applications.reviewingBody":
     "The employer is reviewing your application.",
   "candidate.applications.shortlistedMarker": "SHORTLISTED",
-  "candidate.applications.shortlistedHeading":
-    "You're on the shortlist.",
+  "candidate.applications.shortlistedHeading": "You're on the shortlist.",
   "candidate.applications.shortlistedBody":
     "The employer has moved your application to the shortlist.",
   "candidate.applications.acceptedMarker": "APPLICATION ACCEPTED",
@@ -940,8 +939,7 @@ const germanMessages: Partial<Record<MessageKey, string>> = {
   "candidate.applications.receiptBody":
     "Deine Bewerbung ist jetzt beim Arbeitgeber.",
   "candidate.applications.reviewingMarker": "BEWERBUNG IN PRÜFUNG",
-  "candidate.applications.reviewingHeading":
-    "Deine Bewerbung wird geprüft.",
+  "candidate.applications.reviewingHeading": "Deine Bewerbung wird geprüft.",
   "candidate.applications.reviewingBody":
     "Der Arbeitgeber prüft deine Bewerbung.",
   "candidate.applications.shortlistedMarker": "IN ENGERER AUSWAHL",
