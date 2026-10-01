@@ -231,6 +231,25 @@ const englishMessages = {
   "candidate.applications.receiptHeading": "You're one step closer.",
   "candidate.applications.receiptBody":
     "Your application is now with the employer.",
+  "candidate.applications.reviewingMarker": "APPLICATION IN REVIEW",
+  "candidate.applications.reviewingHeading":
+    "Your application is being reviewed.",
+  "candidate.applications.reviewingBody":
+    "The employer is reviewing your application.",
+  "candidate.applications.shortlistedMarker": "SHORTLISTED",
+  "candidate.applications.shortlistedHeading":
+    "You're on the shortlist.",
+  "candidate.applications.shortlistedBody":
+    "The employer has moved your application to the shortlist.",
+  "candidate.applications.acceptedMarker": "APPLICATION ACCEPTED",
+  "candidate.applications.acceptedReceiptHeading":
+    "Your application was accepted.",
+  "candidate.applications.acceptedReceiptBody":
+    "The employer has accepted this application. Hiring is a separate outcome.",
+  "candidate.applications.rejectedMarker": "APPLICATION UPDATE",
+  "candidate.applications.rejectedHeading": "You were not selected.",
+  "candidate.applications.rejectedBody":
+    "This application will not progress further.",
   "candidate.applications.status": "Status",
   "candidate.applications.currentStatus": "Current status",
   "candidate.applications.employment": "Employment",
@@ -920,6 +939,25 @@ const germanMessages: Partial<Record<MessageKey, string>> = {
   "candidate.applications.receiptHeading": "Du bist einen Schritt weiter.",
   "candidate.applications.receiptBody":
     "Deine Bewerbung ist jetzt beim Arbeitgeber.",
+  "candidate.applications.reviewingMarker": "BEWERBUNG IN PRÜFUNG",
+  "candidate.applications.reviewingHeading":
+    "Deine Bewerbung wird geprüft.",
+  "candidate.applications.reviewingBody":
+    "Der Arbeitgeber prüft deine Bewerbung.",
+  "candidate.applications.shortlistedMarker": "IN ENGERER AUSWAHL",
+  "candidate.applications.shortlistedHeading":
+    "Du bist in der engeren Auswahl.",
+  "candidate.applications.shortlistedBody":
+    "Der Arbeitgeber hat deine Bewerbung in die engere Auswahl aufgenommen.",
+  "candidate.applications.acceptedMarker": "BEWERBUNG ANGENOMMEN",
+  "candidate.applications.acceptedReceiptHeading":
+    "Deine Bewerbung wurde angenommen.",
+  "candidate.applications.acceptedReceiptBody":
+    "Der Arbeitgeber hat diese Bewerbung angenommen. Eine Einstellung ist ein separates Ergebnis.",
+  "candidate.applications.rejectedMarker": "BEWERBUNGSUPDATE",
+  "candidate.applications.rejectedHeading": "Du wurdest nicht ausgewählt.",
+  "candidate.applications.rejectedBody":
+    "Diese Bewerbung wird nicht weiter fortgesetzt.",
   "candidate.applications.status": "Status",
   "candidate.applications.currentStatus": "Aktueller Status",
   "candidate.applications.employment": "Beschäftigung",
