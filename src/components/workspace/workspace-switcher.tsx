@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { activateWorkspaceAction } from "@/app/account/workspace-actions";
+import { logoutAction } from "@/app/auth/actions";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { Popover } from "@/components/popover-menu/popover-menu";
 import type { ActiveWorkspace } from "@/lib/workspace/active-workspace";
@@ -96,6 +97,11 @@ export function WorkspaceSwitcher({
             </span>
           </div>
         ) : null}
+        {current === "candidate" && displayName !== null ? (
+          <Link className={styles.menuLink} href="/candidate/profile">
+            {t("candidate.nav.profile")}
+          </Link>
+        ) : null}
         <div className={styles.current} aria-current="true">
           <span>{currentLabel}</span>
           <span className={styles.currentStatus}>
@@ -109,6 +115,13 @@ export function WorkspaceSwitcher({
             {otherAvailable ? otherLabel : addCapabilityLabel}
           </button>
         </form>
+        {current === "candidate" && displayName !== null ? (
+          <form action={logoutAction}>
+            <button className={styles.signOutAction} type="submit">
+              {t("auth.logOut")}
+            </button>
+          </form>
+        ) : null}
       </div>
     </Popover>
   );
