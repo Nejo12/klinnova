@@ -30,7 +30,10 @@ import { WorkAuthorisationNotice } from "@/components/candidate-matches/work-aut
 
 import styles from "./application-confirmation.module.scss";
 
-type ApplicationConfirmationPageProps = { showEmployerNav: boolean } & (
+type ApplicationConfirmationPageProps = {
+  showEmployerNav: boolean;
+  displayName?: string | null;
+} & (
   | {
       status: "ready";
       confirmation: ApplicationConfirmation;
@@ -50,6 +53,7 @@ export function ApplicationConfirmationPage(
       <main className={styles.page}>
         <CandidateApplicationsPageHeader
           showEmployerNav={props.showEmployerNav}
+          displayName={props.displayName}
         />
         <section
           className={styles.unavailable}
@@ -200,6 +204,7 @@ export function ApplicationConfirmationPage(
     <main className={styles.page}>
       <CandidateApplicationsPageHeader
         showEmployerNav={props.showEmployerNav}
+        displayName={props.displayName}
       />
 
       <section className={styles.hero} aria-labelledby="confirmation-heading">
