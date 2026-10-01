@@ -8,6 +8,7 @@ import { CandidateApplicationsPageHeader } from "@/components/candidate-applicat
 import { CandidateApplicationsIntro } from "@/components/candidate-applications/candidate-applications-intro";
 import styles from "@/components/candidate-applications/candidate-applications.module.scss";
 import { loadCandidateApplicationInventory } from "@/lib/applications/load-candidate-application-inventory";
+import { loadCandidateDisplayName } from "@/lib/auth/load-candidate-display-name";
 import { loadAccountCapabilities } from "@/lib/employer/load-capabilities";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -26,12 +27,18 @@ export default async function CandidateApplicationsRoutePage() {
     redirect(view.href);
   }
 
-  const capabilities = await loadAccountCapabilities(supabase);
+  const [capabilities, displayName] = await Promise.all([
+    loadAccountCapabilities(supabase),
+    loadCandidateDisplayName(supabase),
+  ]);
   const showEmployerNav = capabilities?.hasEmployerProfile === true;
 
   return (
     <main className={styles.page}>
-      <CandidateApplicationsPageHeader showEmployerNav={showEmployerNav} />
+      <CandidateApplicationsPageHeader
+        showEmployerNav={showEmployerNav}
+        displayName={displayName}
+      />
       <CandidateApplicationsIntro />
       {view.kind === "failure" ? (
         <ApplicationsErrorState />
