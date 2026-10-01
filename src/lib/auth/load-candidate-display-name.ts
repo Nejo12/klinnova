@@ -7,6 +7,14 @@ import type { Database } from "@/types/database";
 export async function loadCandidateDisplayName(
   supabase: SupabaseClient<Database>,
 ): Promise<string | null> {
+  if (
+    supabase == null ||
+    typeof supabase.auth?.getUser !== "function" ||
+    typeof supabase.from !== "function"
+  ) {
+    return null;
+  }
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
