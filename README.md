@@ -41,7 +41,7 @@ Klinnova is not another generic job board. It is a trusted employment-access pla
 
 Klinnova is in **M5 — Berlin private beta**.
 
-The K6 Production/public-domain cutover is complete and `https://klinnova.com` is the canonical Production origin. Operational readiness and Cohort A external market entry remain **on hold until explicit Founder resumption**. Production Sentry remains **OFF/unwired** unless separately authorized.
+The K6 Production/public-domain cutover is complete and `https://klinnova.com` is the canonical Production origin. Cohort A operational readiness is **GO** and #237 is closed/completed. External Cohort A market entry remains **independently funding-gated**. Production Sentry remains **OFF/unwired** unless separately authorized.
 
 Because execution state changes more frequently than this README should, use the durable sources below rather than treating historical implementation documents as the current operating status:
 
