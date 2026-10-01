@@ -20,14 +20,14 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 | Active milestone | **M5 — Berlin private beta** |
 | Previous milestone | **M4 — Complete** (Slices 7–8 closed; PR #73 merged) |
 | Product boundary | Merged M4 remains the Cohort A baseline; governed product development is unfrozen under D-M5-23 |
-| Active work unit | **K6 COMPLETE / CLOSED.** Klinnova Production/public-domain cutover is complete through K6-6. `https://klinnova.com` is canonical Production. **Operational readiness remains ON HOLD.** GründungsBONUS Plus application assembly/submission is complete; post-submission control is active. See `docs/56-k6-production-cutover-durable-closure.md` and `docs/100-gruendungsbonus-plus-post-submission-control.md`. |
+| Active work unit | **K6 COMPLETE / CLOSED. #237 OPERATIONAL READINESS COMPLETE / GO.** Klinnova Production/public-domain cutover is complete through K6-6 and `https://klinnova.com` is canonical Production. Founder operational GO for Cohort A readiness was recorded on 2026-10-01 and #237 is closed completed. The separate GründungsBONUS Plus project-start/funding boundary remains closed under `docs/100-gruendungsbonus-plus-post-submission-control.md`. |
 | PR | Post-submission funding-control documentation only; Founder manually merges. Never auto-merge. |
 | Funding / admin | **GB9185/2026 SUBMITTED.** Electronic submission complete; signed original dispatched; correction notice for generated EUR 15.00 → intended EUR 15,000.00 next-year drawdown sent by email and post; IBB receipt/review pending. Provider evidence planning is outreach-ready for C05/C01/C04/C03/C07, but outreach/procurement/grant-targeted work remain **NOT AUTHORIZED**. |
 | Product/schema implementation | Product discovery/design is active. Implementation proceeds only through explicitly approved bounded BUILD NOW units, labelled Founder-developed / pre-funding / excluded from grant reimbursement while the funding boundary remains closed. |
 | Preview | Persistent isolated Supabase Preview project remains available through Vercel-generated Preview deployment URLs. Custom `preview.klinnova.com` project-domain attachment is retired. See `docs/52-preview-environment-runbook.md` and `docs/56-k6-production-cutover-durable-closure.md`. |
 | Monitoring | **Preview Sentry complete through G1/G2**. **Production Sentry remains OFF/unwired by deliberate Founder decision for Cohort A.** Funding submission does not activate it. |
 | Production | **Canonical Production is `https://klinnova.com`.** `www.klinnova.com` permanently redirects to apex. `stint.company` permanently redirects to Klinnova and no longer serves the application directly. Production baseline after K6-4 merge: `0564a5e749b65f5589d1bd2dc32f926b848a5493`. |
-| Cohort A readiness | **ON HOLD / NOT STARTED** — employer acquisition, candidate recruitment, founder-assisted onboarding, support/moderation preparation, and other operational work are preserved for later resumption. Funding submission does not start Cohort A. |
+| Cohort A readiness | **OPERATIONAL GO RECORDED / #237 CLOSED.** Rehearsal acceptance criteria 1–13 are satisfied. This does **not** authorize external Cohort A market entry while the independent GründungsBONUS Plus safe-start boundary remains closed. |
 | Hosted destructive proof | Not authorized / not run |
 | Production Demo fixtures | **Closed — cleanup complete before 2026-09-02**; founder-provided cleanup evidence is recorded in `docs/53-m5.1-beta-readiness-closure.md` |
 | Legal readiness | Unit H is **CLOSED for current launch sequencing by Founder decision**. Current merged legal surfaces are accepted provisionally for this launch path; Founder will review/correct legal wording in the nearest future. No qualified legal-review, full legal-compliance, or GDPR-compliance claim is made. |
@@ -135,9 +135,9 @@ This is a planning queue, **not automatic authorization**. Current execution sta
 
 ### Operations
 
-1. Employer acquisition, candidate recruitment, founder-assisted onboarding, support/moderation operating preparation, and other Cohort A operational work remain **ON HOLD** until Founder resumes them and the applicable funding/start boundary is clear.
-2. Preserve the existing plans and playbooks for later resumption; do not mark operational readiness complete.
-3. Run one structured M5 review using `Operate manually / Fix now / Watch / Defer` when operations resume.
+1. #237 operational readiness rehearsal is complete and Founder operational GO is recorded.
+2. Preserve the existing Cohort A plans/playbooks and the `Operate manually / Fix now / Watch / Defer` weekly review discipline.
+3. Do not begin external Cohort A market entry until the independent funding/start boundary in `docs/100-gruendungsbonus-plus-post-submission-control.md` is separately cleared.
 
 ### Funding / administration
 
@@ -157,10 +157,10 @@ Before intentional external Cohort A traffic, after Founder resumption:
 - technical/moderation/privacy support procedures are resumed and understood;
 - demo-fixture cleanup/re-authorization obligations are satisfied as required;
 - applicable GründungsBONUS project-start / procurement boundaries are clear before any grant-targeted Cohort A work;
-- Cohort A employer/candidate acquisition and founder-assisted onboarding preparation are resumed and ready;
-- Founder explicitly returns GO.
+- Cohort A operational readiness has been rehearsed and accepted under #237;
+- Founder operational GO is recorded.
 
-**Current verdict: K6 COMPLETE / OPERATIONAL READINESS ON HOLD / FUNDING APPLICATION UNDER POST-SUBMISSION CONTROL.**
+**Current verdict: K6 COMPLETE / OPERATIONAL READINESS GO / EXTERNAL COHORT A MARKET ENTRY STILL FUNDING-GATED.**
 
 This gate does not establish or claim full GDPR compliance.
 
@@ -187,7 +187,7 @@ Do not optimize M5 for larger test counts. The primary M5 numbers are participat
 | M2 Applications | Complete | Slice 3 |
 | M3 Employer flow | Implementation complete | Slices 4–6; Slice 6 hosted proof remains separately deferred |
 | M4 Trust and beta readiness | **Complete** | Slices 7–8; `docs/44`, `docs/48`; PR #73 |
-| M5 Berlin private beta | **Active** | `docs/49`–`docs/56`; K6 Production/public-domain cutover complete; operational readiness remains ON HOLD; funding application is under post-submission control in `docs/100` |
+| M5 Berlin private beta | **Active** | `docs/49`–`docs/56`; K6 Production/public-domain cutover complete; #237 operational readiness GO recorded; external Cohort A market entry remains gated by `docs/100` |
 
 ## Decision discipline
 
