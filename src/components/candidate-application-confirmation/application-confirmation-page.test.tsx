@@ -177,6 +177,106 @@ describe("ApplicationConfirmationPage", () => {
     expect(screen.getAllByText("In review").length).toBeGreaterThan(0);
   });
 
+  it("renders status-aware receipt copy for progressed reviewing and shortlisted states", () => {
+    const view = render(
+      <ApplicationConfirmationPage
+        status="ready"
+        showEmployerNav={false}
+        confirmation={{
+          ...confirmation,
+          status: "reviewing",
+          statusLabel: "In review",
+        }}
+        history={history}
+        outcomes={[]}
+      />,
+    );
+
+    expect(screen.getByText("APPLICATION IN REVIEW")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", {
+        level: 1,
+        name: "Your application is being reviewed.",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("The employer is reviewing your application."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        `Your application for ${confirmation.vacancyTitle} at ${confirmation.employerDisplayName} is in review.`,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("APPLICATION SUBMITTED")).toBeNull();
+    expect(screen.queryByText("Your application is now with the employer.")).toBeNull();
+
+    view.rerender(
+      <ApplicationConfirmationPage
+        status="ready"
+        showEmployerNav={false}
+        confirmation={{
+          ...confirmation,
+          status: "shortlisted",
+          statusLabel: "Shortlisted",
+        }}
+        history={history}
+        outcomes={[]}
+      />,
+    );
+
+    expect(screen.getByText("SHORTLISTED")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", {
+        level: 1,
+        name: "You're on the shortlist.",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "The employer has moved your application to the shortlist.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("APPLICATION SUBMITTED")).toBeNull();
+  });
+
+  it("keeps progressed status copy localized in German", () => {
+    document.documentElement.dataset.locale = "de";
+    document.documentElement.lang = "de";
+
+    render(
+      <LocaleProvider>
+        <ApplicationConfirmationPage
+          status="ready"
+          showEmployerNav={false}
+          confirmation={{
+            ...confirmation,
+            status: "shortlisted",
+            statusLabel: "Shortlisted",
+          }}
+          history={history}
+          outcomes={[]}
+        />
+      </LocaleProvider>,
+    );
+
+    expect(screen.getByText("IN ENGERER AUSWAHL")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", {
+        level: 1,
+        name: "Du bist in der engeren Auswahl.",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Der Arbeitgeber hat deine Bewerbung in die engere Auswahl aufgenommen.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("BEWERBUNG EINGEREICHT")).toBeNull();
+
+    document.documentElement.dataset.locale = "en";
+    document.documentElement.lang = "en";
+  });
+
   it("renders the accepted banner when status is accepted, distinct from hired/employment", () => {
     render(
       <ApplicationConfirmationPage
@@ -191,10 +291,25 @@ describe("ApplicationConfirmationPage", () => {
         outcomes={[]}
       />,
     );
+    expect(screen.getByText("APPLICATION ACCEPTED")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", {
+        level: 1,
+        name: "Your application was accepted.",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "The employer has accepted this application. Hiring is a separate outcome.",
+      ),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { level: 2, name: "Application accepted" }),
     ).toBeInTheDocument();
     expect(screen.getByText(/separate from being hired/i)).toBeInTheDocument();
+    expect(screen.queryByText("APPLICATION SUBMITTED")).toBeNull();
+    expect(screen.queryByText("You're one step closer.")).toBeNull();
+    expect(screen.queryByText("Your application is now with the employer.")).toBeNull();
     expect(screen.queryByText(/employer will|response time/i)).toBeNull();
     expect(screen.queryByText(/within \d+ days?/i)).toBeNull();
     expect(screen.queryByText(/contact (us|klinnova)/i)).toBeNull();
@@ -307,8 +422,17 @@ describe("ApplicationConfirmationPage", () => {
         outcomes={[]}
       />,
     );
+    expect(screen.getByText("APPLICATION UPDATE")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 1, name: "You were not selected." }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("This application will not progress further."),
+    ).toBeInTheDocument();
     expect(screen.getAllByText("Not selected").length).toBeGreaterThan(0);
     expect(screen.queryByText("Rejected")).toBeNull();
+    expect(screen.queryByText("APPLICATION SUBMITTED")).toBeNull();
+    expect(screen.queryByText(/reason|actor/i)).toBeNull();
   });
 
   it("renders a generic unavailable state", () => {
