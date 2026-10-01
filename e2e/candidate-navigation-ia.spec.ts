@@ -4,8 +4,9 @@ import { registerAndConfirm } from "./helpers/auth";
 
 // M5.1 Unit B — coherent candidate navigation/account IA. Proves the four
 // destinations (Matches, Applications, Profile, Account) are reachable
-// through the real consolidated nav, that Profile opens the existing
-// onboarding-review flow without resetting saved answers, that Account
+// through the real consolidated nav, that Profile opens the persistent
+// saved-profile summary and editing reuses onboarding without resetting answers,
+// that Account
 // exposes export/delete/sign-out without a destructive action firing
 // merely by navigating there, and that the nav/header stay usable —
 // no horizontal overflow, keyboard reachable, focus visible — down to
@@ -84,7 +85,10 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
     test.setTimeout(90_000);
     expect(supabaseUrl).toMatch(/127\.0\.0\.1|localhost/);
     const stamp = Date.now();
-    await registerAndCompleteCandidateOnboarding(page, stamp);
+    const { displayName } = await registerAndCompleteCandidateOnboarding(
+      page,
+      stamp,
+    );
 
     // Already on Matches after confirming essentials.
     await expect(
@@ -108,18 +112,15 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
       .getByLabel("Candidate")
       .getByRole("link", { name: "Profile" })
       .click();
-    await expect(page).toHaveURL(/\/candidate\/onboarding\?group=review$/);
-    await expect(page.getByText("Ready for matching")).toBeVisible();
+    await expect(page).toHaveURL(/\/candidate\/profile$/);
     await expect(
-      page.getByRole("region", { name: "Saved profile" }),
+      page.getByRole("heading", { level: 1, name: displayName }),
     ).toBeVisible();
-    await expect(page.getByRole("link", { name: /: Edit$/ })).toHaveCount(6);
+    await expect(page.getByText("Profile ready")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Edit profile" })).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "View matching jobs" }),
-    ).toBeVisible();
-    await expect(
-      page.getByText(/Completion stays server-controlled/i),
-    ).toHaveCount(0);
+      page.getByRole("link", { name: "Account and security" }),
+    ).toHaveAttribute("href", "/candidate/account");
     await expect(
       page.getByLabel("Candidate").getByRole("link", { name: "Profile" }),
     ).toHaveAttribute("aria-current", "page");
@@ -178,7 +179,7 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
     ).toBeDisabled();
   });
 
-  test("Profile navigation opens the existing review flow without resetting saved answers", async ({
+  test("Profile is persistent and editing reuses onboarding without resetting saved answers", async ({
     page,
   }) => {
     test.setTimeout(90_000);
@@ -189,7 +190,9 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
       .getByLabel("Candidate")
       .getByRole("link", { name: "Profile" })
       .click();
-    await expect(page).toHaveURL(/\/candidate\/onboarding\?group=review$/);
+    await expect(page).toHaveURL(/\/candidate\/profile$/);
+    await page.getByRole("link", { name: "Edit profile" }).click();
+    await expect(page).toHaveURL(/group=review/);
     await page.getByRole("link", { name: "Edit profile" }).click();
     await expect(page).toHaveURL(/group=languages/);
 
@@ -211,7 +214,10 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
       test.setTimeout(90_000);
       const stamp = Date.now() + width;
       await page.setViewportSize({ width, height: 800 });
-      await registerAndCompleteCandidateOnboarding(page, stamp);
+      const { displayName } = await registerAndCompleteCandidateOnboarding(
+        page,
+        stamp,
+      );
 
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth > window.innerWidth,
@@ -233,7 +239,10 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
       await expect(accountLink).toBeFocused();
 
       await nav.getByRole("link", { name: "Profile" }).click();
-      await expect(page).toHaveURL(/group=review/);
+      await expect(page).toHaveURL(/\/candidate\/profile$/);
+      await expect(
+        page.getByRole("heading", { level: 1, name: displayName }),
+      ).toBeVisible();
 
       if (width === 360) {
         await page
@@ -242,8 +251,9 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
         await page.getByRole("button", { name: "Deutsch" }).click();
         await page.keyboard.press("Escape");
         await expect(page.locator("html")).toHaveAttribute("lang", "de");
+        await expect(page.getByText("Profil bereit")).toBeVisible();
         await expect(
-          page.getByRole("heading", { name: "Profil prüfen" }),
+          page.getByRole("link", { name: "Profil bearbeiten" }),
         ).toBeVisible();
         const germanNav = page.getByLabel("Bewerbendenbereich");
         await expect(
