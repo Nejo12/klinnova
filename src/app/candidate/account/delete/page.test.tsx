@@ -13,7 +13,7 @@ vi.mock("@/lib/supabase/server", () => ({
 vi.mock("@/lib/employer/load-capabilities", () => ({
   loadAccountCapabilities,
 }));
-vi.mock("next/navigation", () => ({ redirect }));
+vi.mock("next/navigation", () => ({ redirect, usePathname: () => null }));
 vi.mock("@/app/candidate/account/delete/actions", () => ({
   cancelCandidateAccountDeletionAction: vi.fn(),
   confirmCandidateAccountDeletionAction: vi.fn(),

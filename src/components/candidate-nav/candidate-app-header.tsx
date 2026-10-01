@@ -4,12 +4,14 @@ import {
   CandidateNav,
   type CandidateNavDestination,
 } from "@/components/candidate-nav/candidate-nav";
+import { CandidateNotificationUtility } from "@/components/candidate-notifications/candidate-notification-utility";
 import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
 
 import styles from "./candidate-nav.module.scss";
 
 type CandidateAppHeaderProps = {
   current?: CandidateNavDestination;
+  unreadNotificationsCount?: number;
   showEmployerNav: boolean;
   /** The candidate matches page uses a plain "/" brand link in its failure state, before a session is confirmed. */
   brandHref?: string;
@@ -23,6 +25,7 @@ type CandidateAppHeaderProps = {
  */
 export function CandidateAppHeader({
   current,
+  unreadNotificationsCount,
   showEmployerNav,
   brandHref = "/candidate",
   displayName = null,
@@ -34,6 +37,11 @@ export function CandidateAppHeader({
       </Link>
       <div className={styles.headerActions}>
         <CandidateNav current={current} />
+        {brandHref !== "/" ? (
+          <CandidateNotificationUtility
+            unreadCount={unreadNotificationsCount}
+          />
+        ) : null}
         <WorkspaceSwitcher
           current="candidate"
           hasCandidate
