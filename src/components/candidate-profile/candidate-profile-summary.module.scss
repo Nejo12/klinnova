@@ -1,0 +1,212 @@
+@use "../../styles/breakpoints" as *;
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.identity {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: center;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-action-primary);
+  color: var(--color-action-primary-text);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.identityCopy {
+  min-width: 0;
+}
+
+.eyebrow,
+.heading,
+.cardHeading,
+.cardValue,
+.support,
+.definitionList {
+  margin: 0;
+}
+
+.eyebrow {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+}
+
+.heading {
+  margin-top: var(--space-1);
+  color: var(--color-text-primary);
+  font-size: var(--type-display-size);
+  font-weight: var(--type-display-weight);
+  line-height: var(--type-display-line-height);
+  overflow-wrap: anywhere;
+}
+
+.readiness {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin-top: var(--space-2);
+}
+
+.readinessBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: var(--space-1) var(--space-3);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
+  background: var(--color-bg-surface);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.readinessBadge[data-ready="true"] {
+  border-color: var(--color-status-success);
+  color: var(--color-status-success);
+  background: var(--color-status-success-bg);
+}
+
+.readinessCopy,
+.support {
+  color: var(--color-text-muted);
+  font-size: var(--type-body-supporting-size);
+  line-height: var(--type-body-supporting-line-height);
+}
+
+.primaryAction,
+.secondaryAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+  text-decoration: none;
+}
+
+.primaryAction {
+  grid-column: 1 / -1;
+  background: var(--color-action-primary);
+  color: var(--color-action-primary-text);
+}
+
+.secondaryAction {
+  border: var(--border-width-default) solid var(--color-border-strong);
+  color: var(--color-text-primary);
+  background: var(--color-bg-surface);
+}
+
+.primaryAction:focus-visible,
+.secondaryAction:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.card,
+.accountLinkCard {
+  min-width: 0;
+  padding: var(--space-5);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cardHeading {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-md);
+}
+
+.cardValue {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  overflow-wrap: anywhere;
+}
+
+.definitionList {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.4fr) minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: var(--border-width-default) solid var(--color-border-default);
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.row dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.row dd {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.accountLinkCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+@media (min-width: $breakpoint-sm) {
+  .identity {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .primaryAction {
+    grid-column: auto;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .accountLinkCard {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
