@@ -5,6 +5,10 @@ vi.mock("@/app/account/workspace-actions", () => ({
   activateWorkspaceAction: vi.fn(),
 }));
 
+vi.mock("@/app/auth/actions", () => ({
+  logoutAction: vi.fn(),
+}));
+
 import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
 
 describe("WorkspaceSwitcher", () => {
@@ -46,6 +50,12 @@ describe("WorkspaceSwitcher", () => {
     const dialog = screen.getByRole("dialog", { name: "Switch workspace" });
     expect(within(dialog).getByText("Ada Candidate")).toBeInTheDocument();
     expect(within(dialog).getAllByText("Candidate").length).toBeGreaterThan(0);
+    expect(
+      within(dialog).getByRole("link", { name: "Profile" }),
+    ).toHaveAttribute("href", "/candidate/profile");
+    expect(
+      within(dialog).getByRole("button", { name: "Log out" }),
+    ).toBeInTheDocument();
   });
 
   it("offers explicit second-capability creation instead of silently adding it", () => {
