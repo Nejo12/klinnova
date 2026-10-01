@@ -124,7 +124,9 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
       page.getByRole("link", { name: "Account and security" }),
     ).toHaveAttribute("href", "/candidate/account");
     await expect(
-      page.getByLabel("Candidate").getByRole("link", { name: "Profile" }),
+      page
+        .getByLabel("Candidate")
+        .getByRole("link", { name: "Profile", exact: true }),
     ).toHaveAttribute("aria-current", "page");
 
     await page
