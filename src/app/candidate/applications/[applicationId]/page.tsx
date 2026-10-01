@@ -83,6 +83,7 @@ export default async function CandidateApplicationConfirmationRoutePage({
     <ApplicationConfirmationPage
       status="failure"
       showEmployerNav={showEmployerNav}
+      displayName={displayName}
     />
   );
 }
