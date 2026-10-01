@@ -52,7 +52,7 @@ export default async function CandidateOnboardingPage({
     redirect(onboardingGroupHref(current === "review" ? "review" : current));
   }
 
-  const { profile, languages, progress } = loaded.data;
+  const { displayName, profile, languages, progress } = loaded.data;
   const onboardingCompleted = profile.onboardingCompletedAt !== null;
   const capabilities = await loadAccountCapabilities(supabase);
   const showEmployerNav = capabilities?.hasEmployerProfile === true;
@@ -63,7 +63,11 @@ export default async function CandidateOnboardingPage({
         current === "review" ? styles.reviewPage : ""
       }`}
     >
-      <CandidateAppHeader current="profile" showEmployerNav={showEmployerNav} />
+      <CandidateAppHeader
+        current="profile"
+        showEmployerNav={showEmployerNav}
+        displayName={displayName}
+      />
 
       {current === "review" ? null : (
         <OnboardingProgressNav progress={progress} current={current} />
