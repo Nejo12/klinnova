@@ -131,11 +131,13 @@ test.describe("candidate navigation and account IA (M5.1 Unit B)", () => {
 
     await page
       .getByLabel("Candidate")
-      .getByRole("link", { name: "Account" })
+      .getByRole("link", { name: "Account", exact: true })
       .click();
     await expect(page).toHaveURL(/\/candidate\/account$/);
     await expect(
-      page.getByLabel("Candidate").getByRole("link", { name: "Account" }),
+      page
+        .getByLabel("Candidate")
+        .getByRole("link", { name: "Account", exact: true }),
     ).toHaveAttribute("aria-current", "page");
 
     // Sign-out is not a primary-nav destination once Account exists.
