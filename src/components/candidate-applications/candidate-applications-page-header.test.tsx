@@ -45,7 +45,7 @@ describe("CandidateApplicationsPageHeader", () => {
     );
     expect(screen.getByRole("link", { name: "Profile" })).toHaveAttribute(
       "href",
-      "/candidate/onboarding?group=review",
+      "/candidate/profile",
     );
     expect(screen.getByRole("link", { name: "Account" })).toHaveAttribute(
       "href",
