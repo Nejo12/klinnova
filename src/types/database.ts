@@ -1048,6 +1048,10 @@ export type Database = {
       }
       complete_candidate_onboarding: { Args: never; Returns: Json }
       complete_employer_onboarding: { Args: never; Returns: Json }
+      count_current_candidate_unread_notifications: {
+        Args: never
+        Returns: number
+      }
       count_unseen_current_employer_applications: { Args: never; Returns: Json }
       create_employer_vacancy_draft: {
         Args: {
@@ -1169,6 +1173,18 @@ export type Database = {
         Returns: {
           occurred_at: string
           to_status: string
+        }[]
+      }
+      list_current_candidate_notifications: {
+        Args: never
+        Returns: {
+          application_id: string
+          created_at: string
+          employer_display_name: string
+          kind: string
+          notification_id: string
+          read_at: string
+          vacancy_title: string
         }[]
       }
       list_current_candidate_vacancy_matches: {
@@ -1296,8 +1312,16 @@ export type Database = {
           website: string
         }[]
       }
+      mark_all_current_candidate_notifications_read: {
+        Args: never
+        Returns: Json
+      }
       mark_all_current_employer_notifications_read: {
         Args: never
+        Returns: Json
+      }
+      mark_current_candidate_notification_read: {
+        Args: { p_notification_id: string }
         Returns: Json
       }
       mark_current_employer_notification_read: {

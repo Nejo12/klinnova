@@ -19,6 +19,7 @@ vi.mock("@/lib/supabase/server", () => ({
 }));
 
 vi.mock("next/navigation", () => ({
+  usePathname: () => null,
   redirect: vi.fn((href: string) => {
     throw new Error(`REDIRECT:${href}`);
   }),
