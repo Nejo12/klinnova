@@ -11,7 +11,13 @@ Related:
 - Founder dashboard: `docs/14-founder-dashboard.md`
 - Current M5.1 execution/readiness state: `docs/53-m5.1-beta-readiness-closure.md`
 
-### Current execution-state note — 2026-08-12
+### Current execution-state note — 2026-10-01
+
+#237 completed the isolated-Preview operational rehearsal and the Founder recorded **GO for Cohort A operational readiness**. Acceptance criteria 1–13 are satisfied and #237 is closed completed. Remaining rehearsal findings are Watch-only. This operational GO does **not** authorize external Cohort A market entry while the independent GründungsBONUS Plus safe project-start boundary remains closed under `docs/100-gruendungsbonus-plus-post-submission-control.md`. Production Sentry remains intentionally OFF/unwired by Founder decision. Preview synthetic fixtures and metrics are test-only and must never be counted as real M5/Cohort A evidence.
+
+The 2026-08-12 note below is retained as historical execution context and is superseded for current readiness state.
+
+### Historical execution-state note — 2026-08-12
 
 This document preserves the operating direction approved in M5.0. Subsequent separately authorized M5.1 work has now implemented the outcome contract through Units D/E, provisioned persistent isolated Preview through F/F2, and implemented plus hosted-Preview-verified minimal Sentry through G1/G2. Production Sentry remains intentionally unwired. Unit H (legal/support readiness) is the exact current next unit and is **not started**; Unit I has baseline investigation evidence but is not formally closed. Cohort A readiness remains **BLOCKED**. See `docs/53-m5.1-beta-readiness-closure.md` for the authoritative execution state.
 

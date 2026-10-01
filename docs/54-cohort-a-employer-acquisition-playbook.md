@@ -1,14 +1,14 @@
 # Cohort A Employer Acquisition Playbook
 
-**Status:** Prepared — founder-operational playbook, execution not started.
+**Status:** Prepared — operational readiness GO recorded; external execution remains funding-gated.
 
 **Date:** 2026-08-13
 
 **Authority:** Converts the approved strategy in `docs/51-m5-operating-plan.md` (§4 Cohort A employer segment, §6 employer acquisition channels, §7 founder-assisted onboarding) into a bounded, execution-ready founder workflow. Does not change or reopen that approved strategy.
 
-**Scope:** Preparation only. No employers have been contacted, no accounts created, no vacancies published, and no external research or outreach was performed to produce this document.
+**Scope:** This remains the approved founder-operational acquisition playbook. The #237 rehearsal used synthetic Preview fixtures only and did not start real Employer acquisition. No external Cohort A outreach or market entry is authorized while the separate GründungsBONUS Plus safe-start boundary remains closed under `docs/100-gruendungsbonus-plus-post-submission-control.md`.
 
-**Naming note:** This document is an internal repository operating record and follows repository convention in referring to the underlying product/engineering identity as "Stint" where relevant. Everything the founder sends or shows to an employer must use **Klinnova**, the current public-facing identity (`docs/53-m5.1-beta-readiness-closure.md`, K2/K5). See §13 for why the domain/brand split still matters for outreach.
+**Naming note:** This document is an internal repository operating record and preserves some historical "Stint" terminology where it reflects the original plan. The public product identity is **Klinnova**. K6 is complete and `https://klinnova.com` is canonical Production; `stint.company` redirects to Klinnova. Use Klinnova in all external Employer communication.
 
 **Pricing note:** The founder has decided employer pricing for M5/Cohort A (D-092, `docs/10-decisions.md`): participation is free for employers during the private beta — no subscription, placement fee, or commission. This is a beta-scoped policy, not a permanent commitment; future commercial terms remain undecided. §6, §7, and §8 below use this wording directly.
 
@@ -226,7 +226,7 @@ What the repository does support: candidate recruitment is only *meaningfully* u
 
 Precise next real-world actions once this playbook is approved. None of these are performed by this task.
 
-1. Pricing is decided (D-092, §8) — no further action needed before outreach on this point. Confirm the remaining §13 caveats (legal identity, support channel, domain mismatch) don't block the specific outreach planned.
+1. Pricing is decided (D-092, §8). Operational readiness GO is recorded under #237. Before any real outreach, confirm that the independent funding/start gate in `docs/100-gruendungsbonus-plus-post-submission-control.md` has been separately cleared.
 2. Build the first prospect batch per §9 (target ~20–30), using the founder's own network and direct knowledge of Berlin cleaning businesses/property managers — no scraping.
 3. Set up the tracking sheet using the fields in §5.
 4. Begin outreach in the channel order from `docs/51` §6 (warm network first), using the message structures in §6.
@@ -235,19 +235,22 @@ Precise next real-world actions once this playbook is approved. None of these ar
 7. Track funnel movement weekly against §4 and roll it into the existing `docs/51` §8 weekly review cadence.
 8. Revisit §10's thresholds after the first 2–3 weeks of outreach to see whether messaging, ICP, or product friction needs adjustment.
 9. Escalate any recurring objection or product blocker per `docs/51` §8/§10, not silently.
-10. Do not begin candidate recruitment ramp-up (§11) until the guideline in §11 is met, and do not treat Cohort A as ready for GO/NO-GO based on employer acquisition alone — Unit H, Production Sentry decision, and K6 remain independent gates (`docs/53-m5.1-beta-readiness-closure.md`).
+10. Do not begin candidate recruitment ramp-up (§11) until the guideline in §11 is met. #237 operational readiness is complete; Production Sentry remains intentionally OFF/unwired, and the separate funding/start boundary remains the current external-execution gate.
 
-## 13. Unresolved commercial/support/legal wording — remaining founder decisions before outreach
+## 13. Current commercial/support/legal operating boundary
 
-### Resolved
+### Resolved for current Cohort A sequencing
 
-**Are employers free during M5/Cohort A? RESOLVED — 2026-08-13.** The founder has decided: employer participation is free during the M5/Cohort A private beta — no subscription fee, no placement fee, no commission, no other paid employer service (D-092, `docs/10-decisions.md`). This is a beta-scoped policy, not a permanent commitment; future commercial terms remain undecided. §6, §7, and §8 above now use this wording directly. Do not extend it beyond the approved wording (no "free forever," no "never any fees," no promise about future services).
+1. **Pricing.** Employer participation in M5/Cohort A remains free during the private beta — no subscription fee, placement fee, commission or other paid Employer service (D-092). This is beta-scoped and not a permanent pricing commitment.
+2. **Support/contact channel.** `support@klinnova.com` is operational, Founder-owned and also serves as the Cohort A privacy/data-subject contact unless later qualified legal review requires separation.
+3. **K6 / public domain.** K6 is complete. `https://klinnova.com` is canonical Production; `www.klinnova.com` and `stint.company` redirect to the canonical Klinnova domain.
+4. **Operational readiness.** #237 is closed completed with Founder GO recorded. This does not itself authorize real Cohort A market entry.
 
-### Still open — do not resolve these silently
+### Still gated / do not resolve silently
 
-1. **Legal entity/business identity (Impressum).** Still open — Unit H has not started (`docs/53`). Do not present a finalized company/legal identity to employers; if asked, defer rather than improvise.
-2. **Support/contact channel.** Still open — Unit H item, linked to the same legal/support readiness finalization (`docs/53`). The founder is the de facto support channel today; there is no separate published support address/process yet. Do not promise a dedicated support channel beyond direct founder contact.
-3. **K6 domain cutover has not occurred.** The Klinnova public-domain cutover (K6) remains separately gated and has not happened (`docs/53` K5 section). Production still runs on the `stint.company` domain.
-4. **Brand/domain mismatch.** The product's user-visible identity is already "Klinnova" (K2, complete), but Production still runs on `stint.company` because K6 (point 3 above) hasn't occurred. A discerning employer signing up today will see "Klinnova" branding at a `stint.company` URL. This is not a legal problem, but it is a plausible outreach/trust question ("why does the link say stint.company?"). The founder must be ready to explain this honestly if it comes up before K6 — e.g. "we're mid-rebrand; the product is Klinnova, the URL hasn't caught up yet" — rather than being surprised by the question or glossing over it.
+1. **Funding/start boundary.** External Cohort A market entry, paid acquisition, grant-targeted provider work, procurement, contracts and deposits remain unauthorized until the separate GründungsBONUS Plus safe-start boundary is evidenced or explicitly cleared under `docs/100-gruendungsbonus-plus-post-submission-control.md`.
+2. **Legal wording.** Current merged legal surfaces remain provisionally accepted for this launch sequencing. No qualified legal-review, full legal-compliance or GDPR-compliance claim is made.
+3. **Production Sentry.** Remains OFF/unwired by deliberate Founder decision for Cohort A and is not an operational-readiness blocker.
 
-Nothing else in `docs/51`/`docs/53`/`docs/10-decisions.md` was found to materially affect outreach wording beyond these points.
+Do not treat the synthetic Preview rehearsal fixtures or M5 counts from #237 as real Employer/Candidate acquisition evidence.
+
