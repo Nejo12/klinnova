@@ -208,7 +208,9 @@ describe("ApplicationConfirmationPage", () => {
       ),
     ).toBeInTheDocument();
     expect(screen.queryByText("APPLICATION SUBMITTED")).toBeNull();
-    expect(screen.queryByText("Your application is now with the employer.")).toBeNull();
+    expect(
+      screen.queryByText("Your application is now with the employer."),
+    ).toBeNull();
 
     view.rerender(
       <ApplicationConfirmationPage
@@ -309,7 +311,9 @@ describe("ApplicationConfirmationPage", () => {
     expect(screen.getByText(/separate from being hired/i)).toBeInTheDocument();
     expect(screen.queryByText("APPLICATION SUBMITTED")).toBeNull();
     expect(screen.queryByText("You're one step closer.")).toBeNull();
-    expect(screen.queryByText("Your application is now with the employer.")).toBeNull();
+    expect(
+      screen.queryByText("Your application is now with the employer."),
+    ).toBeNull();
     expect(screen.queryByText(/employer will|response time/i)).toBeNull();
     expect(screen.queryByText(/within \d+ days?/i)).toBeNull();
     expect(screen.queryByText(/contact (us|klinnova)/i)).toBeNull();
