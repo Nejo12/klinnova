@@ -2,6 +2,7 @@ import { CandidateAppHeader } from "@/components/candidate-nav/candidate-app-hea
 
 type CandidateApplicationsPageHeaderProps = {
   showEmployerNav: boolean;
+  displayName?: string | null;
 };
 
 /**
@@ -11,11 +12,13 @@ type CandidateApplicationsPageHeaderProps = {
  */
 export function CandidateApplicationsPageHeader({
   showEmployerNav,
+  displayName = null,
 }: CandidateApplicationsPageHeaderProps) {
   return (
     <CandidateAppHeader
       current="applications"
       showEmployerNav={showEmployerNav}
+      displayName={displayName}
     />
   );
 }
