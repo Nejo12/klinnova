@@ -93,7 +93,7 @@ select is((select count(*)::int from public.notifications where kind='applicatio
 select is((select count(*)::int from public.notifications where kind='application_rejected'),1,'exactly one rejection');
 
 -- Safe snapshot context survives unpublished/changed vacancies.
-update public.vacancies set title='Changed live title', publication_state='paused' where id='a2780000-0000-4000-8000-000000000012';
+update public.vacancies set title='Changed live title', publication_state='paused', paused_at=now() where id='a2780000-0000-4000-8000-000000000012';
 set local role authenticated;
 select set_config('request.jwt.claim.sub','a2780000-0000-4000-8000-000000000003',true);
 select is((select count(*)::int from public.list_current_candidate_notifications()),3,'Candidate owns three events');
