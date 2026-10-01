@@ -62,7 +62,9 @@ describe("CandidateProfileSummary", () => {
     expect(
       screen.getByText(/I can understand and use some basic German/),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Berlin/)).toBeInTheDocument();
+    expect(
+      screen.getByText("Berlin · up to 45 minutes travel"),
+    ).toBeInTheDocument();
     expect(screen.getByText(/45 minutes/)).toBeInTheDocument();
     expect(screen.getByText("Yes")).toBeInTheDocument();
   });
