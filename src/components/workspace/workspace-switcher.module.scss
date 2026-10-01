@@ -1,6 +1,8 @@
 .trigger,
 .switchAction,
-.securityLink {
+.securityLink,
+.menuLink,
+.signOutAction {
   min-height: var(--touch-target-min);
   font: inherit;
   font-size: var(--font-size-sm);
@@ -26,7 +28,9 @@
 }
 
 .current,
-.switchAction {
+.switchAction,
+.menuLink,
+.signOutAction {
   width: 100%;
   padding: var(--space-3);
   border-radius: var(--radius-md);
@@ -48,12 +52,28 @@
   white-space: nowrap;
 }
 
-.switchAction {
+.switchAction,
+.menuLink,
+.signOutAction {
   border: var(--border-width-default) solid var(--color-border-default);
   background: var(--color-bg-surface);
   color: var(--color-text-primary);
   text-align: left;
+}
+
+.switchAction,
+.signOutAction {
   cursor: pointer;
+}
+
+.menuLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.signOutAction {
+  font: inherit;
 }
 
 .securityLink {
@@ -65,12 +85,16 @@
 
 .trigger:focus-visible,
 .switchAction:focus-visible,
-.securityLink:focus-visible {
+.securityLink:focus-visible,
+.menuLink:focus-visible,
+.signOutAction:focus-visible {
   outline: var(--focus-ring-width) solid var(--color-focus-ring);
   outline-offset: var(--focus-ring-offset);
 }
 
-.switchAction:hover {
+.switchAction:hover,
+.menuLink:hover,
+.signOutAction:hover {
   background: var(--color-bg-subtle);
 }
 
