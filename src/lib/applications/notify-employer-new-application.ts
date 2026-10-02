@@ -1,4 +1,5 @@
 import "server-only";
+import { resolveRecipientEmailPreference } from "@/lib/notification-preferences/resolve-email-preference";
 
 import { buildEmployerNewApplicationEmail } from "@/lib/applications/employer-new-application-email";
 import { resolveEmployerRecipientForVacancy } from "@/lib/applications/privileged-employer-recipient-lookup";
@@ -14,6 +15,8 @@ export type NotifyEmployerNewApplicationInput = {
 };
 
 export type NotifyEmployerNewApplicationResult =
+  | { status: "suppressed" }
+  | { status: "preference_unresolved" }
   | { status: "sent"; providerMessageId: string }
   | { status: "recipient_unresolved"; reason: string }
   | { status: "message_invalid"; issues: string[] }
@@ -61,6 +64,13 @@ export async function notifyEmployerOfNewApplication(
     });
     return { status: "recipient_unresolved", reason: recipient.status };
   }
+
+  const enabled = await resolveRecipientEmailPreference(
+    recipient.recipientUserId,
+    "employer_new_applicants",
+  );
+  if (enabled === null) return { status: "preference_unresolved" };
+  if (!enabled) return { status: "suppressed" };
 
   const content = buildEmployerNewApplicationEmail({
     vacancyTitle: recipient.vacancyTitle,

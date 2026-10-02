@@ -40,6 +40,9 @@ describe("CandidateAccountPage (M5.1 Unit B)", () => {
   it("exposes export, delete, and sign-out without any destructive action firing merely by rendering", async () => {
     render(await CandidateAccountPage());
 
+    expect(
+      screen.getByRole("link", { name: "Notification preferences" }),
+    ).toHaveAttribute("href", "/candidate/account/notifications");
     const exportLink = screen.getByRole("link", {
       name: "Download candidate data",
     });

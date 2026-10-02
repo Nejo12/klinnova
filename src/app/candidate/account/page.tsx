@@ -85,6 +85,15 @@ export default async function CandidateAccountPage() {
         </p>
       </section>
 
+      <p>
+        <Link
+          className={styles.secondaryLink}
+          href="/candidate/account/notifications"
+        >
+          <LocalizedText message="notificationPreferences.destination" />
+        </Link>
+      </p>
+
       <SessionSecurity />
     </main>
   );

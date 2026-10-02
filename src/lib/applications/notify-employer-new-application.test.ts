@@ -5,6 +5,11 @@ import type { MailSendResult } from "@/lib/mail/transport";
 
 const resolveEmployerRecipientForVacancyMock = vi.fn();
 const sendTransactionalEmailMock = vi.fn();
+const preferenceMock = vi.fn();
+vi.mock("@/lib/notification-preferences/resolve-email-preference", () => ({
+  resolveRecipientEmailPreference: (...args: unknown[]) =>
+    preferenceMock(...args),
+}));
 
 vi.mock("@/lib/applications/privileged-employer-recipient-lookup", () => ({
   resolveEmployerRecipientForVacancy: (...args: unknown[]) =>
@@ -31,6 +36,7 @@ async function loadModule() {
 const readyRecipient: EmployerRecipientLookupResult = {
   status: "ready",
   employerEmail: "employer@example.com",
+  recipientUserId: "22222222-2222-4222-8222-222222222222",
   vacancyTitle: "Morning kitchen support",
 };
 
@@ -44,6 +50,7 @@ describe("notifyEmployerOfNewApplication", () => {
   beforeEach(() => {
     resolveEmployerRecipientForVacancyMock.mockReset();
     sendTransactionalEmailMock.mockReset();
+    preferenceMock.mockReset().mockResolvedValue(true);
     consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
@@ -51,6 +58,34 @@ describe("notifyEmployerOfNewApplication", () => {
     consoleErrorSpy.mockRestore();
   });
 
+  it("skips transport after explicit Email opt-out", async () => {
+    resolveEmployerRecipientForVacancyMock.mockResolvedValue(readyRecipient);
+    preferenceMock.mockResolvedValue(false);
+    const { notifyEmployerOfNewApplication } = await loadModule();
+    expect(
+      await notifyEmployerOfNewApplication({
+        applicationId: applicationIdA,
+        vacancyId,
+      }),
+    ).toEqual({ status: "suppressed" });
+    expect(preferenceMock).toHaveBeenCalledWith(
+      readyRecipient.recipientUserId,
+      "employer_new_applicants",
+    );
+    expect(sendTransactionalEmailMock).not.toHaveBeenCalled();
+  });
+  it("skips transport on preference lookup failure without throwing", async () => {
+    resolveEmployerRecipientForVacancyMock.mockResolvedValue(readyRecipient);
+    preferenceMock.mockResolvedValue(null);
+    const { notifyEmployerOfNewApplication } = await loadModule();
+    expect(
+      await notifyEmployerOfNewApplication({
+        applicationId: applicationIdA,
+        vacancyId,
+      }),
+    ).toEqual({ status: "preference_unresolved" });
+    expect(sendTransactionalEmailMock).not.toHaveBeenCalled();
+  });
   it("sends via the N1 mail facade with the expected recipient, subject, and body", async () => {
     resolveEmployerRecipientForVacancyMock.mockResolvedValue(readyRecipient);
     sendTransactionalEmailMock.mockResolvedValue({
