@@ -519,6 +519,30 @@ export type Database = {
           },
         ]
       }
+      notification_preferences: {
+        Row: {
+          category: string
+          created_at: string
+          email_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          email_enabled: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          email_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           application_id: string
@@ -855,6 +879,10 @@ export type Database = {
         Args: { p_uid: string }
         Returns: undefined
       }
+      _current_notification_category_available: {
+        Args: { p_category: string }
+        Returns: boolean
+      }
       _employer_first_incomplete_reason: {
         Args: {
           p_berlin_locality: string
@@ -1103,6 +1131,10 @@ export type Database = {
       fill_employer_vacancy: { Args: { p_vacancy_id: string }; Returns: Json }
       get_current_employer_application: {
         Args: { p_application_id: string }
+        Returns: Json
+      }
+      get_current_notification_email_preference: {
+        Args: { p_category: string }
         Returns: Json
       }
       get_effective_public_vacancy: {
@@ -1382,6 +1414,10 @@ export type Database = {
       }
       revoke_employer_verification: {
         Args: { p_employer_profile_id: string; p_reason: string }
+        Returns: Json
+      }
+      set_current_notification_email_preference: {
+        Args: { p_category: string; p_email_enabled: boolean }
         Returns: Json
       }
       submit_candidate_application: {

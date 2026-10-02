@@ -14,7 +14,12 @@ const privilegedEnvSchema = z.object({
 const vacancySnapshotTitleSchema = z.object({ title: z.string().min(1) });
 
 export type CandidateRecipientLookupResult =
-  | { status: "ready"; candidateEmail: string; vacancyTitle: string }
+  | {
+      status: "ready";
+      candidateEmail: string;
+      vacancyTitle: string;
+      recipientUserId: string;
+    }
   | { status: "application_not_found" }
   | { status: "candidate_not_found" }
   | { status: "lookup_failed"; message: string };
@@ -95,6 +100,7 @@ export async function resolveCandidateRecipientForApplication(
   return {
     status: "ready",
     candidateEmail: email,
+    recipientUserId: application.candidate_id,
     vacancyTitle: parsedSnapshot.data.title,
   };
 }

@@ -5,6 +5,11 @@ import type { MailSendResult } from "@/lib/mail/transport";
 
 const resolveCandidateRecipientForApplicationMock = vi.fn();
 const sendTransactionalEmailMock = vi.fn();
+const preferenceMock = vi.fn();
+vi.mock("@/lib/notification-preferences/resolve-email-preference", () => ({
+  resolveRecipientEmailPreference: (...args: unknown[]) =>
+    preferenceMock(...args),
+}));
 
 vi.mock("@/lib/applications/privileged-candidate-recipient-lookup", () => ({
   resolveCandidateRecipientForApplication: (...args: unknown[]) =>
@@ -31,6 +36,7 @@ async function loadModule() {
 const readyRecipient: CandidateRecipientLookupResult = {
   status: "ready",
   candidateEmail: "candidate@example.com",
+  recipientUserId: "22222222-2222-4222-8222-222222222222",
   vacancyTitle: "Morning kitchen support",
 };
 
@@ -43,6 +49,7 @@ describe("notifyCandidateOfStatusChange", () => {
   beforeEach(() => {
     resolveCandidateRecipientForApplicationMock.mockReset();
     sendTransactionalEmailMock.mockReset();
+    preferenceMock.mockReset().mockResolvedValue(true);
     consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
@@ -50,6 +57,41 @@ describe("notifyCandidateOfStatusChange", () => {
     consoleErrorSpy.mockRestore();
   });
 
+  it.each(["shortlisted", "accepted", "rejected"] as const)(
+    "skips %s transport after explicit Email opt-out",
+    async (toStatus) => {
+      resolveCandidateRecipientForApplicationMock.mockResolvedValue(
+        readyRecipient,
+      );
+      preferenceMock.mockResolvedValue(false);
+      const { notifyCandidateOfStatusChange } = await loadModule();
+      expect(
+        await notifyCandidateOfStatusChange({
+          applicationId: applicationIdA,
+          toStatus,
+        }),
+      ).toEqual({ status: "suppressed" });
+      expect(preferenceMock).toHaveBeenCalledWith(
+        readyRecipient.recipientUserId,
+        "candidate_application_updates",
+      );
+      expect(sendTransactionalEmailMock).not.toHaveBeenCalled();
+    },
+  );
+  it("skips transport on preference lookup failure without throwing", async () => {
+    resolveCandidateRecipientForApplicationMock.mockResolvedValue(
+      readyRecipient,
+    );
+    preferenceMock.mockResolvedValue(null);
+    const { notifyCandidateOfStatusChange } = await loadModule();
+    expect(
+      await notifyCandidateOfStatusChange({
+        applicationId: applicationIdA,
+        toStatus: "shortlisted",
+      }),
+    ).toEqual({ status: "preference_unresolved" });
+    expect(sendTransactionalEmailMock).not.toHaveBeenCalled();
+  });
   it("sends via the N1 mail facade with the expected recipient, subject, and body for shortlisted", async () => {
     resolveCandidateRecipientForApplicationMock.mockResolvedValue(
       readyRecipient,

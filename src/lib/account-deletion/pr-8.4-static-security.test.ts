@@ -105,12 +105,34 @@ describe("PR 8.4 account-deletion privileged-boundary static security proof", ()
         PRE_EXISTING_SERVICE_ROLE_REFERENCES.has(file) ||
         ACCOUNT_DELETION_PRIVILEGED_FILES.has(file) ||
         N2_PRIVILEGED_FILES.has(file) ||
-        N3_PRIVILEGED_FILES.has(file)
+        N3_PRIVILEGED_FILES.has(file) ||
+        file === "src/lib/notification-preferences/resolve-email-preference.ts"
       ) {
         continue;
       }
       const source = readSource(file);
       expect(source, file).not.toMatch(pattern);
+    }
+  });
+
+  it("isolates #280 preference lookup to the existing post-event N2/N3 callers", () => {
+    const resolver =
+      "src/lib/notification-preferences/resolve-email-preference.ts";
+    const source = readSource(resolver);
+    expect(source).toMatch(/^import "server-only";/m);
+    expect(source).not.toMatch(/auth\.admin|console\.(log|error|warn)/);
+    expect(source).not.toMatch(/\.(insert|update|delete)\(/);
+    for (const file of allSourceFiles().filter((file) => file !== resolver)) {
+      if (
+        readSource(file).includes(
+          'from "@/lib/notification-preferences/resolve-email-preference"',
+        )
+      ) {
+        expect([
+          "src/lib/applications/notify-candidate-status-change.ts",
+          "src/lib/applications/notify-employer-new-application.ts",
+        ]).toContain(file);
+      }
     }
   });
 

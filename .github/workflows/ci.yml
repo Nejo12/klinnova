@@ -202,7 +202,7 @@ jobs:
         run: pnpm test:e2e:candidate-navigation-ia
 
       - name: Candidate and Employer notification journeys (local Supabase + Mailpit)
-        run: pnpm exec playwright test --workers=1 e2e/candidate-notifications-journey.spec.ts e2e/employer-notifications-journey.spec.ts
+        run: pnpm exec playwright test --workers=1 e2e/candidate-notifications-journey.spec.ts e2e/employer-notifications-journey.spec.ts e2e/notification-preferences-journey.spec.ts
 
       - name: Employer navigation IA journeys (local Supabase + Mailpit)
         run: pnpm test:e2e:employer-navigation-ia

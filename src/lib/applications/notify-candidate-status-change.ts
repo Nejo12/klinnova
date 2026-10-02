@@ -1,4 +1,5 @@
 import "server-only";
+import { resolveRecipientEmailPreference } from "@/lib/notification-preferences/resolve-email-preference";
 
 import {
   buildCandidateStatusEmail,
@@ -17,6 +18,8 @@ export type NotifyCandidateStatusChangeInput = {
 };
 
 export type NotifyCandidateStatusChangeResult =
+  | { status: "suppressed" }
+  | { status: "preference_unresolved" }
   | { status: "sent"; providerMessageId: string }
   | { status: "recipient_unresolved"; reason: string }
   | { status: "message_invalid"; issues: string[] }
@@ -75,6 +78,13 @@ export async function notifyCandidateOfStatusChange(
     );
     return { status: "recipient_unresolved", reason: recipient.status };
   }
+
+  const enabled = await resolveRecipientEmailPreference(
+    recipient.recipientUserId,
+    "candidate_application_updates",
+  );
+  if (enabled === null) return { status: "preference_unresolved" };
+  if (!enabled) return { status: "suppressed" };
 
   const content = buildCandidateStatusEmail({
     toStatus: input.toStatus,

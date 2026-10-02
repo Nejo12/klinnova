@@ -12,7 +12,12 @@ const privilegedEnvSchema = z.object({
 });
 
 export type EmployerRecipientLookupResult =
-  | { status: "ready"; employerEmail: string; vacancyTitle: string }
+  | {
+      status: "ready";
+      employerEmail: string;
+      vacancyTitle: string;
+      recipientUserId: string;
+    }
   | { status: "vacancy_not_found" }
   | { status: "employer_not_found" }
   | { status: "lookup_failed"; message: string };
@@ -80,5 +85,10 @@ export async function resolveEmployerRecipientForVacancy(
     return { status: "employer_not_found" };
   }
 
-  return { status: "ready", employerEmail: email, vacancyTitle: vacancy.title };
+  return {
+    status: "ready",
+    employerEmail: email,
+    recipientUserId: vacancy.employer_profile_id,
+    vacancyTitle: vacancy.title,
+  };
 }

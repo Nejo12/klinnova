@@ -113,6 +113,7 @@ describe("resolveCandidateRecipientForApplication", () => {
     expect(result).toEqual({
       status: "ready",
       candidateEmail: validCandidateEmail,
+      recipientUserId: validCandidateId,
       vacancyTitle: "Morning kitchen support",
     });
     expect(mock.eq).toHaveBeenCalledWith("id", validApplicationId);

@@ -92,6 +92,15 @@ export default async function EmployerAccountPage() {
         </Link>
       </section>
 
+      <p>
+        <Link
+          className={styles.textLink}
+          href="/employer/account/notifications"
+        >
+          <LocalizedText message="notificationPreferences.destination" />
+        </Link>
+      </p>
+
       <SessionSecurity />
     </main>
   );

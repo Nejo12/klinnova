@@ -294,6 +294,37 @@ const englishMessages = {
   "candidate.applications.notAvailableHeading": "Application not available",
   "candidate.applications.notAvailableBody":
     "This application could not be shown. It may not exist or you may not have access.",
+  "notificationPreferences.destination": "Notification preferences",
+  "notificationPreferences.candidate.heading":
+    "Candidate notification preferences",
+  "notificationPreferences.employer.heading":
+    "Employer notification preferences",
+  "notificationPreferences.candidate.lead":
+    "Choose whether Klinnova emails you about application status updates. Notification history stays available in the app.",
+  "notificationPreferences.employer.lead":
+    "Choose whether Klinnova emails you about new applicants. Notification history stays available in the app.",
+  "notificationPreferences.candidate.group": "Hiring activity",
+  "notificationPreferences.employer.group": "Employer activity",
+  "notificationPreferences.candidate.category": "Application updates",
+  "notificationPreferences.employer.category": "New applicants",
+  "notificationPreferences.candidate.description":
+    "Status changes after you apply.",
+  "notificationPreferences.employer.description":
+    "For employers: new candidate applications.",
+  "notificationPreferences.email": "Email",
+  "notificationPreferences.push": "Push",
+  "notificationPreferences.category": "Category",
+  "notificationPreferences.comingLater": "Coming later",
+  "notificationPreferences.unavailable": "Unavailable",
+  "notificationPreferences.on": "On",
+  "notificationPreferences.off": "Off",
+  "notificationPreferences.saving": "Saving…",
+  "notificationPreferences.saved": "Saved",
+  "notificationPreferences.saveFailed":
+    "Could not save. Your setting has not changed. Please try again.",
+  "notificationPreferences.loadFailed":
+    "Could not load your setting. Please reload to try again.",
+  "notificationPreferences.back": "Back to Account",
   "candidate.account.heading": "Account",
   "candidate.account.lead":
     "Download your data, delete your account, or sign out.",
@@ -1050,6 +1081,37 @@ const germanMessages: Partial<Record<MessageKey, string>> = {
   "candidate.applications.notAvailableHeading": "Bewerbung nicht verfügbar",
   "candidate.applications.notAvailableBody":
     "Diese Bewerbung konnte nicht angezeigt werden. Möglicherweise existiert sie nicht oder du hast keinen Zugriff.",
+  "notificationPreferences.destination": "Benachrichtigungseinstellungen",
+  "notificationPreferences.candidate.heading":
+    "Benachrichtigungseinstellungen für Bewerbende",
+  "notificationPreferences.employer.heading":
+    "Benachrichtigungseinstellungen für Arbeitgeber",
+  "notificationPreferences.candidate.lead":
+    "Wähle, ob Klinnova dir E-Mails zu deinem Bewerbungsstatus sendet. Dein Benachrichtigungsverlauf bleibt in der App verfügbar.",
+  "notificationPreferences.employer.lead":
+    "Wähle, ob Klinnova dir E-Mails zu neuen Bewerbungen sendet. Dein Benachrichtigungsverlauf bleibt in der App verfügbar.",
+  "notificationPreferences.candidate.group": "Bewerbungsaktivität",
+  "notificationPreferences.employer.group": "Arbeitgeberaktivität",
+  "notificationPreferences.candidate.category": "Bewerbungsupdates",
+  "notificationPreferences.employer.category": "Neue Bewerbungen",
+  "notificationPreferences.candidate.description":
+    "Statusänderungen nach deiner Bewerbung.",
+  "notificationPreferences.employer.description":
+    "Für Arbeitgeber: neue Bewerbungen.",
+  "notificationPreferences.email": "E-Mail",
+  "notificationPreferences.push": "Push",
+  "notificationPreferences.category": "Kategorie",
+  "notificationPreferences.comingLater": "Kommt später",
+  "notificationPreferences.unavailable": "Nicht verfügbar",
+  "notificationPreferences.on": "An",
+  "notificationPreferences.off": "Aus",
+  "notificationPreferences.saving": "Wird gespeichert…",
+  "notificationPreferences.saved": "Gespeichert",
+  "notificationPreferences.saveFailed":
+    "Speichern fehlgeschlagen. Deine Einstellung wurde nicht geändert. Bitte versuche es erneut.",
+  "notificationPreferences.loadFailed":
+    "Deine Einstellung konnte nicht geladen werden. Bitte lade die Seite neu.",
+  "notificationPreferences.back": "Zurück zum Konto",
   "candidate.account.heading": "Konto",
   "candidate.account.lead":
     "Lade deine Daten herunter, lösche dein Konto oder melde dich ab.",

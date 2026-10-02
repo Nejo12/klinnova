@@ -55,6 +55,9 @@ describe("EmployerAccountPage", () => {
       expect(
         screen.getByRole("heading", { name: "Session security" }),
       ).toBeVisible();
+      expect(
+        screen.getByRole("link", { name: "Notification preferences" }),
+      ).toHaveAttribute("href", "/employer/account/notifications");
       expect(fetchSpy).not.toHaveBeenCalled();
     } finally {
       fetchSpy.mockRestore();
