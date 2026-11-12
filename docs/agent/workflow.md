@@ -54,10 +54,11 @@ When a coding-agent task authorizes PR creation, the default endpoint is:
 4. review the final diff for scope drift;
 5. commit and push;
 6. open the PR;
-7. report exact head SHA, changed files, verification results, PR URL, and residual risk;
-8. stop.
+7. check required CI once on the exact PR head;
+8. report the PR URL, exact head SHA, changed files, local verification, CI status and residual risk;
+9. hand back to the Founder.
 
-Do not wait for, poll, babysit, or repeatedly re-check CI/Vercel after PR creation unless the task explicitly asks for it. Chat should normally review the PR and exact-head CI. If CI fails, Chat isolates the failure and sends a narrow continuation to the coding agent.
+When any required check is incomplete, report **PENDING CI** and name the incomplete checks. Report failed checks separately. Stop and take one fresh snapshot only when the Founder explicitly requests another check. Apply the same rule during merge review. Return failed checks to Chat for diagnosis unless the Founder authorizes a bounded continuation.
 
 Do not auto-merge. The Founder manually reviews and merges.
 
@@ -71,4 +72,4 @@ Before push or PR, verify exact HEAD, inspect the full diff, ensure no unrelated
 
 ## Post-Merge Verification
 
-After the Founder merges, verify the PR merge state, main SHA, exact-head CI, and hosted result where applicable. Report authoritative state. Do not perform the merge unless governance is explicitly changed for that task.
+After the Founder merges, verify the PR merge state, main SHA, exact-head CI and hosted result where applicable. Report the authoritative state. The Founder performs all merges.
