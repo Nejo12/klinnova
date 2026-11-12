@@ -169,7 +169,7 @@ Historical slice-specific discovery/build-plan/proposal/closure files remain in 
 
 ## Agent development
 
-Repository agent governance starts in [AGENTS.md](AGENTS.md). Codex project setup, reusable Klinnova skills, and the Founder-controlled workflow are documented in [docs/agent/README.md](docs/agent/README.md).
+Repository agent governance starts in [AGENTS.md](AGENTS.md). See the [agent setup](docs/agent/README.md) for repository-local skills and the [delivery workflow](docs/agent/workflow.md#pr-handoff) for PR handoff. Check required CI once on the exact PR head. If checks are incomplete, report them as pending and recheck only on Founder request. The Founder performs all merges manually.
 
 ## Local development
 
