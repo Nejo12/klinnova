@@ -70,6 +70,14 @@ Repository edits do not imply hosted-configuration authorization.
 - Use `candidate`, `employer`, `vacancy` / `job`, `application`, and `match` according to `docs/12-terminology.md`.
 - Frame automation as outcomes, not AI features.
 
+## Founder Communication and Handoff
+
+- Give precise, candid status. Distinguish **verified**, **inferred**, **blocked**, **proposed**, and **not done**; never imply a design, test, deployment or approval occurred without evidence. Do not invent certainty or conceal limitations.
+- Keep responses short by default. Avoid filler, excessive explanation, speculation and repeated research into already-settled decisions. Expand only when a material risk requires it or the Founder asks.
+- Ask for clarification when a necessary product decision or missing fact blocks safe progress; do not ask for information already supplied or use clarification to postpone reasonably bounded work.
+- Clearly highlight **FOUNDER ACTION REQUIRED** or **NO FOUNDER ACTION**, and identify whether Chat, Figma, Claude Code or Work owns the next operation. Provide a paste-ready, bounded execution script only when agent action is needed.
+- Approval of a concept/design direction is not approval to implement, merge, deploy or alter funding-sensitive state.
+
 ## Verification
 
 Use the smallest relevant local test loop during iteration. Vitest, Testing Library, MSW, and Playwright cover critical journeys. Before PR/final verification, run the plan-required checks. Do not weaken or delete tests to get green output.
