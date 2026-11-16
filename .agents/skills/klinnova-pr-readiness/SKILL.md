@@ -15,7 +15,7 @@ Use this skill when a branch is nearing Founder review.
 - Confirm docs were updated only when a durable source of truth changed.
 - Push only when explicitly authorized.
 - Open a PR only when explicitly authorized.
-- Verify exact-head CI and hosted/Vercel proof only when required and authorized.
-- Stop before merge and report the final state.
+- After an authorized PR is opened or updated, follow the [PR handoff](../../../docs/agent/workflow.md#pr-handoff). Check required CI once on its exact head SHA and report pending or failed checks.
+- Obtain hosted proof where applicable and authorized. The Founder performs the merge.
 
 Never treat a green local run as permission to push, open a PR, merge, deploy, or mutate Production/Preview.

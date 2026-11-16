@@ -22,7 +22,7 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 | Product boundary | Merged M4 remains the Cohort A baseline; governed product development is unfrozen under D-M5-23 |
 | Active work unit | **K6 COMPLETE / CLOSED. #237 OPERATIONAL READINESS COMPLETE / GO.** Klinnova Production/public-domain cutover is complete through K6-6 and `https://klinnova.com` is canonical Production. Founder operational GO for Cohort A readiness was recorded on 2026-10-01 and #237 is closed completed. The separate GründungsBONUS Plus project-start/funding boundary remains closed under `docs/100-gruendungsbonus-plus-post-submission-control.md`. |
 | PR | Post-submission funding-control documentation only; Founder manually merges. Never auto-merge. |
-| Funding / admin | **GB9185/2026 SUBMITTED.** Electronic submission complete; signed original dispatched; correction notice for generated EUR 15.00 → intended EUR 15,000.00 next-year drawdown sent by email and post; IBB receipt/review pending. Provider evidence planning is outreach-ready for C05/C01/C04/C03/C07, but outreach/procurement/grant-targeted work remain **NOT AUTHORIZED**. |
+| Funding / admin | **GB9185/2026 — Nachforderung submitted by the Founder on 12 November 2026.** Revised uploads verified. Separate portal confirmation, IBB clarification and signed-original postal receipt remain pending. The project-start boundary remains closed. [Issue #282](https://github.com/Nejo12/klinnova/issues/282) |
 | Product/schema implementation | Product discovery/design is active. Implementation proceeds only through explicitly approved bounded BUILD NOW units, labelled Founder-developed / pre-funding / excluded from grant reimbursement while the funding boundary remains closed. |
 | Preview | Persistent isolated Supabase Preview project remains available through Vercel-generated Preview deployment URLs. Custom `preview.klinnova.com` project-domain attachment is retired. See `docs/52-preview-environment-runbook.md` and `docs/56-k6-production-cutover-durable-closure.md`. |
 | Monitoring | **Preview Sentry complete through G1/G2**. **Production Sentry remains OFF/unwired by deliberate Founder decision for Cohort A.** Funding submission does not activate it. |
@@ -35,7 +35,8 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 ## GründungsBONUS Plus post-submission gate
 
 - Application **GB9185/2026**: electronic submission complete.
-- Signed original: dispatched by post; actual IBB receipt/processing evidence is pending.
+- Signed original: dispatched by post. IBB confirmation of postal receipt is pending.
+- Nachforderung: Founder submitted on 12 November 2026. Revised uploads are visible and the open request disappeared. Track the separate confirmation and IBB follow-up in [Issue #282](https://github.com/Nejo12/klinnova/issues/282).
 - Correction notice: sent by email and post for the generated application display of `EUR 15.00`; controlling next-year grant drawdown is **EUR 15,000.00** and the EUR 30,000 / EUR 15,000 financing baseline is unchanged.
 - Sensitive submission artifacts, identity evidence, bank identifiers, tax identifiers and signatures remain outside Git.
 - Keep the grant-targeted project boundary closed until the legally relevant signed-original receipt / safe start boundary is evidenced or clarified by IBB.
@@ -142,7 +143,7 @@ This is a planning queue, **not automatic authorization**. Current execution sta
 ### Funding / administration
 
 1. Retain private evidence of postal dispatch and the sent correction email.
-2. Record the first IBB receipt acknowledgement, information request or decision when received.
+2. Record the signed-original postal receipt, separate Nachforderung acknowledgement and any IBB clarification or decision when received.
 3. Record Steuernummer / W-IdNr / USt-IdNr privately when issued; update IBB only where required.
 4. Before any first funded expenditure, establish invoice → payment → cost-block → project-purpose evidence linkage.
 

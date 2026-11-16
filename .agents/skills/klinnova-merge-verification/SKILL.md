@@ -14,6 +14,6 @@ Use this skill only after the Founder says a merge happened or asks for post-mer
 - Confirm post-merge CI status on the exact merged head.
 - Verify hosted result only when applicable and authorized; do not mutate Production/Preview while checking.
 - Report whether repository docs or dashboards need follow-up updates, but do not rewrite product history unless authorized.
-- Never perform the merge yourself unless the user explicitly changes governance for that task.
+- The Founder performs all merges manually.
 
 Final output should state the authoritative repository state, remaining risks, and any blocked external proof.

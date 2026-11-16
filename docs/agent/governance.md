@@ -10,7 +10,7 @@ Authoritative state comes from merged GitHub `main`, accepted closure/proof docu
 
 Substantial work requires discovery, Founder review, and explicit implementation authorization. Approval for discovery is not approval to implement. Approval to implement is not approval to push, open a PR, merge, deploy, mutate hosted services, or change Production.
 
-Stop before merge. The Founder performs or explicitly authorizes any merge.
+The Founder performs all merges manually. Auto-merge stays disabled.
 
 ## Safety Boundaries
 

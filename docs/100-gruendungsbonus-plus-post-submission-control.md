@@ -1,8 +1,10 @@
 # GründungsBONUS Plus — Post-Submission Control & Evidence Readiness
 
-**Status:** SUBMITTED / signed original dispatched / IBB receipt and review pending
+**Status:** Original application submitted and signed original dispatched. Founder submitted the Nachforderung digitally on 12 November 2026. Separate receipt and IBB response are pending.
 
-**Date:** 2026-09-02
+**Opened:** 2026-09-02
+
+**Last updated:** 2026-11-12
 
 **Application:** GB9185/2026 — Klinnova
 
@@ -20,11 +22,18 @@ Confirmed by Founder:
 - the EUR 15,000 grant request, EUR 30,000 total project financing and private financial/liquidity plan remain unchanged;
 - IBB acknowledgement of receipt / processing is **pending**.
 
-Do not infer the legally relevant IBB receipt date from dispatch. Record the actual receipt/acknowledgement date only when evidence is received.
+Record the legally relevant postal receipt date when IBB confirms it. Dispatch and the November digital follow-up do not establish that date.
 
-## 2. Controlling financing baseline — unchanged
+### 12 November 2026 Nachforderung
 
-The controlling baseline remains:
+- The portal showed a **20 November 2026** deadline. The Founder reported submitting the supplementary response on **12 November**.
+- A subsequent portal inspection found the revised Businessplan PDF, formula-based Excel financial plan and additional address evidence on file. The open Nachforderung banner and navigation entry disappeared after submission. The inspected view displayed no separate receipt or submitted response text.
+- The portal shows the corrected **EUR 15,000.00** next-year amount. Calendar allocation across the workbook's project quarters and portal years awaits IBB clarification. The requested grant and total project expenditure are unchanged.
+- IBB clarification on employment timing and the outstanding W-IdNr. remain open. Preserve any receipt and correspondence privately. Track follow-up in [Issue #282](https://github.com/Nejo12/klinnova/issues/282).
+
+## 2. Original application financing baseline
+
+The original application baseline is recorded below. The November package retains the project expenditure, grant request and applicant share.
 
 - eligible project costs: **EUR 30,000 net**;
 - requested GründungsBONUS Plus: **EUR 15,000**;
@@ -33,7 +42,7 @@ The controlling baseline remains:
 - Founder contribution: **EUR 500/month during Years 1–2**;
 - Founder remuneration: **EUR 0**;
 - Year 1 revenue assumption: **EUR 0**;
-- minimum modelled pre-reimbursement liquidity: approximately **EUR 4,100**;
+- minimum modelled pre-reimbursement liquidity in the original plan: approximately **EUR 4,100**;
 - supplier quotations: **none yet**;
 - historical MVP costs: **excluded**.
 
@@ -91,6 +100,7 @@ The Founder should retain the following outside Git. Do not commit copies, accou
 | correction email evidence | sent; retain sent-message copy privately |
 | postal dispatch evidence | retain privately |
 | IBB postal receipt / acknowledgement | **pending** |
+| 12 November Nachforderung and separate confirmation | Founder reported digital submission. Revised files and disappearance of open request observed. Separate confirmation pending. |
 | Businessplan | submitted; private final artifact |
 | financial/liquidity plan | submitted; private final artifact |
 | corrected Founder CV | submitted; private final artifact |
@@ -125,8 +135,8 @@ No new provider research or outreach is required merely because the application 
 
 1. Wait for evidence of receipt / acknowledgement of the signed original.
 2. Preserve any acknowledgement of the correction notice.
-3. If IBB requests clarification or replacement pages, reconcile the request against the submitted package before replying.
-4. Do not treat silence as confirmation of the safe project-start boundary.
+3. Track the Nachforderung acknowledgement and IBB clarification on employment timing and calendar-year reimbursement allocation in [Issue #282](https://github.com/Nejo12/klinnova/issues/282).
+4. Reconcile any further request against the submitted package. Keep the project-start boundary closed until the applicable evidence or IBB clarification is recorded.
 
 ### Tax / registrations
 
@@ -161,10 +171,12 @@ No provider selection, quote outreach or procurement action is required from the
 
 **CORRECTION NOTICE: SENT BY EMAIL + POST.**
 
-**IBB RECEIPT / REVIEW: PENDING.**
+**SIGNED-ORIGINAL POSTAL RECEIPT: PENDING.**
+
+**NACHFORDERUNG: FOUNDER SUBMITTED ON 12 NOVEMBER 2026. REVISED UPLOADS VERIFIED. SEPARATE CONFIRMATION AND IBB RESPONSE PENDING.**
 
 **PROVIDER EVIDENCE PLANNING: COMPLETE TO OUTREACH-READY LEVEL for C05/C01/C04/C03/C07.**
 
 **PROVIDER OUTREACH / PROCUREMENT / GRANT-TARGETED WORK: NOT AUTHORIZED.**
 
-Next state transition: evidence of IBB receipt / processing, a substantive IBB request, or an explicit Founder decision after the safe funding boundary is established.
+Next update: record any postal receipt evidence, separate Nachforderung confirmation, IBB clarification or funding decision when received.
