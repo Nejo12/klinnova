@@ -17,6 +17,27 @@ describe("EmployerBand", () => {
     ).toHaveAttribute("href", "/employer/register");
   });
 
+  it("explains three stages with verification as a process, not an endorsement", () => {
+    render(<EmployerBand />);
+
+    const stages = screen.getByRole("list", { name: "Employer stages" });
+    const items = within(stages).getAllByRole("listitem");
+    expect(items).toHaveLength(3);
+    expect(items[1]).toHaveTextContent("verify your employer type manually");
+    expect(items[1]).toHaveTextContent("not an endorsement");
+    expect(items[2]).toHaveTextContent("Publish when eligible");
+  });
+
+  it("labels the sample applicant panel as illustrative", () => {
+    render(<EmployerBand />);
+
+    expect(
+      screen.getByRole("group", { name: "Applications" }),
+    ).toHaveAccessibleDescription(
+      "Illustrative example — sample data, not real Klinnova activity.",
+    );
+  });
+
   it("shows the real workflow strip with canonical status labels, no Hired or New", () => {
     render(<EmployerBand />);
 

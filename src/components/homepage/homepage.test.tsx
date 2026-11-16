@@ -64,7 +64,8 @@ describe("Homepage", () => {
       "You never wonder where it went",
       "Open in Berlin right now",
       "Reach people who can start",
-      "Working now, in Berlin first",
+      "Common questions",
+      "Berlin first",
     ]);
 
     expect(screen.queryByText(/Candidate experience/)).not.toBeInTheDocument();
@@ -114,7 +115,8 @@ describe("Homepage", () => {
       "You never wonder where it went",
       "Open in Berlin right now",
       "Reach people who can start",
-      "Working now, in Berlin first",
+      "Common questions",
+      "Berlin first",
     ]);
   });
 
@@ -155,9 +157,9 @@ describe("Homepage", () => {
     ).toBeInTheDocument();
     expect(
       screen.getAllByText(
-        "Sprachniveau, Verfügbarkeit und Standort — geprüft anhand der Anforderungen jeder Stelle.",
+        "Klinnova bringt Bewerbende und Arbeitgeber in Berlin zusammen. Sprachniveau, Verfügbarkeit und Standort werden anhand der Anforderungen jeder Stelle geprüft.",
       ),
-    ).toHaveLength(2);
+    ).toHaveLength(1);
     expect(
       screen.getByRole("heading", {
         level: 2,
@@ -175,7 +177,11 @@ describe("Homepage", () => {
         name: "Du weißt immer, wie es weitergeht",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Passende Stellen finden")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Echte Stellen ansehen: nur veröffentlichte Stellen, mit ihren Anforderungen",
+      ),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
         level: 2,
@@ -191,18 +197,21 @@ describe("Homepage", () => {
         name: "Erreiche Menschen, die anfangen können",
       }),
     ).toBeInTheDocument();
+    expect(screen.getByText("Arbeitgeberprofil anlegen")).toBeInTheDocument();
     expect(
-      screen.getByText("Alle Bewerbungen an einem Ort"),
+      screen.getByRole("heading", { level: 2, name: "Häufige Fragen" }),
     ).toBeInTheDocument();
     expect(screen.getAllByText("Eingereicht").length).toBeGreaterThan(0);
     expect(
       screen.getByRole("heading", {
         level: 2,
-        name: "Jetzt arbeiten — zuerst in Berlin",
+        name: "Zuerst in Berlin",
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Klinnova ist aktiv und startet in Berlin."),
+      screen.getByText(
+        "Klinnova startet in Berlin. Worauf du dich bewerben kannst, hängt von den Stellen ab, die geprüfte Arbeitgeber veröffentlicht haben.",
+      ),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
@@ -216,5 +225,77 @@ describe("Homepage", () => {
       "href",
       "/privacy",
     );
+  });
+  it("makes no unsupported launch, beta or guarantee claims in either language", () => {
+    for (const locale of ["en", "de"] as const) {
+      const { container, unmount } = renderAtLocale(locale);
+      const text = container.textContent ?? "";
+      expect(text).not.toMatch(
+        /working now|private beta|jetzt am Start|Nur geprüfte Arbeitgeber|Verified employers only|Jetzt arbeiten|guarantee|garantiert/i,
+      );
+      unmount();
+    }
+  });
+
+  it("offers the how-it-works and FAQ anchors with matching targets", () => {
+    const { container } = render(
+      <Homepage jobsResult={{ ok: true, vacancies: [] }} />,
+    );
+
+    expect(container.querySelector("#how-it-works")).not.toBeNull();
+    expect(container.querySelector("#faq")).not.toBeNull();
+    expect(container.querySelector("#for-candidates")).not.toBeNull();
+    expect(container.querySelector("#for-employers")).not.toBeNull();
+  });
+
+  it("shows dashboard actions, not sign-up prompts, to an authenticated viewer", () => {
+    render(
+      <Homepage
+        jobsResult={{ ok: true, vacancies: [] }}
+        viewer={{ destination: "/employer", workspace: "employer" }}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("link", { name: "Create an employer account" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Create a candidate account" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "I'm a candidate" }),
+    ).not.toBeInTheDocument();
+    for (const link of screen.getAllByRole("link", { name: "Dashboard" })) {
+      expect(link).toHaveAttribute("href", "/employer");
+    }
+  });
+
+  it("keeps empty, failed and populated vacancy states distinct and truthful", () => {
+    const empty = render(<Homepage jobsResult={{ ok: true, vacancies: [] }} />);
+    expect(
+      screen.getByText("No vacancies are open right now — check back soon."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Jobs are temporarily unavailable.")).toBeNull();
+    empty.unmount();
+
+    const failed = render(<Homepage jobsResult={{ ok: false }} />);
+    expect(
+      screen.getByText("Jobs are temporarily unavailable."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/No vacancies are open/)).toBeNull();
+    failed.unmount();
+
+    render(
+      <Homepage
+        jobsResult={{
+          ok: true,
+          vacancies: [
+            makeItem("11111111-1111-4111-8111-111111111111", "Küchenhilfe"),
+          ],
+        }}
+      />,
+    );
+    expect(screen.queryByText(/No vacancies are open/)).toBeNull();
+    expect(screen.queryByText(/temporarily unavailable/)).toBeNull();
   });
 });

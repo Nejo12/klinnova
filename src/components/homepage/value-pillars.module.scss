@@ -17,6 +17,21 @@
   color: var(--color-text-primary);
 }
 
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.lead {
+  max-width: 48rem;
+  margin: 0;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
 .grid {
   display: grid;
   grid-template-columns: 1fr;

@@ -4,9 +4,11 @@ const englishMessages = {
   "shell.homeLabel": "Klinnova home",
   "shell.menu": "Menu",
   "shell.siteNav": "Site",
+  "shell.howItWorks": "How it works",
   "shell.jobs": "Jobs",
   "shell.forCandidates": "For candidates",
   "shell.forEmployers": "For employers",
+  "shell.faq": "FAQ",
   "shell.signIn": "Sign in",
   "shell.createAccount": "Create account",
   "shell.dashboard": "Dashboard",
@@ -420,23 +422,27 @@ const englishMessages = {
   "preferences.hint": "Choose language and appearance.",
   "homepage.illustrative":
     "Illustrative example — sample data, not real Klinnova activity.",
-  "homepage.hero.eyebrow": "Berlin · working now",
+  "homepage.hero.eyebrow": "Berlin first",
   "homepage.hero.heading": "Jobs that match your situation.",
   "homepage.hero.accent": "In Berlin.",
   "homepage.hero.lead":
-    "Language level, availability and location — checked against what each vacancy needs.",
+    "Klinnova connects candidates and employers in Berlin. Language level, availability and location are checked against what each vacancy needs.",
   "homepage.hero.imageAlt":
     "A Berlin café worker beside a neighbourhood market, with the TV Tower and a city bus in the background.",
   "homepage.hero.candidateCta": "I'm a candidate",
   "homepage.hero.employerCta": "I'm an employer",
-  "homepage.hero.verifiedOnly": "Verified employers only",
+  "homepage.hero.verifiedOnly": "Employers are checked manually",
   "homepage.hero.builtForBerlin": "Built for Berlin",
+  "homepage.hero.pathsNote":
+    "Candidates browse and apply. Employers are verified before they can publish.",
   "homepage.hero.verifiedEmployer": "Verified employer",
   "homepage.hero.reasonsHeading": "Why this fits you",
   "homepage.hero.signInNote": "Sign in to check your fit and apply.",
   "homepage.hero.dashboardNote":
     "Open your dashboard to check your fit and apply.",
   "homepage.pillars.heading": "Made for how Berlin works",
+  "homepage.pillars.intro":
+    "Klinnova has two paths. Candidates set up a profile and apply to published vacancies. Employers are verified manually and publish only when eligible.",
   "homepage.pillars.fit.heading": "Jobs that fit your situation",
   "homepage.pillars.fit.body":
     "Category, language, hours and availability — matched to your profile.",
@@ -445,14 +451,17 @@ const englishMessages = {
     "Requirements stated on the vacancy, not hidden in the text.",
   "homepage.pillars.status.heading": "Your status stays visible",
   "homepage.pillars.status.body": "In the app, and by email.",
-  "homepage.pillars.verified.heading": "Verified before publishing",
-  "homepage.pillars.verified.body": "Every employer is checked first.",
+  "homepage.pillars.verified.heading": "Manual check before publishing",
+  "homepage.pillars.verified.body":
+    "A vacancy is published only when the employer is eligible. Verification is a process, not an endorsement.",
   "homepage.candidate.eyebrow": "From profile to decision",
   "homepage.candidate.heading": "You never wonder where it went",
-  "homepage.candidate.stepProfile": "Your situation, set once",
-  "homepage.candidate.stepMatches": "Vacancies that match it",
-  "homepage.candidate.stepApply": "Apply, a CV only when a role needs one",
-  "homepage.candidate.stepStatus": "Status you can see, updates by email",
+  "homepage.candidate.stepProfile":
+    "Set up your profile: your situation, set once",
+  "homepage.candidate.stepMatches":
+    "Review actual openings: only published vacancies, with their requirements",
+  "homepage.candidate.stepApply":
+    "Apply and track: a CV only when a role needs one, status in the app and by email",
   "homepage.candidate.dateSubmitted": "4 August",
   "homepage.candidate.dateReviewing": "6 August",
   "homepage.candidate.decision": "Decision",
@@ -463,16 +472,35 @@ const englishMessages = {
   "homepage.jobs.failure": "Jobs are temporarily unavailable.",
   "homepage.employer.eyebrow": "For employers",
   "homepage.employer.heading": "Reach people who can start",
-  "homepage.employer.benefitRequirements": "Post what the role actually needs",
-  "homepage.employer.benefitApplications": "Every application in one place",
-  "homepage.employer.benefitDecide": "Shortlist and decide faster",
+  "homepage.employer.stageProfile": "Create your employer profile",
+  "homepage.employer.stageVerify":
+    "Verification and drafts: we verify your employer type manually, and you prepare vacancy drafts. Verification is a process, not an endorsement.",
+  "homepage.employer.stagePublish":
+    "Publish when eligible, then review applicants. Publishing requires verification.",
+  "homepage.employer.stagesLabel": "Employer stages",
   "homepage.employer.cta": "Create an employer account",
   "homepage.employer.workflow": "Application workflow",
   "homepage.employer.applications": "Applications",
-  "homepage.final.heading": "Working now, in Berlin first",
-  "homepage.final.body": "Klinnova is working and starting in Berlin.",
+  "homepage.final.heading": "Berlin first",
+  "homepage.final.body":
+    "Klinnova starts in Berlin. What you can apply to depends on the vacancies that verified employers have published.",
   "homepage.final.createAccount": "Create your account",
   "homepage.final.browseJobs": "Browse jobs first",
+  "homepage.faq.heading": "Common questions",
+  "homepage.faq.language.q": "Do I need to speak German?",
+  "homepage.faq.language.a":
+    "It depends on the vacancy. Each vacancy states the language level it needs, so you can check before you apply. Klinnova does not promise that a role suits any particular language level.",
+  "homepage.faq.verification.q": "How are employers verified?",
+  "homepage.faq.verification.a":
+    "Manually, depending on the employer type. Verification is a process that has to be completed before a vacancy can be published. It is not an endorsement of the employer or the role.",
+  "homepage.faq.empty.q": "What if there are no vacancies?",
+  "homepage.faq.empty.a":
+    "Then none are shown. The list contains only vacancies that employers have actually published, never examples. You can set up a profile now and come back to browse later.",
+  "homepage.faq.start.q": "How do I get started?",
+  "homepage.faq.start.a":
+    "Candidates create an account and set up a profile. Employers create an employer account and then go through verification.",
+  "homepage.faq.start.candidate": "Create a candidate account",
+  "homepage.faq.start.employer": "Create an employer account",
   "publicJobs.heading": "Jobs in Berlin",
   "publicJobs.lead":
     "Verified Berlin employers publish roles here that do not require fluent German. Browse what is currently open — sign in to check your eligibility and apply.",
@@ -785,9 +813,11 @@ const germanMessages: Partial<Record<MessageKey, string>> = {
   "shell.homeLabel": "Klinnova Startseite",
   "shell.menu": "Menü",
   "shell.siteNav": "Website",
+  "shell.howItWorks": "So funktioniert's",
   "shell.jobs": "Jobs",
   "shell.forCandidates": "Für Bewerbende",
   "shell.forEmployers": "Für Arbeitgeber",
+  "shell.faq": "Häufige Fragen",
   "shell.signIn": "Anmelden",
   "shell.createAccount": "Konto erstellen",
   "shell.dashboard": "Dashboard",
@@ -1206,17 +1236,19 @@ const germanMessages: Partial<Record<MessageKey, string>> = {
   "preferences.hint": "Sprache und Darstellung wählen.",
   "homepage.illustrative":
     "Beispiel zur Veranschaulichung — Testdaten, keine echten Klinnova-Aktivitäten.",
-  "homepage.hero.eyebrow": "Berlin · jetzt am Start",
+  "homepage.hero.eyebrow": "Zuerst in Berlin",
   "homepage.hero.heading": "Jobs, die zu deiner Situation passen.",
   "homepage.hero.accent": "In Berlin.",
   "homepage.hero.lead":
-    "Sprachniveau, Verfügbarkeit und Standort — geprüft anhand der Anforderungen jeder Stelle.",
+    "Klinnova bringt Bewerbende und Arbeitgeber in Berlin zusammen. Sprachniveau, Verfügbarkeit und Standort werden anhand der Anforderungen jeder Stelle geprüft.",
   "homepage.hero.imageAlt":
     "Eine Berliner Café-Mitarbeiterin neben einem Kiezmarkt, mit Fernsehturm und Stadtbus im Hintergrund.",
   "homepage.hero.candidateCta": "Ich suche einen Job",
   "homepage.hero.employerCta": "Ich bin Arbeitgeber",
-  "homepage.hero.verifiedOnly": "Nur geprüfte Arbeitgeber",
+  "homepage.hero.verifiedOnly": "Arbeitgeber werden manuell geprüft",
   "homepage.hero.builtForBerlin": "Für Berlin entwickelt",
+  "homepage.hero.pathsNote":
+    "Bewerbende stöbern und bewerben sich. Arbeitgeber werden geprüft, bevor sie veröffentlichen können.",
   "homepage.hero.verifiedEmployer": "Geprüfter Arbeitgeber",
   "homepage.hero.reasonsHeading": "Warum das zu dir passt",
   "homepage.hero.signInNote":
@@ -1224,6 +1256,8 @@ const germanMessages: Partial<Record<MessageKey, string>> = {
   "homepage.hero.dashboardNote":
     "Öffne dein Dashboard, um zu prüfen, ob die Stelle passt, und dich zu bewerben.",
   "homepage.pillars.heading": "Gemacht für den Berliner Arbeitsalltag",
+  "homepage.pillars.intro":
+    "Klinnova hat zwei Wege. Bewerbende legen ein Profil an und bewerben sich auf veröffentlichte Stellen. Arbeitgeber werden manuell geprüft und veröffentlichen nur, wenn sie die Voraussetzungen erfüllen.",
   "homepage.pillars.fit.heading": "Jobs, die zu deiner Situation passen",
   "homepage.pillars.fit.body":
     "Kategorie, Sprache, Arbeitszeit und Verfügbarkeit — abgestimmt auf dein Profil.",
@@ -1232,16 +1266,18 @@ const germanMessages: Partial<Record<MessageKey, string>> = {
     "Anforderungen stehen direkt bei der Stelle und sind nicht im Text versteckt.",
   "homepage.pillars.status.heading": "Dein Status bleibt sichtbar",
   "homepage.pillars.status.body": "In der App und per E-Mail.",
-  "homepage.pillars.verified.heading": "Vor der Veröffentlichung geprüft",
-  "homepage.pillars.verified.body": "Jeder Arbeitgeber wird zuerst geprüft.",
+  "homepage.pillars.verified.heading":
+    "Manuelle Prüfung vor der Veröffentlichung",
+  "homepage.pillars.verified.body":
+    "Eine Stelle wird nur veröffentlicht, wenn der Arbeitgeber die Voraussetzungen erfüllt. Die Prüfung ist ein Verfahren, keine Empfehlung.",
   "homepage.candidate.eyebrow": "Vom Profil bis zur Entscheidung",
   "homepage.candidate.heading": "Du weißt immer, wie es weitergeht",
-  "homepage.candidate.stepProfile": "Deine Situation einmal festlegen",
-  "homepage.candidate.stepMatches": "Passende Stellen finden",
+  "homepage.candidate.stepProfile":
+    "Profil anlegen: deine Situation einmal festlegen",
+  "homepage.candidate.stepMatches":
+    "Echte Stellen ansehen: nur veröffentlichte Stellen, mit ihren Anforderungen",
   "homepage.candidate.stepApply":
-    "Bewerben — mit Lebenslauf nur, wenn die Stelle ihn verlangt",
-  "homepage.candidate.stepStatus":
-    "Status jederzeit sehen, Updates per E-Mail erhalten",
+    "Bewerben und verfolgen: Lebenslauf nur, wenn die Stelle ihn verlangt, Status in der App und per E-Mail",
   "homepage.candidate.dateSubmitted": "4. August",
   "homepage.candidate.dateReviewing": "6. August",
   "homepage.candidate.decision": "Entscheidung",
@@ -1253,17 +1289,35 @@ const germanMessages: Partial<Record<MessageKey, string>> = {
   "homepage.jobs.failure": "Jobs sind vorübergehend nicht verfügbar.",
   "homepage.employer.eyebrow": "Für Arbeitgeber",
   "homepage.employer.heading": "Erreiche Menschen, die anfangen können",
-  "homepage.employer.benefitRequirements":
-    "Veröffentliche, was die Stelle wirklich erfordert",
-  "homepage.employer.benefitApplications": "Alle Bewerbungen an einem Ort",
-  "homepage.employer.benefitDecide": "Schneller auswählen und entscheiden",
+  "homepage.employer.stageProfile": "Arbeitgeberprofil anlegen",
+  "homepage.employer.stageVerify":
+    "Prüfung und Entwürfe: Wir prüfen deine Arbeitgeberart manuell, und du bereitest Stellenentwürfe vor. Die Prüfung ist ein Verfahren, keine Empfehlung.",
+  "homepage.employer.stagePublish":
+    "Veröffentlichen, sobald die Voraussetzungen erfüllt sind, dann Bewerbungen prüfen. Die Veröffentlichung setzt eine Prüfung voraus.",
+  "homepage.employer.stagesLabel": "Schritte für Arbeitgeber",
   "homepage.employer.cta": "Arbeitgeberkonto erstellen",
   "homepage.employer.workflow": "Bewerbungsablauf",
   "homepage.employer.applications": "Bewerbungen",
-  "homepage.final.heading": "Jetzt arbeiten — zuerst in Berlin",
-  "homepage.final.body": "Klinnova ist aktiv und startet in Berlin.",
+  "homepage.final.heading": "Zuerst in Berlin",
+  "homepage.final.body":
+    "Klinnova startet in Berlin. Worauf du dich bewerben kannst, hängt von den Stellen ab, die geprüfte Arbeitgeber veröffentlicht haben.",
   "homepage.final.createAccount": "Konto erstellen",
   "homepage.final.browseJobs": "Zuerst Jobs ansehen",
+  "homepage.faq.heading": "Häufige Fragen",
+  "homepage.faq.language.q": "Muss ich Deutsch sprechen?",
+  "homepage.faq.language.a":
+    "Das hängt von der Stelle ab. Jede Stelle nennt das benötigte Sprachniveau, sodass du es vor der Bewerbung prüfen kannst. Klinnova verspricht nicht, dass eine Stelle zu einem bestimmten Sprachniveau passt.",
+  "homepage.faq.verification.q": "Wie werden Arbeitgeber geprüft?",
+  "homepage.faq.verification.a":
+    "Manuell, je nach Art des Arbeitgebers. Die Prüfung ist ein Verfahren, das abgeschlossen sein muss, bevor eine Stelle veröffentlicht werden kann. Sie ist keine Empfehlung für den Arbeitgeber oder die Stelle.",
+  "homepage.faq.empty.q": "Was, wenn es keine Stellen gibt?",
+  "homepage.faq.empty.a":
+    "Dann werden keine angezeigt. Die Liste enthält nur Stellen, die Arbeitgeber tatsächlich veröffentlicht haben, nie Beispiele. Du kannst jetzt ein Profil anlegen und später wieder stöbern.",
+  "homepage.faq.start.q": "Wie fange ich an?",
+  "homepage.faq.start.a":
+    "Bewerbende erstellen ein Konto und legen ein Profil an. Arbeitgeber erstellen ein Arbeitgeberkonto und durchlaufen dann die Prüfung.",
+  "homepage.faq.start.candidate": "Konto für Bewerbende erstellen",
+  "homepage.faq.start.employer": "Arbeitgeberkonto erstellen",
   "publicJobs.heading": "Jobs in Berlin",
   "publicJobs.lead":
     "Geprüfte Berliner Arbeitgeber veröffentlichen hier Stellen, für die kein fließendes Deutsch nötig ist. Sieh dir offene Stellen an — melde dich an, um deine Voraussetzungen zu prüfen und dich zu bewerben.",

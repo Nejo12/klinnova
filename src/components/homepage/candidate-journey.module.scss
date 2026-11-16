@@ -43,7 +43,7 @@
 
 .step {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-3);
   font-size: var(--font-size-md);
   color: var(--color-text-secondary);

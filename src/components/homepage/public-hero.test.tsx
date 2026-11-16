@@ -47,6 +47,13 @@ describe("PublicHero", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("uses neutral availability wording without beta or launch claims", () => {
+    render(<PublicHero />);
+
+    expect(screen.getByText("Berlin first")).toBeInTheDocument();
+    expect(screen.queryByText(/working now|beta|launch/i)).toBeNull();
+  });
+
   it("renders the full-width Berlin illustration with localized accessible text", () => {
     render(<PublicHero />);
 
@@ -55,7 +62,9 @@ describe("PublicHero", () => {
         name: "A Berlin café worker beside a neighbourhood market, with the TV Tower and a city bus in the background.",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Verified employers only")).toBeInTheDocument();
+    expect(
+      screen.getByText("Employers are checked manually"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Built for Berlin")).toBeInTheDocument();
     expect(screen.queryByText(/Hauswerk Berlin/)).not.toBeInTheDocument();
   });

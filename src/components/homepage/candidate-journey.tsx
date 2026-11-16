@@ -10,7 +10,6 @@ const STEPS: MessageKey[] = [
   "homepage.candidate.stepProfile",
   "homepage.candidate.stepMatches",
   "homepage.candidate.stepApply",
-  "homepage.candidate.stepStatus",
 ];
 
 export function CandidateJourney() {
@@ -41,6 +40,7 @@ export function CandidateJourney() {
         className={styles.timelineCard}
         role="group"
         aria-labelledby="candidate-timeline-title"
+        aria-describedby="candidate-timeline-note"
       >
         <div className={styles.timelineHeader}>
           <h3 className={styles.timelineTitle} id="candidate-timeline-title">
@@ -85,7 +85,7 @@ export function CandidateJourney() {
             </div>
           </li>
         </ol>
-        <p className={styles.illustrativeCaption}>
+        <p className={styles.illustrativeCaption} id="candidate-timeline-note">
           {t("homepage.illustrative")}
         </p>
       </div>

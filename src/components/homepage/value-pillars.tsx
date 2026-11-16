@@ -33,10 +33,17 @@ export function ValuePillars() {
   const { t } = useLocale();
 
   return (
-    <section className={styles.section} aria-labelledby="value-pillars-heading">
-      <h2 className={styles.heading} id="value-pillars-heading">
-        {t("homepage.pillars.heading")}
-      </h2>
+    <section
+      className={styles.section}
+      id="how-it-works"
+      aria-labelledby="value-pillars-heading"
+    >
+      <div className={styles.intro}>
+        <h2 className={styles.heading} id="value-pillars-heading">
+          {t("homepage.pillars.heading")}
+        </h2>
+        <p className={styles.lead}>{t("homepage.pillars.intro")}</p>
+      </div>
       <ul className={styles.grid}>
         {PILLARS.map((pillar) => (
           <li key={pillar.heading} className={styles.card}>

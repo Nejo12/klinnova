@@ -13,12 +13,17 @@ describe("ValuePillars", () => {
         name: "Made for how Berlin works",
       }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: "Made for how Berlin works" }),
+    ).toHaveAttribute("id", "how-it-works");
+    expect(screen.getByText(/two paths/)).toBeInTheDocument();
+    expect(screen.getByText(/not an endorsement/)).toBeInTheDocument();
 
     const cardHeadings = [
       "Jobs that fit your situation",
       "Know before you apply",
       "Your status stays visible",
-      "Verified before publishing",
+      "Manual check before publishing",
     ];
     for (const name of cardHeadings) {
       expect(

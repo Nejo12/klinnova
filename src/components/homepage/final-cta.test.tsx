@@ -10,12 +10,14 @@ describe("FinalCta", () => {
     expect(
       screen.getByRole("heading", {
         level: 2,
-        name: "Working now, in Berlin first",
+        name: "Berlin first",
       }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText("Klinnova is working and starting in Berlin."),
+      screen.getByText(
+        "Klinnova starts in Berlin. What you can apply to depends on the vacancies that verified employers have published.",
+      ),
     ).toBeInTheDocument();
 
     expect(screen.queryByText(/join early access/i)).not.toBeInTheDocument();

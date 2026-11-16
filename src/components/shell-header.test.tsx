@@ -29,6 +29,29 @@ describe("ShellHeader", () => {
     ).toHaveAttribute("href", "#for-employers");
   });
 
+  it("exposes How it works and FAQ anchors in the Site nav", () => {
+    render(<ShellHeader />);
+    fireEvent.click(screen.getByRole("button", { name: "Menu" }));
+
+    const nav = screen.getByRole("navigation", { name: "Site" });
+    expect(
+      within(nav).getByRole("link", { name: "How it works" }),
+    ).toHaveAttribute("href", "#how-it-works");
+    expect(within(nav).getByRole("link", { name: "FAQ" })).toHaveAttribute(
+      "href",
+      "#faq",
+    );
+  });
+
+  it("closes the open menu when an anchor link is chosen", () => {
+    render(<ShellHeader />);
+    const toggle = screen.getByRole("button", { name: "Menu" });
+    fireEvent.click(toggle);
+    fireEvent.click(screen.getByRole("link", { name: "FAQ" }));
+
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+  });
+
   it("exposes Sign in and Create account actions to real routes", () => {
     render(<ShellHeader />);
     fireEvent.click(screen.getByRole("button", { name: "Menu" }));
