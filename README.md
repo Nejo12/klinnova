@@ -52,6 +52,8 @@ Because execution state changes more frequently than this README should, use the
 
 Historical planning, discovery, implementation and closure documents intentionally retain the terminology and state that applied when they were written.
 
+**Current product-clarity design lane:** [#287 — Product Clarity & Guided Self-Service](https://github.com/Nejo12/klinnova/issues/287). On 16 November 2026 the Founder approved its **design direction only**, not any implementation slice. The [existing canonical Figma proposal](https://www.figma.com/design/AMGtkXbC5D28v6D0rjvf4q/Klinnova?node-id=293-2) contains eight concept screens plus a specification/handoff board. The independent historical [#255 approved Figma artifact](https://www.figma.com/design/AMGtkXbC5D28v6D0rjvf4q/Klinnova?node-id=251-3) was verified intact, and its clipping was corrected without changing product semantics. See the [design handoff and guardrails](docs/101-product-clarity-design-handoff.md).
+
 ## M5 targets
 
 | Metric                  | Target |
@@ -157,6 +159,7 @@ Core source-of-truth documents:
 - [Terminology](docs/12-terminology.md)
 - [Implementation plan](docs/13-implementation-plan.md)
 - [Founder dashboard](docs/14-founder-dashboard.md)
+- [Product clarity / #287 design handoff](docs/101-product-clarity-design-handoff.md)
 - [M5 beta transition and measurement](docs/49-m5-beta-transition-and-measurement.md)
 - [M5 operating plan](docs/51-m5-operating-plan.md)
 - [Preview environment runbook](docs/52-preview-environment-runbook.md)

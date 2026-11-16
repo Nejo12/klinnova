@@ -10,6 +10,7 @@ M5 operating plan: `docs/51-m5-operating-plan.md`.
 M5.1 execution/readiness closure: `docs/53-m5.1-beta-readiness-closure.md`.
 K6 durable Production-cutover closure: `docs/56-k6-production-cutover-durable-closure.md`.
 GründungsBONUS Plus post-submission control: `docs/100-gruendungsbonus-plus-post-submission-control.md`.
+Product clarity #287 design handoff: `docs/101-product-clarity-design-handoff.md`.
 Deferred ideas: `NOT_NOW.md`.
 Historical slice detail remains in the individual discovery/build-plan/closure documents.
 
@@ -21,9 +22,10 @@ Historical slice detail remains in the individual discovery/build-plan/closure d
 | Previous milestone | **M4 — Complete** (Slices 7–8 closed; PR #73 merged) |
 | Product boundary | Merged M4 remains the Cohort A baseline; governed product development is unfrozen under D-M5-23 |
 | Active work unit | **K6 COMPLETE / CLOSED. #237 OPERATIONAL READINESS COMPLETE / GO.** Klinnova Production/public-domain cutover is complete through K6-6 and `https://klinnova.com` is canonical Production. Founder operational GO for Cohort A readiness was recorded on 2026-10-01 and #237 is closed completed. The separate GründungsBONUS Plus project-start/funding boundary remains closed under `docs/100-gruendungsbonus-plus-post-submission-control.md`. |
-| PR | Post-submission funding-control documentation only; Founder manually merges. Never auto-merge. |
+| PR | **As verified 16 November 2026:** PR #283 was merged into `main` at `c9db5679`; no PR remained open at that snapshot. New PRs require separate Founder review and manual merge; never auto-merge. |
 | Funding / admin | **GB9185/2026 — Nachforderung submitted by the Founder on 12 November 2026.** Revised uploads verified. Separate portal confirmation, IBB clarification and signed-original postal receipt remain pending. The project-start boundary remains closed. [Issue #282](https://github.com/Nejo12/klinnova/issues/282) |
 | Product/schema implementation | Product discovery/design is active. Implementation proceeds only through explicitly approved bounded BUILD NOW units, labelled Founder-developed / pre-funding / excluded from grant reimbursement while the funding boundary remains closed. |
+| Product clarity / onboarding | **#287 DESIGN / SPEC ONLY.** Founder approved the *design direction* on 16 November 2026 (eight proposed Figma screens and specification); no implementation slice is authorized. Original #255 approved Figma artifact was confirmed intact and its clipping corrected separately. See `docs/101-product-clarity-design-handoff.md`. |
 | Preview | Persistent isolated Supabase Preview project remains available through Vercel-generated Preview deployment URLs. Custom `preview.klinnova.com` project-domain attachment is retired. See `docs/52-preview-environment-runbook.md` and `docs/56-k6-production-cutover-durable-closure.md`. |
 | Monitoring | **Preview Sentry complete through G1/G2**. **Production Sentry remains OFF/unwired by deliberate Founder decision for Cohort A.** Funding submission does not activate it. |
 | Production | **Canonical Production is `https://klinnova.com`.** `www.klinnova.com` permanently redirects to apex. `stint.company` permanently redirects to Klinnova and no longer serves the application directly. Production baseline after K6-4 merge: `0564a5e749b65f5589d1bd2dc32f926b848a5493`. |
