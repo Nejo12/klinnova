@@ -9,9 +9,9 @@ import { resolveActiveWorkspace } from "@/lib/workspace/active-workspace";
 import { readActiveWorkspace } from "@/lib/workspace/active-workspace.server";
 
 export const metadata: Metadata = {
-  title: "Klinnova – Berlin Jobs Without Fluent German",
+  title: "Klinnova – Berlin-first jobs and hiring",
   description:
-    "Find English-friendly jobs, minijobs, and entry-level roles in Berlin where fluent German is not required.",
+    "Klinnova connects candidates and employers in Berlin. Browse published vacancies with their language requirements; employers are verified manually before they publish.",
 };
 
 export const dynamic = "force-dynamic";

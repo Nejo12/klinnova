@@ -67,7 +67,7 @@ export function PublicHero({
       <div className={styles.trustBar}>
         <p>
           <strong>{t("homepage.pillars.heading")}</strong>{" "}
-          {t("homepage.hero.lead")}
+          {t("homepage.hero.pathsNote")}
         </p>
         <ul className={styles.trustList}>
           <li>{t("homepage.hero.verifiedOnly")}</li>

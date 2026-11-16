@@ -71,6 +71,13 @@ export function ShellHeader({ authenticated }: ShellHeaderProps) {
             </Link>
             <a
               className={styles.navLink}
+              href="#how-it-works"
+              onClick={() => setMenuOpen(false)}
+            >
+              {t("shell.howItWorks")}
+            </a>
+            <a
+              className={styles.navLink}
               href="#for-candidates"
               onClick={() => setMenuOpen(false)}
             >
@@ -82,6 +89,13 @@ export function ShellHeader({ authenticated }: ShellHeaderProps) {
               onClick={() => setMenuOpen(false)}
             >
               {t("shell.forEmployers")}
+            </a>
+            <a
+              className={styles.navLink}
+              href="#faq"
+              onClick={() => setMenuOpen(false)}
+            >
+              {t("shell.faq")}
             </a>
           </div>
           <div className={styles.authActions}>

@@ -1,5 +1,6 @@
 import { CandidateJourney } from "@/components/homepage/candidate-journey";
 import { EmployerBand } from "@/components/homepage/employer-band";
+import { Faq } from "@/components/homepage/faq";
 import { FinalCta } from "@/components/homepage/final-cta";
 import { OpenJobsPreview } from "@/components/homepage/open-jobs-preview";
 import { PublicHero } from "@/components/homepage/public-hero";
@@ -28,6 +29,7 @@ export function Homepage({ jobsResult, viewer }: HomepageProps) {
         <CandidateJourney />
         <OpenJobsPreview result={jobsResult} />
         <EmployerBand authenticatedDestination={viewer?.destination} />
+        <Faq authenticatedDestination={viewer?.destination} />
         <FinalCta authenticatedDestination={viewer?.destination} />
       </main>
       <footer className={styles.footer}>

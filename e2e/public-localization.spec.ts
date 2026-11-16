@@ -25,7 +25,7 @@ test("public homepage renders the complete English section set", async ({
     page.getByRole("heading", { name: "Reach people who can start" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Working now, in Berlin first" }),
+    page.getByRole("heading", { name: "Berlin first" }),
   ).toBeVisible();
 });
 
@@ -64,7 +64,64 @@ test("public homepage renders German without horizontal overflow on mobile", asy
     }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Jetzt arbeiten — zuerst in Berlin" }),
+    page.getByRole("heading", { name: "Zuerst in Berlin" }),
+  ).toBeVisible();
+
+  const widths = await page.locator("html").evaluate((root) => ({
+    clientWidth: root.clientWidth,
+    scrollWidth: root.scrollWidth,
+  }));
+  expect(widths.scrollWidth).toBeLessThanOrEqual(widths.clientWidth + 1);
+});
+
+test("public homepage anchors reach the explainer and FAQ sections by keyboard", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+
+  const nav = page.getByRole("navigation", { name: "Site" });
+  await nav.getByRole("link", { name: "How it works" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/#how-it-works$/);
+  await expect(
+    page.getByRole("region", { name: "Made for how Berlin works" }),
+  ).toBeInViewport();
+
+  await nav.getByRole("link", { name: "FAQ" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/#faq$/);
+
+  const question = page.getByText("How are employers verified?");
+  await question.focus();
+  await page.keyboard.press("Enter");
+  await expect(
+    page.getByText(/not an endorsement of the employer/),
+  ).toBeVisible();
+});
+
+test("German homepage keeps nav, FAQ and actions inside a 390px viewport", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem("klinnova-locale", "de");
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+
+  await page.getByRole("button", { name: "Menü" }).click();
+  await page.getByRole("link", { name: "Häufige Fragen" }).click();
+  await expect(page).toHaveURL(/#faq$/);
+  await expect(
+    page.getByRole("region", { name: "Häufige Fragen" }),
+  ).toBeInViewport();
+
+  await page.getByText("Wie fange ich an?").click();
+  await expect(
+    page.getByRole("link", { name: "Konto für Bewerbende erstellen" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Arbeitgeberkonto erstellen" }).last(),
   ).toBeVisible();
 
   const widths = await page.locator("html").evaluate((root) => ({

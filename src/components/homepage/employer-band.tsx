@@ -66,11 +66,14 @@ export function EmployerBand({
           <h2 className={styles.heading} id="employer-band-heading">
             {t("homepage.employer.heading")}
           </h2>
-          <ul className={styles.benefits}>
-            <li>{t("homepage.employer.benefitRequirements")}</li>
-            <li>{t("homepage.employer.benefitApplications")}</li>
-            <li>{t("homepage.employer.benefitDecide")}</li>
-          </ul>
+          <ol
+            className={styles.benefits}
+            aria-label={t("homepage.employer.stagesLabel")}
+          >
+            <li>{t("homepage.employer.stageProfile")}</li>
+            <li>{t("homepage.employer.stageVerify")}</li>
+            <li>{t("homepage.employer.stagePublish")}</li>
+          </ol>
           <Link
             className={styles.cta}
             href={authenticatedDestination ?? "/employer/register"}
@@ -83,7 +86,12 @@ export function EmployerBand({
           </Link>
         </div>
 
-        <div className={styles.panel}>
+        <div
+          className={styles.panel}
+          role="group"
+          aria-labelledby="employer-sample-title"
+          aria-describedby="employer-sample-note"
+        >
           <ol
             className={styles.workflowStrip}
             aria-label={t("homepage.employer.workflow")}
@@ -102,7 +110,7 @@ export function EmployerBand({
             ))}
           </ol>
 
-          <p className={styles.panelTitle}>
+          <p className={styles.panelTitle} id="employer-sample-title">
             {t("homepage.employer.applications")}
           </p>
           <ul className={styles.applicantList}>
@@ -119,7 +127,7 @@ export function EmployerBand({
               </li>
             ))}
           </ul>
-          <p className={styles.illustrativeCaption}>
+          <p className={styles.illustrativeCaption} id="employer-sample-note">
             {t("homepage.illustrative")}
           </p>
         </div>
