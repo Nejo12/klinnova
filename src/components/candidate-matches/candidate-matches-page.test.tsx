@@ -116,6 +116,16 @@ describe("CandidateMatchesPage", () => {
     expect(
       screen.getByRole("link", { name: /Review your saved preferences/i }),
     ).toHaveAttribute("href", "/candidate/onboarding?group=review");
+    expect(
+      screen.getByText(/does not mean your profile is incomplete or invalid/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Browse all jobs" }),
+    ).toHaveAttribute("href", "/jobs");
+    expect(
+      screen.getByText(/not the same as your personalised matches/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/travel|commute|minutes/i)).toBeNull();
     expect(screen.queryByText(/could not load/i)).toBeNull();
 
     rerender(<CandidateMatchesPage status="failure" />);

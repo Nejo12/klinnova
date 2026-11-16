@@ -15,6 +15,9 @@ export function MatchesEmptyState() {
         {t("candidate.matches.emptyHeading")}
       </h2>
       <p className={styles.emptyBody}>{t("candidate.matches.emptyBody")}</p>
+      <p className={styles.emptyBody}>
+        {t("candidate.matches.emptyProfileNote")}
+      </p>
       <div className={styles.stateDivider} />
       <h3 className={styles.stateSubheading}>
         {t("candidate.matches.emptyActionHeading")}
@@ -24,6 +27,15 @@ export function MatchesEmptyState() {
       </p>
       <Link className={styles.link} href={onboardingGroupHref("review")}>
         {t("candidate.matches.emptyAction")}
+      </Link>
+      <h3 className={styles.stateSubheading}>
+        {t("candidate.matches.emptyBrowseHeading")}
+      </h3>
+      <p className={styles.emptyBody}>
+        {t("candidate.matches.emptyBrowseBody")}
+      </p>
+      <Link className={styles.link} href="/jobs">
+        {t("candidate.matches.emptyBrowseAction")}
       </Link>
     </section>
   );

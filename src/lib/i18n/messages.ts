@@ -160,6 +160,12 @@ const englishMessages = {
   "candidate.matches.emptyActionBody":
     "Review your saved preferences. Opening them does not clear your completion on its own.",
   "candidate.matches.emptyAction": "Review your saved preferences",
+  "candidate.matches.emptyProfileNote":
+    "Having no matches does not mean your profile is incomplete or invalid. Your list depends on the vacancies employers have published and on the criteria Klinnova currently uses.",
+  "candidate.matches.emptyBrowseHeading": "Browse all jobs",
+  "candidate.matches.emptyBrowseBody":
+    "The public job list shows every published vacancy, whether or not it fits your profile. It is not the same as your personalised matches, and it can be empty too.",
+  "candidate.matches.emptyBrowseAction": "Browse all jobs",
   "candidate.matches.errorHeading": "We could not load your matches",
   "candidate.matches.errorSubheading": "If loading fails",
   "candidate.matches.errorBody":
@@ -573,6 +579,14 @@ const englishMessages = {
   "page.register.heading": "Create your account",
   "page.register.lead":
     "Start with an email and a name we can use to address you. You will confirm your email before continuing.",
+  "page.register.guideHeading": "What happens next",
+  "page.register.guideIntro":
+    "After you create your account and confirm your email, you answer six short groups of questions about your work preferences:",
+  "page.register.guideSave":
+    "Each group is saved when you continue. You can stop, come back later and edit your answers at any time. Work authorisation is your own declaration; Klinnova does not check documents.",
+  "page.register.guideOutcome":
+    "Finishing your profile does not guarantee a job, an interview or a match. What you see depends on the vacancies employers have published.",
+  "page.register.guideBrowse": "Browse available jobs first",
   "page.register.already": "Already have an account?",
   "page.employerRegister.heading": "Create an employer account",
   "page.employerRegister.lead":
@@ -971,6 +985,12 @@ const germanMessages: Partial<Record<MessageKey, string>> = {
   "candidate.matches.emptyActionBody":
     "Prüfe deine gespeicherten Angaben. Allein durch das Öffnen wird dein Profilabschluss nicht aufgehoben.",
   "candidate.matches.emptyAction": "Gespeicherte Angaben prüfen",
+  "candidate.matches.emptyProfileNote":
+    "Keine passenden Jobs bedeuten nicht, dass dein Profil unvollständig oder ungültig ist. Deine Liste hängt davon ab, welche Stellen Arbeitgeber veröffentlicht haben und welche Kriterien Klinnova aktuell verwendet.",
+  "candidate.matches.emptyBrowseHeading": "Alle Jobs ansehen",
+  "candidate.matches.emptyBrowseBody":
+    "Die öffentliche Jobliste zeigt alle veröffentlichten Stellen, unabhängig davon, ob sie zu deinem Profil passen. Sie ist nicht dasselbe wie deine persönlichen passenden Jobs und kann ebenfalls leer sein.",
+  "candidate.matches.emptyBrowseAction": "Alle Jobs ansehen",
   "candidate.matches.errorHeading":
     "Passende Jobs konnten nicht geladen werden",
   "candidate.matches.errorSubheading": "Wenn das Laden fehlschlägt",
@@ -1393,6 +1413,14 @@ const germanMessages: Partial<Record<MessageKey, string>> = {
   "page.register.heading": "Erstelle dein Konto",
   "page.register.lead":
     "Starte mit einer E-Mail-Adresse und einem Namen, mit dem wir dich ansprechen können. Bevor es weitergeht, bestätigst du deine E-Mail-Adresse.",
+  "page.register.guideHeading": "So geht es weiter",
+  "page.register.guideIntro":
+    "Nachdem du dein Konto erstellt und deine E-Mail-Adresse bestätigt hast, beantwortest du sechs kurze Fragengruppen zu deinen Arbeitswünschen:",
+  "page.register.guideSave":
+    "Jede Gruppe wird gespeichert, sobald du fortfährst. Du kannst jederzeit unterbrechen, später weitermachen und deine Antworten ändern. Die Arbeitserlaubnis ist deine eigene Angabe; Klinnova prüft keine Dokumente.",
+  "page.register.guideOutcome":
+    "Ein fertiges Profil garantiert weder einen Job noch ein Vorstellungsgespräch oder passende Jobs. Was du siehst, hängt von den Stellen ab, die Arbeitgeber veröffentlicht haben.",
+  "page.register.guideBrowse": "Zuerst verfügbare Jobs ansehen",
   "page.register.already": "Du hast bereits ein Konto?",
   "page.employerRegister.heading": "Arbeitgeberkonto erstellen",
   "page.employerRegister.lead":
